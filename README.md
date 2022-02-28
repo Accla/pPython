@@ -5,7 +5,7 @@ PythonMPI support with a grid environment so that jobs can be launched much easi
 There are a couple of requireemnts to use the gridPython package
 <br>
 <li>
-It assumes that PythonMPI is distributed with gridPython at its root directory.
+It assumes that PythonMPI is distributed with gridPython at its root directory. <br>
 </li>
 <li>
 It is also assumes that a local configuration is available from $HOME/pythonmpi directory.
