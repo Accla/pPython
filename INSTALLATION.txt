@@ -1,0 +1,24 @@
+Installation
+------------
+
+1. Unpack the gridPython tarball source at your desired location on your LLGrid account 
+   and set GRIDPYTHON_HOME.
+
+   tar xf gridPython-v0.1.tar.bz2 -C /path/to/your/desired/location
+   export GRIDPYTHON_HOME=/path/to/your/desired/location/gridPython-$VERSION 
+   ($VERSION is the additional string for the unpacked directory name.)
+
+2. Create ~/pythonmpi directory
+
+   mkdir ~/pythonmpi
+
+3. Copy the following local configuratiton files to ~/pythonmpi
+
+   cp $GRIDPYTHON_HOME/local/grid_config_local.py ~/pythonmpi
+   cp $GRIDPYTHON_HOME/PythonMPI/local/pyMPI_Comm_settings_local.py ~/pythonmpi
+
+4. Edit the local configuration files for your LLGrid account.
+
+   grid_config_local.py
+   pyMPI_Comm_settings_local.py
+
