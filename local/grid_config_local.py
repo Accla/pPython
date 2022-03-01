@@ -4,7 +4,36 @@ import platform
 import checkOS as OS
 
 def grid_config_local(grid_config):
-    """Update local grid_config parameters. """
+    """Update local grid_config parameters. 
+
+    Usage:
+    ------
+
+    grid_config = grid_config_local(grid_config)
+
+    Update the following information.
+
+    grid_config['remote_host']: the fully qualified hostname to access the scheduler
+    grid_config['remote_user']: username on the grid
+    grid_config['remote_launch']: command used to access the remote host
+    grid_config['remote_flags']: flags used by the remote launch command
+
+    grid_config['q_name']: the queue (partition) name where the job is submitted to
+    grid_config['cpu_type']: the CPU type for the nodes in the queue (deprecated in the future compute nodes
+                             bacause each queue will have only one CPU-type node)
+    grid_config['default_q_name']: default queue (partition) name
+    grid_config['default_cpu_type']: default CPU type name 
+
+    grid_config['LL_FILE_SERVER'] = file server name to mount grid home directory locally
+
+    grid_config['GRID_HOME_PATH']: home directory path on the grid for the remote user
+    grid_config['HOME_PATH']: locally mounted path for GRID_HOME_PATH
+    grid_config['GRIDPYTHON_PATH']: gridPython source installation path
+    grid_config['PYTHONMPI_PATH']: PythonMPI source installation path
+    grid_config['USER_PYTHONMPI_PATH']: path for remote user configuration customization files
+    grid_config['CWD_PATH']: current working directory path where you submit a job (automatically detected)
+
+    """
 
     # Define grid configuration parameters
     #
@@ -26,16 +55,17 @@ def grid_config_local(grid_config):
     grid_config['cpu_type'] = grid_config['default_cpu_type']
     #
     # Paths for PythonMPI installation location and customization
-    grid_config['GRID_HOME_PATH'] = '/home/gridsan/ch21778'
+    grid_config['GRID_HOME_PATH'] = '/home/gridsan/'+grid_config['remote_user']
     
     # LLGrid Filesystem
     grid_config['LL_FILE_SERVER'] = 'txg-gridfs.llgrid.ll.mit.edu'
     
-    # Locally valid paths
     # locally mounted GRID_HOME_PATH
     if os.path.exists('/etc/llgrid.id'):
-        HOME_PATH = '/home/gridsan/ch21778'
+        # path on the grid
+        HOME_PATH = grid_config['GRID_HOME_PATH']
     else:
+        # path on the local machines
         if OS.ispc:
             HOME_PATH = 'Z:'
         elif OS.islinux:
