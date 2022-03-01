@@ -9,6 +9,15 @@ def pyMPI_Comm_settings_local(machine_db_settings):
     
     machine_db_settings:   an internal machine database (dtype: dictionary)
 
+    python_location: python binary to be used on the grid and on local machine
+    python_command: python binary with additional option(s) for python
+    python_command_llsc: python binary with additional option(s) for python on LLGrid
+    python_module_path: module path on LLGrid where anaconda modules are located
+    python_module_name: anaconda module name to be used for PythonMPI
+
+    local_dir_map: local paths matching with the LLGrid home directory path
+                   for PC, Linux, and Mac OS environment
+
     """
 
     # Set default type of remote machines to 'unix' (for linux and mac OSes) or 'pc'
