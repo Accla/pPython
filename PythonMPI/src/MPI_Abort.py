@@ -1,11 +1,9 @@
-from multipledispatch import dispatch
 import os
 from glob import glob
 
 from pyMPI_Comm_settings import *
 import checkOS as OS
 
-@dispatch()
 def MPI_Abort():
     """MPI_Abort  -  Aborts any currently running MatlabMPI sessions.
 

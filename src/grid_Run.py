@@ -1,7 +1,11 @@
+from multipledispatch import dispatch
+import math
+import re
 import os
 
-import pyMPI_COMM_WORLD as pyMCW
 import checkOS as OS
+import pyMPI_COMM_WORLD as pyMCW
+from MPI_Run import *
 
 from convert_to_dict import *
 from StopExecution import *
@@ -9,8 +13,20 @@ from pyMPI_Comm_init import *
 from pyMPI_Commands import *
 from pyMPI_Dir_map import *
 
-def MPI_Run( py_file, n_proc, machines ):
-    """MPI_Run  -  Run py_file on multiple processors.
+from exec_shell_cmd import *
+from grid_resource_policy  import *
+from slurm_write_job_script import *
+from slurm_submit_job import *
+import grid_config as grid
+
+@dispatch(str,int,list)
+def grid_Run( py_file, n_proc, machines ):
+    """Wrapper for MPI_Run()."""
+    return MPI_Run(py_file, n_proc, machines)
+
+@dispatch(str,int,str)
+def grid_Run( py_file, n_proc, machines ):
+    """MPI_Run  -  Run py_file on multiple processors on LLGrid.
 
     Usage:
     ------
@@ -18,30 +34,17 @@ def MPI_Run( py_file, n_proc, machines ):
 
     Runs n_proc copies of py_file on machines, where
 
-    machines = []   (dtype: dictionary, empty)
-        Run on a local machine.
+    machines = 'grid'   (dtype: string)
+        Run on a LLGrid system interactively.
 
-    machines = [ 'machine1', 'machine2'] (dtype: list)
-        Run on multi nodes
-        
-    machines = ['machine1:dir1' 'machine2:dir2'] (dtype: list)
-        Run on multi nodes and communicate using via dir1 and dir2,
-        which must be visible to both machines. 
-
-    machines = ['machine1:type:dir1' 'machine2:type:dir2'] (dtype: list)
-        Run on a multi processors of different type ('unix' or 'pc').
-        Default is 'unix' (can be overiden in pyMPI_Comm_settings.py)
-
-    Full syntax is: machine['&'][':unix'|':pc'][:dir]
-        & => all jobs launched on host should be run in background.
-
-    If machine1 is the local cpu, then defscommands will contain
-    the commands that need to be run locally, via exec(open("defscommands").read()).
+    machines = 'grid&'   (dtype: string)
+        Run on a LLGrid system in a backgrounded mode.
 
     py_file:  the python script name (dtype: string)
     n_proc:   total number of MPI processes (dtype: int)
-    machines: a list of machines (dtype: dictionary)
-              if given as a lit, convert it as a dictionary.
+    machines: 'grid' or 'grid&'
+              extended to 'grid-cpu_type' or 'grid-cpu_type&'
+    
     defscommands: command to run locally if machine is a local machine
 
     """
@@ -49,8 +52,15 @@ def MPI_Run( py_file, n_proc, machines ):
     DEBUG = 0
 
     if DEBUG:
-        print('--> Entering MPI_Run.')
+        print('--> Entering MPI_Run (gridPython version).')
         print('MPI_Run: isunix, ismac, islinux, ispc = %d,%d,%d,%d'%(OS.isunix, OS.ismac, OS.islinux, OS.ispc))
+    
+    # Set some strings for special characters.
+    qq = '"'
+    sp = ' '
+    nl = '\n'
+    # Get single quote character. 
+    q = '\''
     
     # Unix vs. Windows file seperator.
     dir_sep = os.sep
@@ -61,6 +71,60 @@ def MPI_Run( py_file, n_proc, machines ):
     elif (OS.ispc):
         host = os.getenv('computername')
 
+    # Determine whether it is an interactive or backgrounded job
+    # print('machines: %s'%(machines))
+    if machines.find('&')>0:
+        # Backgrounded job
+        endStr = '&'
+        interactive = 0
+    else:
+        # Interacttive job
+        endStr = ''
+        interactive = 1
+    
+    # Determine if a specific CPU type is requested
+    cpu_type = ''
+    if len(machines) > 5:
+        # 'grid-xeon-e5[&]'
+        if endStr == '&':
+            cpu_type = machines[5:-1]
+        else:
+            cpu_type = machines[5:]
+            
+    # Modify the default value if cpu_type is specified
+    if len(cpu_type):
+        grid.grid_config['cpu_type'] = cpu_type
+        # Update the queue name (partition name) accordingly
+        if (cpu_type == 'xeon64c'):
+            grid.grid_config['q_name'] = 'manycore'
+        elif (cpu_type == 'xeon-g6'):
+            grid.grid_config['q_name'] = 'gaia'
+
+    # number of cores to be allocated from the grid
+    requested,unclaimed_procs,unclaimed_nodes = grid_resource_policy(grid.grid_config, n_proc, interactive)
+    n_proc = requested + interactive
+
+    # Create a fictious machine list when 'grid[&]' is used
+    machines = []
+    if grid.grid_config['n_nodes'] > 0: 
+        # Triples modes, local MPI processes aggregated into a single scheduler task
+        grid.grid_config['ntasks'] = grid.grid_config['n_nodes']
+        n_digits = int(math.log10(grid.grid_config['n_nodes'])+1)
+        for i in range(grid.grid_config['n_nodes']):
+            node_strid = str(i+1).zfill(n_digits)
+            machines.append('grid_slurm_'+node_strid)
+    else:
+        # Non-triple modes
+        grid.grid_config['ntasks'] = n_proc
+        n_digits = int(math.log10(n_proc)+1)
+        for i in range(n_proc):
+            node_strid = str(i+1).zfill(n_digits)
+            machines.append('grid_slurm_'+node_strid)
+    
+    # Overwrite the Pid=0 machine for an interactive job
+    if interactive:
+        machines[0] = host
+        
     # Convert machines into a dictionary variable if needed
     machines = convert_to_dict(machines,host)
 
@@ -84,27 +148,6 @@ def MPI_Run( py_file, n_proc, machines ):
         print(os.getcwd())
     pwd_pc,pwd_linux,pwd_mac = pyMPI_Dir_map(pyMCW.MPI_COMM_WORLD['machine_db'],os.getcwd())
 
-    # Set some strings for special characters.
-    qq = '"'
-    sp = ' '
-    nl = '\n'
-    # Get single quote character. 
-    q = '\''
-    ssh_response=checkPath+dir_sep+'remote.out'
-    
-    # Extract the actual pPython script name (do we need this?)
-    script_file_head = '.pRUN_Parallel_Stub_';
-    script_file_tail = '_temp';
-    # The following assumes that only one such a file exists.
-    # It will fail if more than one files exists.
-    # Find the script file name
-    for file in os.listdir("."):
-        if file.startswith(script_file_head):
-            last5chars = file[len(file)-5:]
-            if script_file_tail == last5chars:
-                my_script_file = file[len(script_file_head):(len(file)-5)]
-                # print('Script name: %s'%(script_name))
-                
     tmp = py_file.split('.')
     py_file_basename = tmp[0] # Remove .py
     
@@ -114,11 +157,6 @@ def MPI_Run( py_file, n_proc, machines ):
     # Get number of machines.
     n_m = pyMCW.MPI_COMM_WORLD['machine_db']['n_machine']
 
-    # dos2unix convert command
-    if OS.ispc:
-        convert_command = 'dos2unix PythonMPI/*py PythonMPI/*sh'
-        convert_file = 'PythonMPI\dos2unix_conversion.bat'
-    
     # Loop backwards over each machine target machine
     # so that we hit the host machine last (if it is a target).
     for i_m in range(n_m,0,-1):
@@ -180,84 +218,76 @@ def MPI_Run( py_file, n_proc, machines ):
             # unix_cmd_file used when host machine is running Unix
             # dos_cmd_file used when host machine is running Windows/DOS
             if type == 'pc':
-                unix_cmd_file = 'PythonMPI/Dos_Commands.' +machine+'.'+str(i_rank_start)+file_ext
-                dos_cmd_file = 'PythonMPI\\Dos_Commands.'+machine+'.'+str(i_rank_start)+file_ext
+                unix_cmd_file = 'PythonMPI/Dos_Commands.'+imstr+file_ext
+                dos_cmd_file = 'PythonMPI\\Dos_Commands.'+imstr+file_ext
             else:
                 # Add prefix for Unix systems
                 unix_commands = unix_commands_prefix+unix_commands
-                unix_cmd_file = 'PythonMPI/Unix_Commands.'+machine+'.'+str(i_rank_start)+file_ext
-                dos_cmd_file = 'PythonMPI/Unix_Commands.'+machine+'.'+str(i_rank_start)+file_ext
+                unix_cmd_file = 'PythonMPI/Unix_Commands.'+imstr+file_ext
+                dos_cmd_file = 'PythonMPI/Unix_Commands.'+imstr+file_ext
 
             # Put commands in a file.
             fid = open(unix_cmd_file,'w')
+            
+            # Fix unix_commands for LLGrid run
+            # Remove & at the end of each line
+            # unix_commands = re.sub("out &","out", unix_commands)
+            # Comment out the touch command
+            unix_commands = re.sub("touch","# touch", unix_commands)
+            # Add the "wait" at the end so that all the processes are done 
+            # before exiting Slurm task
+            unix_commands += '\nwait\n'
             fid.write(unix_commands)
             fid.close()
 
-            # Create host commands to launch this file.
-            if machine == host:     # Target (machine) is host.
-                if type == 'pc':    # Host is a pc.
-                    unix_launch_i_m = 'start /b '+dos_cmd_file+nl
-                else:
-                    unix_launch_i_m = '/bin/bash ./'+unix_cmd_file+' &'+nl
-
-            else:    # Target is a remote machine.
-                if (OS.ispc):    # Host is a pc.
-                    if type == 'pc':    # Target is a pc.
-                        if DEBUG:
-                            print('C1 - Remote target: host IS a pc and remote target is a pc')
-                        unix_launch_i_m = 'sttart /b '+remote_launch+machine+remote_flags+qq+'cd /d '+pwd_pc+' & '+dos_cmd_file+qq+nl
-                    else:
-                        if DEBUG:
-                            print('C2 - Remote target: host IS a pc but remote target is NOT a pc')
-                        unix_launch_i_m = 'start /b '+remote_launch+machine+remote_flags+qq+'cd '+pwd_linux+'; /bin/bash ./'+unix_cmd_file+' &'+qq+nl
-                        remote_machine = machine
-                else:    # Host is NOT a pc.
-                    if DEBUG:
-                        print('Remote target: host is NOT a pc')
-                    if type == 'pc':    # Target is a pc.
-                        if DEBUG:
-                            print('C3 - Remote target: host is NOT a pc but remote target IS a pc')
-                        unix_launch_i_m = remote_launch+machine+remote_flags+qq+'cd /d '+pwd_pc+' & '+dos_cmd_file+qq+nl
-                    else: 
-                        if DEBUG:
-                            print('C4 - Remote target: host is NOT a pc but remote target IS NOT a pc')
-                        unix_launch_i_m = remote_launch+machine+remote_flags+q+'cd '+pwd_linux+'; /bin/bash ./'+unix_cmd_file+q+' > '+ssh_response+' >&2 & '+nl
-
-            # Append to variable that will be written to a file.
-            unix_launch = unix_launch+unix_launch_i_m
-
+    # If it's an interactive job, translate the current working directory as local path for Pid=0
+    if interactive:
+        if OS.ispc:
+            local_path = pwd_pc
+        elif OS.islinux:
+            local_path = pwd_linux
+        elif OS.ismac:
+            local_path = pwd_mac
+        pyMCW.MPI_COMM_WORLD['machine_db']['dir']['0'] = local_path
+        
     # Display launch command.
-    print(unix_launch)
+    # print(unix_launch)
   
-    # Write launch commands to .sh or .bat text file
+    # Write the scheduler job script file
     # This is done to fix Matlab's problem with very long commands sent to unix().
     # It may not present with python, though
-    if (OS.ispc):
-        launch_file = 'PythonMPI\Dos_Commands.bat'
+    sched_job_file = 'PythonMPI/Unix_Commands.sh'
+    if grid.grid_config['scheduler'] == 'slurm':
+        slurm_write_job_script(sched_job_file,py_file,pwd_linux)
     else:
-        launch_file = 'PythonMPI/Unix_Commands.sh'
-            
-    fid = open(launch_file,'w')
-    fid.write(unix_launch)
-    fid.close()
-
+        print('Error: unsupported scheduler, %s'%(grid.grid_config['scheduler']))
+        exit()
+        
     # Execute launch script.
-    if (OS.ispc):
+    # dos2unix convert command
+    if OS.ispc:
         # Convert Windows EOL characters to Unix EOL characters
-        fid = open(convert_file,'w')
-        cmd = 'start /b '+remote_launch+remote_machine+remote_flags+qq+'cd '+pwd_linux+'; '+convert_command
-        fid.write(cmd)
-        fid.close()
-        os.startfile(convert_file)
-        os.startfile(launch_file)
+        # print('Execute dos2unix to convert EOL characters')
+        convert_command = 'dos2unix PythonMPI/*py PythonMPI/*sh'    
+        ecmd = ExecShellCmd(set_remote_cc())
+        cmdstr = qq+'cd '+pwd_linux+'; '+convert_command+qq
+        ecmd.run(cmdstr)
+        #
+        # Need a delay to make this conversion become effective on the grid environment
+        pyMPI_Sleep(1.0)
+
+    # Submit the job
+    if grid.grid_config['scheduler'] == 'slurm':
+            slurm_submit_job(grid.grid_config,sched_job_file,py_file,pwd_linux)
     else:
-        os.system('/bin/bash '+launch_file)
+        print('Error: unsupported scheduler, %s'%(grid.grid_config['scheduler']))
+        exit()
 
     # For somehow find out if this is an interactive job. then, execute the local processing:
-    if DEBUG:
+    if interactive:
         print(defscommands)
         print('MPI_Run: executing %s in the current python process.'%(py_file))
-    exec(defscommands)
+        exec(defscommands)
 
     if DEBUG:
         print('. . .')

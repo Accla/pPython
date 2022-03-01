@@ -118,7 +118,10 @@ def pRUN(py_file,n_proc,machines,sched_options=None):
     print('Running: %s'%(py_file))
 
     # Clearn up an old PythonMPI run
-    MPI_Abort(grid.grid_config)
+    if isinstance(machines, str):
+        grid_Abort(grid.grid_config)
+    else:
+        grid_Abort()
     # wait for the filesystem update
     pyMPI_Sleep(1.0)
     pyMPI_Delete_all()
@@ -127,8 +130,8 @@ def pRUN(py_file,n_proc,machines,sched_options=None):
 
     # Launch PythonMPI
     if DEBUG:
-        print('MPI_Run called . . .')
-    cmd = MPI_Run(py_file, n_proc, machines)
+        print('grid_Run called . . .')
+    cmd = grid_Run(py_file, n_proc, machines)
 
     if DEBUG:
         print('<-- Exiting pRUN')
