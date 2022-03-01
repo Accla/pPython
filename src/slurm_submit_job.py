@@ -46,21 +46,26 @@ def slurm_submit_job(grid_config,sched_job_file,py_file,dir_llsc):
     cmdstr = cmdstr+' --comment='+q+'Python:%s,PythonMPI,'%(version)+q
         
     # Construct the final sbatch command
-    cmdstr = qq+cmdstr+' '+dir_llsc+'/'+sched_job_file+qq
-    
-    if DEBUG:
-        print(cmdstr)
     
     # Submit the job
     remote_cc = set_remote_cc()
     ecmd = ExecShellCmd(remote_cc)
+    if DEBUG:
+        print('remote_cc: %s'%(remote_cc))
     if remote_cc:
-        ecmd.run(cmd_chdir+";"+cmdstr)
+        cmdstr = qq+cmd_chdir+";"+cmdstr+' '+dir_llsc+'/'+sched_job_file+qq
+        if DEBUG:
+            print(cmdstr)
+        ecmd.run(cmdstr)
     else:
         # Not able to execute sbatch command as is.
         # Workaround to make it work on the grid environment
         save_cwd = os.getcwd()
         os.chdir(dir_llsc)
+        cmdstr = qq+cmdstr+' '+dir_llsc+'/'+sched_job_file+qq
+        if DEBUG:
+            print('chdir to %s'%(dir_llsc))
+            print(cmdstr)
         ecmd.run('/bin/bash -c '+cmdstr)
         
     output = ecmd.get_output().strip()
