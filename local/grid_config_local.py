@@ -1,6 +1,8 @@
 import os
 import platform
 
+import checkOS as OS
+
 def grid_config_local(grid_config):
     """Update local grid_config parameters. """
 
