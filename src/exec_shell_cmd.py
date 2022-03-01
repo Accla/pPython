@@ -19,9 +19,9 @@ class ExecShellCmd:
         if len(self.transport_cmd):
             cmdstr = self.transport_cmd+' '+cmdstr
         if stdIn :
-            self.procObj = Popen(cmdstr, shell=True, executable='/bin/bash', stdin=stdIn, stdout=PIPE, stderr=PIPE)
+            self.procObj = Popen(cmdstr, shell=True, stdin=stdIn, stdout=PIPE, stderr=PIPE)
         else:
-            self.procObj = Popen(cmdstr, shell=True, executable='/bin/bash', stdout=PIPE, stderr=PIPE)
+            self.procObj = Popen(cmdstr, shell=True, stdout=PIPE, stderr=PIPE)
  
     def get_stdout(self):
         """Return the standard output stream. """

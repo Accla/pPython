@@ -12,6 +12,7 @@ from StopExecution import *
 from pyMPI_Comm_init import *
 from pyMPI_Commands import *
 from pyMPI_Dir_map import *
+from pyMPI_Sleep import *
 
 from exec_shell_cmd import *
 from grid_resource_policy  import *
