@@ -39,14 +39,14 @@ if os.path.exists(PYTHONMPI_PATH):
     import checkOS as OS
     from PythonMPI import *
 else:
-    print('pRUN: PythonMPI package path, %s, does not exist.'%(PYTHONMPI_PATH))
+    print('ERROR(pRUN): PythonMPI package path, %s, does not exist.'%(PYTHONMPI_PATH))
     exit()
     
 if os.path.exists(GRIDPYTHON_PATH):
     import grid_config as grid
     from gridPython import *
 else:
-    print('pRUN: gridPython package path, %s, does not exist.'%(GRIDPYTHON_PATH))
+    print('ERROR(pRUN): gridPython package path, %s, does not exist.'%(GRIDPYTHON_PATH))
     exit()
 
 def pRUN(py_file,n_proc,machines,sched_options=None):
