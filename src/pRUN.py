@@ -4,34 +4,49 @@ import sys
 
 # Set gridPython & PythonMPI search path and import it
 GRIDPYTHON_HOME = os.getenv('GRIDPYTHON_HOME')
-GRIDPYTHON_PATH = GRIDPYTHON_HOME+os.sep+'src'
-if not os.path.exists(GRIDPYTHON_PATH):
-    print('Need to set the environment variable, GRIDPYTHON_PATH')
+if not GRIDPYTHON_HOME:
+    print('ERROR(pRUN): GRIDPYTHON_HOME is not set.')
     exit()
-sys.path.append(GRIDPYTHON_PATH)
+if not os.path.exists(GRIDPYTHON_HOME):
+    print('ERROR(pRUN): GRIDPYTHON_HOME path, %s, does not exist.'%(GRIDPYTHON_HOME))
+    exit()
 
 # Assuming PythonMPI is distributed with gridPython as shown below
+# PythonMPI path must be added first
 PYTHONMPI_PATH = GRIDPYTHON_HOME+os.sep+'PythonMPI'+os.sep+'src'
 sys.path.append(PYTHONMPI_PATH)
 
 # Assuming local configuration is available from $HOME/pythonmpi directory.
-HOME = os.getenv('HOME')
-USER_PYTHONMPI_PATH = HOME+os.sep+'pythonmpi'
+# where $HOME is local path matching with GRID_HOME_PATH
+HOME_PATH = os.getenv('HOME_PATH')
+if not HOME_PATH:
+    print('ERROR(pRUN): HOME_PATH is not set.')
+    exit()
+
+USER_PYTHONMPI_PATH = HOME_PATH+os.sep+'pythonmpi'
+if not os.path.exists(USER_PYTHONMPI_PATH):
+    print('ERROR(pRUN): USER_PYTHONMPI_PATH path, %s, does not exist.'%(USER_PYTHONMPI_PATH))
+    exit()
 sys.path.append(USER_PYTHONMPI_PATH)
 
-# PythonMPI path must be added first
+GRIDPYTHON_PATH = GRIDPYTHON_HOME+os.sep+'src'
+sys.path.append(GRIDPYTHON_PATH)
+
+# for p in sys.path:
+#     print(p)
+
 if os.path.exists(PYTHONMPI_PATH):
     import checkOS as OS
     from PythonMPI import *
 else:
-    print('pRUN: PythonMPI package is not found at %s.'%(PYTHONMPI_PATH))
+    print('pRUN: PythonMPI package path, %s, does not exist.'%(PYTHONMPI_PATH))
     exit()
     
 if os.path.exists(GRIDPYTHON_PATH):
     import grid_config as grid
     from gridPython import *
 else:
-    print('pRUN: gridPython package is not found at %s.'%(GRIDPYTHON_PATH))
+    print('pRUN: gridPython package path, %s, does not exist.'%(GRIDPYTHON_PATH))
     exit()
 
 def pRUN(py_file,n_proc,machines,sched_options=None):
@@ -58,7 +73,7 @@ def pRUN(py_file,n_proc,machines,sched_options=None):
     
     # At this point, grid_config should be set.
     
-    DEBUG = 0
+    DEBUG = 1
     if DEBUG:
         print('--> Entering pRUN')
         for p in sys.path:
@@ -92,7 +107,8 @@ def pRUN(py_file,n_proc,machines,sched_options=None):
         
     GRID_PATH = grid.grid_config['GRIDPYTHON_PATH']+sep_path \
         +grid.grid_config['PYTHONMPI_PATH']+sep_path \
-        +grid.grid_config['USER_PYTHONMPI_PATH']
+        +grid.grid_config['USER_PYTHONMPI_PATH']+sep_path \
+        +grid.grid_config['CWD_PATH']
     os.environ["PYTHONMPI_PATH"] = GRID_PATH
 
     # Disable HDF5 file locking
