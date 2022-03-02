@@ -1,6 +1,7 @@
 import numpy as np
 
 from PythonMPI import *
+from partition_1d import *
 
 from sample_function import *
 
@@ -30,48 +31,16 @@ m = 3   # number of output arguments
 n = 16  # number of independent iterations
 
 # Design data distribution among the MPI processes.
-# Arrays to handle non-uniform data distribution
-chunk_sizes = np.zeros(n_procs)
-# A dictionary to store the beginning and ending indices of each chunk
-# chunk_index['Pid']['beg'] and chunk_index['Pid']['end']
-chunk_index = dict()
-
-chunk_size = int(n / n_procs)
-remainder = n%n_procs
-
-# Calculate the number of elements per each MPI process
-if remainder:
-    # if the size is NOT divisible by n_procs
-    icnt = 0
-    for iam in range(n_procs):
-        chunk_index[str(iam)] = dict()
-        if icnt < remainder:
-            chunk_index[str(iam)]['beg'] = (chunk_size)*iam + icnt
-            chunk_index[str(iam)]['end'] = chunk_index[str(iam)]['beg'] + chunk_size
-            icnt = icnt + 1
-        else:
-            chunk_index[str(iam)]['beg'] = (chunk_size)*iam + icnt
-            chunk_index[str(iam)]['end'] = chunk_index[str(iam)]['beg'] + chunk_size - 1
-else:
-    # if the size is divisible by n_procs
-    for iam in range(n_procs):
-        chunk_index[str(iam)] = dict()
-        chunk_index[str(iam)]['beg'] = (chunk_size)*iam
-        chunk_index[str(iam)]['end'] = chunk_index[str(iam)]['beg'] + chunk_size - 1
-        
-# Store the chunk size for each MPI process    
-for iam in range(n_procs):
-    # Calculate the chunk size of each MPI process
-    chunk_sizes[iam] = chunk_index[str(iam)]['end'] - chunk_index[str(iam)]['beg'] + 1
-    
-# print(chunk_index)
-# print(chunk_sizes)
+# (partition_1d is distributed with gridPython)
+d_index,d_sizes = partition_1d(n,n_procs)
+# print(d_index)
+# print(d_sizes)
         
 # Create z - data output matrix.
 z = np.zeros((n, m),dtype=float)
 
 # Get the local portion of the global indices
-my_i_global = range(chunk_index[str(my_rank)]['beg'],chunk_index[str(my_rank)]['end']+1)
+my_i_global = range(d_index[str(my_rank)]['beg'],d_index[str(my_rank)]['end']+1)
 
 # Get the local portion of the distributed matrix
 my_z = z[my_i_global,:]
@@ -125,7 +94,7 @@ if my_rank == leader:
                 [t1] = MPI_Recv(source,tag,comm)
                 # Reshape t1 to update a column vector
                 # Note the python index is from 0 to N-1
-                my_i_global = range(chunk_index[str(source)]['beg'],chunk_index[str(source)]['end']+1)
+                my_i_global = range(d_index[str(source)]['beg'],d_index[str(source)]['end']+1)
                 z[my_i_global,:] = t1
                 print('Received data packet number %d' %(recvCounter))
                 recvCounter = recvCounter + 1
