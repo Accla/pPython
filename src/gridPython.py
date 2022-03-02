@@ -8,6 +8,7 @@ from grid_status import *
 from grid_Abort import *
 from grid_Run import *
 from gridPython_Ver import *
+from partition_1d import *
 from pRUN import *
 from set_remote_cc import *
 from slurm_submit_job import *
