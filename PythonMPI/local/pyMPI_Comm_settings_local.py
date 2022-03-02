@@ -34,7 +34,7 @@ def pyMPI_Comm_settings_local(machine_db_settings):
         python_location = 'C:\ProgramData\Anaconda3\python.exe'
         machine_db_settings['python_command'] = python_location + ' -u '
     elif OS.islinux:
-        python_location = '/usr/bin/python'
+        python_location = 'python'
         machine_db_settings['python_command'] = python_location + ' -u '
     elif OS.ismac:
         # python_location = '/usr/bin/python'
@@ -51,8 +51,8 @@ def pyMPI_Comm_settings_local(machine_db_settings):
     machine_db_settings['python_module_path'] = '/etc/environment-modules/modules'
     machine_db_settings['python_module_name'] = 'anaconda/2021b'
 
-    # local directory mapping. (pc, linux, mac)
-    machine_db_settings['local_dir_map'] = ['Z:', '/home/gridsan/ch21778', '/Volumes/ch21778']
+    # local directory mapping. (pc, linux, mac, grid)
+    machine_db_settings['local_dir_map'] = ['Z:', '/export/home/ch21778', '/Volumes/ch21778', '/home/gridsan/ch21778']
 
     return machine_db_settings
 

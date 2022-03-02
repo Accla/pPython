@@ -1,15 +1,18 @@
+from replace_token import *
+
 def pyMPI_Dir_map(machine_db,path):
-    """pyMPI_Dir_map  -  Takes care of pc/linux/mac translation of current working directory.
+    """pyMPI_Dir_map  -  Takes care of pc/linux/mac/grid path translation for a given patth.
     
     Usage:
     ------
-    dir_pc, dir_linux, dir_mac = pyMPI_Dir_map(machine_db,path)
+    dir_pc, dir_linux, dir_mac, dir_grid = pyMPI_Dir_map(machine_db,path)
     
     machine_db: machine database (dtype; dictionary)
     path:       directory path (dtype: string)
     dir_pc:     Winods OS directory path (dtype: string)
     dir_linux:  Linux OS directory path (dtype: string)
-    dir_max:    Mac OS directory path (dtype: string)
+    dir_mac:    Mac OS directory path (dtype: string)
+    dir_grid:   directory path on the grid (dtype: string)
     
     """
 
@@ -19,6 +22,7 @@ def pyMPI_Dir_map(machine_db,path):
     dir_pc = path;
     dir_linux = path;
     dir_mac = path;
+    dir_grid = path;
 
     # Check if a directory mapping has been defined.
     # If so, convert directory names.
@@ -29,54 +33,53 @@ def pyMPI_Dir_map(machine_db,path):
         linux_n    = len(linux_base);
         mac_base = machine_db['local_dir_map'][2]
         mac_n    = len(mac_base);
+        grid_base = machine_db['local_dir_map'][3]
+        grid_n    = len(grid_base);
 
-        # Check if pc_dir has a linux base 
-        # remove from string.
-        if dir_pc[0:linux_n] == linux_base[0:linux_n]:
-            # Swap bases.
-            dir_pc = pc_base + dir_pc[linux_n:]
+        if path[0:pc_n].lower() == pc_base.lower():
+            # Check if path has a pc base
+            # Convert all other paths accordingly.
+            # Swap bases for other path variables.
+            dir_linux = linux_base + path[pc_n:]
+            dir_mac = mac_base + path[pc_n:]
+            dir_grid = grid_base + path[pc_n:]
 
-        # Replace '/' with '\'.
-        dir_pc.replace('/','\\')
+            dir_linux = replace_token('\\','/',dir_linux)
+            dir_mac = replace_token('\\','/',dir_mac)
+            dir_grid = replace_token('\\','/',dir_grid)
+            
+        elif path[0:linux_n].lower() == linux_base.lower():
+            # Check if path has a linux base
+            # Convert all other paths accordingly.
+            # Swap bases for other path variables.
+            dir_pc = pc_base + path[linux_n:]
+            dir_mac = mac_base + path[linux_n:]
+            dir_grid = grid_base + path[linux_n:]
 
-        # Check if mac_dir has a linux base 
-        # remove from string.
-        if dir_mac[0:linux_n] == linux_base[0:linux_n]:
-            # Swap bases.
-            dir_mac = mac_base + dir_mac[linux_n:]
+            dir_pc = replace_token('/','\\',dir_pc)
+            
+        elif path[0:mac_n].lower() == mac_base.lower():
+            # Check if path has a mac base
+            # Convert all other paths accordingly.
+            # Swap bases for other path variables.
+            dir_pc = pc_base + path[mac_n:]
+            dir_linux = linux_base + path[mac_n:]
+            dir_grid = grid_base + path[mac_n:]
 
-        # Check if linux_dir has a pc base or a mac base
-        # remove from string.
-        if dir_linux[0:pc_n] == pc_base[0:pc_n]:
-            # Swap bases.
-            dir_linux = linux_base + dir_linux[pc_n:]
-        elif dir_linux[0:mac_n] == mac_base[0:mac_n]:
-            # Swap bases.
-            dir_linux = linux_base + dir_linux[mac_n:]
+            dir_pc = replace_token('/','\\',dir_pc)
+            
+        elif path[0:grid_n].lower() == grid_base.lower():
+            # Check if path has a grid base
+            # Convert all other paths accordingly.
+            # Swap bases for other path variables.
+            dir_pc = pc_base + path[grid_n:]
+            dir_linux = linux_base + path[grid_n:]
+            dir_mac = mac_base + path[grid_n:]
 
-        # Replace '\' with '/'.
-        if DEBUG:
-            print('befor replace: %s'%(dir_linux))
-        old_str = "\\"
-        new_str = "/"
-        # replace() does not work for some reason
-        # dir_linux.replace(old_str,new_str)
-        # dir_mac.replace(old_str,new_str)
-        new_path = ''
-        for i, letter in enumerate(dir_linux):
-            if letter == old_str:
-                new_path = new_path+new_str
-            else:
-                new_path = new_path+letter
-        dir_linux = new_path
-        new_path = ''
-        for i, letter in enumerate(dir_mac):
-            if letter == old_str:
-                new_path = new_path+new_str
-            else:
-                new_path = new_path+letter
-        dir_mac = new_path
-        if DEBUG:
-            print('after replace: %s'%(dir_linux))
+            dir_pc = replace_token('/','\\',dir_pc)
+            
+        else:
+            print("ERROR(pyMPI_Dir_map): path, %s, does not match with any in machine_db['local_dir_map']"%(path))
+            exit()
 
-    return dir_pc, dir_linux, dir_mac
+    return dir_pc, dir_linux, dir_mac, dir_grid

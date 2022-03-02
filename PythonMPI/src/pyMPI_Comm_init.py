@@ -87,7 +87,7 @@ def pyMPI_Comm_init(n_proc,machines):
         default_type = 'unix'
 
     # Set paths.
-    pwd_pc,pwd_linux,pwd_mac = pyMPI_Dir_map(machine_db,os.getcwd())
+    pwd_pc,pwd_linux,pwd_mac,pwd_grid = pyMPI_Dir_map(machine_db,os.getcwd())
     pwd = os.getcwd()
     sep = os.sep
 
@@ -143,18 +143,22 @@ def pyMPI_Comm_init(n_proc,machines):
                 # Set type to type of host.
                 machine_db['type'][iistr] = default_type
                 machine_db['python_command'][iistr] = machine_db_settings['python_command']
-                if OS.ispc:
-                   machine_db['dir'][iistr] = pwd_pc+'\PythonMPI'
-                elif OS.islinux:
-                   machine_db['dir'][iistr] = pwd_linux+'/PythonMPI'
+
+                if os.path.exists('/etc/llgrid.id'):
+                    machine_db['dir'][iistr] = pwd_grid+'/PythonMPI'
                 else:
-                   machine_db['dir'][iistr] = pwd_mac+'/PythonMPI'
+                    if OS.ispc:
+                        machine_db['dir'][iistr] = pwd_pc+'\PythonMPI'
+                    elif OS.islinux:
+                        machine_db['dir'][iistr] = pwd_linux+'/PythonMPI'
+                    else:
+                        machine_db['dir'][iistr] = pwd_mac+'/PythonMPI'
             else:
                 # Use user specified default (probably 'unix').
                 machine_db['type'][iistr] = machine_db_settings['type']
                 # Assuming the remote hosts are LLSC system for now
                 machine_db['python_command'][iistr] = machine_db_settings['python_command_llsc']
-                machine_db['dir'][iistr] = pwd_linux+'/PythonMPI'
+                machine_db['dir'][iistr] = pwd_grid+'/PythonMPI'
 
             if DEBUG:
                 print('python command updated: %s'%(machine_db['python_command'][iistr]))

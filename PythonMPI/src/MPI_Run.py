@@ -82,7 +82,7 @@ def MPI_Run( py_file, n_proc, machines ):
     if DEBUG:
         # print(pyMCW.MPI_COMM_WORLD['machine_db'])
         print(os.getcwd())
-    pwd_pc,pwd_linux,pwd_mac = pyMPI_Dir_map(pyMCW.MPI_COMM_WORLD['machine_db'],os.getcwd())
+    pwd_pc,pwd_linux,pwd_mac,pwd_grid = pyMPI_Dir_map(pyMCW.MPI_COMM_WORLD['machine_db'],os.getcwd())
 
     # Set some strings for special characters.
     qq = '"'
@@ -209,7 +209,7 @@ def MPI_Run( py_file, n_proc, machines ):
                     else:
                         if DEBUG:
                             print('C2 - Remote target: host IS a pc but remote target is NOT a pc')
-                        unix_launch_i_m = 'start /b '+remote_launch+machine+remote_flags+qq+'cd '+pwd_linux+'; /bin/bash ./'+unix_cmd_file+' &'+qq+nl
+                        unix_launch_i_m = 'start /b '+remote_launch+machine+remote_flags+qq+'cd '+pwd_grid+'; /bin/bash ./'+unix_cmd_file+' &'+qq+nl
                         remote_machine = machine
                 else:    # Host is NOT a pc.
                     if DEBUG:
@@ -221,7 +221,7 @@ def MPI_Run( py_file, n_proc, machines ):
                     else: 
                         if DEBUG:
                             print('C4 - Remote target: host is NOT a pc but remote target IS NOT a pc')
-                        unix_launch_i_m = remote_launch+machine+remote_flags+q+'cd '+pwd_linux+'; /bin/bash ./'+unix_cmd_file+q+' > '+ssh_response+' >&2 & '+nl
+                        unix_launch_i_m = remote_launch+machine+remote_flags+q+'cd '+pwd_grid+'; /bin/bash ./'+unix_cmd_file+q+' > '+ssh_response+' >&2 & '+nl
 
             # Append to variable that will be written to a file.
             unix_launch = unix_launch+unix_launch_i_m
@@ -245,7 +245,7 @@ def MPI_Run( py_file, n_proc, machines ):
     if (OS.ispc):
         # Convert Windows EOL characters to Unix EOL characters
         fid = open(convert_file,'w')
-        cmd = 'start /b '+remote_launch+remote_machine+remote_flags+qq+'cd '+pwd_linux+'; '+convert_command
+        cmd = 'start /b '+remote_launch+remote_machine+remote_flags+qq+'cd '+pwd_grid+'; '+convert_command
         fid.write(cmd)
         fid.close()
         os.startfile(convert_file)

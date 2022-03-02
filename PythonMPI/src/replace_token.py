@@ -1,5 +1,11 @@
 def replace_token(old_str,new_str,old_path):
-    """Replace an old token with the new token for a given path."""
+    """Replace an old token with the new token for a given path.
+    Usage:
+    ------
+
+    new_path = replace_token(old_str,new_str,old_path)
+    
+    """
     # replace() does not work for some reason
     # dir_linux.replace(old_str,new_str)
     # dir_mac.replace(old_str,new_str)

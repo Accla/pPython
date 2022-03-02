@@ -69,7 +69,7 @@ def grid_config_local(grid_config):
         if OS.ispc:
             HOME_PATH = 'Z:'
         elif OS.islinux:
-            HOME_PATH = '/home/gridsan/ch21778'
+            HOME_PATH = '/export/home/ch21778'
         elif OS.ismac:
             HOME_PATH = '/Volumes/ch21778'
         else:

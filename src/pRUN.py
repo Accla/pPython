@@ -73,7 +73,7 @@ def pRUN(py_file,n_proc,machines,sched_options=None):
     
     # At this point, grid_config should be set.
     
-    DEBUG = 1
+    DEBUG = 0
     if DEBUG:
         print('--> Entering pRUN')
         for p in sys.path:

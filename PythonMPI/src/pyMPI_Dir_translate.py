@@ -1,10 +1,11 @@
+import os
 import re
 
 import checkOS as OS
 from replace_token import *
 
 def pyMPI_Dir_translate(machine_db,path):
-    """pyMPI_Dir_map  -  Takes care of pc/linux/mac translation of current working directory.
+    """pyMPI_Dir_translate  -  Takes care of pc/linux/mac/grid translation of current working directory.
     
     Usage:
     ------
@@ -26,6 +27,8 @@ def pyMPI_Dir_translate(machine_db,path):
         linux_n    = len(linux_base);
         mac_base = machine_db['local_dir_map'][2]
         mac_n    = len(mac_base);
+        grid_base = machine_db['local_dir_map'][3]
+        grid_n    = len(grid_base);
     else:
         print('Error (pyMPI_Dir_translate): local directory map not defined in machine_db (local_dir_map)')
         exit()
@@ -37,6 +40,8 @@ def pyMPI_Dir_translate(machine_db,path):
         n_base = linux_n
     elif re.search(mac_base,path,re.IGNORECASE):
         n_base = mac_n
+    elif re.search(grid_base,path,re.IGNORECASE):
+        n_base = grid_n
     else:
         print('Error (pyMPI_Dir_translate): given path, %s, is not compatible with local directory map.')
         exit()
@@ -45,18 +50,23 @@ def pyMPI_Dir_translate(machine_db,path):
         print('n_base = %d'%(n_base))
         
     # Swap bases.
-    if OS.ispc:
-        local_path = pc_base + path[n_base:]
-        # Replace '/' with '\\' if exists.
-        local_path = replace_token("/","\\",local_path)
-    elif OS.islinux:
-        local_path = linux_base + path[n_base:]
-        # Replace '\\' with '/' if exists.
+    if os.path.exists('/etc/llgrid.id'):
+        local_path = grid_base + path[n_base:]
+        # in case, local_path has Windows separator in path
         local_path = replace_token("\\","/",local_path)
-    elif OS.ismac:
-        local_path = mac_base + path[n_base:]
-        # Replace '\\' with '/' if exists.
-        local_path = replace_token("\\","/",local_path)
+    else:
+        if OS.ispc:
+            local_path = pc_base + path[n_base:]
+            # Replace '/' with '\\' if exists.
+            local_path = replace_token("/","\\",local_path)
+        elif OS.islinux:
+            local_path = linux_base + path[n_base:]
+            # Replace '\\' with '/' if exists.
+            local_path = replace_token("\\","/",local_path)
+        elif OS.ismac:
+            local_path = mac_base + path[n_base:]
+            # Replace '\\' with '/' if exists.
+            local_path = replace_token("\\","/",local_path)
 
     if DEBUG:
         print('after replace: %s'%(dir_linux))

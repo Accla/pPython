@@ -77,17 +77,20 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD):
     add_path_str = ''
     for path in tmp:
         # path needs to be translated in to the LLSC path if the machine is not the host
-        dir_pc, dir_linux, dir_mac = pyMPI_Dir_map(pyMCW.MPI_COMM_WORLD['machine_db'],path)
+        dir_pc, dir_linux, dir_mac, dir_grid = pyMPI_Dir_map(pyMCW.MPI_COMM_WORLD['machine_db'],path)
         if machine == host:
-            if OS.ispc:
-                path = dir_pc
-            elif OS.ismac:
-                path = dir_mac
+            if os.path.exists('/etc/llgrid.id'):
+                path = dir_grid
             else:
-                path = dir_linux
+                if OS.ispc:
+                    path = dir_pc
+                elif OS.ismac:
+                    path = dir_mac
+                else:
+                    path = dir_linux
         else:
-            # Use dir_linux (assuming all remote hosts are linux)
-            path = dir_linux
+            # Use dir_grid (assuming all remote hosts are on the grid)
+            path = dir_grid
         if DEBUG:
             print('Translated path: %s'%(path))
         add_path_str = add_path_str + 'sys.path.append('+q+path+q+')'+nl

@@ -147,7 +147,7 @@ def grid_Run( py_file, n_proc, machines ):
     if DEBUG:
         # print(pyMCW.MPI_COMM_WORLD['machine_db'])
         print(os.getcwd())
-    pwd_pc,pwd_linux,pwd_mac = pyMPI_Dir_map(pyMCW.MPI_COMM_WORLD['machine_db'],os.getcwd())
+    pwd_pc,pwd_linux,pwd_mac,pwd_grid = pyMPI_Dir_map(pyMCW.MPI_COMM_WORLD['machine_db'],os.getcwd())
 
     tmp = py_file.split('.')
     py_file_basename = tmp[0] # Remove .py
@@ -243,12 +243,15 @@ def grid_Run( py_file, n_proc, machines ):
 
     # If it's an interactive job, translate the current working directory as local path for Pid=0
     if interactive:
-        if OS.ispc:
+        if os.path.exists('/etc/llgrid.id'):
             local_path = pwd_pc
-        elif OS.islinux:
-            local_path = pwd_linux
-        elif OS.ismac:
-            local_path = pwd_mac
+        else:
+            if OS.ispc:
+                local_path = pwd_pc
+            elif OS.islinux:
+                local_path = pwd_linux
+            elif OS.ismac:
+                local_path = pwd_mac
         pyMCW.MPI_COMM_WORLD['machine_db']['dir']['0'] = local_path
         
     # Display launch command.
@@ -259,7 +262,7 @@ def grid_Run( py_file, n_proc, machines ):
     # It may not present with python, though
     sched_job_file = 'PythonMPI/Unix_Commands.sh'
     if grid.grid_config['scheduler'] == 'slurm':
-        slurm_write_job_script(sched_job_file,py_file,pwd_linux)
+        slurm_write_job_script(sched_job_file,py_file,pwd_grid)
     else:
         print('Error: unsupported scheduler, %s'%(grid.grid_config['scheduler']))
         exit()
@@ -271,15 +274,22 @@ def grid_Run( py_file, n_proc, machines ):
         # print('Execute dos2unix to convert EOL characters')
         convert_command = 'dos2unix PythonMPI/*py PythonMPI/*sh'    
         ecmd = ExecShellCmd(set_remote_cc())
-        cmdstr = qq+'cd '+pwd_linux+'; '+convert_command+qq
+        cmdstr = qq+'cd '+pwd_grid+'; '+convert_command+qq
         ecmd.run(cmdstr)
         #
         # Need a delay to make this conversion become effective on the grid environment
         pyMPI_Sleep(1.0)
+        
+        if DEBUG:
+            output = ecmd.get_output().strip()
+            print('\n'+output+'\n')
+            errout = ecmd.get_stderr()
+            print(errout)
+
 
     # Submit the job
     if grid.grid_config['scheduler'] == 'slurm':
-            slurm_submit_job(grid.grid_config,sched_job_file,py_file,pwd_linux)
+            slurm_submit_job(grid.grid_config,sched_job_file,py_file,pwd_grid)
     else:
         print('Error: unsupported scheduler, %s'%(grid.grid_config['scheduler']))
         exit()
