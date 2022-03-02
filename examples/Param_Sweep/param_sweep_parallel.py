@@ -4,6 +4,7 @@ from PythonMPI import *
 from partition_1d import *
 
 from sample_function import *
+from agg_msg import *
 
 # basic parameter sweep code
 #
@@ -66,46 +67,8 @@ print('local results:')
 print(my_z)
 
 # Finally, aggregate all of the output onto the leader process
-if my_rank == leader:
-    # Update my own results:
-    z[my_i_global,:] = my_z
-
-    # while loop for proving incomming messages
-    # flag for being done with all processing
-    N2 = n_procs-1
-    done = 0;
-
-    # Instead of using for loops, use counters
-    recvCounter = 1
-
-    while not done:
-        # Leader receives all the results.
-        if recvCounter <= N2:
-            # Compute who sent this message.
-            # Do not include leader in data dealing
-            message_ranks,message_tags = MPI_Probe('*', '*', comm)
-
-            # if message_ranks is not empty then receive the message
-            if len(message_ranks):
-                # Receive output.
-                source = message_ranks[0]
-                tag = message_tags[0]
-                print('Waiting on Pid %d' %(source))
-                [t1] = MPI_Recv(source,tag,comm)
-                # Reshape t1 to update a column vector
-                # Note the python index is from 0 to N-1
-                my_i_global = range(d_index[str(source)]['beg'],d_index[str(source)]['end']+1)
-                z[my_i_global,:] = t1
-                print('Received data packet number %d' %(recvCounter))
-                recvCounter = recvCounter + 1
-            else:
-                print('Waiting on data packet %d' %(recvCounter))
-                pyMPI_Sleep(2.0)
-        else:
-            done = 1
-else:
-    # Send the results back to the leader process
-    MPI_Send(leader,1004,comm,my_z)
+tag = 1004
+z = agg_msg(z,my_z,d_index,leader,tag,comm)
 
 # Finally, display the resulting matrix on the leader
 if my_rank == leader:
