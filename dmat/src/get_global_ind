@@ -13,6 +13,9 @@ def get_global_ind(falls, grid_dim=None):
         object. IND(i) is of the form [ind1 ind2 ind3 ...] where ind_i is a
         global index of the distributed object that is local to the current
         processor.
+        
+        ToDo: should it be a list or a dictionary?
+        
     Original Author:   Nadya Travinin (pMatlab)
     Author: Dr. Chansup Byun (gridPython)
     """
@@ -24,10 +27,8 @@ def get_global_ind(falls, grid_dim=None):
         grid_dims=[]
     
     if dim <= 4:
-        ind = []
+        ind = dict()
         for i in range(dim):
-            if DEBUG:
-                print('i = %d'%(i))
             temp = []
             if isinstance(falls[i],type(Falls())):
                 # falls is an instance of Falls class
@@ -41,10 +42,10 @@ def get_global_ind(falls, grid_dim=None):
                     #       complete_block==1
                     if DEBUG:
                         print('falls[i].n-1 = %d'%(falls[i].n-1))
-                    for j in range(1,falls[i].n):
+                    for j in range(0,falls[i].n-1):
                         lval = falls[i].l+j*falls[i].s
                         rval = falls[i].r+j*falls[i].s+1
-                        temp.append(range(lval,rval))
+                        temp = temp + list(range(lval,rval))
                         if DEBUG:
                             print('j = %d'%(j))
                             print('(Left,Right): %d,%d'%(lval,rval))
@@ -53,24 +54,26 @@ def get_global_ind(falls, grid_dim=None):
                     # get indices for the n-th cycle, if it exists
                     if (falls[i].complete_cycle and falls[i].complete_block): 
                         # complete n-th cycle, complete block
-                        temp.append(range(falls[i].l+(falls[i].n-1)*falls[i].s,falls[i].r+(falls[i].n-1)*falls[i].s+1))
+                        if DEBUG:
+                            print('complete n-th cycle & complete block')
+                        temp = temp + list(range(falls[i].l+(falls[i].n-1)*falls[i].s,falls[i].r+(falls[i].n-1)*falls[i].s+1))
  
                     elif (not falls[i].complete_cycle) and (not falls[i].complete_block):
+                        if DEBUG:
+                            print('incomplete n-th cycle & incomplete block')
                         # incomplete n-th cycle, incomplete block  
                         block_size = falls[i].r-falls[i].l+1
                         rem_block = falls[i].local_len%block_size
                         if falls[i].dist == 'b':
-                            temp.append(range(falls[i].l,falls[i].r+1))
+                            temp = temp + list(range(falls[i].l,falls[i].r+1))
                         else:
-                            temp.append(range(falls[i].l+(falls[i].n-1)*falls[i].s,falls[i].l+(falls[i].n-1)*falls[i].s+rem_block-1))
+                            temp = temp + list(range(falls[i].l+(falls[i].n-1)*falls[i].s,falls[i].l+(falls[i].n-1)*falls[i].s+rem_block))
             else:
                 print('falls instance is not Falls type.')
                 
-            # Convert range object to a list
-            if DEBUG:
-                print('len(temp): %d'%(len(temp)))
-            for i in range(len(temp)):
-                ind.append(list(temp[i]))
+            # store temp in ind
+            ind[str(i)] = temp
+                
     else:
         print('ERROR(get_global_ind): Only objects up to 4-D are supported')
         exit()
