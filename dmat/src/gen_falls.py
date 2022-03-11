@@ -1,7 +1,4 @@
-class Falls:
-    """Define empty FALLS class.
-    """
-    pass
+from Falls import *
 
 # Modified implemention to distribute elements across processors as evenly as possible.
 #

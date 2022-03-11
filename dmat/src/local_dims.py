@@ -1,5 +1,7 @@
 import numpy as np
 
+from Falls import *
+
 def local_dims(falls, dim):
     """Given the local FALLS and object dimension, calculates
     a vector of local dimensions of the distributed object.

@@ -1,6 +1,8 @@
 import math
 import numpy as np
 
+from Falls import *
+
 def get_local_falls(pitfalls, grid, rank):
     """Given the PITFALLS object, the grid and local processor rank, 
     returns an array of local FALLS objects (one for each dimension of the

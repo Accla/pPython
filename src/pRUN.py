@@ -108,6 +108,8 @@ def pRUN(py_file,n_proc,machines,sched_options=None):
     GRID_PATH = grid.grid_config['GRIDPYTHON_PATH']+sep_path \
         +grid.grid_config['PYTHONMPI_PATH']+sep_path \
         +grid.grid_config['USER_PYTHONMPI_PATH']+sep_path \
+        +grid.grid_config['GMAP_PATH']+sep_path \
+        +grid.grid_config['DMAT_PATH']+sep_path \
         +grid.grid_config['CWD_PATH']
     os.environ["PYTHONMPI_PATH"] = GRID_PATH
 

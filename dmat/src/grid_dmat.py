@@ -1,5 +1,11 @@
-# import pyMPI_COMM_WORLD as pyMCW
-# from MPI_Comm_rank import *
+import pyMPI_COMM_WORLD as pyMCW
+from MPI_Comm_rank import *
+
+from Dmat import *
+from gen_pitfalls import *
+from get_local_falls import *
+from local_dims import *
+from get_global_ind import *
 
 def grid_dmat(m,n=None,q=None,r=None,p=None):
     """Distributed matrix constructor.

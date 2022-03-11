@@ -1,6 +1,8 @@
 from multipledispatch import dispatch
 import numpy as np
 
+from grid_dmat import *
+
 def dmat(v,p):
     """grid_dmat() wrapper method.
     """

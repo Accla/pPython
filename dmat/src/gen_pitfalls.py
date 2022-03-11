@@ -1,9 +1,6 @@
 import math
 
-class PitFalls:
-    """Define empty PITFALLS class.
-    """
-    pass
+from PitFalls import *
 
 def gen_pitfalls(np, dist_spec, dim_len, overlap=None):
     """Given the number of processors, distribution spec, and the length of the dimension,
@@ -99,6 +96,7 @@ def gen_pitfalls(np, dist_spec, dim_len, overlap=None):
             b_size = math.ceil(dim_len/np)
         else:
             print('ERROR(gen_pitfalls): Overlap is only supported for block distributions.')
+            exit()
 
         # cycle length
         cycle_len = b_size*np+overlap
