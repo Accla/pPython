@@ -16,6 +16,12 @@ if not os.path.exists(GRIDPYTHON_HOME):
 PYTHONMPI_PATH = GRIDPYTHON_HOME+os.sep+'PythonMPI'+os.sep+'src'
 sys.path.append(PYTHONMPI_PATH)
 
+# Additional path for distributed map and array support
+GMAP_PATH = GRIDPYTHON_HOME+os.sep+'gmap'+os.sep+'src'
+sys.path.append(GMAP_PATH)
+DMAT_PATH = GRIDPYTHON_HOME+os.sep+'dmat'+os.sep+'src'
+sys.path.append(DMAT_PATH)
+
 # Assuming local configuration is available from $HOME/pythonmpi directory.
 # where $HOME is local path matching with GRID_HOME_PATH
 HOME_PATH = os.getenv('HOME_PATH')

@@ -1,6 +1,9 @@
 from multipledispatch import dispatch
 import numpy as np
 
+from GridMap import *
+from grid_zeros import *
+
 @dispatch(int,type(GridMap()))
 def zeros(m,map):
     """grid_zeros() wrapper method.

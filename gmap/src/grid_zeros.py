@@ -1,7 +1,7 @@
 import numpy as np
 
-# import pyMPI_COMM_WORLD as pyMCW
-# from MPI_Comm_rank import *
+from dmat import *
+from pitfalls import *
 
 def grid_zeros(m,n=None,q=None,r=None,p=None,dtype=None):
     """Zeros distributed array.

@@ -50,6 +50,11 @@ def gen_pitfalls(np, dist_spec, dim_len, overlap=None):
 
     """
 
+    DEBUG = 0
+    if DEBUG:
+        print('--> Entering gen_pitfalls.')
+        print('np = %d'%(np))
+
     # Create an empty PitFalls class.
     p = PitFalls()
     p.overlap = overlap
@@ -120,5 +125,7 @@ def gen_pitfalls(np, dist_spec, dim_len, overlap=None):
         p.p = np
         p.rem_cycle = rem_cycle
 
+    if DEBUG:
+        print('--> Exitting gen_pitfalls.')
     return p
 

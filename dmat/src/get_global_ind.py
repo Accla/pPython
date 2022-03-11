@@ -1,3 +1,5 @@
+from Falls import *
+
 def get_global_ind(falls, grid_dims=None):
     """Returns a list array of global indices stored locally given
     a FALLS object (list array of FALLS, one for each dimension)

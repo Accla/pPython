@@ -1,6 +1,6 @@
 import numpy as np
 
-# import pyMPI_COMM_WORLD as pyMCW
+import pyMPI_COMM_WORLD as pyMCW
 
 class GridMap:
     """Define Map class. 
@@ -41,6 +41,9 @@ class GridMap:
         if not bool(grid_spec):
             return
         
+        # set the comm as MPI_COMM_WORLD
+        comm = pyMCW.MPI_COMM_WORLD
+
         dim = len(grid_spec); # dimension of the distributed object
         self.dim = dim
         self.grid_spec = grid_spec
@@ -108,9 +111,9 @@ class GridMap:
             # then the processor list is checked against current
             # comm scope
             # find the number of processes allocated for the job
-            if my_MCW.MPI_COMM_WORLD:
-                if 'size' in my_MCW.MPI_COMM_WORLD:
-                    n_procs = my_MCW.MPI_COMM_WORLD['size']
+            if comm:
+                if 'size' in comm:
+                    n_procs = comm['size']
                     # check that the length of the processor list matches the number of
                     # processors requested
                     if (len(proc_list) > n_procs):
@@ -182,9 +185,9 @@ class GridMap:
             # then the processor list is checked against current
             # comm scope
             # find the number of processes allocated for the job
-            if my_MCW.MPI_COMM_WORLD:
-                if 'size' in my_MCW.MPI_COMM_WORLD:
-                    n_procs = my_MCW.MPI_COMM_WORLD['size']
+            if comm:
+                if 'size' in comm:
+                    n_procs = comm['size']
                     # check that the length of the processor list matches the number of
                     # processors requested
                     if (len(proc_list) > n_procs):

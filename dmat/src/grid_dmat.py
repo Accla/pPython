@@ -2,10 +2,13 @@ import pyMPI_COMM_WORLD as pyMCW
 from MPI_Comm_rank import *
 
 from Dmat import *
+
 from gen_pitfalls import *
 from get_local_falls import *
 from local_dims import *
 from get_global_ind import *
+from print_pitfalls import *
+from print_falls import *
 
 def grid_dmat(m,n=None,q=None,r=None,p=None):
     """Distributed matrix constructor.
@@ -110,7 +113,7 @@ def grid_dmat(m,n=None,q=None,r=None,p=None):
             print_pitfalls(pf)
             
     # get the local rank
-    comm = my_MCW.MPI_COMM_WORLD
+    comm = pyMCW.MPI_COMM_WORLD
     my_rank = MPI_Comm_rank(comm)
 
     # get the local falls
