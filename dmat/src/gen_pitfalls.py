@@ -1,9 +1,9 @@
+import math
+
 class PitFalls:
     """Define empty PITFALLS class.
     """
     pass
-
-import math
 
 def gen_pitfalls(np, dist_spec, dim_len, overlap=None):
     """Given the number of processors, distribution spec, and the length of the dimension,
@@ -55,6 +55,7 @@ def gen_pitfalls(np, dist_spec, dim_len, overlap=None):
 
     # Create an empty PitFalls class.
     p = PitFalls()
+    p.overlap = overlap
 
     if not overlap:  # no overlap
         # store block size

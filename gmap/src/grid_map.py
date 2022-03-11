@@ -1,11 +1,11 @@
 import numpy as np
 
-import pyMPI_COMM_WORLD as pyMCW
+# import pyMPI_COMM_WORLD as pyMCW
 
 class GridMap:
     """Define Map class. 
 
-    MAP(GRID_SPEC, DIST_SPEC, PROC_LIST, OVERLAP_SPEC)
+    MAP(GRID_SPEC, DIST_SPEC, PROC_LIST, overlap)
     GRID_SPEC - array of integers specifying how each dimension of a
             distributed object is broken up.
             For example is GRID_SPEC = [2 3], the first dimension is broken
@@ -24,7 +24,7 @@ class GridMap:
             object should be distributed. 
     
     GridMap object p contains:
-    p.dim: umber of dimensions of the the distributed object
+    p.dim: number of dimensions of the the distributed object
     p.proc_list: the list of processors on which the object should bedistributed
     p.dist_spec: the distribution description for each dimension
     p.grid: p.dim-dimensional array of processors corresponding to how the
@@ -35,7 +35,7 @@ class GridMap:
     """
     name = 'grid_map_class'
     
-    def __init__(self,grid_spec=None,dist_spec=None,proc_list=None,overlap_spec=None):
+    def __init__(self,grid_spec=None,dist_spec=None,proc_list=None,overlap=None):
         """Init constructor."""
         
         if not bool(grid_spec):
@@ -46,7 +46,7 @@ class GridMap:
         self.grid_spec = grid_spec
         self.proc_list = proc_list
  
-        if not overlap_spec:
+        if not overlap:
             # MAP(GRID_SPEC, DIST_SPEC, PROC_LIST)
             # ensure that distribution is specified
             if not bool(dist_spec):
@@ -93,7 +93,7 @@ class GridMap:
             self.dist_spec = dist_spec
             
             # create the grid from the processor list
-            grid = np.zeros(grid_spec);
+            grid = np.zeros(grid_spec,'int')
 
             # check that the length of the processor list matches the size of
             # the grid
@@ -119,10 +119,10 @@ class GridMap:
                 else:
                     n_procs = None
             self.grid = grid
-            self.overlap_spec = None # no overlap specification
+            self.overlap = None # no overlap specification
 
         else:
-            # MAP(GRID_SPEC, DIST_SPEC, PROC_LIST, OVERLAP_SPEC)
+            # MAP(GRID_SPEC, DIST_SPEC, PROC_LIST, overlap)
             # ensure that distribution is specified
             if not bool(dist_spec):
                 # dist_spec is empty such as {} 
@@ -162,7 +162,7 @@ class GridMap:
             self.dist_spec = dist_spec
             
             # create the grid from the processor list
-            grid = np.zeros(grid_spec);
+            grid = np.zeros(grid_spec,'int')
 
             # check that the length of the processor list matches the size of
             # the grid
@@ -174,7 +174,7 @@ class GridMap:
                 grid.reshape(gsize)[:] = proc_list[:]
             self.grid = grid
         
-            if len(overlap_spec) != self.dim:
+            if len(overlap) != self.dim:
                 print('RROR (GridMap): Overlap must be specified for all of the dimensions of the map.')
                 exit()
 
@@ -192,17 +192,15 @@ class GridMap:
                         'than number of processors requested.')
                 else:
                     n_procs = None
-            self.overlap_spec = overlap_spec
+            self.overlap = overlap
         
     def copy(self,old_map):
         """Copy the given map."""
-        try:
-            self.grid_spec = old_map.grid_spec
-            self.dist_spec = old_map.dist_spec
-            self.proc_list = old_map.proc_list
-            self.overlap_spec = old_map.overlap_spec
-        except:
-            print('ERROR (GridMap): Failed to copy a map.')
-            exit()
+        self.grid = old_map.grid
+        self.grid_spec = old_map.grid_spec
+        self.dist_spec = old_map.dist_spec
+        self.proc_list = old_map.proc_list
+        self.overlap = old_map.overlap
+
         return self
 
