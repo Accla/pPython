@@ -1,3 +1,13 @@
+# PythonMPI method
+from PythonMPI import *
+
+# GridPython class
+import GridPython as GPC
+
+# gridPython methods
+from gridPython_init import *
+from gridPython_Ver import *
+
 from check_allowance import *
 from check_mount import *
 from detect_transport import *
@@ -7,7 +17,6 @@ from grid_resource_policy import *
 from grid_status import *
 from grid_Abort import *
 from grid_Run import *
-from gridPython_Ver import *
 from partition_1d import *
 from pRUN import *
 from set_remote_cc import *

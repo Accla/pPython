@@ -23,7 +23,7 @@ def MPI_Recv( source, tag, comm ):
 
     """
 
-    DEBUG = 1
+    DEBUG = 0
     
     # Get processor rank.
     my_rank = MPI_Comm_rank(comm)
