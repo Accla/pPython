@@ -12,7 +12,7 @@ def gridPython_Ver():
     """
     
     location = pathlib.Path().absolute()
-    version = '0.2.1'
+    version = '0.3.0'
     
     print('gridPython version: %s'%(version))
     print('          Location: %s'%(location))
