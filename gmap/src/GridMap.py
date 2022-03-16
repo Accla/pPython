@@ -59,27 +59,32 @@ class GridMap:
                 for d in range(len(grid_spec)):
                     dist_spec[str(d)] = dict()
                     dist_spec[str(d)]['dist'] ='b'
-            elif len(dist_spec) == 1:
-                # if only one distribution is provided, then all dimensions are
-                # distributed that way
-                if isinstance(dist_spec,str):
-                    if dist_spec == 'bc':
-                        print('ERROR (GridMap): block-cyclic distribution also needs block size.')
-                        exit()
-                    # 'b' for block & 'c' for cyclic distribution
-                    tmp_dist_spec = dist_spec
-                    dist_spec = dict()
-                    for d in range(len(grid_spec)):
-                        dist_spec[str(d)] = dict()
-                        dist_spec[str(d)]['dist'] = tmp_dist_spec
-                else:
-                    # dist_spec is provided as a dictionary form
-                    # dist_spec['dist'] = 'b' or 'c' or 'bc'
-                    # dist_spec['b_size'] = N where N is the block size 
-                    #                       for block-cyclic distributions
-                    tmp_dist_spec = dist_spec
-                    for d in range(len(grid_spec)):
-                        dist_spec[str(d)] = tmp_dist_spec
+            elif isinstance(dist_spec,str):
+                if dist_spec == 'bc':
+                    print('ERROR (GridMap): block-cyclic distribution also needs block size.')
+                    exit()
+                # 'b' for block & 'c' for cyclic distribution
+                tmp_dist_spec = dist_spec
+                dist_spec = dict()
+                for d in range(len(grid_spec)):
+                    dist_spec[str(d)] = dict()
+                    dist_spec[str(d)]['dist'] = tmp_dist_spec
+            elif any(map(lambda x: isinstance(x,dict),dist_spec.values())):
+                # distribution spec is provided for all directions individually
+                # dist_spec = {'0': {'dist': 'bc', 'b_size': 3}, '1': {'dist': 'b'}}
+                if len(grid_spec) != len(dist_spec):
+                    print('ERROR (GridMap): dimension does not match between grid_spec and dist_spec.')
+                    exit()
+            else:
+                # dist_spec is provided as a dictionary form
+                # dist_spec['dist'] = 'b' or 'c' or 'bc'
+                # dist_spec['b_size'] = N where N is the block size
+                #                       for block-cyclic distributions
+                tmp_dist_spec = dist_spec
+                dist_spec = dict()
+                for d in range(len(grid_spec)):
+                    dist_spec[str(d)] = tmp_dist_spec
+            # check for distribution spec
             for i in range(dim):
                 # check that distributions defined are consistent with {'b', 'c', 'bc'}
                 if (dist_spec[str(i)]['dist'] != 'b') \
@@ -134,29 +139,39 @@ class GridMap:
                 for d in range(len(grid_spec)):
                     dist_spec[str(d)] = dict()
                     dist_spec[str(d)]['dist'] ='b'
-            elif len(dist_spec) == 1:
+            elif isinstance(dist_spec,str):
                 # if only one distribution is provided, then all dimensions are
                 # distributed that way
-                if isinstance(dist_spec,str):
-                    if dist_spec == 'b':
-                        # 'b' for block distribution
-                        tmp_dist_spec = dist_spec
-                        dist_spec = dict()
-                        for d in range(len(grid_spec)):
-                            dist_spec[str(d)] = dict()
-                            dist_spec[str(d)]['dist'] = tmp_dist_spec
-                    else:
-                        print('ERROR (GridMap): Overlap is only supported for block distributions.')
-                        exit()
-                else:
-                    # dist_spec is provided as a dictionary form
-                    # dist_spec['dist'] = 'b' 
-                    if dist_spec['dist'] != 'b':
-                        print('ERROR (GridMap): Overlap is only supported for block distributions.')
-                        exit()
+                if dist_spec == 'b':
+                    # 'b' for block distribution
                     tmp_dist_spec = dist_spec
+                    dist_spec = dict()
                     for d in range(len(grid_spec)):
-                        dist_spec[str(d)] = tmp_dist_spec
+                        dist_spec[str(d)] = dict()
+                        dist_spec[str(d)]['dist'] = tmp_dist_spec
+                else:
+                    print('ERROR (GridMap): Overlap is only supported for block distributions.')
+                    exit()
+            elif any(map(lambda x: isinstance(x,dict),dist_spec.values())):
+                # distribution spec is provided for all directions individually
+                # dist_spec = {'0': {'dist': 'bc', 'b_size': 3}, '1': {'dist': 'b'}}
+                if len(grid_spec) != len(dist_spec):
+                    print('ERROR (GridMap): dimension does not match between grid_spec and dist_spec.')
+                    exit()
+                #
+                # Can we use overlap only certain direction with this?
+                #
+            else:
+                # dist_spec is provided as a dictionary form
+                # dist_spec['dist'] = 'b'
+                if dist_spec['dist'] != 'b':
+                        print('ERROR (GridMap): Overlap is only supported for block distributions.')
+                        exit()
+                tmp_dist_spec = dist_spec
+                dist_spec = dict()
+                for d in range(len(grid_spec)):
+                    dist_spec[str(d)] = tmp_dist_spec
+            # check for distribution  for all directions (dimensions)
             for i in range(dim):
                 # check that distributions defined are consistent with {'b', 'c', 'bc'}
                 if dist_spec[str(i)]['dist'] != 'b':

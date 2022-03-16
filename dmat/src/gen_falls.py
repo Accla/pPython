@@ -91,7 +91,7 @@ def gen_falls(pf, pid):
             elif (pid+1)>num_blocks:
                 # local processor has one less block (incomplete cycle)
                 # but no imcomplete blocks
-                f.local_len = (f.n-1)*block_size;
+                f.local_len = (f.n-1)*block_size
                 f.complete_cycle = False
                 f.complete_block = True
             elif (pid+1)==num_blocks:

@@ -10,16 +10,17 @@ def get_global_ind(falls, grid_dims=None):
     ind = get_global_ind(falls,grid_dim)
     
     FALLS: array of FALLS objects
+    grid_dims:
     IND:
-        length(IND) is equal to the number of dimensions of the distributed
+        len(IND) is equal to the number of dimensions of the distributed
         object. IND(i) is of the form [ind1 ind2 ind3 ...] where ind_i is a
         global index of the distributed object that is local to the current
         processor.
         
         ToDo: should it be a list or a dictionary?
         
-    Original Author:   Nadya Travinin (pMatlab)
-    Author: Dr. Chansup Byun (gridPython)
+    Author:   Nadya Travinin (pMatlab)
+    Python version: Dr. Chansup Byun (gridPython)
     """
     
     DEBUG = 0

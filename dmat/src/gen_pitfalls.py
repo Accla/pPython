@@ -42,8 +42,8 @@ def gen_pitfalls(np, dist_spec, dim_len, overlap=None):
                 evenly divisible by the cycle length.
         p.dist: distribution spec ('b', 'c', or 'bc'  )
 
-    Original Author: Nadya Travinin (pMatlab)
-    Author: Dr. Chansup Byun (gridPython)
+    Author: Nadya Travinin (pMatlab)
+    Python version: Dr. Chansup Byun (gridPython)
 
     References: Shankar Ramaswamy and Prithviraj Banerjee. Automatic Generation of Efficient Array
         Redistribution Routines for Distributed Memory Multicomputers. IEEE 1995.
@@ -76,13 +76,16 @@ def gen_pitfalls(np, dist_spec, dim_len, overlap=None):
         # ToDo: raise by 1 or not?
         num_cycles = math.ceil(dim_len/cycle_len)
         # length of incomplete cycle
-        rem_cycle = dim_len%np
+        if dist_spec['dist'] == 'b':
+            rem_cycle = dim_len%np
+        else:
+            rem_cycle = dim_len%cycle_len
         # additional info used when calculating global index in get_global_ind()
         p.dist = dist_spec['dist']
 
         # create the PITFALLS data structure
-        p.l = 1
-        p.r = b_size
+        p.l = 0
+        p.r = b_size-1
 
 
         # !!!THIS PRODUCES STRIDE>1 EVEN IF NUM_CYCLES==1...MAKE SURE THIS WORKS
@@ -113,7 +116,7 @@ def gen_pitfalls(np, dist_spec, dim_len, overlap=None):
         rem_cycle = dim_len%cycle_len
 
         # create the PITFALLS data structure
-        p.l = 1
+        p.l = 0
         p.r = b_size+overlap
 
         # !!!THIS PRODUCES STRIDE>1 EVEN IF NUM_CYCLES==1...MAKE SURE THIS WORKS
