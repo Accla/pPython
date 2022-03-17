@@ -1,19 +1,9 @@
 """RUN.py
 
-    Example to run a PythonMPI code with gridPython
+Example to run a PythonMPI code, param_sweep_parallel.py, with gridPython
+To run, execute the following command.
 
-    Python environemtn with the following packages:
-        matplotlib
-        glob
-        h5py
-        numpy
-        pickle
-        scipy
-        time
-
-    To run, execute the following command.
-        python RUN.py
-
+    python RUN.py
 """
 
 import os
@@ -25,6 +15,10 @@ GRIDPYTHON_PATH = GRIDPYTHON_HOME+os.sep+"src"
 os.environ["GRIDPYTHON_HOME"] = GRIDPYTHON_HOME
 sys.path.append(GRIDPYTHON_PATH)
 
+# To locate local configuration files
+HOME_PATH = "/home/gridsan/ch21778"
+os.environ["HOME_PATH"] = HOME_PATH
+
 # Import PythonMPI launch funciton
 from pRUN import *
 
@@ -32,11 +26,11 @@ from pRUN import *
 os.environ["HDF5_USE_FILE_LOCKING"]="FALSE"
 
 # PythonMPI script filename
-py_file = 'basic.py'
+py_file = 'param_sweep_parallel.py'
 # Define number of MPI processes
 n_proc = 4
 
 # Launch PythonMPI
-print('Running: %s via pRUN().'%(py_file))
+# print('Running: %s via pRUN().'%(py_file))
 pRUN( py_file, n_proc, 'grid&' )
 
