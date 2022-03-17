@@ -19,6 +19,8 @@ def pyMPI_Comm_settings_local(machine_db_settings):
                    for PC, Linux, and Mac OS environment
 
     """
+    # Grid user
+    USER = 'ch21778'
 
     # Set default type of remote machines to 'unix' (for linux and mac OSes) or 'pc'
     machine_db_settings['type'] = 'unix';     # [OK TO CHANGE.]
@@ -52,7 +54,7 @@ def pyMPI_Comm_settings_local(machine_db_settings):
     machine_db_settings['python_module_name'] = 'anaconda/2021b'
 
     # local directory mapping. (pc, linux, mac, grid, sgrp_1)
-    machine_db_settings['local_dir_map'] = ['Z:', '/export/home/ch21778', '/Volumes/ch21778', '/home/gridsan/ch21778', '/home/gridsan/groups']
+    machine_db_settings['local_dir_map'] = ['Z:', '/export/home/'+USER, '/Volumes/'+USER, '/home/gridsan/'+USER, '/home/gridsan/groups']
 
     return machine_db_settings
 

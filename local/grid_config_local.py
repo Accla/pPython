@@ -44,9 +44,12 @@ def grid_config_local(grid_config):
     if DEBUG:
         print('--> Entering grid_config_local')
 
+    # Grid user
+    USER = 'ch21778'
+
     # Remote access
     grid_config['remote_host'] = 'txg-login.llgrid.ll.mit.edu'
-    grid_config['remote_user'] = 'ch21778'
+    grid_config['remote_user'] = USER
     grid_config['remote_launch'] = 'ssh'
     grid_config['remote_flags'] = '-q -x'
     #
@@ -71,9 +74,9 @@ def grid_config_local(grid_config):
         if OS.ispc:
             HOME_PATH = 'Z:'
         elif OS.islinux:
-            HOME_PATH = '/export/home/ch21778'
+            HOME_PATH = '/export/home/'+USER
         elif OS.ismac:
-            HOME_PATH = '/Volumes/ch21778'
+            HOME_PATH = '/Volumes/'+USER
         else:
             print('HOME_PATH is not set. Check OS type.')
             exit()
