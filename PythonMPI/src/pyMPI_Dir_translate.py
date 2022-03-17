@@ -18,6 +18,13 @@ def pyMPI_Dir_translate(machine_db,path):
 
     DEBUG = 0
 
+    # Initialize the path check
+    is_pc_path = 0
+    is_linux_path = 0
+    is_mac_path = 0
+    is_grid_path = 0
+    is_sgrp_1_path = 0
+
     # Check if a directory mapping has been defined.
     # If so, convert directory names.
     if 'local_dir_map' in machine_db:
@@ -29,6 +36,8 @@ def pyMPI_Dir_translate(machine_db,path):
         mac_n    = len(mac_base);
         grid_base = machine_db['local_dir_map'][3]
         grid_n    = len(grid_base);
+        sgrp_1_base = machine_db['local_dir_map'][3]
+        sgrp_1_n    = len(sgrp_1_base);
     else:
         print('Error (pyMPI_Dir_translate): local directory map not defined in machine_db (local_dir_map)')
         exit()
@@ -36,12 +45,19 @@ def pyMPI_Dir_translate(machine_db,path):
     # Check which OS is compatiable with the given path
     if re.search(pc_base,path,re.IGNORECASE):
         n_base = pc_n
+        is_pc_path = 1
     elif re.search(linux_base,path,re.IGNORECASE):
         n_base = linux_n
+        is_linux_path = 1
     elif re.search(mac_base,path,re.IGNORECASE):
         n_base = mac_n
+        is_mac_path = 1
     elif re.search(grid_base,path,re.IGNORECASE):
         n_base = grid_n
+        is_grid_path = 1
+    elif re.search(sgrp_1_base,path,re.IGNORECASE):
+        n_base = sgrp_1_n
+        is_sgrp_1_path = 1
     else:
         print('Error (pyMPI_Dir_translate): given path, %s, is not compatible with local directory map.')
         exit()
@@ -51,7 +67,10 @@ def pyMPI_Dir_translate(machine_db,path):
         
     # Swap bases.
     if os.path.exists('/etc/llgrid.id'):
-        local_path = grid_base + path[n_base:]
+        if is_grid_path:
+            local_path = grid_base + path[n_base:]
+        elif is_sgrp_1_path:
+            local_path = sgrp_1__base + path[n_base:]
         # in case, local_path has Windows separator in path
         local_path = replace_token("\\","/",local_path)
     else:

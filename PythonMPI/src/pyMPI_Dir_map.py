@@ -13,16 +13,20 @@ def pyMPI_Dir_map(machine_db,path):
     dir_linux:  Linux OS directory path (dtype: string)
     dir_mac:    Mac OS directory path (dtype: string)
     dir_grid:   directory path on the grid (dtype: string)
-    
+
+    Note: machine_db can support multiple paths on the grid but only one path
+          based on the user home directory path.  All other group shared directories
+          should have symbolic links at $HOME.
     """
 
-    DEBUG = 0
+    DEBUG = 0 
 
     # Default is to do nothing.
     dir_pc = path;
     dir_linux = path;
     dir_mac = path;
     dir_grid = path;
+    dir_sgrp_1 = path;
 
     # Check if a directory mapping has been defined.
     # If so, convert directory names.
@@ -35,6 +39,8 @@ def pyMPI_Dir_map(machine_db,path):
         mac_n    = len(mac_base);
         grid_base = machine_db['local_dir_map'][3]
         grid_n    = len(grid_base);
+        sgrp_1_base = machine_db['local_dir_map'][4]
+        sgrp_1_n    = len(sgrp_1_base);
 
         if path[0:pc_n].lower() == pc_base.lower():
             # Check if path has a pc base
@@ -75,6 +81,20 @@ def pyMPI_Dir_map(machine_db,path):
             dir_pc = pc_base + path[grid_n:]
             dir_linux = linux_base + path[grid_n:]
             dir_mac = mac_base + path[grid_n:]
+
+            dir_pc = replace_token('/','\\',dir_pc)
+            
+        elif path[0:sgrp_1_n].lower() == sgrp_1_base.lower():
+            # Check if path has a shared group 1 base
+            # Convert all other paths accordingly.
+            # Swap bases for other path variables.
+            #
+            # shared group 1 path will be converted to dir_grid
+            # 
+            dir_pc = pc_base + path[sgrp_1_n:]
+            dir_linux = linux_base + path[sgrp_1_n:]
+            dir_mac = mac_base + path[sgrp_1_n:]
+            dir_grid = grid_base + path[sgrp_1_n:]
 
             dir_pc = replace_token('/','\\',dir_pc)
             
