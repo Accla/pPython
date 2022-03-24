@@ -43,14 +43,21 @@ sys.path.append(GRIDPYTHON_PATH)
 
 if os.path.exists(PYTHONMPI_PATH):
     import checkOS as OS
-    from PythonMPI import *
+    # from PythonMPI import *
+    from pyMPI_Delete_all import *
+    from pyMPI_Sleep import *
 else:
     print('ERROR(pRUN): PythonMPI package path, %s, does not exist.'%(PYTHONMPI_PATH))
     exit()
     
 if os.path.exists(GRIDPYTHON_PATH):
     import grid_config as grid
-    from gridPython import *
+    # from gridPython import *
+    from check_allowance import *
+    from grid_Abort import *
+    from grid_config_init import *
+    from grid_run import *
+    print('gridPython functions are loaded......')
 else:
     print('ERROR(pRUN): gridPython package path, %s, does not exist.'%(GRIDPYTHON_PATH))
     exit()
@@ -138,8 +145,8 @@ def pRUN(py_file,n_proc,machines,sched_options=None):
 
     # Launch PythonMPI
     if DEBUG:
-        print('grid_Run called . . .')
-    cmd = grid_Run(py_file, n_proc, machines)
+        print('grid_run called . . .')
+    cmd = grid_run(py_file, n_proc, machines)
 
     if DEBUG:
         print('<-- Exiting pRUN')

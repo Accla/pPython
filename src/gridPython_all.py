@@ -1,5 +1,5 @@
 # PythonMPI method
-from PythonMPI import *
+from PythonMPI_all import *
 
 # GridPython class
 import GridPython as GPC
@@ -16,9 +16,9 @@ from grid_config_init import *
 from grid_resource_policy import *
 from grid_status import *
 from grid_Abort import *
-from grid_Run import *
+from grid_run import *
 from partition_1d import *
-from pRUN import *
+# from pRUN import *
 from set_remote_cc import *
 from slurm_submit_job import *
 from slurm_write_job_script import *

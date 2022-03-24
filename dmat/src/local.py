@@ -1,4 +1,4 @@
-from Dmat import *
+from GridDmat import *
 
 def local(d):
     """Returns the local part of the distributed array.
@@ -8,7 +8,7 @@ def local(d):
     Python version: Dr. Chansup Byun
     """
     
-    if isinstance(d,type(Dmat())):
+    if isinstance(d,type(GridDmat())):
         return d.local
     else:
         return d

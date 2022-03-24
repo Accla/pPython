@@ -5,6 +5,9 @@ from grid_dmat import *
 
 def dmat(v,p):
     """grid_dmat() wrapper method.
+    
+    p: map
+
     """
     
     # Check if len(v) is equal to p.dim

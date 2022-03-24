@@ -1,6 +1,6 @@
 import math
 
-from PitFalls import *
+from GridPitFalls import *
 
 def gen_pitfalls(np, dist_spec, dim_len, overlap=None):
     """Given the number of processors, distribution spec, and the length of the dimension,
@@ -55,8 +55,8 @@ def gen_pitfalls(np, dist_spec, dim_len, overlap=None):
         print('--> Entering gen_pitfalls.')
         print('np = %d'%(np))
 
-    # Create an empty PitFalls class.
-    p = PitFalls()
+    # Create an empty GridPitFalls class.
+    p = GridPitFalls()
     p.overlap = overlap
 
     if not overlap:  # no overlap

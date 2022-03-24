@@ -1,7 +1,7 @@
 # classes
-from PitFalls import *
-from Falls import *
-from Dmat import *
+from GridPitFalls import *
+from GridFalls import *
+from GridDmat import *
 
 # functions
 from agg import *

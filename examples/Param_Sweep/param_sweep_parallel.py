@@ -17,26 +17,16 @@
     cbyun@ll.mit.edu
 """
 
-# import numpy as np
-# from scipy.fft import fft
-
-# from PythonMPI import *
-from gridPython import *
+# Load almost all the gridPython packages
+from gridPython_all import *
 
 from sample_function import *
 
-# Initialize MPI
-# MPI_Init()
-
 # Create communicator.
-# pyMCW is imported in PythonMPI.py
-# comm = pyMCW.MPI_COMM_WORLD;
-# GridPython as GPC in gridPython.py
+# GridPython as GPC in gridPython_all.py
 comm = GPC.comm
 
 # Get size and rank.
-# Np = MPI_Comm_size(comm)
-# Pid = MPI_Comm_rank(comm)
 Np = GPC.comm_size
 Pid = GPC.my_rank
 
@@ -45,6 +35,7 @@ print('size: %d'%(Np))
 print('my_rank: %d'%(Pid))
 
 # Create a map
+# 'b': block distribution, for details help('GridMap')
 pmap = GridMap([Np,1],'b',range(Np))
 
 # Create a distributed matrix on individual rank

@@ -1,5 +1,13 @@
 # import PythonMPI and gridPython
-from gridPython import *
+import pyMPI_COMM_WORLD as pyMCW
+
+# from gridPython import *
+from MPI_Init import *
+from MPI_Comm_rank import *
+from MPI_Comm_size import *
+
+# GridPython class
+import GridPython as GPC
 
 def gridPython_init():
     """Initialize Grid Python environment.

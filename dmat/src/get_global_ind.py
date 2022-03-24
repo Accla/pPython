@@ -1,4 +1,4 @@
-from Falls import *
+from GridFalls import *
 
 def get_global_ind(falls, grid_dims=None):
     """Returns a list array of global indices stored locally given
@@ -37,8 +37,8 @@ def get_global_ind(falls, grid_dims=None):
         for i in range(dim):
             temp = []
             falls_i = falls[i]
-            if isinstance(falls_i,type(Falls())):
-                # falls is an instance of Falls class
+            if isinstance(falls_i,type(GridFalls())):
+                # falls is an instance of GridFalls class
                 if (len(grid_dims)>0) and (grid_dims[i] == 1): 
                     # dimension is not distributed
                     # print('get_global_ind: To be checked, am i here?')
@@ -78,7 +78,7 @@ def get_global_ind(falls, grid_dims=None):
                         else:
                             temp += list(range(falls_i.l+(falls_i.n-1)*falls_i.s,falls_i.l+(falls_i.n-1)*falls_i.s+rem_block))
             else:
-                print('falls instance is not Falls type.')
+                print('falls instance is not GridFalls type.')
                 
             # store temp in ind
             ind[str(i)] = temp

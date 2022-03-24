@@ -1,6 +1,6 @@
 import numpy as np
 
-from Falls import *
+from GridFalls import *
 
 def local_dims(falls, dim):
     """Given the local FALLS and object dimension, calculates
@@ -29,7 +29,7 @@ def local_dims(falls, dim):
         # !!!NOTE: The following calculation works only if data on processor
         # RANK can be represented by a single FALLS.
         local_size = []
-        if isinstance(falls[0], type(Falls())):
+        if isinstance(falls[0], type(GridFalls())):
             for i in range(dim):
                 # local size is just the local_len field of the local falls
                 local_size = local_size + [falls[i].local_len]

@@ -1,16 +1,16 @@
-from Falls import *
+from GridFalls import *
 
 # Modified implemention to distribute elements across processors as evenly as possible.
 #
 def gen_falls(pf, pid):
     """Generates the local FALLS (FAmiLy of Line Segmentts) structure for processor, pid, from the given
-    instance of PitFalls class.
+    instance of GridPitFalls class.
 
     Usage:
     ------
     f = gen_falls(pf, pid)
 
-    pf: insttance of the PitFalls class
+    pf: insttance of the GridPitFalls class
     pid: process rank, starting from zero
 
     The following are the fields of each falls F:
@@ -37,8 +37,8 @@ def gen_falls(pf, pid):
     if DEBUG:
         print('--> Entering gen_falls')
 
-    # Create an empty Falls class.
-    f = Falls()
+    # Create an empty GridFalls class.
+    f = GridFalls()
 
     f.l = pf.l+pid*pf.d
     f.r = pf.r+pid*pf.d

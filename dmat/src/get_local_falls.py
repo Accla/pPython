@@ -1,7 +1,7 @@
 import math
 import numpy as np
 
-from Falls import *
+from GridFalls import *
 
 def get_local_falls(pitfalls, grid, rank):
     """Given the PITFALLS object, the grid and local processor rank, 
@@ -76,8 +76,8 @@ def get_local_falls(pitfalls, grid, rank):
             
         if len(ind):
             for i in range(dim):
-                # Create an empty Falls class.
-                f = Falls()
+                # Create an empty GridFalls class.
+                f = GridFalls()
 
                 pid = ind[i]
                 pf = pitfalls[i]

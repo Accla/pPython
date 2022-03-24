@@ -1,7 +1,7 @@
 import pyMPI_COMM_WORLD as pyMCW
 from MPI_Comm_rank import *
 
-from Dmat import *
+from GridDmat import *
 
 from gen_pitfalls import *
 from get_local_falls import *
@@ -70,7 +70,7 @@ def grid_dmat(m,n=None,q=None,r=None,p=None):
         print('Dimension of distributed zeros: %d'%(len(dims)))
         print(dims)
     
-    d = Dmat()
+    d = GridDmat()
     
     if len(dims) == 1: # DMAT(M, P)
         dims = dims + dims
