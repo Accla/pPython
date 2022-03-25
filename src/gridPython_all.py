@@ -19,6 +19,8 @@ from grid_Abort import *
 from grid_run import *
 from partition_1d import *
 # from pRUN import *
+from n_dim_find import *
 from set_remote_cc import *
 from slurm_submit_job import *
 from slurm_write_job_script import *
+

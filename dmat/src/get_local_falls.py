@@ -2,6 +2,7 @@ import math
 import numpy as np
 
 from GridFalls import *
+from n_dim_find import *
 
 def get_local_falls(pitfalls, grid, rank):
     """Given the PITFALLS object, the grid and local processor rank, 
@@ -55,6 +56,8 @@ def get_local_falls(pitfalls, grid, rank):
     local_falls = []
     
     if dim <= 4:
+
+        """ 
         result = np.where(grid == rank)
         # result is a tuple with indices of grid where rank is located
         ifound = any(map(lambda x: any(x>=0), result))
@@ -69,7 +72,9 @@ def get_local_falls(pitfalls, grid, rank):
         if ifound and (len(ind)<dim):
             for d in range((len(ind)+1),dim+1):
                 ind.append(0)
+        """ 
         
+        ind = n_dim_find(grid,rank)
         if DEBUG:
             print('get_local_falls: index posititon for given rank, %d'%(rank))
             print(ind)

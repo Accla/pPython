@@ -19,3 +19,4 @@ from print_falls import *
 from print_pitfalls import *
 from put_local import *
 from reconstruct import *
+from synch import *
