@@ -101,7 +101,9 @@ def grid_dmat(m,n=None,q=None,r=None,p=None):
             pitfalls.append(gen_pitfalls(p.grid.shape[i], p.dist_spec[str(i)], dims[i]))
         else:
             # non-zero p.overlap is defined.
-            # print('non-zero overlap')
+            if DEBUG:
+                print('non-zero overlap')
+                print('p.overlap: %d in axis, i = %d'%(p.overlap[i],i))
             pitfalls.append(gen_pitfalls(p.grid.shape[i], p.dist_spec[str(i)], dims[i], p.overlap[i]))
 
     d.pitfalls = pitfalls

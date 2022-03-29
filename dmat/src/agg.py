@@ -51,11 +51,19 @@ def agg(d, leader=None):
                 for j in range(dim[1]):
                     if (GPC.my_rank==d.map.grid[i][j]):
                         temp_mat[str(i)][str(j)] = d.local
+                        if DEBUG:
+                            print('Local array, d.local:')
+                            print('type(d.local): %s'%(type(d.local)))
+                            print('type(d.local[0,0]): %s'%(type(d.local[0,0])))
+
                     else:
                         [temp] = MPI_Recv(d.map.grid[i][j], GPC.tag, GPC.comm)
                         temp_mat[str(i)][str(j)] = temp
                         if DEBUG:
                             print('Leader received msg for (i,j) = (%d,%d) from Pid, %d, with the tag, %s.'%(i,j,d.map.grid[i][j],GPC.tag))
+                            print('Received array, temp:')
+                            print('type(temp): %s'%(type(temp)))
+                            print('type(temp[0,0]): %s'%(type(temp[0,0])))
         else:
             print('ERROR(agg): map dimension, %d, is not yet supported.'%(d.dim))
             
@@ -74,6 +82,9 @@ def agg(d, leader=None):
             MPI_Send(map_leader, GPC.tag, GPC.comm, d.local)
             if DEBUG:
                 print('Sent msg to %d with tag, %s'%(map_leader,GPC.tag))
+                print('Sent array, d.local:')
+                print('type(d.local): %s'%(type(d.local)))
+                print('type(d.local[0,0]): %s'%(type(d.local[0,0])))
         mat = d.local
 
     if DEBUG:

@@ -3,6 +3,8 @@ import numpy as np
 
 from GridFalls import *
 from n_dim_find import *
+from print_pitfalls import *
+from print_falls import *
 
 def get_local_falls(pitfalls, grid, rank):
     """Given the PITFALLS object, the grid and local processor rank, 
@@ -57,23 +59,6 @@ def get_local_falls(pitfalls, grid, rank):
     
     if dim <= 4:
 
-        """ 
-        result = np.where(grid == rank)
-        # result is a tuple with indices of grid where rank is located
-        ifound = any(map(lambda x: any(x>=0), result))
-        if ifound:
-            # Convert np array into a list for easy of use
-            for i in range(len(result)):
-                ind.append(result[i][0])
-        else:
-            print('ERROR(get_local_falls): Rank, %d, not found in grid.'%(rank))
-            
-        # fill up in case ind dimension does not match with dim
-        if ifound and (len(ind)<dim):
-            for d in range((len(ind)+1),dim+1):
-                ind.append(0)
-        """ 
-        
         ind = n_dim_find(grid,rank)
         if DEBUG:
             print('get_local_falls: index posititon for given rank, %d'%(rank))
@@ -165,6 +150,12 @@ def get_local_falls(pitfalls, grid, rank):
                         f.complete_cycle = False
                         f.complete_block = False
             
+                    #CB: For the last block, check if f.r > max. data dimension
+                    #    With the block distribution, pf.rem_cycle is always the max dimension (right?)
+                    if f.r >= pf.rem_cycle:
+                        f.r = pf.rem_cycle - 1
+                        f.local_len = f.r - f.l +1
+
                 # store the FALLS structure 
                 local_falls.append(f)
                 if DEBUG:

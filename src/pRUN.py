@@ -54,7 +54,7 @@ if os.path.exists(GRIDPYTHON_PATH):
     import grid_config as grid
     # from gridPython import *
     from check_allowance import *
-    from grid_Abort import *
+    from grid_abort import *
     from grid_config_init import *
     from grid_run import *
     print('gridPython functions are loaded......')
@@ -134,9 +134,9 @@ def pRUN(py_file,n_proc,machines,sched_options=None):
 
     # Clearn up an old PythonMPI run
     if isinstance(machines, str):
-        grid_Abort(grid.grid_config)
+        grid_abort(grid.grid_config)
     else:
-        grid_Abort()
+        grid_abort()
     # wait for the filesystem update
     pyMPI_Sleep(1.0)
     pyMPI_Delete_all()

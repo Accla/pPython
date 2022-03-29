@@ -114,10 +114,12 @@ def gen_pitfalls(np, dist_spec, dim_len, overlap=None):
         num_cycles = math.ceil(dim_len/cycle_len)
         # length of incomplete cycle
         rem_cycle = dim_len%cycle_len
+        # additional info used when calculating global index in get_global_ind()
+        p.dist = dist_spec['dist']
 
         # create the PITFALLS data structure
         p.l = 0
-        p.r = b_size+overlap
+        p.r = b_size-1+overlap
 
         # !!!THIS PRODUCES STRIDE>1 EVEN IF NUM_CYCLES==1...MAKE SURE THIS WORKS
         # !!!This might influence the intersection algorithm
@@ -128,7 +130,9 @@ def gen_pitfalls(np, dist_spec, dim_len, overlap=None):
         p.p = np
         p.rem_cycle = rem_cycle
 
-    if DEBUG:
-        print('--> Exitting gen_pitfalls.')
+        if DEBUG:
+            print('Overlap:')
+            print('b_size,overlap: %d,%d'%(b_size,overlap))
+            print('--> Exitting gen_pitfalls.')
     return p
 

@@ -51,14 +51,19 @@ def reconstruct(pitfalls, grid, temp_mat, mat_size):
             for jkey in ival.keys():
                 jval = ival[jkey]
                 jkeys = ival.keys()
-                dtype = type(jval)
-                # print('dtype, %s, at ikey,jkey = %s,%s'%(dtype,ikey,jkey))
+                dtype = type(jval[0,0])
+                if DEBUG:
+                    print('dtype, %s, at ikey,jkey = %s,%s'%(dtype,ikey,jkey))
+                    print('jval:')
+                    print(jval)
                 break
             break
         # Create a zeros array of the same type as temp_mat
         mat = np.zeros(mat_size,dtype)
         if DEBUG:
             print('mat size: %s'%(str(mat_size)))
+            print('type(mat): %s'%(type(mat)))
+            print('type(mat[0,0]): %s'%(type(mat[0,0])))
 
         # get local indices for each processor in the grid
         my_global_ind = dict()

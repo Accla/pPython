@@ -65,7 +65,9 @@ def get_global_ind(falls, grid_dims=None):
                             print('complete n-th cycle & complete block')
                             print(falls_i.l+(falls_i.n-1)*falls_i.s)
                             print(falls_i.r+(falls_i.n-1)*falls_i.s+1)
-                        temp += list(range(falls_i.l+(falls_i.n-1)*falls_i.s,falls_i.r+(falls_i.n-1)*falls_i.s+1))
+                        i_left = falls_i.l+(falls_i.n-1)*falls_i.s
+                        i_rght = falls_i.r+(falls_i.n-1)*falls_i.s+1
+                        temp += list(range(i_left,i_rght))
  
                     elif (not falls_i.complete_cycle) and (not falls_i.complete_block):
                         if DEBUG:
@@ -76,7 +78,10 @@ def get_global_ind(falls, grid_dims=None):
                         if falls_i.dist == 'b':
                             temp += list(range(falls_i.l,falls_i.r+1))
                         else:
-                            temp += list(range(falls_i.l+(falls_i.n-1)*falls_i.s,falls_i.l+(falls_i.n-1)*falls_i.s+rem_block))
+                            i_left = falls_i.l+(falls_i.n-1)*falls_i.s
+                            i_rght = falls_i.l+(falls_i.n-1)*falls_i.s+rem_block
+                            temp += list(range(i_left,i_rght))
+                            # temp += list(range(falls_i.l+(falls_i.n-1)*falls_i.s,falls_i.l+(falls_i.n-1)*falls_i.s+rem_block))
             else:
                 print('falls instance is not GridFalls type.')
                 

@@ -6,7 +6,7 @@ import GridPython as GPC
 
 # gridPython methods
 from gridPython_init import *
-from gridPython_Ver import *
+from gridPython_ver import *
 
 from check_allowance import *
 from check_mount import *
@@ -15,7 +15,7 @@ from exec_shell_cmd import *
 from grid_config_init import *
 from grid_resource_policy import *
 from grid_status import *
-from grid_Abort import *
+from grid_abort import *
 from grid_run import *
 from partition_1d import *
 # from pRUN import *

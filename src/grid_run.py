@@ -296,8 +296,9 @@ def grid_run( py_file, n_proc, machines ):
 
     # For somehow find out if this is an interactive job. then, execute the local processing:
     if interactive:
-        print(defscommands)
+        # print(defscommands)
         print('grid_run: executing %s in the current python process.'%(py_file))
+        print(' ')
         exec(defscommands)
 
     if DEBUG:

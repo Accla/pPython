@@ -14,7 +14,8 @@ def n_dim_find(grid,rank):
     python version: Dr. Chansup Byun
     """
     
-    ind = []
+    dim = len(grid.shape)
+    ind = np.zeros(dim,dtype=int)
     
     result = np.where(grid == rank)
     # result is a tuple with indices of grid where rank is located
@@ -22,14 +23,14 @@ def n_dim_find(grid,rank):
     if ifound:
         # Convert np array into a list for easy of use
         for i in range(len(result)):
-            ind.append(result[i][0])
+            ind[i] = result[i][0]
     else:
         print('ERROR(n_dim_find): Rank, %d, not found in process grid.'%(rank))
             
     # fill up in case ind dimension does not match with dim
     if ifound and (len(ind)<dim):
         for d in range((len(ind)+1),dim+1):
-            ind.append(0)
+            ind[d] = 0
             
     return ind    
 

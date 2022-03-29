@@ -38,18 +38,18 @@ def grid_zeros(m,n=None,q=None,r=None,p=None,dtype=None):
     dims = []
     dims.append(m)
     if n:
-        dims.append(n)
+        dims.append(int(n))
     if q:
-        dims.append(q)
+        dims.append(int(q))
     if r:
-        dims.append(r)
+        dims.append(int(r))
     
     if DEBUG:
         print('Dimension of distributed zeros: %d'%(len(dims)))
         print(dims)
     
     if not dtype:
-        dtype = 'float'
+        dtype = np.float64
     
     if len(dims) < 5:
         d = dmat(dims, p)

@@ -9,12 +9,12 @@ from exec_shell_cmd import *
 from set_remote_cc import *
 
 @dispatch()
-def grid_Abort():
+def grid_abort():
     """Wrapper for MPI_Abort  -  Aborts any currently running MatlabMPI sessions."""
     MPI_Abort()
 
 @dispatch(dict)
-def grid_Abort(grid_config):
+def grid_abort(grid_config):
     """MPI_Abort  -  Aborts any currently running MatlabMPI sessions.
 
     Usage:

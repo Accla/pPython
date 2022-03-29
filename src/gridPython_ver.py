@@ -1,7 +1,7 @@
 import pathlib
 
-def gridPython_Ver():
-    """gridPython_Ver - Return the current gridPython version.
+def gridPython_ver():
+    """gridPython_ner - Return the current gridPython version.
     
     Usage:
     version = gridPython_Ver()
@@ -12,7 +12,7 @@ def gridPython_Ver():
     """
     
     location = pathlib.Path().absolute()
-    version = '0.4.0'
+    version = '0.5.0'
     
     print('gridPython version: %s'%(version))
     print('          Location: %s'%(location))

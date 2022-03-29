@@ -6,6 +6,7 @@ from MPI_Recv import *
 
 import GridPython as GPC
 from n_dim_find import *
+from inmap import *
 
 def synch(d):
     """Syncronize the data in the distribute matrix. 
@@ -27,12 +28,16 @@ def synch(d):
     python version: Dr. Chansup Byun
     """
 
+    DEBUG = 0
+    if DEBUG:
+        print('--> Entering synch')
+
     p = d.map
     # find current processor index in the grid
     proc_grid = p.grid
     my_grid_ind = n_dim_find(proc_grid, GPC.my_rank)
     # obtain the process grid dimensions
-    grid_dims = len(proc_grid.shape)
+    grid_dims = list(proc_grid.shape)
 
     if inmap(p, GPC.my_rank):
         subs = []
@@ -40,7 +45,7 @@ def synch(d):
             if bool(p.overlap): # overlap description defined
                 if p.overlap[i]>0: # overlap is greater than 0
                 
-                    ind_adjuster = np.zeros(d.dim)
+                    ind_adjuster = np.zeros(d.dim,dtype=int)
                     ind_adjuster[i] = -1
                                     
                     # increment tag
@@ -49,9 +54,12 @@ def synch(d):
                 
                     # CB: the following implicitly assumes that both process grid and data dimensions match
                     recv_proc_ind = my_grid_ind+ind_adjuster
+                    if DEBUG:
+                        print('recv_proc_ind:')
+                        print(recv_proc_ind)
                 
                     # if the rank is not at the starting edge in the i-th direction (dimension)
-                    if my_grid_ind[i] != 0:
+                    if my_grid_ind[i] > 0:
                         str_sub_data = 'd.local['
                         for s in range(len(p.overlap)):
                             if p.overlap[s] > 0:
@@ -60,28 +68,34 @@ def synch(d):
                                 str_sub_data += ':,'
                         # Take care of the last character
                         str_sub_data = str_sub_data[0:-1]+']'
-                        # print('string representation for subset array: %s'%(str_sub_data))
-                        subs = eval(str_sub_data)
+                        if DEBUG:
+                            print('string representation for subset array: %s'%(str_sub_data))
+                        data = eval(str_sub_data)
                         
                         # Construct a string to extract process rank to send the data
                         str_proc_grid = 'proc_grid['
                         for j in range(d.dim):
                             str_proc_grid += 'recv_proc_ind['+str(j)+'],'
-                            str_proc_grid = str_proc_grid[0:-1]+']'
-                        # print(str_proc_grid)
+                        str_proc_grid = str_proc_grid[0:-1]+']'
+                        if DEBUG:
+                            print(str_proc_grid)
                         send_to_rank = eval(str_proc_grid)
                         MPI_Send(send_to_rank, GPC.tag, GPC.comm, data)
                 
                     ind_adjuster[i] = 1
                     send_proc_ind = my_grid_ind+ind_adjuster
+                    if DEBUG:
+                        print('send_proc_ind:')
+                        print(send_proc_ind)
                 
-                    if my_grid_ind[i] != grid_dims[i]:
+                    if my_grid_ind[i] < grid_dims[i]-1:
                         # Construct a string to extract process rank to send the data
                         str_proc_grid = 'proc_grid['
                         for j in range(d.dim):
                             str_proc_grid += 'send_proc_ind['+str(j)+'],'
-                            str_proc_grid = str_proc_grid[0:-1]+']'
-                        # print(str_proc_grid)
+                        str_proc_grid = str_proc_grid[0:-1]+']'
+                        if DEBUG:
+                            print(str_proc_grid)
                         recv_from_rank = eval(str_proc_grid)
                         [data] = MPI_Recv(recv_from_rank, GPC.tag, GPC.comm)
 
@@ -96,11 +110,15 @@ def synch(d):
                                 str_sub_data += ':,'
                         # Take care of the last character
                         str_sub_data = str_sub_data[0:-1]+'] = data'
-                        # print('string representation for subset array: %s'%(str_sub_data))
+                        if DEBUG:
+                            print('string representation for subset array: %s'%(str_sub_data))
                         exec(str_sub_data)
                # End of section with overlap is greater than 0
             # End of section for overlap description defined
         # syncronize each dimension
+
+    if DEBUG:
+        print('--> Exiting synch')
 
     return d
 
