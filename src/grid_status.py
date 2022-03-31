@@ -27,6 +27,8 @@ def grid_status(cpu_type):
     
     """
 
+    DEBUG = 0
+
     total_procs = 0
     unclaimed_procs = 0
     unclaimed_nodes = 0
@@ -39,6 +41,13 @@ def grid_status(cpu_type):
     ecmd = ExecShellCmd(set_remote_cc())
     ecmd.run(cmdstr)
     llsc_status = ecmd.get_output()
+
+    if DEBUG:
+        print('Remote execution: %s'%(set_remote_cc()))
+        print('Standard output:')
+        print(ecmd.get_stdout())
+        print('Standard error:')
+        print(ecmd.get_stderr())
     
     i_found_cpu_type = 0
     for line in llsc_status.split('\n'):
@@ -59,7 +68,7 @@ def grid_status(cpu_type):
                 
     if not i_found_cpu_type:
         print('Error (grid_status): cpu type, %s, is not found.'%(cpu_type))
-        exit
+        exit()
         
     return total_procs,unclaimed_procs,unclaimed_nodes,\
     cluster_name,grid_scheduler,grid_scheduler_ver

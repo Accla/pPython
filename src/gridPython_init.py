@@ -15,7 +15,7 @@ def gridPython_init():
 
     # PythonMPI initialization
 
-    # Initialize MatlabMPI
+    # Initialize PYthonMPI
     MPI_Init()
 
     # Create communicator. 

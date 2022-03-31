@@ -20,6 +20,11 @@ from slurm_write_job_script import *
 from slurm_submit_job import *
 import grid_config as grid
 
+@dispatch(str,int,dict)
+def grid_run( py_file, n_proc, machines ):
+    """Wrapper for MPI_Run()."""
+    return MPI_Run(py_file, n_proc, machines)
+
 @dispatch(str,int,list)
 def grid_run( py_file, n_proc, machines ):
     """Wrapper for MPI_Run()."""
