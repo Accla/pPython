@@ -1,3 +1,5 @@
+import numpy as np
+
 def put_local(x, x_local):
     """Assigns new data to the local part of the distributed array.
     
@@ -11,6 +13,10 @@ def put_local(x, x_local):
     Python version: Dr. Chansup Byun
     """
 
-    x.local = x_local
+    if isinstance(x_local, np.ndarray):
+        x.local = x_local
+    else:
+        x.local[:] = x_local
+
     return x
 
