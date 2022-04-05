@@ -20,6 +20,10 @@ def MPI_Send(dest, tag, comm, *argv):
 
     """
 
+    DEBUG = 0
+    if DEBUG:
+        print('--> Entering MPI_Send')
+
     # Get processor rank.
     my_rank = MPI_Comm_rank(comm)
 
@@ -31,9 +35,12 @@ def MPI_Send(dest, tag, comm, *argv):
     # Save buf to file after packing the message into a dictionary
     msg = dict()
     ii = 0
-    # print('Length of argv: %d'%(len(argv)))
+    if DEBUG:
+        print('Length of argv: %d'%(len(argv)))
     for arg in argv:
         # Serialize object with pickle
+        if DEBUG:
+            print(arg)
         msg[ii] = arg
         ii = ii + 1
     # Write the message into a file.
@@ -43,3 +50,5 @@ def MPI_Send(dest, tag, comm, *argv):
     fid = open(lock_file,'w+')
     fid.close()
 
+    if DEBUG:
+        print('<-- Exiting MPI_Send')
