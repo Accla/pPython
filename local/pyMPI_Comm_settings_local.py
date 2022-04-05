@@ -54,8 +54,8 @@ def pyMPI_Comm_settings_local(machine_db_settings):
     machine_db_settings['python_module_path'] = '/etc/environment-modules/modules'
     machine_db_settings['python_module_name'] = 'anaconda/2021b'
 
-    # local directory mapping. (pc, linux, mac, grid, sgrp_1)
-    machine_db_settings['local_dir_map'] = ['Z:', '/export/home/'+USER, '/Volumes/'+USER, '/home/gridsan/'+USER, '/home/gridsan/groups']
+    # local directory mapping. (pc, linux, mac, grid, sgrp_1, sgrp_2)
+    machine_db_settings['local_dir_map'] = ['Z:', '/export/home/'+USER, '/Volumes/'+USER, '/home/gridsan/'+USER, '/home/gridsan/groups', '/data2/groups']
 
     return machine_db_settings
 

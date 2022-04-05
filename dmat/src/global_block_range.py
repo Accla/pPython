@@ -2,24 +2,21 @@ from multipledispatch import dispatch
 import numpy as np
 
 from GridDmat import *
-from grid_global_ind import *
-
-dmat_type = type(GridDmat())
 
 #
 # For np.ndarray type variables
 #
 
 @dispatch(np.ndarray)
-def global_block_ranges(d):
-    """Returns the range of indices in the specified dimension along with its rank
+def global_block_range(d):
+    """Returns the range of indices in the specified dimension.
     
     Usage:
     ------
-    ind = global_block_ranges(D) 
+    ind = GLOBAL_BLOCK_RANGE(D) 
     
     d: a DOUBLE.
-    ind: an array containing index range boundary for all dimensions along with its rank
+    ind: an array containing index range boundary for all dimensions
     
     One of the functions that mimics the parallel library behavior on
     non-distributed arrays.
@@ -33,16 +30,16 @@ def global_block_ranges(d):
     for i in range(len(d.shape)):
         dims.append(i)
 
-    return global_block_ranges(d, dims)
+    return global_block_range(d, dims)
 
 
 @dispatch(np.ndarray,int)
-def global_block_ranges(d, dim):
+def global_block_range(d, dim):
     """Returns the range of indices in the specified dimension.
     
     Usage:
     ------
-    ind = global_block_ranges(D, dim) 
+    ind = GLOBAL_BLOCK_RANGE(D, dim) 
     
     d: a DOUBLE.
     dim: an integer from range(max. dimension)
@@ -59,23 +56,23 @@ def global_block_ranges(d, dim):
     dims = []
     dims.append(dim)
         
-    return global_block_ranges(d, dims)
+    return global_block_range(d, dims)
 
 
 @dispatch(np.ndarray,list)
-def global_block_ranges(d, dims):
+def global_block_range(d, dims):
     """Returns the range of indices in the specified dimension.
     
     Usage:
     ------
-    ind = global_block_ranges(D, dims=None) 
+    ind = GLOBAL_BLOCK_RANGE(D, dims=None) 
     
     d: a DOUBLE.
     dims: a list of dimension or dimensions
     ind: an array containing index range boundary for given list
     
     One of the functions that mimics the parallel library behavior on
-    non-distributed a rrays.
+    non-distributed arrays.
  
     Author:   Nadya Travinin
     Pytthon version: Dr. Chansup Byun
@@ -84,17 +81,14 @@ def global_block_ranges(d, dims):
     
     print(dims)
     
-    ind = np.zeros((len(dims),3),int)
-    # 1st: its rank (for serial)
-    # 2nd: starting index, which is always 0
-    # 3rd: ending index (N-1)
+    ind = np.zeros((len(dims),2),int)
     my_inds = list(d.shape)
     print(my_inds)
     
     for i in range(len(dims)):
         # For python, index ranges from 0 to N-1
         print(dims[i])
-        ind[i,2] = my_inds[dims[i]]-1
+        ind[i,1] = my_inds[dims[i]]-1
         
     return ind
 
@@ -102,22 +96,21 @@ def global_block_ranges(d, dims):
 # For distributed array type (GridDmat) variables
 #
 
-@dispatch(dmat_type)
-def global_block_ranges(d):
-    """Returns the global index range of the distributed array D for all processors in 
-    all dimensions of D.
+@dispatch(type(GridDmat()))
+def global_block_range(d):
+    """Returns the ranges of global indices local to the current processor.
     
     Usage:
     ------
-    ind = global_block_ranges(D) 
-            
+    ind = GLOBAL_BLOCK_RANGE(D) 
+    
+    GLOBAL_BLOCK_RANGE(D) Returns the global index range of the 
+        distributed array D local to the current processor in all 
+        dimensions.
+        
     d: a distributed array.
-
-    For each dimension, the following is the format of the indices returned:
-        Array size: NUM_PROCS_IN_GRIDx3. Each line of the returned array M, 
-        M(i,:) contains the follwing information 
-        [PROCESSOR_RANK START_INDEX END_INDEX]
-
+    ind: an array containing index range boundary for given dimension
+    
     Author:   Nadya Travinin
     Pytthon version: Dr. Chansup Byun
     
@@ -127,25 +120,25 @@ def global_block_ranges(d):
     for i in range(len(d.shape)):
         dims.append(i)
 
-    return global_block_ranges(d, dims)
+    return global_block_range(d, dims)
 
 
-@dispatch(dmat_type,int)
-def global_block_ranges(d, dim):
-    """Returns the global index ranges of the distributed array D for all processors in the 
-    specified dimension, DIM.
+@dispatch(type(GridDmat()),int)
+def global_block_range(d, dim):
+    """Returns the ranges of global indices local to the current processor.
     
     Usage:
     ------
-    ind = global_block_ranges(D) 
-            
-    d: a distributed array.
-
-    For each dimension, the following is the format of the indices returned:
-        Array size: NUM_PROCS_IN_GRIDx3. Each line of the returned array M, 
-        M(i,:) contains the follwing information 
-        [PROCESSOR_RANK START_INDEX END_INDEX]
-
+    ind = GLOBAL_BLOCK_RANGE(D, dim) 
+    
+    GLOBAL_BLOCK_RANGE(D, DIM) Returns the global index range of the 
+        distributed array D local to the current processor in the 
+        specified dimension, DIM.
+        
+    d: a DOUBLE.
+    dim: an integer for a specfic dimension
+    ind: an array containing index range boundary for given dimension
+    
     Author:   Nadya Travinin
     Pytthon version: Dr. Chansup Byun
     
@@ -154,80 +147,59 @@ def global_block_ranges(d, dim):
     dims = []
     dims.append(dim)
         
-    return global_block_ranges(d, dims)
+    return global_block_range(d, dims)
 
 
-@dispatch(dmat_type,list)
-def global_block_ranges(d, dims):
-    """Returns the global index ranges of the distributed array D for all processors in the 
-    specified dimension, DIMS.
+@dispatch(type(GridDmat()),list)
+def global_block_range(d, dims):
+    """Returns the ranges of global indices local to the current processor.
     
     Usage:
     ------
-    ind = global_block_ranges(D, dims) 
+    ind = GLOBAL_BLOCK_RANGE(D, dim) 
     
-    For each dimension, the following is the format of the indices returned:
-        Array size: NUM_PROCS_IN_GRIDx3. Each line of the returned array ind, 
-        ind(i,:) contains the follwing information 
-        [PROCESSOR_RANK START_INDEX END_INDEX]
+    GLOBAL_BLOCK_RANGE(D, DIM) Returns the global index range of the 
+        distributed array D local to the current processor in the 
+        specified dimension, DIM.
+        
+    d: a DOUBLE.
+    dims: a list for a specfic dimension or all dimensions
+    ind: an array containing index range boundary for given dimension[s]
     
     Author:   Nadya Travinin
     Pytthon version: Dr. Chansup Byun
     
     """
 
-    # processor grid on which the object is distributed
-    grid = d.map.grid
-    grid_dims = list(grid.shape)
-    dim = len(grid_dims)
+    DEBUG = 0
+    if DEBUG:
+        print('--> Entering global_block_range')
 
-    # Obtain global index information for all processor grid
-    global_ind = grid_global_ind(d)
-    
     my_inds = d.global_ind
     """
     global_ind is a dictionary such as {'0': [0, 1, 2, 3], '1': [0, 1, 2]}
     """
+    myLocalLenghs = [d.falls[i].local_len  for i in range(len(d.falls))  ]
+
+    """
+    d.falls: a list of len(dims)
+    """
     s = d.size
     
-    if len(dims)>1:
-        ind = []
+    ind = np.zeros((len(dims),2),int)
 
-    for i in range(len(dims)):
-        num_procs = np.prod(grid_dims)  # total number of grid processors
-        temp = np.zeros((num_procs,3),int)   # create array to store indices for dim i
-        proc_count = 0                  # keep track of the number of processors
+    if (all(myLocalLenghs) == 0):
+        ind = None
+    else:
+        for i in range(len(dims)):
+            # For python, index ranges from 0 to N-1
+            # print(dims[i])
+            ind[i,0] = my_inds[str(dims[i])][0]
+            ind[i,1] = my_inds[str(dims[i])][-1]
 
-        if dim==2: #2D array
-            for g1 in range(grid_dims[0]): #grid cols
-                for g2 in range(grid_dims[1]): #grid rows
-                    curr_inds = global_ind[str(g1)][str(g2)]
-                    # print(curr_inds)
-                    dim_inds = curr_inds[str(dims[i])]
-                    temp[proc_count,0:] = [grid[g1,g2], dim_inds[0], dim_inds[-1]] 
-                    proc_count = proc_count+1 
-        elif dim==3: #3D array
-            for g1 in range(grid_dims[0]):
-                for g2 in range(grid_dims[1]):
-                    for g3 in range(grid_dims[2]):
-                        curr_inds = global_ind[str(g1)][str(g2)][str(g3)]
-                        dim_inds = curr_inds[str(dims[i])]
-                        temp[proc_count,0:] = [grid[g1,g2,g3], dim_inds[0], dim_inds[-1]] 
-                        proc_count = proc_count+1 
-        elif dim==4: #4D array
-            for g1 in range(grid_dims[0]):
-                for g2 in range(grid_dims[1]):
-                    for g3 in range(grid_dims[2]):
-                        for g4 in range(grid_dims[3]):
-                            curr_inds = global_ind[str(g1)][str(g2)][str(g3)][str(g4)]
-                            dim_inds = curr_inds[str(dims[i])]
-                            temp[proc_count,0:] = [grid[g1,g2,g3,g4], dim_inds[0], dim_inds[-1]] 
-                            proc_count = proc_count+1 
-        if len(dims)>1:
-            ind.append(temp)
-        else:
-            ind = temp
-    
+    if DEBUG:
+        print('<-- Exiting global_block_range')
+
     return ind
 
     """

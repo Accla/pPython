@@ -10,7 +10,7 @@ import os
 import sys
 
 # Export the path to find gridPython & PythonMPI source code:
-GRIDPYTHON_HOME = "/home/gridsan/groups/llgrid_beta/gridPython/Ver-0.3.0"
+GRIDPYTHON_HOME = "/home/gridsan/groups/llgrid_beta/gridPython/Ver-0.5.0"
 GRIDPYTHON_PATH = GRIDPYTHON_HOME+os.sep+"src"
 os.environ["GRIDPYTHON_HOME"] = GRIDPYTHON_HOME
 sys.path.append(GRIDPYTHON_PATH)
@@ -29,7 +29,7 @@ os.environ["HDF5_USE_FILE_LOCKING"]="FALSE"
 # PythonMPI script filename
 py_file = 'param_sweep_parallel.py'
 # Define number of MPI processes
-n_proc = 4
+n_proc = 5
 
 # Launch PythonMPI
 # print('Running: %s via pRUN().'%(py_file))

@@ -17,16 +17,22 @@
     cbyun@ll.mit.edu
 """
 
-# Load almost all the gridPython packages
 from gridPython_all import *
 
 from sample_function import *
 
+# Initialize MPI
+# MPI_Init()
+
 # Create communicator.
-# GridPython as GPC in gridPython_all.py
+# pyMCW is imported in PythonMPI.py
+# comm = pyMCW.MPI_COMM_WORLD;
+# GridPython as GPC in gridPython.py
 comm = GPC.comm
 
 # Get size and rank.
+# Np = MPI_Comm_size(comm)
+# Pid = MPI_Comm_rank(comm)
 Np = GPC.comm_size
 Pid = GPC.my_rank
 
@@ -39,13 +45,18 @@ print('my_rank: %d'%(Pid))
 pmap = GridMap([Np,1],'b',range(Np))
 
 # Create a distributed matrix on individual rank
-m = 25
+m = 16
 n = 3
 z = zeros(m,n,pmap)
 
 # Check the distributed z matrix
-# print('Local portion of global indices on Pid = %d:'%(Pid))
-# print(z.global_ind)
+print('Local portion of global indices on Pid = %d:'%(Pid))
+print(z.global_ind)
+print('my local length:')
+for i  in range(len(z.falls)):
+    print_falls(z.falls[i])
+print('my size:')
+print(z.size)
 
 # Get the local portion of the global indices
 my_i_global = global_ind(z, 0)
