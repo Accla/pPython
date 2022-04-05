@@ -45,7 +45,6 @@ def grid_config_local(grid_config):
         print('--> Entering grid_config_local')
 
     # Grid user
-    # USER = 'ch21778'
     USER = os.getenv('USER')
 
     # Remote access
