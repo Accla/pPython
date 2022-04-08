@@ -13,7 +13,7 @@ USER = os.getenv('USER')
 HOME_PATH = "/export/home/"+USER
 os.environ["HOME_PATH"] = HOME_PATH
 
-GRIDPYTHON_HOME = HOME_PATH+"/llgrid_beta/gridPython/Ver-0.5.0"
+GRIDPYTHON_HOME = HOME_PATH+"/llgrid_beta/gridPython/latest"
 GRIDPYTHON_PATH = GRIDPYTHON_HOME+os.sep+"src"
 os.environ["GRIDPYTHON_HOME"] = GRIDPYTHON_HOME
 sys.path.append(GRIDPYTHON_PATH)
