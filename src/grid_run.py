@@ -22,17 +22,19 @@ import grid_config as grid
 
 @dispatch(str,int,dict)
 def grid_run( py_file, n_proc, machines ):
-    """Wrapper for MPI_Run()."""
+    """Wrapper for original pMatlab MPI_Run()."""
     return MPI_Run(py_file, n_proc, machines)
 
 @dispatch(str,int,list)
 def grid_run( py_file, n_proc, machines ):
-    """Wrapper for MPI_Run()."""
+    """Wrapper for original pMatlab MPI_Run()."""
     return MPI_Run(py_file, n_proc, machines)
 
 @dispatch(str,int,str)
 def grid_run( py_file, n_proc, machines ):
-    """MPI_Run  -  Run py_file on multiple processors on LLGrid.
+    """Wrapper for modified MPI_Run from gridMatlab
+    
+    MPI_Run  -  Run py_file on multiple processors on LLGrid.
 
     Usage:
     ------
