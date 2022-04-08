@@ -114,6 +114,9 @@ def grid_run( py_file, n_proc, machines ):
 
     # Create a fictious machine list when 'grid[&]' is used
     machines = []
+    # set the Pid=0 machine for an interactive job
+    if interactive:
+        machines.append(host)
     if grid.grid_config['n_nodes'] > 0: 
         # Triples modes, local MPI processes aggregated into a single scheduler task
         grid.grid_config['ntasks'] = grid.grid_config['n_nodes']
@@ -123,15 +126,15 @@ def grid_run( py_file, n_proc, machines ):
             machines.append('grid_slurm_'+node_strid)
     else:
         # Non-triple modes
-        grid.grid_config['ntasks'] = n_proc
-        n_digits = int(math.log10(n_proc)+1)
-        for i in range(n_proc):
+        if interactive:
+            grid.grid_config['ntasks'] = n_proc-1
+        else:
+            grid.grid_config['ntasks'] = n_proc
+        n_digits = int(math.log10(grid.grid_config['ntasks'])+1)
+        for i in range(grid.grid_config['ntasks']):
             node_strid = str(i+1).zfill(n_digits)
             machines.append('grid_slurm_'+node_strid)
     
-    # Overwrite the Pid=0 machine for an interactive job
-    if interactive:
-        machines[0] = host
         
     # Convert machines into a dictionary variable if needed
     machines = convert_to_dict(machines,host)
@@ -146,6 +149,8 @@ def grid_run( py_file, n_proc, machines ):
 
     # Get number of machines to launch on.
     n_machines = len(machines)
+    if interactive:
+        n_machines = n_machines-1
 
     # Create generic comm. (Initialize global pyMCW.MPI_COMM_WORLD)
     pyMCW.MPI_COMM_WORLD = pyMPI_Comm_init(n_proc,machines);
@@ -225,6 +230,14 @@ def grid_run( py_file, n_proc, machines ):
             # Make sure to use the correct directory separator for Unix and DOS
             # unix_cmd_file used when host machine is running Unix
             # dos_cmd_file used when host machine is running Windows/DOS
+
+            if interactive:
+                # For ineractive, one less scripts are generaed
+                imstr = imstrm1
+                if i_m == 1:
+                    # skip the last one
+                    continue
+
             if type == 'pc':
                 unix_cmd_file = 'PythonMPI/Dos_Commands.'+imstr+file_ext
                 dos_cmd_file = 'PythonMPI\\Dos_Commands.'+imstr+file_ext
@@ -303,7 +316,7 @@ def grid_run( py_file, n_proc, machines ):
 
     # For somehow find out if this is an interactive job. then, execute the local processing:
     if interactive:
-        # print(defscommands)
+        print(defscommands)
         print('grid_run: executing %s in the current python process.'%(py_file))
         print(' ')
         exec(defscommands)
