@@ -1,3 +1,5 @@
+import os
+1
 import checkOS as OS
 
 def pyMPI_Comm_settings_local(machine_db_settings):
@@ -40,7 +42,7 @@ def pyMPI_Comm_settings_local(machine_db_settings):
         machine_db_settings['python_command'] = python_location + ' -u '
     elif OS.ismac:
         # python_location = '/usr/bin/python'
-        # python_location = '/state/partition1/llgrid/pkg/anaconda/anaconda3-2021b/bin/python'
+        # python_location = '/state/partition1/llgrid/pkg/anaconda/anaconda3-2022a/bin/python'
         python_location = '/opt/anaconda3/bin/python'
         machine_db_settings['python_command'] = python_location + ' -u '
     else:
@@ -48,10 +50,10 @@ def pyMPI_Comm_settings_local(machine_db_settings):
         exit()
 
     # LLSC python location
-    python_location = '/state/partition1/llgrid/pkg/anaconda/anaconda3-2021b/bin/python'
+    python_location = '/state/partition1/llgrid/pkg/anaconda/anaconda3-2022a/bin/python'
     machine_db_settings['python_command_llsc'] = python_location + ' -u '
     machine_db_settings['python_module_path'] = '/etc/environment-modules/modules'
-    machine_db_settings['python_module_name'] = 'anaconda/2021b'
+    machine_db_settings['python_module_name'] = 'anaconda/2022a'
 
     # local directory mapping. (pc, linux, mac, grid, sgrp_1, sgrp_2)
     machine_db_settings['local_dir_map'] = ['Z:', '/export/home/'+USER, '/Volumes/'+USER, '/home/gridsan/'+USER, '/home/gridsan/groups', '/data2/groups']
