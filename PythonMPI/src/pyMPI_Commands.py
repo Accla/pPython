@@ -1,5 +1,7 @@
 import os
 
+from MPI_Comm_size import *
+
 import pyMPI_COMM_WORLD as pyMCW
 import checkOS as OS
 from pyMPI_Host_rank import *
@@ -25,6 +27,9 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD):
     if DEBUG:
         print('--> Entering pyMPI_Commands:')
         print('rank = %d'%(rank))
+
+    Np = MPI_Comm_size(MPI_COMM_WORLD)
+
     # Unix vs. Windows file seperator.
     dir_sep = os.sep;
 
@@ -112,7 +117,14 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD):
     defscommands = '';
 
     # Print name of the target machine we are launching on.
-    print('Launching MPI rank: %d on %s.' %(rank,machine))
+    # CB: Reduce the output when Np > 16
+    if (Np>=16):
+        if (rank > (Np-3)) or (rank < 2):
+            print('Launching MPI rank: %d on %s.' %(rank,machine))
+        elif (rank==(Np-3)):
+            print('Continuing to launch MPI processes ......')
+    else:
+        print('Launching MPI rank: %d on %s.' %(rank,machine))
 
     # Create base python command.
     python_command = python_base+' '+defsfile+' &> '+outfile
