@@ -57,7 +57,7 @@ def grid_run( py_file, n_proc, machines ):
 
     """
 
-    DEBUG = 0
+    DEBUG = 1
 
     if DEBUG:
         print('--> Entering MPI_Run (gridPython version).')
@@ -130,7 +130,13 @@ def grid_run( py_file, n_proc, machines ):
             grid.grid_config['ntasks'] = n_proc-1
         else:
             grid.grid_config['ntasks'] = n_proc
-        n_digits = int(math.log10(grid.grid_config['ntasks'])+1)
+        if DEBUG:
+            print('n_proc = %d'%(n_proc))
+            print("grid.grid_config['ntasks'] = %d"%(grid.grid_config['ntasks']))
+        if grid.grid_config['ntasks']>0:
+            n_digits = int(math.log10(grid.grid_config['ntasks'])+1)
+        else:
+            n_digits = 1
         for i in range(grid.grid_config['ntasks']):
             node_strid = str(i+1).zfill(n_digits)
             machines.append('grid_slurm_'+node_strid)
