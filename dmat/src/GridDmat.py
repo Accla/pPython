@@ -1,3 +1,5 @@
+import numpy as np
+
 from local import *
 from put_local import *
 
@@ -37,4 +39,19 @@ class GridDmat:
             print('The type, %s, is not supported for the subtraction operator with GridDmat class yet.'%(type(other)))
             exit()
         return self
+
+    def copy(self):
+        """Copy the given dmat."""
+        d = GridDmat()
+        d.map = self.map
+        d.dim = self.dim
+        d.size = self.size
+        d.pitfalls = self.pitfalls
+        d.falls = self.falls
+        d.local_dim = self.local_dim
+        d.global_ind = self.global_ind
+        # create an array same as d.local
+        d.local = np.zeros(self.local.shape)
+        d.local[:] = self.local
+        return d
 
