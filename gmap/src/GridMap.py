@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 
 import pyMPI_COMM_WORLD as pyMCW
@@ -211,6 +212,20 @@ class GridMap:
                 else:
                     n_procs = None
             self.overlap = overlap
+
+    def __eq__(self, other):
+
+        if isinstance(other, GridMap):
+            if ((self.grid == other.grid).all()) and \
+                (self.dim == other.dim) and \
+                (self.dist_spec == other.dist_spec) and \
+                (self.grid_spec == other.grid_spec) and \
+                (self.proc_list == other.proc_list) and \
+                (self.overlap == other.overlap):
+                return True
+            else:
+                return False
+        return False
         
     def copy(self,old_map):
         """Copy the given map."""
