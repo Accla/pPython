@@ -8,14 +8,21 @@ def local(d):
     Python version: Dr. Chansup Byun
     """
     
+    DEBUG = 0
+    if DEBUG:
+        print('--> Entering local')
+
     if hasattr(d,'local'):
         # create an array same as d.local
         x = np.zeros(d.local.shape)
         x[:] = d.local
-        return x
     else:
         # create an array same as d
         x = np.zeros(d.shape)
         x[:] = d
-        return x
+
+    if DEBUG:
+        print('<-- Exiting local')
+
+    return x
 
