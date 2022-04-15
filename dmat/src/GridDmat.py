@@ -11,7 +11,7 @@ class GridDmat:
         pass
 
     def __add__(self, other):
-        """Implement addition of Dmat() + Float
+        """Implement addition with Dmat()
         """
         if isinstance(other,(float)):
             # Extract local portion of a distributed array
@@ -20,13 +20,20 @@ class GridDmat:
             d_local = d_local + other
             # update the distributed array
             self = put_local(self,d_local)
+        elif isinstance(other,(GridDmat)):
+            if (self.map == other.map) and \
+                (self.size == other.size):
+                self.local = self.local + other.local
+            else:
+                print('Error (GridDmat): both map and array dimension should match for the subtraction.')
+                exit()
         else:
             print('The type, %s, is not supported for the add operator with GridDmat class yet.'%(type(other)))
             exit()
         return self
 
     def __sub__(self, other):
-        """Implement subtraction of Dmat() - Float
+        """Implement subtraction with Dmat()
         """
         if isinstance(other,(float)):
             # Extract local portion of a distributed array
@@ -35,6 +42,59 @@ class GridDmat:
             d_local = d_local - other
             # update the distributed array
             self = put_local(self,d_local)
+        elif isinstance(other,(GridDmat)):
+            if (self.map == other.map) and \
+                (self.size == other.size):
+                self.local = self.local - other.local
+            else:
+                print('Error (GridDmat): both map and array dimension should match for the subtraction.')
+                exit()
+        else:
+            print('The type, %s, is not supported for the subtraction operator with GridDmat class yet.'%(type(other)))
+            exit()
+        return self
+
+    def __mul__(self, other):
+        """Implement multiplication with Dmat()
+        """
+        if isinstance(other,(float)):
+            # Create a copy to avoid to change the original distributed array 
+            d = self.copy()
+            # update local array
+            d.local = d.local * other
+            return d
+        elif isinstance(other,(GridDmat)):
+            if (self.map == other.map) and \
+                (self.size == other.size):
+                # ToDo: Need to implement the multiplicaiton of distributed arrays.
+                self.local = self.local * other.local
+            else:
+                print('Error (GridDmat): both map and array dimension should match for the subtraction.')
+                exit()
+        else:
+            print('The type, %s, is not supported for the subtraction operator with GridDmat class yet.'%(type(other)))
+            exit()
+        return self
+
+    def __rmul__(self, other):
+        """Implement multiplication with Dmat()
+        """
+        if isinstance(other,(float)):
+            # Create a copy to avoid to change the original distributed array 
+            d = self.copy()
+            # update local array
+            d.local = other * d.local 
+            return d
+        elif isinstance(other,(GridDmat)):
+            if (self.map == other.map) and \
+                (self.size == other.size):
+                # ToDo: Need to implement the multiplicaiton of distributed arrays.
+                d = self.copy()
+                d.local = other.local * self.local
+                return d
+            else:
+                print('Error (GridDmat): both map and array dimension should match for the subtraction.')
+                exit()
         else:
             print('The type, %s, is not supported for the subtraction operator with GridDmat class yet.'%(type(other)))
             exit()
