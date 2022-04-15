@@ -10,5 +10,5 @@ def MPI_Comm_size(comm):
     
     """
 
-    return comm['size']
+    return int(comm['size'])
 

@@ -57,7 +57,7 @@ def grid_run( py_file, n_proc, machines ):
 
     """
 
-    DEBUG = 1
+    DEBUG = 0
 
     if DEBUG:
         print('--> Entering MPI_Run (gridPython version).')

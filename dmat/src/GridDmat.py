@@ -106,6 +106,7 @@ class GridDmat:
         d.map = self.map
         d.dim = self.dim
         d.size = self.size
+        d.shape = self.shape
         d.pitfalls = self.pitfalls
         d.falls = self.falls
         d.local_dim = self.local_dim

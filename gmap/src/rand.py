@@ -16,7 +16,7 @@ def rand(m,n,imap):
     """grid_rand() wrapper method for imap = 1 (int)
     """
     # print('Called rand(m,n,imap) where m and n are int')
-    return np.rand((m,n))
+    return np.random.rand(m,n)
 
 @dispatch(int,type(GridMap()))
 def rand(m,map):

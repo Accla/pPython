@@ -1,6 +1,7 @@
 import pyMPI_COMM_WORLD as pyMCW
 from MPI_Comm_rank import *
 
+from GridMap import *
 from GridDmat import *
 
 from gen_pitfalls import *
@@ -70,6 +71,10 @@ def grid_dmat(m,n=None,q=None,r=None,p=None):
         print('Dimension of distributed zeros: %d'%(len(dims)))
         print(dims)
     
+    if not isinstance(p,GridMap):
+        d = np.array(dims)
+        return d
+
     d = GridDmat()
     
     if len(dims) == 1: # DMAT(M, P)
@@ -78,7 +83,8 @@ def grid_dmat(m,n=None,q=None,r=None,p=None):
     d.map = p
     d.dim = len(dims)
     d.size = dims
-    if p.dim != len(dims):
+    d.shape = dims
+    if isinstance(p,GridMap) and (p.dim != len(dims)):
         print('ERROR(dmat): Map and distributed object dimensions must match')
         exit()
         

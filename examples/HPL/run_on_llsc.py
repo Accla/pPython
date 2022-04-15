@@ -1,9 +1,9 @@
-"""RUN.py
+"""run_on_llsc.py.py
 
-Example to run a PythonMPI code, param_sweep_parallel.py, with gridPython
+Example to run a parallel python code, pHPL.py, with gridPython
 To run, execute the following command.
 
-    python RUN.py
+    python run_on_llsc.py
 """
 
 import os
@@ -32,7 +32,7 @@ os.environ["HDF5_USE_FILE_LOCKING"]="FALSE"
 # py_file = 'test_HPL_02.py'
 py_file = 'pHPL.py'
 # Define number of MPI processes
-n_proc = 1
+n_proc = 4
 
 # Launch PythonMPI
 # print('Running: %s via pRUN().'%(py_file))

@@ -39,7 +39,7 @@ def pyMPI_Comm_init(n_proc,machines):
     # Initialize comm.
     MPI_COMM_WORLD = dict()
     MPI_COMM_WORLD['rank'] = -1
-    MPI_COMM_WORLD['size'] = n_proc
+    MPI_COMM_WORLD['size'] = int(n_proc)
     MPI_COMM_WORLD['save_message_flag'] = 0
     MPI_COMM_WORLD['group'] = np.arange(0,n_proc,dtype=int)
     MPI_COMM_WORLD['machine_id'] = np.zeros((n_proc,),dtype=int)

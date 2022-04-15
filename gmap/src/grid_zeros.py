@@ -1,5 +1,6 @@
 import numpy as np
 
+from GridMap import *
 from dmat import *
 from pitfalls import *
 
@@ -50,7 +51,11 @@ def grid_zeros(m,n=None,q=None,r=None,p=None,dtype=None):
     
     if not dtype:
         dtype = np.float64
-    
+
+    if not isinstance(p,GridMap):
+        d = np.zeros(dims, dtype)
+        return d
+
     if len(dims) < 5:
         d = dmat(dims, p)
     else:

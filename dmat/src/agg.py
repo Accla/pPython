@@ -2,6 +2,8 @@ from MPI_Recv import *
 from MPI_Send import *
 
 import GridPython as GPC
+from GridDmat import *
+
 from inmap import *
 from reconstruct import *
 
@@ -26,6 +28,9 @@ def agg(d, leader=None):
     DEBUG = 0
     if DEBUG:
         print('--> Entering agg')
+
+    if not isinstance(d,GridDmat):
+        return d
 
     # Set the leader for aggregation
     if hasattr(GPC, 'leader'):

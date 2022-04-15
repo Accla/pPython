@@ -31,44 +31,35 @@ def pLUfactor(A):
     Np = GPC.comm_size
     Pid = GPC.my_rank
 
-    [N,N] = list(A.size)                       # Get size of distributed array A.  
+    [N,N] = list(A.shape)                    # Get size of distributed array A.  
     # Python index starts from 0. Hene -1
-    # global_block_range returns a 2-D array [ 1 or N dimens, 2 (start,end)]
-    myJ  = global_block_range(A,2-1)     # Get the local columns.
-    # global_block_ranges returns a 2-D array [ N dimensions, 3 (rank,start,end)]
-    allJ = global_block_ranges(A,2-1)      # Get all the local columns.
+    #                                         global_block_range returns a 2-D array [ 1 or N dimens, 2 (start,end)]
+    myJ  = global_block_range(A,2-1)        # Get the local columns.
+    #                                         global_block_ranges returns a 2-D array [ N dimensions, 3 (rank,start,end)]
+    allJ = global_block_ranges(A,2-1)       # Get all the local columns.
     allNloc = allJ[0:,3-1] - allJ[0:,2-1] + 1      # Number of local columns., it returns a list of len(Np)
 
-    Aloc = local(A)                          # Get local part of A.
-    if DEBUG:
-        print('allJ')
-        print(allJ)
-        print(allNloc)
-        print(Aloc.shape)
-
-    Nloc = list(Aloc.shape)[1]                  # Get local column size.
+    Aloc = local(A)                         # Get local part of A.
+    Nloc = list(Aloc.shape)[1]              # Get local column size.
     #
-    # (Do not modify A)
-    # Create a dmat L & U before the update
-    L = A.copy()
-    L = put_local(L,0)                       # Zero out local part of A.
-    U = L.copy()
+    # Create a dmat L & U before the update (do not modify A)
+    if isinstance(A,np.ndarray):
+        L = np.zeros(A.shape)
+        U = np.zeros(A.shape)
+    else:
+        L = A.copy()
+        L = put_local(L,0)                      # Zero out local part of A.
+        U = L.copy()
 
     # Turn off message deletion to allow non-blocking broadcasts.
     comm = pyMPI_Save_messages(comm,1)
 
     pivots = (np.arange(N)).T               # Initialize pivots.
-
     for p in range(Np):                     # Loop over each Pid.
-        if DEBUG:
-            print('Loop over Np: p = %d'%(p))
         tagHigh = (2*p+1)%32                # High message tag.
         tagLow = (2*p+1)%32                 # Low message tag.
-
         if p == Pid:                        # Factor block p.
-
             i = list(range(myJ[0][0],N))    # Get rows to work on.
-
             """ 
             if 0:
                 #  tic
@@ -78,7 +69,6 @@ def pLUfactor(A):
                 Lloc(eye(numel(i),Nloc)==1) = 1      # Set diagonal to 1.
                 #  Tgetrf = toc
             """
-
 
             if 1:
                 # Get a zero clock.
@@ -97,35 +87,31 @@ def pLUfactor(A):
                 Lloc[np.eye(len(i),Nloc)==1] = 1   # Set diagonal to 1.
                 #  Tlu = timer()
 
-            pPivots = pPivots+myJ[0][0]           # Update pivots.
-
+            pPivots = pPivots+myJ[0][0]            # Update pivots.
 
             #  T_after_lu = timer()
-            pHigh = list(range(p+1,Np))         # Higher Pids.
+            pHigh = list(range(p+1,Np))            # Higher Pids.
             if len(pHigh)>0:              
-                #       SendMsg(pHigh,tagHigh,Lloc,pPivots) # Send Lloc and pPivots to higher Pids.
                 for pp in pHigh:
                     if DEBUG:
                         print('Called SendMsg when Pid = p to PId, %d'%(pp))
                     SendMsg(pp,tagHigh,Lloc,pPivots) # Send Lloc and pPivots to higher Pids.
 
-            pLow = list(range(0,p))          # Lower Pids.
+            pLow = list(range(0,p))                # Lower Pids.
             if len(pLow)>0:                 
-                #        SendMsg(pLow,tagLow, pPivots)      # Send pPivots to lower Pids.
                 for pp in pLow:
                     if DEBUG:
                         print('Called SendMsg when Pid = p to PId, %d'%(pp))
-                    SendMsg(pp,tagLow, pPivots)  # Send pPivots to lower Pids.
+                    SendMsg(pp,tagLow, pPivots)    # Send pPivots to lower Pids.
 
             # Tsend = timer()
-            
             Aloc[myJ[0][0]:N,0:] = AlocSub
 
         elif Pid > p:
             # zero_clock = timer()
             if DEBUG:
                 print('Called RecvMsg when Pid > p')
-            [Lloc, pPivots] = RecvMsg(p,tagHigh)  # Receive L and pivots.
+            [Lloc, pPivots] = RecvMsg(p,tagHigh)   # Receive L and pivots.
             # Trecv = timer()
         elif Pid < p:
             # zero_clock = timer()
@@ -135,35 +121,21 @@ def pLUfactor(A):
             # Trecv = timer()
 
         # zero_clock2 = timer()
-        i = list(range(allJ[p,2-1],N))         # Remaining rows.
-        pivots[i] = pivots[pPivots]            # Update pivot list.
+        i = list(range(allJ[p,2-1],N))            # Remaining rows.
+        pivots[i] = pivots[pPivots]               # Update pivot list.
 
         if p != Pid:
-            Aloc[i,:] = Aloc[pPivots,:]          # Apply pivots everywhere else.
+            Aloc[i,:] = Aloc[pPivots,:]           # Apply pivots everywhere else.
     
         # Apply multipliers to following blocks.
         if Pid > p:
-            iL1 = list(range(allNloc[p]))                  # Upper rows of Lloc.
-            # iL2 = (allNloc(p+1):size(Lloc,1);  % Lower rows of Lloc.
+            iL1 = list(range(allNloc[p]))                # Upper rows of Lloc.
             iL2 = list(range(allNloc[p],Lloc.shape[0]))  # Lower rows of Lloc.
-            if DEBUG2:
-                print('allJ[p,2-1] = %d'%(allJ[p,2-1]))
-                print('allJ[p,3-1] = %d'%(allJ[p,3-1]))
-            iA1 = list(range(allJ[p,2-1],allJ[p,3-1]+1))   # Current p rows od Aloc.
-            iA2 = list(range(allJ[p,3-1]+1,N))             # Lower rows of Aloc.
-            # Aloc[iA1,:] = Lloc[iL1,:]\Aloc[iA1,:]   # Solve.
-            if DEBUG:
-                print('iL1:')
-                print(iL1)
-                print('iL2:')
-                print(iL2)
-                print('iA1:')
-                print(iA1)
-                print('iA2:')
-                print(iA2)
+            iA1 = list(range(allJ[p,2-1],allJ[p,3-1]+1)) # Current p rows od Aloc.
+            iA2 = list(range(allJ[p,3-1]+1,N))           # Lower rows of Aloc.
+            # Aloc[iA1,:] = Lloc[iL1,:]\Aloc[iA1,:]      # Solve.
             Aloc[iA1,:] = np.linalg.solve(Lloc[iL1,:], Aloc[iA1,:])         # Solve.
             Aloc[iA2,:] = Aloc[iA2,:] - np.matmul(Lloc[iL2,:],Aloc[iA1,:])  # Update.
-
         # Tapply = timer()
 
     # zero_clock2 = timer()
@@ -175,19 +147,16 @@ def pLUfactor(A):
     i = list(range(myJ[0][0],myJ[0][1]+1))       # Get local rows.
     Lloc[i,:] = Lloc[i,:] + np.eye(Nloc,Nloc)    # Add ones to diagonal.
 
-    L = put_local(L,Lloc)                        # Put into distributed array.
-    Uloc = np.triu( Aloc, -(myJ[0][0]))       # Get upper triangle.
-    U = put_local(U,Uloc)                        # Insert into U.
+    if isinstance(A,np.ndarray):
+        L[:] = Lloc                        # Put into distributed array.
+        U[:] = Uloc                        # Insert into U.
+    else:
+       L = put_local(L,Lloc)                        # Put into distributed array.
+       Uloc = np.triu( Aloc, -(myJ[0][0]))          # Get upper triangle.
+       U = put_local(U,Uloc)                        # Insert into U.
 
     # Tput = timer()
     if DEBUG:
-        print('L matrix before exiting pLUfacor:')
-        print(local(L))
-        print('U matrix before exiting pLUfacor:')
-        print(local(U))
-        print('pivots vector:')
-        print(pivots)
         print('<-- Exiting pLUfactor')
     return L,U,pivots
-
 

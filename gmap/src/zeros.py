@@ -4,7 +4,7 @@ import numpy as np
 from GridMap import *
 from grid_zeros import *
 
-@dispatch(object,type(GridMap()))
+@dispatch(object,object)
 def zeros(v,map):
     """grid_zeros() wrapper method.
     """
@@ -45,7 +45,7 @@ def zeros(v,map):
     # print('Called zeros(m,map) where m is a np.ndarray (vector)')
     return grid_zeros(m,n,q,r,map,dtype)
 
-@dispatch(object,object,type(GridMap()))
+@dispatch(object,object,object)
 def zeros(m,n,map):
     """grid_zeros() wrapper method.
     """
@@ -61,7 +61,7 @@ def zeros(m,n,map):
     # print('Called zeros(m,n,map)')
     return grid_zeros(m,n,q,r,map,dtype)
 
-@dispatch(object,object,object,type(GridMap()))
+@dispatch(object,object,object,object)
 def zeros(m,n,q,map):
     """grid_zeros() wrapper method.
     """
@@ -79,7 +79,7 @@ def zeros(m,n,q,map):
     # print('Called zeros(m,n,q,map)')
     return grid_zeros(m,n,q,r,map,dtype)
 
-@dispatch(object,object,object,object,type(GridMap()))
+@dispatch(object,object,object,object,object)
 def zeros(m,n,q,r,map):
     """grid_zeros() wrapper method.
     """

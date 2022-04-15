@@ -28,7 +28,7 @@ def grid_rand(m,n,q,r,p):
     Python version: Dr. Chansup Byun (cbyun@ll.mit.edu)
     """
     
-    DEBUG = 1
+    DEBUG = 0
     if DEBUG:
         print('--> Entering grid_rand')
     
