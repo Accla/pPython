@@ -13,7 +13,7 @@ class GridDmat:
     def __add__(self, other):
         """Implement addition with Dmat()
         """
-        if isinstance(other,(float)):
+        if isinstance(other,(float,int)):
             # Extract local portion of a distributed array
             d_local = local(self)
             # update local array
@@ -35,7 +35,7 @@ class GridDmat:
     def __sub__(self, other):
         """Implement subtraction with Dmat()
         """
-        if isinstance(other,(float)):
+        if isinstance(other,(float,int)):
             # Extract local portion of a distributed array
             d_local = local(self)
             # update local array
@@ -57,7 +57,7 @@ class GridDmat:
     def __mul__(self, other):
         """Implement multiplication with Dmat()
         """
-        if isinstance(other,(float)):
+        if isinstance(other,(float,int)):
             # Create a copy to avoid to change the original distributed array 
             d = self.copy()
             # update local array
@@ -79,7 +79,7 @@ class GridDmat:
     def __rmul__(self, other):
         """Implement multiplication with Dmat()
         """
-        if isinstance(other,(float)):
+        if isinstance(other,(float,int)):
             # Create a copy to avoid to change the original distributed array 
             d = self.copy()
             # update local array
