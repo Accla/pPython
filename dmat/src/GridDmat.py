@@ -13,46 +13,46 @@ class GridDmat:
     def __add__(self, other):
         """Implement addition with Dmat()
         """
+        # Create a copy to avoid to change the original distributed array 
+        d = self.copy()
         if isinstance(other,(float,int)):
             # Extract local portion of a distributed array
-            d_local = local(self)
+            d.local = local(self)
             # update local array
-            d_local = d_local + other
-            # update the distributed array
-            self = put_local(self,d_local)
+            d.local = d.local + other
         elif isinstance(other,(GridDmat)):
             if (self.map == other.map) and \
                 (self.size == other.size):
-                self.local = self.local + other.local
+                d.local = self.local + other.local
             else:
                 print('Error (GridDmat): both map and array dimension should match for the subtraction.')
                 exit()
         else:
             print('The type, %s, is not supported for the add operator with GridDmat class yet.'%(type(other)))
             exit()
-        return self
+        return d
 
     def __sub__(self, other):
         """Implement subtraction with Dmat()
         """
+        # Create a copy to avoid to change the original distributed array 
+        d = self.copy()
         if isinstance(other,(float,int)):
             # Extract local portion of a distributed array
-            d_local = local(self)
+            d.local = local(self)
             # update local array
-            d_local = d_local - other
-            # update the distributed array
-            self = put_local(self,d_local)
+            d.local = d.local - other
         elif isinstance(other,(GridDmat)):
             if (self.map == other.map) and \
                 (self.size == other.size):
-                self.local = self.local - other.local
+                d.local = self.local - other.local
             else:
                 print('Error (GridDmat): both map and array dimension should match for the subtraction.')
                 exit()
         else:
             print('The type, %s, is not supported for the subtraction operator with GridDmat class yet.'%(type(other)))
             exit()
-        return self
+        return d
 
     def __mul__(self, other):
         """Implement multiplication with Dmat()
