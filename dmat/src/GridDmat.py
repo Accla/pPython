@@ -22,7 +22,7 @@ class GridDmat:
             d.local = d.local + other
         elif isinstance(other,(GridDmat)):
             if (self.map == other.map) and \
-                (self.size == other.size):
+                (self.shape == other.shape):
                 d.local = self.local + other.local
             else:
                 print('Error (GridDmat): both map and array dimension should match for the subtraction.')
@@ -44,7 +44,7 @@ class GridDmat:
             d.local = d.local - other
         elif isinstance(other,(GridDmat)):
             if (self.map == other.map) and \
-                (self.size == other.size):
+                (self.shape == other.shape):
                 d.local = self.local - other.local
             else:
                 print('Error (GridDmat): both map and array dimension should match for the subtraction.')
@@ -65,7 +65,7 @@ class GridDmat:
             return d
         elif isinstance(other,(GridDmat)):
             if (self.map == other.map) and \
-                (self.size == other.size):
+                (self.shape == other.shape):
                 # ToDo: Need to implement the multiplicaiton of distributed arrays.
                 self.local = self.local * other.local
             else:
@@ -87,7 +87,7 @@ class GridDmat:
             return d
         elif isinstance(other,(GridDmat)):
             if (self.map == other.map) and \
-                (self.size == other.size):
+                (self.shape == other.shape):
                 # ToDo: Need to implement the multiplicaiton of distributed arrays.
                 d = self.copy()
                 d.local = other.local * self.local
@@ -105,7 +105,6 @@ class GridDmat:
         d = GridDmat()
         d.map = self.map
         d.dim = self.dim
-        d.size = self.size
         d.shape = self.shape
         d.pitfalls = self.pitfalls
         d.falls = self.falls

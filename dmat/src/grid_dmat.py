@@ -82,7 +82,7 @@ def grid_dmat(m,n=None,q=None,r=None,p=None):
 
     d.map = p
     d.dim = len(dims)
-    d.size = dims
+    # d.size = dims
     d.shape = dims
     if isinstance(p,GridMap) and (p.dim != len(dims)):
         print('ERROR(dmat): Map and distributed object dimensions must match')

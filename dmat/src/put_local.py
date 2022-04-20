@@ -17,8 +17,8 @@ def put_local(x, x_local):
     if DEBUG:
         print('--> Entering put_local')
 
-    if isinstance(x_local, np.ndarray):
-        x.local = x_local
+    if isinstance(x, np.ndarray):
+        x = x_local
     else:
         x.local[:] = x_local
 

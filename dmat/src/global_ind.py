@@ -1,3 +1,6 @@
+from GridDmat import *
+from size import *
+
 def global_ind(d, dim=None):
     """Returns the global indices of the distributed array D local to 
     the current processor in the specified dimension, DIM.
@@ -17,19 +20,11 @@ def global_ind(d, dim=None):
     if DEBUG:
         print('--> Entering global_ind')
         
-    my_inds = d.global_ind
-    s = d.size
-    if DEBUG:
-        print('my_inds:')
-        print(my_inds)
-        print('d.size:')
-        print(s)
-    
     if dim == None:
         # no dim provided. returns for all dimension
         if DEBUG:
             print('no dim')
-        dims = list(range(d.dim))
+        dims = list(range(len(d.shape)))
     else:
         if DEBUG:
             print('provided dim')
@@ -38,15 +33,37 @@ def global_ind(d, dim=None):
             dims.append(dim)
         else:
             dims = dim
+
+    if isinstance(d,GridDmat): 
+        #
+        # distributed array
+        #
+        my_inds = d.global_ind
+        s = d.shape
+        if DEBUG:
+            print('my_inds:')
+            print(my_inds)
+            print('d.shape:')
+            print(s)
     
-    
-    if len(dims)==1:
-        local_ind = my_inds[str(dims[0])]
+        if len(dims)==1:
+            local_ind = my_inds[str(dims[0])]
+        else:
+            local_ind = []
+            for i in range(len(dims)):
+                local_ind.append(my_inds[str(dims[i])])
     else:
-        local_ind = []
-        for i in range(len(dims)):
-            local_ind.append(my_inds[str(dims[i])])
-        
+        #
+        # non-distributed array
+        # 
+        my_inds = size(d)
+        if len(dims)==1:
+            local_ind = list(range(my_inds[dims[0]]))
+        else:
+            local_ind = []
+            for i in range(len(dims)):
+                local_ind.append(list(range(my_inds[dims[i]])))
+
     if DEBUG:
         print('--> Exiting global_ind')
     return local_ind

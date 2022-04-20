@@ -27,10 +27,7 @@ def size(d, dims=None):
     s = []
     for i in dims:
         # take care of non Dmat array
-        if isinstance(d,np.ndarray):
-            s.append(d.shape[i])
-        else:
-            s.append(d.size[i])
+        s.append(d.shape[i])
     
     return s
 

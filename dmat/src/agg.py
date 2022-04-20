@@ -79,7 +79,7 @@ def agg(d, leader=None):
 
         # reconstruct the matrix from the local pieces
         # this is a NO-OP for block distributions since the data does not
-        mat = reconstruct(d.pitfalls,  d.map.grid, temp_mat, d.size)
+        mat = reconstruct(d.pitfalls,  d.map.grid, temp_mat, d.shape)
 
     else: # my_rank != leader
         # send local data to the leader regardless of the matrix dimension
