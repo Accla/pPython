@@ -35,8 +35,8 @@ n_image_y = 2**10
 n_point = 100 
 
 # Set filter size (use powers of 2).
-n_filter_x = 2.**5 
-n_filter_y = 2.**5 
+n_filter_x = int(2.**5)
+n_filter_y = int(2.**5)
 
 # Create maps
 mapImOv = 1 
@@ -74,7 +74,7 @@ imOv_local = local(imOv)
 # Add one to compensate the starting index, zero
 # myI = myI + 1
 # myJ = myJ + 1
-imOv_local = np.array([myI+1]).T * np.ones([len(myJ)]) + np.ones((1,len(myI))).T * np.array([myJ+1])
+imOv_local = (np.array(myI)+1).reshape(len(myI),1) * np.ones([1,len(myJ)]) + np.ones((1,len(myI))).T * (np.array(myJ)+1).reshape(1,len(myJ))
 
 # Store the locally updated part into the distributed matrix
 imOv = put_local(imOv,imOv_local) 

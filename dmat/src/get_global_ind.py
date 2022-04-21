@@ -42,7 +42,7 @@ def get_global_ind(falls, grid_dims=None):
                 if (len(grid_dims)>0) and (grid_dims[i] == 1): 
                     # dimension is not distributed
                     # print('get_global_ind: To be checked, am i here?')
-                    temp += list(range(falls_i.local_len))
+                    temp += list(range(int(falls_i.local_len)))
                 else: #dimension is distributed
                     # get the indices for the first n-1 cycles
                     # NOTE: This takes care of the case when complete_cycle==0 and
@@ -65,8 +65,8 @@ def get_global_ind(falls, grid_dims=None):
                             print('complete n-th cycle & complete block')
                             print(falls_i.l+(falls_i.n-1)*falls_i.s)
                             print(falls_i.r+(falls_i.n-1)*falls_i.s+1)
-                        i_left = falls_i.l+(falls_i.n-1)*falls_i.s
-                        i_rght = falls_i.r+(falls_i.n-1)*falls_i.s+1
+                        i_left = int(falls_i.l+(falls_i.n-1)*falls_i.s)
+                        i_rght = int(falls_i.r+(falls_i.n-1)*falls_i.s+1)
                         temp += list(range(i_left,i_rght))
  
                     elif (not falls_i.complete_cycle) and (not falls_i.complete_block):

@@ -188,7 +188,7 @@ def global_block_ranges(d, dims):
     """
     global_ind is a dictionary such as {'0': [0, 1, 2, 3], '1': [0, 1, 2]}
     """
-    s = d.size
+    s = d.shape
     
     if len(dims)>1:
         ind = []

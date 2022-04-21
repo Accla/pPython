@@ -5,6 +5,7 @@ from MPI_Send import *
 from MPI_Recv import *
 
 import GridPython as GPC
+from GridDmat import *
 from n_dim_find import *
 from inmap import *
 
@@ -31,6 +32,9 @@ def synch(d):
     DEBUG = 0
     if DEBUG:
         print('--> Entering synch')
+
+    if not isinstance(d,GridDmat):
+        return d
 
     p = d.map
     # find current processor index in the grid

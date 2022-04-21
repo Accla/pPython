@@ -184,7 +184,7 @@ def global_block_range(d, dims):
     """
     d.falls: a list of len(dims)
     """
-    s = d.size
+    s = d.shape
     
     ind = np.zeros((len(dims),2),int)
 

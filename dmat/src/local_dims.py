@@ -32,7 +32,7 @@ def local_dims(falls, dim):
         if isinstance(falls[0], type(GridFalls())):
             for i in range(dim):
                 # local size is just the local_len field of the local falls
-                local_size = local_size + [falls[i].local_len]
+                local_size = local_size + [int(falls[i].local_len)]
         else: # no local data
             local_size = np.zeros(dim,dtype='int')
     else:
