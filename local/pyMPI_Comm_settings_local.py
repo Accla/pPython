@@ -1,5 +1,4 @@
 import os
-1
 import checkOS as OS
 
 def pyMPI_Comm_settings_local(machine_db_settings):
