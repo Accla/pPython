@@ -37,7 +37,7 @@ def get_global_ind(falls, grid_dims=None):
         for i in range(dim):
             temp = []
             falls_i = falls[i]
-            if isinstance(falls_i,type(GridFalls())):
+            if isinstance(falls_i,GridFalls):
                 # falls is an instance of GridFalls class
                 if (len(grid_dims)>0) and (grid_dims[i] == 1): 
                     # dimension is not distributed
@@ -72,6 +72,7 @@ def get_global_ind(falls, grid_dims=None):
                     elif (not falls_i.complete_cycle) and (not falls_i.complete_block):
                         if DEBUG:
                             print('incomplete n-th cycle & incomplete block')
+                            print('falls_i.r = %d, falls_i.l = %d'%(falls_i.r,falls_i.l))
                         # incomplete n-th cycle, incomplete block  
                         block_size = falls_i.r-falls_i.l+1
                         rem_block = falls_i.local_len%block_size
@@ -93,8 +94,8 @@ def get_global_ind(falls, grid_dims=None):
         exit()
 
     if DEBUG:
-        print(ind)
-        print('--> Eexiting get_global_ind')
+        # print(ind)
+        print('<-- Eexiting get_global_ind')
 
     return ind
 

@@ -62,7 +62,7 @@ def get_local_falls(pitfalls, grid, rank):
         ind = n_dim_find(grid,rank)
         if DEBUG:
             print('get_local_falls: index posititon for given rank, %d'%(rank))
-            print(ind)
+            # print(ind)
             
         if len(ind):
             for i in range(dim):
@@ -92,8 +92,7 @@ def get_local_falls(pitfalls, grid, rank):
                         # (i.e. local indices can be computed directly from the falls info without 
                         # dealing with local length)
                     else: # rem_cycle != 0
-                        # number of blocks in the incomplete cycle (both complete
-                        # and incomplete)
+                        # number of blocks in the incomplete cycle (both complete and incomplete)
                         num_blocks = math.ceil(pf.rem_cycle/block_size)
                         # the length of incomplete block (if one exists)
                         rem_block = pf.rem_cycle%block_size
@@ -114,6 +113,8 @@ def get_local_falls(pitfalls, grid, rank):
                                 # adjustment for incomplete cycle & incomple block
                                 f.l = pf.l+pid*pf.d-(pid-pf.rem_cycle)
                                 f.r = pf.r+pid*pf.d-(pid-pf.rem_cycle)-1
+                                if DEBUG:
+                                    print('f.l & f.r changed (incomplete cycle, incomplete block): %d,%d'%(f.l,f.r))
                         else: 
                             if (pid+1)<num_blocks:
                                 # local processor does not have an incomplete cycle
@@ -173,7 +174,7 @@ def get_local_falls(pitfalls, grid, rank):
         for i in range(len(local_falls)):
             lf = local_falls[i]
             print_falls(lf)
-        print('--> Exiting get_local_falls.')
+        print('<-- Exiting get_local_falls.')
         
     return local_falls
 

@@ -81,6 +81,8 @@ def gen_falls(pf, pid):
                 # adjustment for incomplete cycle & incomple block
                 f.l = pf.l+pid*pf.d-(pid-pf.rem_cycle)
                 f.r = pf.r+pid*pf.d-(pid-pf.rem_cycle)-1
+                if DEBUG:
+                    print('f.l & f.r changed (incomplete cycle, incomplete block): %d,%d'%(f.l,f.r))
         else:
             if (pid+1)<num_blocks:
                 # local processor does not have an incomplete cycle
@@ -106,5 +108,7 @@ def gen_falls(pf, pid):
                     f.local_len = (f.n-1)*block_size+rem_block
                     f.complete_cycle = False
                     f.complete_block = False
+    if DEBUG:
+        print('<-- Exiting gen_falls')
     return f
 
