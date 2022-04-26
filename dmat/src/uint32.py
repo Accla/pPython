@@ -1,5 +1,7 @@
 import numpy as np
 
+from unfun import *
+
 def uint32(d):
     """UINT32 Convert each local part of the DMAT to unsigned 32-bit integers.
     UINT32(D) Returns unsigned 32-bit integer value for the local part of D

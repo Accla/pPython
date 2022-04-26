@@ -1,5 +1,7 @@
 import numpy as np
 
+from unfun import *
+
 def uint16(d):
     """UINT16 Convert each local part of the DMAT to unsigned 16-bit integers.
     UINT16(D) Returns unsigned 16-bit integer value for the local part of D

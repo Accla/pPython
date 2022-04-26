@@ -1,4 +1,6 @@
-import numpy as np
+import numpy
+
+from GridDmat import *
 
 def unfun(fhandle,x):
     """Unary operation on a distirbuted array Y.
@@ -11,10 +13,12 @@ def unfun(fhandle,x):
     Author:  Nadya Travinin
     """
     
-    x.local = fhandle(x.local)
+    if isinstance(x,GridDmat):
+        x.local = fhandle(x.local)
+    else:
+        x = fhandle(x)
 
     return x
-
 
     """
     Python version: Dr. Chansup Byun (cbyun@ll.mit.edu)

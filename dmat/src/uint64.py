@@ -1,5 +1,7 @@
 import numpy as np
 
+from unfun import *
+
 def uint64(d):
     """UINT64 Convert each local part of the DMAT to unsigned 64-bit integers.
     UINT64(D) Returns unsigned 64-bit integer value for the local part of D

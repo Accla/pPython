@@ -1,5 +1,7 @@
 import numpy as np
 
+from unfun import *
+
 def uint8(d):
     """UINT8 Convert each local part of the DMAT to unsigned 8-bit integers.
     UINT8(D) Returns unsigned 8-bit integer value for the local part of D
