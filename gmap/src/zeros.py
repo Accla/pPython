@@ -57,7 +57,12 @@ def zeros(m,n,map):
         exit()
     q=None
     r=None
-    dtype = None
+    if isinstance(map,str):
+        # Assuming map is datatype
+        dtype = map
+        map = 1
+    else:
+        dtype = None
     # print('Called zeros(m,n,map)')
     return grid_zeros(m,n,q,r,map,dtype)
 
