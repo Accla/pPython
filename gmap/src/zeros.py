@@ -10,11 +10,12 @@ def zeros(v,map):
     """
     
     if isinstance(v,(np.ndarray)):
-        # Check if len(v) is equal to map.dim
-        if not (len(v) == map.dim):
-            print('ERROR(zeros): the dimensions of the given list and the map does not match.')
-            exit()
-        
+        # check if map (the 2nd element) is GridMap object
+        if isinstance(map,GridMap):
+            # Check if len(v) is equal to map.dim
+            if not (len(v) == map.dim):
+                print('ERROR(zeros): the dimensions of the given list and the map does not match.')
+                exit()
         n=None
         q=None
         r=None
@@ -35,7 +36,13 @@ def zeros(v,map):
             exit()
     elif isinstance(v,(int,np.int64)):
         m=v
-        n=None
+        # check if map (the 2nd element) is GridMap object
+        if isinstance(map,GridMap):
+            n=None
+        else:
+            # non-distributed numpy array
+            n = map
+            map = 1
         q=None
         r=None
     else:
