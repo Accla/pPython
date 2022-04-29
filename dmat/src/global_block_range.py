@@ -79,11 +79,9 @@ def global_block_range(d, dims):
 
     """
     
-    print(dims)
-    
     ind = np.zeros((len(dims),2),int)
     my_inds = list(d.shape)
-    print(my_inds)
+    # print(my_inds)
     
     for i in range(len(dims)):
         # For python, index ranges from 0 to N-1

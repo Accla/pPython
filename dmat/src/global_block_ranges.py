@@ -82,8 +82,6 @@ def global_block_ranges(d, dims):
 
     """
     
-    print(dims)
-    
     ind = np.zeros((len(dims),3),int)
     # 1st: its rank (for serial)
     # 2nd: starting index, which is always 0
