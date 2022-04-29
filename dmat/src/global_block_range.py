@@ -87,7 +87,7 @@ def global_block_range(d, dims):
     
     for i in range(len(dims)):
         # For python, index ranges from 0 to N-1
-        print(dims[i])
+        # print(dims[i])
         ind[i,1] = my_inds[dims[i]]-1
         
     return ind
