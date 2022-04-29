@@ -4,6 +4,38 @@ import numpy as np
 from GridMap import *
 from grid_zeros import *
 
+@dispatch(object)
+def zeros(v):
+    """grid_zeros() wrapper method.
+    """
+    n=None
+    q=None
+    r=None
+    if isinstance(v,(np.ndarray)):
+        # Extract elements from the list.
+        m = v[0]
+        if len(v) == 2:
+            n = v[1]
+        elif len(v) == 3:
+            n = v[1]
+            q = v[2]
+        elif len(v) == 4:
+            n = v[1]
+            q = v[2]
+            r = v[3]
+        else:
+            print('ERROR(zeros): matrix dimension should be less than or equal to 4.')
+            exit()
+    elif isinstance(v,(int,np.int64)):
+        m=v
+        map = 1
+    else:
+        print('ERROR(zeros): data type, %s, is not supported for matrix size.'%(type(v)))
+        exit()
+    dtype = None
+    # print('Called zeros(m) where m is an integer or a np.ndarray (vector)')
+    return grid_zeros(m,n,q,r,map,dtype)
+
 @dispatch(object,object)
 def zeros(v,map):
     """grid_zeros() wrapper method.
