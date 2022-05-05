@@ -57,12 +57,16 @@ def global_ind(d, dim=None):
         # non-distributed array
         # 
         my_inds = size(d)
-        if len(dims)==1:
-            local_ind = list(range(my_inds[dims[0]]))
+        if len(my_inds) == 1:
+            # 1-D array (even if array construct was 2-D)
+            local_ind = list(range(my_inds[0]))
         else:
-            local_ind = []
-            for i in range(len(dims)):
-                local_ind.append(list(range(my_inds[dims[i]])))
+            if len(dims)==1:
+                local_ind = list(range(my_inds[dims[0]]))
+            else:
+                local_ind = []
+                for i in range(len(dims)):
+                    local_ind.append(list(range(my_inds[dims[i]])))
 
     if DEBUG:
         print('--> Exiting global_ind')

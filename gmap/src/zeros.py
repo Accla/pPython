@@ -89,10 +89,10 @@ def zeros(m,n,map):
     """grid_zeros() wrapper method.
     """
     if not isinstance(m,(int,np.int64)):
-        print('ERROR(zeros): data type, %s, is not supported for matrix size.'%(type(v)))
+        print('ERROR(zeros): data type, %s, is not supported for matrix size.'%(type(m)))
         exit()
     if not isinstance(n,(int,np.int64)):
-        print('ERROR(zeros): data type, %s, is not supported for matrix size.'%(type(v)))
+        print('ERROR(zeros): data type, %s, is not supported for matrix size.'%(type(n)))
         exit()
     q=None
     r=None

@@ -25,6 +25,8 @@ def pyMPI_Comm_init(n_proc,machines):
     """
     
     DEBUG = 0
+    if DEBUG:
+        print('--> Entering pyMPI_Comm_init')
 
     # Set default machine.
     if (OS.isunix):
@@ -180,9 +182,14 @@ def pyMPI_Comm_init(n_proc,machines):
     # Add machine_db to communicator.
     MPI_COMM_WORLD['machine_db'] = machine_db
 
+    if DEBUG:
+        print('MPI_COMM_WORLD')
+        print(MPI_COMM_WORLD)
     # Write out.
     comm_h5_file = 'PythonMPI/MPI_COMM_WORLD.h5'
     save_dict_to_hdf5(MPI_COMM_WORLD, comm_h5_file)   
                    
+    if DEBUG:
+        print('<-- Exiting pyMPI_Comm_init')
     return MPI_COMM_WORLD
 
