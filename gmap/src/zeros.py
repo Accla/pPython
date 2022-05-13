@@ -11,7 +11,7 @@ def zeros(v):
     n=None
     q=None
     r=None
-    if isinstance(v,(np.ndarray)):
+    if isinstance(v,(np.ndarray,list)):
         # Extract elements from the list.
         m = v[0]
         if len(v) == 2:
@@ -41,7 +41,7 @@ def zeros(v,map):
     """grid_zeros() wrapper method.
     """
     
-    if isinstance(v,(np.ndarray)):
+    if isinstance(v,(np.ndarray,list)):
         # check if map (the 2nd element) is GridMap object
         if isinstance(map,GridMap):
             # Check if len(v) is equal to map.dim
@@ -150,7 +150,7 @@ def zeros(v,map,dtype):
     """grid_zeros() wrapper method.
     """
     
-    if isinstance(v,(np.ndarray)):
+    if isinstance(v,(np.ndarray,list)):
         # Check if len(v) is equal to map.dim
         if not (len(v) == map.dim):
             print('ERROR(zeros): the dimensions of the given list and the map does not match.')

@@ -9,7 +9,7 @@ def ones(v,map):
     """grid_ones() wrapper method.
     """
     
-    if isinstance(v,(np.ndarray)):
+    if isinstance(v,(np.ndarray,list)):
         # Check if len(v) is equal to map.dim
         if not (len(v) == map.dim):
             print('ERROR(ones): the dimensions of the given list and the map does not match.')
@@ -125,7 +125,7 @@ def ones(v,map,dtype):
     """grid_ones() wrapper method.
     """
     
-    if isinstance(v,(np.ndarray)):
+    if isinstance(v,(np.ndarray,list)):
         # Check if len(v) is equal to map.dim
         if not (len(v) == map.dim):
             print('ERROR(ones): the dimensions of the given list and the map does not match.')
