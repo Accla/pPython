@@ -39,20 +39,33 @@ def recursively_save_dict_contents_to_group( h5file, path, dic):
         if not isinstance(key, str):
             raise ValueError("dict keys must be strings to save to hdf5")
         # save strings, numpy.int64, and numpy.float64 types
-        if isinstance(item, (np.int64, np.float64, np.float, str, float, np.float32, int)):
+        if isinstance(item, (np.int64, np.float64, np.float32, str, float, int)):
             #print( 'here' )
             h5file[path + key] = item
             if not h5file[path + key][()] == item:
                 raise ValueError('The data representation in the HDF5 file does not match the original dict.')
         # save numpy arrays
         elif isinstance(item, np.ndarray):            
-            try:
-                h5file[path + key] = item
-            except:
-                item = np.array(item).astype('|S9')
-                h5file[path + key] = item
-            if not np.array_equal(h5file[path + key][()], item):
-                raise ValueError('The data representation in the HDF5 file does not match the original dict.')
+            #
+            # hdf5 cannot handle a numpy array with complex data type
+            #
+            if (np.iscomplex(item)).any():
+                # Serialization using pickle
+                sdata = pickle.dumps(item)
+                # print('Serialized object size: %d bytes'%sys.getsizeof(sdata))
+                # Convert binary into np.asarray
+                bdata_np = np.asarray(sdata)
+                h5file[path + key] = bdata_np
+                if not h5file[path + key][()] == bdata_np:
+                    raise ValueError('The data representation in the HDF5 file does not match the original dict.')
+            else:
+                try:
+                    h5file[path + key] = item
+                except:
+                    item = np.array(item).astype('|S9')
+                    h5file[path + key] = item
+                if not np.array_equal(h5file[path + key][()], item):
+                    raise ValueError('The data representation in the HDF5 file does not match the original dict.')
         # save dictionaries
         elif isinstance(item, dict):
             recursively_save_dict_contents_to_group(h5file, path + key + '/', item)

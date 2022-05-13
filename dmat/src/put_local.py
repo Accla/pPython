@@ -17,10 +17,21 @@ def put_local(x, x_local):
     if DEBUG:
         print('--> Entering put_local')
 
-    if isinstance(x, np.ndarray):
-        x = x_local
+    if hasattr(x,'local'):
+        if (np.iscomplex(x_local)).any():
+            y = np.real(x_local)
+            z = np.imag(x_local)
+            x.local = np.vectorize(complex)(y,z)
+        else:
+            x.local[:] = x_local
     else:
-        x.local[:] = x_local
+        if (np.iscomplex(x_local)).any():
+            y = np.real(x_local)
+            z = np.imag(x_local)
+            x = np.vectorize(complex)(y,z)
+        else:
+            x = np.zeros(x.shape,x.dtype)
+            x[:] = x_local
 
     if DEBUG:
         print('<-- Exiting put_local')

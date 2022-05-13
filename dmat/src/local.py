@@ -14,12 +14,26 @@ def local(d):
 
     if hasattr(d,'local'):
         # create an array same as d.local
-        x = np.zeros(d.local.shape)
-        x[:] = d.local
+        if (np.iscomplex(d.local)).any():
+            y = np.real(d.local)
+            z = np.imag(d.local)
+            x = np.vectorize(complex)(y,z)
+            if DEBUG:
+                print('Return a complex local array from a DMAT')
+        else:
+            x = np.zeros(d.local.shape)
+            x[:] = d.local
+            if DEBUG:
+                print('Return a real local array from a DMAT')
     else:
         # create an array same as d
-        x = np.zeros(d.shape)
-        x[:] = d
+        if (np.iscomplex(d)).any():
+            y = np.real(d)
+            z = np.imag(d)
+            x = np.vectorize(complex)(y,z)
+        else:
+            x = np.zeros(d.shape,d.dtype)
+            x[:] = d
 
     if DEBUG:
         print('<-- Exiting local')
