@@ -1,6 +1,7 @@
 import numpy as np
 
 import GridPython as GPC
+from GridMap import *
 from dmat import *
 
 def grid_rand(m,n,q,r,p):
@@ -45,6 +46,10 @@ def grid_rand(m,n,q,r,p):
     if DEBUG:
         print('Dimension of distributed zeros: %d'%(len(dims)))
         print(dims)
+
+    if not isinstance(p,GridMap):
+        d = np.random.random(dims)
+        return d
     
     d = dmat(dims, p)
     local_size = d.local_dim

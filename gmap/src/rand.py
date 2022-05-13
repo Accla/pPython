@@ -62,7 +62,7 @@ def rand(v,map):
     # print('Called rand(v,map) where v is a np.ndarray (vector)')
     return grid_rand(m,n,q,r,map)
 
-@dispatch(int,int,type(GridMap()))
+@dispatch(int,int,GridMap)
 def rand(m,n,map):
     """grid_rand() wrapper method.
     """
