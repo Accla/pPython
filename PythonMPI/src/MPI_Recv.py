@@ -24,6 +24,8 @@ def MPI_Recv( source, tag, comm ):
     """
 
     DEBUG = 0
+    if DEBUG:
+        print('--> Entering MPI_Recv')
     
     # Get processor rank.
     my_rank = MPI_Comm_rank(comm)
@@ -53,6 +55,9 @@ def MPI_Recv( source, tag, comm ):
         # pyMPI_Sleep(0.02)
         os.remove(lock_file);
 
+    if DEBUG:
+        print(buf.values())
+        print('<-- Exiting MPI_Recv')
     # Get variable out of buf.
     return list(buf.values())
 

@@ -128,7 +128,7 @@ def global_block_ranges(d):
     return global_block_ranges(d, dims)
 
 
-@dispatch(dmat_type,int)
+@dispatch(GridDmat,int)
 def global_block_ranges(d, dim):
     """Returns the global index ranges of the distributed array D for all processors in the 
     specified dimension, DIM.
@@ -149,13 +149,19 @@ def global_block_ranges(d, dim):
     
     """
 
+    DEBUG = 0
+    if DEBUG:
+        print('--> Entering global_block_ranges, signature: (GridDmat,int)')
+
     dims = []
     dims.append(dim)
         
+    if DEBUG:
+        print('<-- Exiting calling global_block_ranges, signature: (GridDmat,List)')
     return global_block_ranges(d, dims)
 
 
-@dispatch(dmat_type,list)
+@dispatch(GridDmat,list)
 def global_block_ranges(d, dims):
     """Returns the global index ranges of the distributed array D for all processors in the 
     specified dimension, DIMS.
@@ -173,6 +179,10 @@ def global_block_ranges(d, dims):
     Pytthon version: Dr. Chansup Byun
     
     """
+
+    DEBUG = 0
+    if DEBUG:
+        print('--> Entering global_block_ranges')
 
     # processor grid on which the object is distributed
     grid = d.map.grid
@@ -193,6 +203,9 @@ def global_block_ranges(d, dims):
 
     for i in range(len(dims)):
         num_procs = np.prod(grid_dims)  # total number of grid processors
+        if DEBUG:
+            print('num_procs = %d'%(num_procs))
+            print(grid_dims)
         temp = np.zeros((num_procs,3),int)   # create array to store indices for dim i
         proc_count = 0                  # keep track of the number of processors
 
@@ -226,6 +239,8 @@ def global_block_ranges(d, dims):
         else:
             ind = temp
     
+    if DEBUG:
+        print('<-- Exiting global_block_ranges')
     return ind
 
     """

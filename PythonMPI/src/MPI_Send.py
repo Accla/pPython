@@ -44,6 +44,8 @@ def MPI_Send(dest, tag, comm, *argv):
         msg[ii] = arg
         ii = ii + 1
     # Write the message into a file.
+    if DEBUG:
+        print(msg.values())
     save_dict_to_hdf5(msg, buffer_file)   
     
     # Create lock file.

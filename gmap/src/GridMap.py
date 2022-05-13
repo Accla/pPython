@@ -102,7 +102,7 @@ class GridMap:
             self.dist_spec = dist_spec
             
             # create the grid from the processor list
-            grid = np.zeros(grid_spec,'int')
+            grid = np.zeros(grid_spec,int)
 
             # check that the length of the processor list matches the size of
             # the grid

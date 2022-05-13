@@ -1,5 +1,6 @@
 import numpy as np
 
+from GridMap import *
 from dmat import *
 from pitfalls import *
 

@@ -13,12 +13,17 @@ def size(d, dims=None):
     Edited:  Edmund L. Wong (elwong@ll.mit.edu)
     """
 
+    DEBUG = 0
+    if DEBUG:
+        print('--> Entering size')
+
     # if no dimensions are specified, all are used
     if dims == None:
         # take care of non Dmat array
         if isinstance(d,np.ndarray):
-            return list(d.shape)
-        dims = list(range(d.dim))
+            dims = list(range(len(d.shape)))
+        else:
+            dims = list(range(d.dim))
     elif isinstance(dims,(int)):
         dims = [dims]
     
@@ -29,6 +34,9 @@ def size(d, dims=None):
         # take care of non Dmat array
         s.append(d.shape[i])
     
+    if DEBUG:
+        print(s)
+        print('<-- Exiting size')
     return s
 
     """
