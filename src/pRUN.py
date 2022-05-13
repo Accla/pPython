@@ -95,6 +95,9 @@ def pRUN(py_file,n_proc,machines,sched_options=None):
     # Initialize the grid_config parameters
     grid.grid_config = grid_config_init()
 
+    if sched_options:
+        grid.grid_config['sched_options'] = sched_options
+
     if DEBUG:
         print(grid.grid_config)
 

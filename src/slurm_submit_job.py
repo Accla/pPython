@@ -18,6 +18,10 @@ def slurm_submit_job(grid_config,sched_job_file,py_file,dir_llsc):
     cmd_chdir = 'cd '+dir_llsc
     cmdstr = 'sbatch'
 
+    # Add additional scheduler options if provided
+    if 'sched_options' in grid_config:
+        cmdstr = cmdstr+' '+grid_config['sched_options']
+    
     # Partition
     cmdstr = cmdstr+' -p '+grid_config['q_name']
     
