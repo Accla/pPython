@@ -1,4 +1,5 @@
 import numpy as np
+from unfun import *
 
 def sin(x):
     """SIN(X) is the sine of the elements of the distributed array X.
