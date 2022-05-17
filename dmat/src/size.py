@@ -22,6 +22,9 @@ def size(d, dims=None):
         # take care of non Dmat array
         if isinstance(d,np.ndarray):
             dims = list(range(len(d.shape)))
+        elif isinstance(d,(int, float)):
+            # special treatment for a scalar
+            dims = list(range(2))
         else:
             dims = list(range(d.dim))
     elif isinstance(dims,(int)):
@@ -32,7 +35,11 @@ def size(d, dims=None):
     s = []
     for i in dims:
         # take care of non Dmat array
-        s.append(d.shape[i])
+        if isinstance(d,(int, float)):
+            # special treatment for a scalar
+            s.append(1)
+        else:
+            s.append(d.shape[i])
     
     if DEBUG:
         print(s)
