@@ -105,6 +105,9 @@ def transpose_grid(B):
             and (B_dist_spec['1']['dist'] == 'b') \
             and (B_overlap == None) ) ):
         # Revert to default.
+        # ToDo:  how to implement MATTLAB subsasgn operator in Python?
+        #        this involves implicit data communication among the MPI processes
+        #        to transfer the necessary data
         A[:,:] = B
         if DEBUG:
             print('Pick off everything but the special case.')

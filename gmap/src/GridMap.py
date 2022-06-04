@@ -28,6 +28,7 @@ class GridMap:
     p.dim: number of dimensions of the the distributed object
     p.proc_list: the list of processors on which the object should bedistributed
     p.dist_spec: the distribution description for each dimension
+    p.grid_spec: the distribution of processor grid (added with gridPython)
     p.grid: p.dim-dimensional array of processors corresponding to how the
             object should be distributed
  
