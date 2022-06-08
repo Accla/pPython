@@ -40,8 +40,8 @@ def MPI_Recv( source, tag, comm ):
     loop = 0;
     while os.path.exists(lock_file) == False :
         # Sleep statement allows cleaner profiling, but adds latency.
-        pyMPI_Sleep(0.08);
-        if loop > 200:
+        pyMPI_Sleep(0.2);
+        if loop > 100:
             print('MPI_Recv: failed to find the %s file.'%(lock_file))
             raise StopExecution
         loop = loop + 1

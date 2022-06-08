@@ -35,7 +35,7 @@ def transpose_grid(B):
 
     """
 
-    DEBUG = 1
+    DEBUG = 0
     if DEBUG:
         print('--> Entering transpose_grid')
     comm = GPC.comm
@@ -118,14 +118,15 @@ def transpose_grid(B):
         # Optimized row to column or column to row redistribution
         A_local = local(A)
         B_local = local(B)
-        if (np.iscomplex(A_local)).any():
-            print('A_local is a complex array')
-        else:
-            print('A_local is NOT a complex array')
-        if (np.iscomplex(B_local)).any():
-            print('B_local is a complex array')
-        else:
-            print('B_local is NOT a complex array')
+        if DEBUG:
+            if (np.iscomplex(A_local)).any():
+                print('A_local is a complex array')
+            else:
+                print('A_local is NOT a complex array')
+            if (np.iscomplex(B_local)).any():
+                print('B_local is a complex array')
+            else:
+                print('B_local is NOT a complex array')
 
         # Compute send and receive order
         # Need to shuffle this for best perf.?????

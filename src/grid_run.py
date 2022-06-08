@@ -101,10 +101,14 @@ def grid_run( py_file, n_proc, machines ):
             
     # Modify the default value if cpu_type is specified
     if len(cpu_type):
+        if DEBUG:
+            print('CPU type, grid.grid_config[\'cpu_type\' ] = %s'%(cpu_type))
         grid.grid_config['cpu_type'] = cpu_type
         # Update the queue name (partition name) accordingly
         if (cpu_type == 'xeon64c'):
             grid.grid_config['q_name'] = 'manycore'
+        elif (cpu_type == 'xeon-p8'):
+            grid.grid_config['q_name'] = 'xeon-p8'
         elif (cpu_type == 'xeon-g6'):
             grid.grid_config['q_name'] = 'gaia'
 

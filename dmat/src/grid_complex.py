@@ -10,6 +10,10 @@ def grid_complex(x,y):
     Python version: Dr. Chansup Byun
     """
 
+    DEBUG = 0
+    if DEBUG:
+        print('--> Entering grid_complex')
+
     if hasattr(x,'local') and hasattr(y,'local'):
         # DMAT objects
         # if only works if x and y are equally sized and distributed DMAT
@@ -21,7 +25,11 @@ def grid_complex(x,y):
             exit()
     else:
         d = np.vectorize(complex)(x,y)
+        if DEBUG:
+            print(d)
  
+    if DEBUG:
+        print('<-- Exiting grid_complex')
     return d
 
     """
