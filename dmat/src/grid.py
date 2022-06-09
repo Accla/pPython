@@ -7,7 +7,7 @@ def grid(d):
     Python version: Dr. Chansup Byun
     Author: Nadya Travinin
     """
-    if nott isinsttance(d,GridDmat):
+    if not isinstance(d,GridDmat):
         print('ERROR(grid): it is not a DMAT object.')
         exit()
 

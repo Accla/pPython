@@ -28,7 +28,7 @@ def get_local_ind(global_ind, ind):
     Author:   Nadya Travinin
     """
     
-    DEBUG = 1
+    DEBUG = 0
     if DEBUG:
         print('--> Enterintering get_local_ind')
         print('global_ind & ind')

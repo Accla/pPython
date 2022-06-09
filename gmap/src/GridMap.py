@@ -40,6 +40,12 @@ class GridMap:
     def __init__(self,grid_spec=None,dist_spec=None,proc_list=None,overlap=None):
         """Init constructor."""
         
+        DEBUG = 0
+        if DEBUG:
+            print('--> Entering GridMap.__init__()')
+            print('proc_list')
+            print(proc_list)
+
         if not bool(grid_spec):
             return
         
@@ -114,6 +120,10 @@ class GridMap:
             else:
                 grid.reshape(gsize)[:] = proc_list[:]
         
+            if DEBUG:
+                print('After grid.reshape(gsize)[:] = proc_list[:]')
+                print(grid)
+
             # if the maps are created within the scope of MPI_COMM_WORLD
             # then the processor list is checked against current
             # comm scope
@@ -213,6 +223,9 @@ class GridMap:
                 else:
                     n_procs = None
             self.overlap = overlap
+
+        if DEBUG:
+            print('<-- Exiting GridMap.__init__()')
 
     def __eq__(self, other):
 
