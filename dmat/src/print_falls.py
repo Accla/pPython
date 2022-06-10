@@ -8,4 +8,5 @@ def print_falls(f):
     print('   f.local_len: %s'%(f.local_len))
     print('   f.complete_cycle: %s'%(f.complete_cycle))
     print('   f.complete_block: %s'%(f.complete_block))
-
+    # Added with FALLS/PITFALLS modification
+    print('   f.dist: %s'%(f.dist))

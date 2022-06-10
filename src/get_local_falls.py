@@ -71,9 +71,9 @@ def get_local_falls(pitfalls, grid, rank):
 
                 pid = ind[i]
                 pf = pitfalls[i]
-                if DEBUG:
-                    print('axis, i, in %d direction.'%(i))
-                    print_pitfalls(pf)
+                # if DEBUG:
+                #     print('axis, i, in %d direction.'%(i))
+                #     print_pitfalls(pf)
                 f.l = pf.l+(pid)*pf.d
                 f.r = pf.r+(pid)*pf.d
                 f.s = pf.s
@@ -159,8 +159,8 @@ def get_local_falls(pitfalls, grid, rank):
 
                 # store the FALLS structure 
                 local_falls.append(f)
-                if DEBUG:
-                    print_falls(f)
+                # if DEBUG:
+                #     print_falls(f)
         else:
             # Empty index list, ind
             for i in range(dim):

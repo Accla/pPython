@@ -248,6 +248,14 @@ class GridMap:
         self.dist_spec = old_map.dist_spec
         self.proc_list = old_map.proc_list
         self.overlap = old_map.overlap
-
         return self
+
+    def print(self):
+        """Print the map."""
+        print('Map Properties:')
+        print('   Process grid: %s'%(str(self.grid)))
+        print('   Map distribution specificaiton: %s'%(str(self.grid_spec)))
+        print('   Distribution type: %s'%(str(self.dist_spec)))
+        print('   Process Pid list: %s'%(str(self.proc_list)))
+        print('   Overlap mapping: %s'%(str(self.overlap)))
 

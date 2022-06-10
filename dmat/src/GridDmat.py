@@ -28,7 +28,7 @@ class GridDmat:
         s = []
         ss = dict()
         if not isinstance(index,tuple): # 1-D distributed array
-            print('GridDmat: 1-D assignment, nOt implemented yet.')
+            print('GridDmat: 1-D assignment, not implemented yet.')
             exit()
         else:
             if len(index)==2: # 2-D distributed array

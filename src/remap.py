@@ -21,6 +21,8 @@ def remap(x, new_map):
         print('--> Entering remap')
 
     s = size(x)
+    if DEBUG:
+        print('size(dmat): %s'%(str(s)))
     is_complex = 0
     if (np.iscomplex(local(x))).any():
         is_complex = 1
