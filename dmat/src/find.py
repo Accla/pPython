@@ -29,12 +29,27 @@ def find(x):
             print('... find for a non-distributed array')
         local_ij = np.argwhere(x)
         # Note: local_ij[:,0] -> local_i, local_ij[:,1] -> local_j
-        if len(local_ij)>0:
-            i = local_ij[:,0]
-            j = local_ij[:,1]
+        if len(x.shape) == 1:
+            if len(local_ij)>0:
+                i = local_ij[:,0]
+            else:
+                i = []
+            if DEBUG:
+                print('<-- Exiting find')
+            return [i]
+        elif len(x.shape) == 2:
+            if len(local_ij)>0:
+                i = local_ij[:,0]
+                j = local_ij[:,1]
+            else:
+                i = []
+                j = []
+            if DEBUG:
+                print('<-- Exiting find')
+            return [i,j]
         else:
-            i = []
-            j = []
+            print('Not implemented yet for DIM > 2.')
+            exit()
     else:
         if DEBUG:
             print('... find for a distributed array')
@@ -114,7 +129,7 @@ def find(x):
             i = []
             j = []
 
-    if DEBUG:
-        print('<-- Exiting find')
-    return [i,j]
+        if DEBUG:
+            print('<-- Exiting find')
+        return [i,j]
 
