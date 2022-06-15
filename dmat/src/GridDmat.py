@@ -104,7 +104,7 @@ class GridDmat:
     def __mul__(self, other):
         """Implement multiplication with Dmat()
         """
-        if isinstance(other,(float,int)):
+        if isinstance(other,(float,int,np.float64)):
             # Create a copy to avoid to change the original distributed array 
             d = self.copy()
             # update local array
@@ -126,7 +126,7 @@ class GridDmat:
     def __rmul__(self, other):
         """Implement multiplication with Dmat()
         """
-        if isinstance(other,(float,int)):
+        if isinstance(other,(float,int,np.float64)):
             # Create a copy to avoid to change the original distributed array 
             d = self.copy()
             # update local array
@@ -158,7 +158,10 @@ class GridDmat:
         d.local_dim = self.local_dim
         d.global_ind = self.global_ind
         # create an array same as d.local
-        d.local = np.zeros(self.local.shape)
+        if (np.iscomplex(self.local)).any():
+            d.local = np.vectorize(complex)(np.zeros(self.local.shape),np.zeros(self.local.shape))
+        else:
+            d.local = np.zeros(self.local.shape)
         d.local[:] = self.local
         return d
 
