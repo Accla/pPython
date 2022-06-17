@@ -69,6 +69,30 @@ def agg(d, leader=None):
                             print('Received array, temp:')
                             print('type(temp): %s'%(type(temp)))
                             print('type(temp[0,0]): %s'%(type(temp[0,0])))
+        elif d.dim==3:
+            dim = d.map.grid.shape
+            # dim(1) - number of grid rows, dim(2) - number of grid cols
+            temp_mat = dict()
+            for i in range(dim[0]):
+                temp_mat[str(i)] = dict()
+                for j in range(dim[1]):
+                    temp_mat[str(i)][str(j)] = dict()
+                    for k in range(dim[2]):
+                        if (GPC.my_rank==d.map.grid[i][j][k]):
+                            temp_mat[str(i)][str(j)][str(k)] = d.local
+                            if DEBUG:
+                                print('Local array, d.local:')
+                                print('type(d.local): %s'%(type(d.local)))
+                                print('type(d.local[0,0,0]): %s'%(type(d.local[0,0,0])))
+
+                        else:
+                            [temp] = MPI_Recv(d.map.grid[i][j][k], GPC.tag, GPC.comm)
+                            temp_mat[str(i)][str(j)][str(k)] = temp
+                            if DEBUG:
+                                print('Leader received msg for (i,j,k) = (%d,%d,%d) from Pid, %d, with the tag, %s.'%(i,j,d.map.grid[i][j][k],GPC.tag))
+                                print('Received array, temp:')
+                                print('type(temp): %s'%(type(temp)))
+                                print('type(temp[0,0,0]): %s'%(type(temp[0,0,0])))
         else:
             print('ERROR(agg): map dimension, %d, is not yet supported.'%(d.dim))
             

@@ -34,6 +34,8 @@ def grid_zeros(m,n=None,q=None,r=None,p=None,dtype=None):
     """
 
     DEBUG = 0
+    if DEBUG:
+        print('--> Entering grid_zero')
     
     # form dims vector
     dims = []
@@ -83,5 +85,7 @@ def grid_zeros(m,n=None,q=None,r=None,p=None,dtype=None):
 
     d.local = np.zeros(d.local_dim, dtype)
 
+    if DEBUG:
+        print('<-- Exiting grid_zero')
     return d
 

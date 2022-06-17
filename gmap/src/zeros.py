@@ -11,10 +11,13 @@ def zeros(v):
     n=None
     q=None
     r=None
+    map = None
     if isinstance(v,(np.ndarray,list)):
         # Extract elements from the list.
         m = v[0]
-        if len(v) == 2:
+        if len(v) == 1:
+            n = None
+        elif len(v) == 2:
             n = v[1]
         elif len(v) == 3:
             n = v[1]
@@ -103,6 +106,20 @@ def zeros(m,n,map):
     else:
         dtype = None
     # print('Called zeros(m,n,map)')
+    return grid_zeros(m,n,q,r,map,dtype)
+
+@dispatch(int,int,int,object)
+def zeros(m,n,q,r):
+    """grid_zeros() wrapper method.
+    """
+    # What is best way to determine existance of Map
+    if isinstance(r, GridMap):
+        map = r
+        r = None
+    else:
+        map = 1
+    dtype = None
+    # print('Called zeros(m,n,q,r)')
     return grid_zeros(m,n,q,r,map,dtype)
 
 @dispatch(object,object,object,object)

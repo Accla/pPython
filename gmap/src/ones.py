@@ -4,6 +4,45 @@ import numpy as np
 from GridMap import *
 from grid_ones import *
 
+@dispatch(int,int)
+def ones(m,n):
+    """grid_ones() wrapper method.
+    """
+    if not isinstance(m,(int,np.int64)):
+        print('ERROR(ones): data type, %s, is not supported for matrix size.'%(type(m)))
+        exit()
+    if not isinstance(n,(int,np.int64)):
+        print('ERROR(ones): data type, %s, is not supported for matrix size.'%(type(n)))
+        exit()
+    q=None
+    r=None
+    map = None
+    dtype = None
+    # print('Called ones(m,n)')
+    return grid_ones(m,n,q,r,map,dtype)
+
+@dispatch(int,int,int,object)
+def ones(m,n,q,r):
+    """grid_ones() wrapper method.
+    """
+    if not isinstance(m,(int,np.int64)):
+        print('ERROR(ones): data type, %s, is not supported for matrix size.'%(type(m)))
+        exit()
+    if not isinstance(n,(int,np.int64)):
+        print('ERROR(ones): data type, %s, is not supported for matrix size.'%(type(n)))
+        exit()
+    if isinstance(r,GridMap):
+        map == r 
+        r = None
+    elif isinstance(r,int) or r == None:
+        map = None
+    else:
+        print('ERROR(ones):  the 4th argunment data type is not supported')
+        exit()
+    dtype = None
+    # print('Called ones(m,n)')
+    return grid_ones(m,n,q,r,map,dtype)
+
 @dispatch(object,GridMap)
 def ones(v,map):
     """grid_ones() wrapper method.

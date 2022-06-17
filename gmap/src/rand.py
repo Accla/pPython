@@ -18,6 +18,36 @@ def rand(m,n,imap):
     # print('Called rand(m,n,imap) where m and n are int')
     return np.random.rand(m,n)
 
+@dispatch(int,int,int,object)
+def rand(m,n,q,r):
+    """grid_rand() wrapper method for imap = 1 (int)
+    """
+    if isinstance(r,GridMap):
+        map = r
+        r = None
+        return grid_rand(m,n,q,r,map)
+    elif r == None:
+        return np.random.rand(m,n,q)
+    elif isinstance(r,int):
+        # print('Called rand(m,n,q,r) where m and n are int')
+        if r == 1:
+            map = 1
+            r = None
+            return grid_rand(m,n,q,r,map)
+        else:
+            return np.random.rand(m,n,q,r)
+    else:
+        print('ERROR(rand): unsupport data type with the 4th argument')
+        exit()
+
+@dispatch(int,type(GridMap()))
+def rand(m,map):
+    """grid_rand() wrapper method.
+    """
+    n=None
+    q=None
+    r=None
+    dtype = None
 @dispatch(int,type(GridMap()))
 def rand(m,map):
     """grid_rand() wrapper method.
