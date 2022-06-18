@@ -103,11 +103,11 @@ def reconstruct(pitfalls, grid, temp_mat, mat_size):
                 for kkey in jval.keys():
                     kval = jval[kkey]
                     kkeys = jval.keys()
-                    dtype = type(kval[0,0])
+                    dtype = type(kval[0,0,0])
                     if DEBUG:
-                        print('dtype, %s, at ikey,jkey,kkey = %s,%s'%(dtype,ikey,jkey,kkey))
+                        print('dtype, %s, at ikey,jkey,kkey = %s,%s,%s'%(dtype,ikey,jkey,kkey))
                         print('kval:')
-                        print(kval)
+                        # print(kval)
                     break
                 break
             break
@@ -135,20 +135,19 @@ def reconstruct(pitfalls, grid, temp_mat, mat_size):
         for ikey in ikeys:
             j = 0
             for jkey in jkeys:
-                j = 0
+                k = 0
                 for kkey in kkeys:
-                    k = 0
                     if temp_mat[ikey][jkey][kkey].any() != 0.0:
                         ii = my_global_ind[str(i)][str(j)][str(k)][str(0)]
                         jj = my_global_ind[str(i)][str(j)][str(k)][str(1)]
                         kk = my_global_ind[str(i)][str(j)][str(k)][str(2)]
                         if DEBUG:
-                            print('mat index: ii,jj,kk = %d,%d,%d'%(len(ii),len(jj).len(kk)))
-                            print('temp_mat keys: ikey,jkeykkey = %s,%s'%(ikey,jkey,kkey))
+                            print('mat index: ii,jj,kk = %d,%d,%d'%(len(ii),len(jj),len(kk)))
+                            print('temp_mat keys: ikey,jkeykkey = %s,%s,%s'%(ikey,jkey,kkey))
                             print(ii)
                             print(jj)
                             print(kk)
-                            print(temp_mat[ikey][jkey][kkey])
+                            # print(temp_mat[ikey][jkey][kkey])
                         mat[ii[0]:ii[-1]+1,jj[0]:jj[-1]+1,kk[0]:kk[-1]+1] = temp_mat[ikey][jkey][kkey]
                     k +=1
                 j +=1
@@ -160,6 +159,6 @@ def reconstruct(pitfalls, grid, temp_mat, mat_size):
         print('RECONSTRUCT: Only objects up to 4-D are supported');
 
     if DEBUG:
-        print('--> Exiting reconstruct')
+        print('<-- Exiting reconstruct')
     return mat
 
