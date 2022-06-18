@@ -149,16 +149,7 @@ def reconstruct(pitfalls, grid, temp_mat, mat_size):
                             print(jj)
                             print(kk)
                             print(temp_mat[ikey][jkey][kkey])
-                        # Add new axis for broadcasting
-                        new_mat = temp_mat[ikey][jkey][kkey]
-                        if len(ii)==1:
-                            new_mat = new_mat[np.newaxis,:,:]
-                        elif len(jj)==1:
-                            new_mat = new_mat[:,np.newaxis,:]
-                        elif len(kk)==1:
-                            new_mat = new_mat[:,:,np.newaxis]
-
-                        mat[ii[0]:ii[-1]+1,jj[0]:jj[-1]+1,kk[0]:kk[-1]+1] = new_mat
+                        mat[ii[0]:ii[-1]+1,jj[0]:jj[-1]+1,kk[0]:kk[-1]+1] = temp_mat[ikey][jkey][kkey]
                     k +=1
                 j +=1
             i +=1
