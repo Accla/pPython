@@ -118,6 +118,9 @@ def zeros(m,n,q,r):
         r = None
     else:
         map = 1
+        if r == 1:
+            # Assuming this is non-distributed array with map = 1
+            r = None
     dtype = None
     # print('Called zeros(m,n,q,r)')
     return grid_zeros(m,n,q,r,map,dtype)

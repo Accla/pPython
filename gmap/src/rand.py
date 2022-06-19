@@ -33,8 +33,10 @@ def rand(m,n,q,r):
         if r == 1:
             map = 1
             r = None
-            return grid_rand(m,n,q,r,map)
+            # print('gmap/rand: calling np.random.rand(m,n,q)')
+            return np.random.rand(m,n,q)
         else:
+            # print('gmap/rand: calling np.random.rand(m,n,q,r)')
             return np.random.rand(m,n,q,r)
     else:
         print('ERROR(rand): unsupport data type with the 4th argument')

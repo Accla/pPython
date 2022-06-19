@@ -23,10 +23,12 @@ def grid_complex(x,y):
         else:
             print('ERROR: Both DMAT objects have to be the same kind.')
             exit()
+        if DEBUG:
+            print('dmat/grid_complex: return distributed array with its local array shape of %s'%(str(d.local.shape)))
     else:
         d = np.vectorize(complex)(x,y)
         if DEBUG:
-            print(d)
+            print('dmat/grid_complex: return non-distributed array shape of %s'%(str(d.shape)))
  
     if DEBUG:
         print('<-- Exiting grid_complex')
