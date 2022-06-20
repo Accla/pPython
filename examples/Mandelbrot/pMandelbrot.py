@@ -47,7 +47,7 @@ if (PARALLEL):
     # dist['1'] = {'dist':'b'}
     # Wmap = map([Np,1],dist,range(Np))  # Cyclic distribution in the 1st dimension.
 
-W = zeros(N,N,Wmap)            # Create distributed array
+W = zeros(N,N,dmap=Wmap)            # Create distributed array
 Wloc = local(W)                # Get local part.
 myI = global_ind(W,0)          # Get local i indices.
 myJ = global_ind(W,1)          # Get local j indices.

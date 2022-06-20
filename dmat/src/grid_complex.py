@@ -18,7 +18,7 @@ def grid_complex(x,y):
         # DMAT objects
         # if only works if x and y are equally sized and distributed DMAT
         if x.map == y.map:
-            d = zeros(np.array(size(x)),x.map,'complex')
+            d = zeros(np.array(size(x)),dmap=x.map,dtype=complex)
             d.local = np.vectorize(complex)(x.local,y.local)
         else:
             print('ERROR: Both DMAT objects have to be the same kind.')

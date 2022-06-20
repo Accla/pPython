@@ -70,7 +70,7 @@ print('Distributed vector size (words)    = %d'%(N))
 print('Distributed vector size (bytes)    = %d'%(N*16))
 
 tic = timer()
-X = grid_complex(rand(1,N,Xmap),rand(1,N,Xmap)) # Create distributed vector.
+X = grid_complex(rand(1,N,dmap=Xmap),rand(1,N,dmap=Xmap)) # Create distributed vector.
 Xloc = local(X)                      # Get local part.
 Xshell = put_local(X,0)              # Create an empty X.
 
@@ -92,7 +92,7 @@ print('Local vector size (bytes)          = %d'%(len(Xloc)*16))
 print('Allocation Time (sec)              = %f'%(Talloc))
 
 tic = timer()
-sync = agg(zeros(1, Np, Xmap))       # Synchronize start.
+sync = agg(zeros(1, Np, dmap=Xmap))       # Synchronize start.
 Tlaunch = timer()-tic
 print('Launch Time (sec)                  = %f'%(Tlaunch))
 
@@ -100,7 +100,7 @@ print('Launch Time (sec)                  = %f'%(Tlaunch))
 # BEGIN BENCHMARK
 tic = timer()
 Xloc = np.reshape(Xloc,(Np,int(M/Np)),order='F') # Reshape local part into a matrix.
-X = put_local(zeros(Np,M,Xmap),Xloc)
+X = put_local(zeros(Np,M,dmap=Xmap),Xloc)
 Tcomp = timer()-tic
 
 print('Begin 1st CornerTurn')
@@ -158,7 +158,7 @@ if VALIDATE:
         Errloc = np.amax(abs(np.transpose(abs(Xloc)) - Zloc))/(N**1.5)
 
     print('Max local error                    = %f'%(Errloc))
-    Err = put_local(zeros(1,Np,Xmap),Errloc)
+    Err = put_local(zeros(1,Np,dmap=Xmap),Errloc)
     Erragg = agg(Err)
     if (Pid == 0):
         maxErr = np.amax(Erragg)

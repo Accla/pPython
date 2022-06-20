@@ -84,7 +84,7 @@ def transpose_grid(B):
 
     # Construct A (for memory allocation)
     if (np.iscomplex(local(B))).any():
-        A = grid_complex(ones(B_size, mapA),ones(B_size, mapA))
+        A = grid_complex(ones(B_size, dmap=mapA),ones(B_size, dmap=mapA))
         if DEBUG:
             print('Creae dmat object, A, as a complex numbers in its local array')
             if isinstance(A,GridDmat):
@@ -94,7 +94,7 @@ def transpose_grid(B):
     else:
         if DEBUG:
             print('Creae dmat object, A, as a real numbers in its local array')
-        A = zeros(B_size, mapA) + 1.j
+        A = zeros(B_size, dmap=mapA) + 1.j
     
     # Pick off everthing but the special case.
     # not (grid has a 1 in either col or row

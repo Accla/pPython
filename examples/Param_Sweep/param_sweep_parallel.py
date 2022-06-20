@@ -47,7 +47,7 @@ pmap = GridMap([Np,1],'b',range(Np))
 # Create a distributed matrix on individual rank
 m = 16
 n = 3
-z = zeros(m,n,pmap)
+z = zeros(m,n,dmap=pmap)
 
 # Check the distributed z matrix
 print('Local portion of global indices on Pid = %d:'%(Pid))

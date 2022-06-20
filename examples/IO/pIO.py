@@ -52,8 +52,8 @@ if (PARALLEL):
     Xmap = GridMap([1,Np],{},range(Np))  
     Ymap = Xmap           # Create parallel maps.
 
-Xrand = rand(N,M,Xmap)    # Create distributed array.
-Yrand = zeros(N,M,Ymap)   # Create distributed array.
+Xrand = rand(N,M,dmap=Xmap)    # Create distributed array.
+Yrand = zeros(N,M,dmap=Ymap)   # Create distributed array.
 tic = timer()             # Start clock.
 write_parallel_matrix(Xrand,FILE)   # Save files.
 Twrite = timer() - tic    # Stop clock.

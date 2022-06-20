@@ -33,7 +33,7 @@ def zeros(*array_sizes, **keywords):
  
     Example:
            Create a 100x10 dmat of 8-bit signed integers
-           p = map([1 Ncpus], {}, 0:Ncpus-1)
+           p = GridMap([1,Ncpus], {}, range(Ncpus))
            x = zeros(100, 10, dmap=p, dtype=int8)
  
     Author:  Nadya Travinin

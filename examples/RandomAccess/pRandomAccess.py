@@ -96,7 +96,7 @@ if PARALLEL:
     Xmap = GridMap([1,Np],{},range(Np))  # Map for table.
 
 tic = timer()
-X = zeros(1,N,Xmap)  # Allocate main table.
+X = zeros(1,N,dmap=Xmap)  # Allocate main table.
 Xloc = uint64(global_ind(X,1)) # Initialize local part indices.
 Talloc = timer() - tic
 print('Allocation Time (sec)              = %f'%(Talloc))
@@ -114,14 +114,14 @@ print('Number of updates blocks           = %d'%(Nblocks))
 # BEGIN BENCHMARK
 
 # Distribute update block indices across processors.
-myBLOCK = global_ind(zeros(1,Nblocks,Xmap),1)
+myBLOCK = global_ind(zeros(1,Nblocks,dmap=Xmap),1)
 
 # Create a block of starting locations in the random sequence.
 ranStarts = RandomAccessStarts( (myBLOCK[0])*Nb + np.arange(Nb)*len(myBLOCK) )
 
 # Synchronize start.
 tic = timer()
-sync = agg(zeros(1, Np, Xmap))
+sync = agg(zeros(1, Np, dmap=Xmap))
 Tlaunch = timer() - tic
 print('Launch Time (sec)                  = %f'%(Tlaunch))
 
@@ -164,7 +164,7 @@ if VALIDATE:
     print('Validate time (sec)                = %f'%(Tvalidate))
 
     # Aggregate data back on leader.
-    Etable = zeros(1, Np, Xmap)
+    Etable = zeros(1, Np, dmap=Xmap)
     Etable = put_local(Etable,Nerrors)
     EtableAll = agg(Etable)
 
