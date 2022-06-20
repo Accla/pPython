@@ -40,7 +40,7 @@ def rand(*array_sizes, **keywords):
     
     DEBUG = 0
     if DEBUG:
-        print('--> Entering grid_rand')
+        print('--> Entering rand')
     
         #
     m = n = q = r = None
@@ -133,7 +133,7 @@ def rand(*array_sizes, **keywords):
 
     if DEBUG:
         print('type(d): %s'%(type(d)))
-        print('<-- Exiting grid_rand')
+        print('<-- Exiting rand')
     return d
 
     """
