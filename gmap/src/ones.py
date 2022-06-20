@@ -108,4 +108,13 @@ def ones(*array_sizes, **keywords):
         print('<-- Exiting ones')
     return d
 
+    """
+    pPython: Dr. Chansup Byun (cbyun@ll.mit.edu)
+    
+    pMatlab: Parallel Matlab Toolbox
+    Software Engineer: Ms. Nadya Travinin (nt@ll.mit.edu)
+    Architect:      Dr. Jeremy Kepner (kepner@ll.mit.edu)
+    MIT Lincoln Laboratory
+    """
+
 
