@@ -1,123 +1,147 @@
-from multipledispatch import dispatch
 import numpy as np
 
-from grid_rand import *
+import GridPython as GPC
 from GridMap import *
+from dmat import *
 
-@dispatch(int,int)
-def rand(m,imap):
-    """grid_rand() wrapper method for imap = 1 (int)
+def rand(*array_sizes, **keywords):
     """
-    # print('Called rand(m,n,imap) where m and n are int')
-    return np.rand((m,m))
+    Rand distributed array.
 
-@dispatch(int,int,int)
-def rand(m,n,imap):
-    """grid_rand() wrapper method for imap = 1 (int)
-    """
-    # print('Called rand(m,n,imap) where m and n are int')
-    return np.random.rand(m,n)
+    Input:
+        array_sizes: array sizes 
+        keywords: 
+            'dmap': 1 or distributed map, GridMap object
+            'dtype': data type of array element
 
-@dispatch(int,int,int,object)
-def rand(m,n,q,r):
-    """grid_rand() wrapper method for imap = 1 (int)
-    """
-    if isinstance(r,GridMap):
-        map = r
-        r = None
-        return grid_rand(m,n,q,r,map)
-    elif r == None:
-        return np.random.rand(m,n,q)
-    elif isinstance(r,int):
-        # print('Called rand(m,n,q,r) where m and n are int')
-        if r == 1:
-            map = 1
-            r = None
-            # print('gmap/rand: calling np.random.rand(m,n,q)')
-            return np.random.rand(m,n,q)
-        else:
-            # print('gmap/rand: calling np.random.rand(m,n,q,r)')
-            return np.random.rand(m,n,q,r)
-    else:
-        print('ERROR(rand): unsupport data type with the 4th argument')
-        exit()
-
-@dispatch(int,type(GridMap()))
-def rand(m,map):
-    """grid_rand() wrapper method.
-    """
-    n=None
-    q=None
-    r=None
-    dtype = None
-@dispatch(int,type(GridMap()))
-def rand(m,map):
-    """grid_rand() wrapper method.
-    """
-    n=None
-    q=None
-    r=None
-    dtype = None
-    # print('Called rand(m,map) where m is a scalar')
-    return grid_rand(m,n,q,r,map)
-
-@dispatch(np.ndarray,type(GridMap()))
-def rand(v,map):
-    """grid_rand() wrapper method.
+    Distributed array of random numbers between 0 and 1 distributed uniformly.
+    NOTE: DIMENSION OF THE DISTRIBUTED ARRAY MUST BE CONSISTENT WITH THE
+        DIMENSION OF THE MAP.
+    Calls the MATLAB RAND function to create each local part of the
+        distributed array. The resulting array will not be the same as a DOUBLE
+        rand array of the same dimensions.
+    RAND(N, P) If N is scalar, an N by N distributed matrix of
+        random numbers mapped according to the map specified by P;
+        if N is a vector, a distributed matrix with dimensions
+        specified by N mapped according to P.
+    RAND(N, P) N by N distributed matrix of random numbers mapped according to the map
+        specified by P.
+    RAND(M, N, P) M by N distributed matrix of random numbers mapped according to the
+        map specified by P.
+    RAND(M, N, Q, P) MxNxQ distributed array of random numbers mapped according to
+        the map specified by P.
+    RAND(M, N, Q, R, P) MxNxQxR distributed array of random numbers mapped according to
+        the map specified by P.
+ 
+    Author:  Nadya Travinin
+    Edited:  Edmund L. Wong (elwong@ll.mit.edu)
+    Python version: Dr. Chansup Byun (cbyun@ll.mit.edu)
     """
     
-    # Check if len(v) is equal to map.dim
-    if not (len(v) == map.dim):
-        print('ERROR(rand): the dimensions of the given list and the map does not match.')
+    DEBUG = 0
+    if DEBUG:
+        print('--> Entering grid_rand')
+    
+        #
+    m = n = q = r = None
+    # Construct the array sizes:
+    ndim = len(array_sizes)
+    if ndim>4:
+        print('ERROR(zeros): array dimension larger than 4-D is not supported')
         exit()
-        
-    n=None
-    q=None
-    r=None
+    # form dims vector
+    dims = []
+    dims.append(array_sizes[0])
+    if ndim>1:
+        dims.append(array_sizes[1])
+    if ndim>2:
+        dims.append(array_sizes[2])
+    if ndim>3:
+        dims.append(array_sizes[3])
+    if DEBUG:
+        print('Dimension of distributed zeros: %d'%(len(dims)))
+        print(dims)
 
-    # Extract elements from the list.
-    m = v[0]
-    if len(v) == 2:
-        n = v[1]
-    elif len(v) == 3:
-        n = v[1]
-        q = v[2]
-    elif len(v) == 4:
-        n = v[1]
-        q = v[2]
-        r = v[3]
+    dmap = None
+    if 'dmap' in keywords:
+        if isinstance(keywords['dmap'], GridMap):
+            dmap = keywords['dmap']
+        elif isinstance(keywords['dmap'], int):
+            dmap = 1
+
+    dtype = np.float64
+    if 'dtype' in keywords:
+        dtype = keywords['dtype']
+
+    if not isinstance(dmap,GridMap):
+        d = np.zeros(dims, dtype)
+        return d
+    
+    if not isinstance(p,GridMap):
+        d = np.random.random(dims)
+        return d
+    
+    d = dmat(dims, dmap)
+    local_size = d.local_dim
+
+    if DEBUG:
+        print('local_size:')
+        print(local_size)
+
+    # Allocating memory for the distributed matrix is no longer done
+    # by @dmat/dmat.  Therefore, we can no longer use the following
+    # line to get the dimensions of the local portion of the dmat
+    # local_size = size(local(d));
+
+    #   Figure out local dimensions of dmat
+    #   NOTE: This is recomputing information already computed within
+    #   @dmat/dmat. Is there a cleaner way of getting this information?
+    #CB falls = get_local_falls(pitfalls(d), p.grid, pMATLAB.my_rank);
+    #CB local_size = localdims(falls, p.dim);
+    
+    dim = dmap.dim
+    g = (dmap.grid).shape
+    if dim==2:
+        for j in range(g[1]):     # i 1
+            for i in range(g[0]): # j 2
+                if DEBUG:
+                    print('my rank: %d, Process grid rank: %d'%(GPC.my_rank,dmap.grid[i][j]))
+                if (GPC.my_rank==dmap.grid[i][j]):
+                    d.local = np.random.random(local_size)
+                else:
+                    np.random.random(local_size)
+    elif dim==3:
+        for k in range(g[2]):
+            for j in range(g[1]):
+                for i in range(g[0]):
+                    if (GPC.my_rank==dmap.grid[i][j][k]):
+                        d.local = np.random.random(local_size)
+                    else:
+                        np.random.random(local_size)
+    elif dim==4:
+        for l in range(g[3]):
+            for k in range(g[2]):
+                for j in range(g[1]):
+                    for i in range(g[0]):
+                        if (GPC.my_rank==dmap.grid[i][j][k][l]):
+                            d.local = np.random.random(local_size)
+                        else:
+                            np.random.random(local_size)
     else:
-        print('ERROR(rand): matrix dimension should be less than or equal to 4.')
+        print('@MAP/RAND: Only objects up to 4 dimensions are supported.')
         exit()
-        
-    dtype = None
-    # print('Called rand(v,map) where v is a np.ndarray (vector)')
-    return grid_rand(m,n,q,r,map)
 
-@dispatch(int,int,GridMap)
-def rand(m,n,map):
-    """grid_rand() wrapper method.
-    """
-    q=None
-    r=None
-    dtype = None
-    # print('Called rand(m,n,map)')
-    return grid_rand(m,n,q,r,map)
+    if DEBUG:
+        print('type(d): %s'%(type(d)))
+        print('<-- Exiting grid_rand')
+    return d
 
-@dispatch(int,int,int,type(GridMap()))
-def rand(m,n,q,map):
-    """grid_rand() wrapper method.
     """
-    r=None
-    dtype = None
-    # print('Called rand(m,n,q,map)')
-    return grid_rand(m,n,q,r,map)
-
-@dispatch(int,int,int,int,type(GridMap()))
-def rand(m,n,q,r,map):
-    """grid_rand() wrapper method.
+    pPython: Dr. Chansup Byun (cbyun@ll.mit.edu)
+    
+    pMatlab: Parallel Matlab Toolbox
+    Software Engineer: Ms. Nadya Travinin (nt@ll.mit.edu)
+    Architect:      Dr. Jeremy Kepner (kepner@ll.mit.edu)
+    MIT Lincoln Laboratory
     """
-    dtype = None
-    # print('Called rand(m,n,q,rmap)')
-    return grid_rand(m,n,q,r,map)
 
