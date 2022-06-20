@@ -1,251 +1,111 @@
-from multipledispatch import dispatch
 import numpy as np
 
 from GridMap import *
-from grid_ones import *
 
-@dispatch(int,int)
-def ones(m,n):
-    """grid_ones() wrapper method.
+def ones(*array_sizes, **keywords):
     """
-    if not isinstance(m,(int,np.int64)):
-        print('ERROR(ones): data type, %s, is not supported for matrix size.'%(type(m)))
-        exit()
-    if not isinstance(n,(int,np.int64)):
-        print('ERROR(ones): data type, %s, is not supported for matrix size.'%(type(n)))
-        exit()
-    q=None
-    r=None
-    map = None
-    dtype = None
-    # print('Called ones(m,n)')
-    return grid_ones(m,n,q,r,map,dtype)
+    Zeros distributed array.
 
-@dispatch(int,int,int,object)
-def ones(m,n,q,r):
-    """grid_ones() wrapper method.
-    """
-    if not isinstance(m,(int,np.int64)):
-        print('ERROR(ones): data type, %s, is not supported for matrix size.'%(type(m)))
-        exit()
-    if not isinstance(n,(int,np.int64)):
-        print('ERROR(ones): data type, %s, is not supported for matrix size.'%(type(n)))
-        exit()
-    if isinstance(r,GridMap):
-        map == r 
-        r = None
-    elif isinstance(r,int) or r == None:
-        map = None
-    else:
-        print('ERROR(ones):  the 4th argunment data type is not supported')
-        exit()
-    dtype = None
-    # print('Called ones(m,n)')
-    return grid_ones(m,n,q,r,map,dtype)
-
-@dispatch(object,GridMap)
-def ones(v,map):
-    """grid_ones() wrapper method.
-    """
+    Input:
+        array_sizes: array sizes 
+        keywords: 
+            'dmap': 1 or distributed map, GridMap object
+            'dtype': data type of array element
     
-    if isinstance(v,(np.ndarray,list)):
-        # Check if len(v) is equal to map.dim
-        if not (len(v) == map.dim):
-            print('ERROR(ones): the dimensions of the given list and the map does not match.')
-            exit()
+    NOTE: DIMENSION OF THE DISTRIBUTED ARRAY MUST BE CONSISTENT WITH THE
+        DIMENSION OF THE MAP.
         
-        n=None
-        q=None
-        r=None
-
-        # Extract elements from the list.
-        m = v[0]
-        if len(v) == 2:
-            n = v[1]
-        elif len(v) == 3:
-            n = v[1]
-            q = v[2]
-        elif len(v) == 4:
-            n = v[1]
-            q = v[2]
-            r = v[3]
-        else:
-            print('ERROR(ones): matrix dimension should be less than or equal to 4.')
-            exit()
-    elif isinstance(v,(int,np.int64)):
-        m=v
-        n=None
-        q=None
-        r=None
-    else:
-        print('ERROR(ones): data type, %s, is not supported for matrix size.'%(type(v)))
-        exit()
-    dtype = None
-    # print('Called ones(m,map) where m is a np.ndarray (vector)')
-    return grid_ones(m,n,q,r,map,dtype)
-
-@dispatch(object,object,GridMap)
-def ones(m,n,map):
-    """grid_ones() wrapper method.
+    ZEROS(N, P) If N is scalar, an N by N distributed matrix of
+        ones mapped according to the map specified by P; if N is a vector
+        (numpy array), a distributed matrix with dimensions specified by N
+        mapped according to P.
+    ZEROS(M, N, P) M by N distributed matrix of ones mapped according to the
+        map specified by P.
+    ZEROS(M, N, Q, P) MxNxQ distributed array of ones mapped according to
+        the map specified by P.
+    ZEROS(M, N, Q, R, P) MxNxQxR distributed array of ones mapped according to
+        the map specified by P.
+    ZEROS(M, N, ..., P, TYPE) MxNx... distributed array of ones of datatype
+        TYPE mapped according to the map specified by P.
+ 
+    Example:
+           Create a 100x10 dmat of 8-bit signed integers
+           p = map([1 Ncpus], {}, 0:Ncpus-1)
+           x = ones(100, 10, p, 'int8')
+ 
+    Author:  Nadya Travinin
+    Edited:  Edmund L. Wong (elwong@ll.mit.edu)
+    Python version: Dr. Chansup Byun (cbyun@ll.mit.edu)
     """
-    if not isinstance(m,(int,np.int64)):
-        print('ERROR(ones): data type, %s, is not supported for matrix size.'%(type(m)))
-        exit()
-    if not isinstance(n,(int,np.int64)):
-        print('ERROR(ones): data type, %s, is not supported for matrix size.'%(type(n)))
-        exit()
-    q=None
-    r=None
-    dtype = None
-    # print('Called ones(m,n,map)')
-    return grid_ones(m,n,q,r,map,dtype)
 
-@dispatch(object,object,object)
-def ones(m,n,map):
-    """grid_ones() wrapper method.
-    """
-    if not isinstance(m,(int,np.int64)):
-        print('ERROR(ones): data type, %s, is not supported for matrix size.'%(type(m)))
-        exit()
-    if not isinstance(n,(int,np.int64)):
-        print('ERROR(ones): data type, %s, is not supported for matrix size.'%(type(n)))
-        exit()
-    if not isinstance(map,(int,np.int64)):
-        print('ERROR(ones): data type, %s, is not supported for map.'%(type(map)))
-        exit()
-    q=None
-    r=None
-    dtype = None
-    # print('Called ones(m,n,map)')
-    return grid_ones(m,n,q,r,map,dtype)
+    DEBUG = 0
+    if DEBUG:
+        print('--> Entering ones')
 
-@dispatch(object,object,object,GridMap)
-def ones(m,n,q,map):
-    """grid_ones() wrapper method.
-    """
-    if not isinstance(m,(int,np.int64)):
-        print('ERROR(ones): data type, %s, is not supported for matrix size.'%(type(m)))
+    #
+    m = n = q = r = None
+    # Construct the array sizes:
+    ndim = len(array_sizes)
+    if ndim>4:
+        print('ERROR(zeros): array dimension larger than 4-D is not supported')
         exit()
-    if not isinstance(n,(int,np.int64)):
-        print('ERROR(ones): data type, %s, is not supported for matrix size.'%(type(n)))
-        exit()
-    if not isinstance(q,(int,np.int64)):
-        print('ERROR(ones): data type, %s, is not supported for matrix size.'%(type(q)))
-        exit()
-    r=None
-    dtype = None
-    # print('Called ones(m,n,q,map)')
-    return grid_ones(m,n,q,r,map,dtype)
+    # form dims vector
+    dims = []
+    dims.append(array_sizes[0])
+    if ndim>1:
+        dims.append(array_sizes[1])
+    if ndim>2:
+        dims.append(array_sizes[2])
+    if ndim>3:
+        dims.append(array_sizes[3])
+    if DEBUG:
+        print('Dimension of distributed zeros: %d'%(len(dims)))
+        print(dims)
 
-@dispatch(object,object,object,object,GridMap)
-def ones(m,n,q,r,map):
-    """grid_ones() wrapper method.
-    """
-    if not isinstance(m,(int,np.int64)):
-        print('ERROR(ones): data type, %s, is not supported for matrix size.'%(type(m)))
-        exit()
-    if not isinstance(n,(int,np.int64)):
-        print('ERROR(ones): data type, %s, is not supported for matrix size.'%(type(n)))
-        exit()
-    if not isinstance(q,(int,np.int64)):
-        print('ERROR(ones): data type, %s, is not supported for matrix size.'%(type(q)))
-        exit()
-    if not isinstance(r,(int,np.int64)):
-        print('ERROR(ones): data type, %s, is not supported for matrix size.'%(type(r)))
-        exit()
-    dtype = None
-    # print('Called ones(m,n,q,rmap)')
-    return grid_ones(m,n,q,r,map,dtype)
-#
-# Use of dtype definition
-#
-@dispatch(object,GridMap,str)
-def ones(v,map,dtype):
-    """grid_ones() wrapper method.
-    """
+    dmap = None
+    if 'dmap' in keywords:
+        if isinstance(keywords['dmap'], GridMap):
+            dmap = keywords['dmap']
+        elif isinstance(keywords['dmap'], int):
+            dmap = 1
+
+    dtype = np.float64
+    if 'dtype' in keywords:
+        dtype = keywords['dtype']
+
+    if not isinstance(p,GridMap):
+        d = np.ones(dims, dtype)
+        return d
     
-    if isinstance(v,(np.ndarray,list)):
-        # Check if len(v) is equal to map.dim
-        if not (len(v) == map.dim):
-            print('ERROR(ones): the dimensions of the given list and the map does not match.')
-            exit()
-        n=None
-        q=None
-        r=None
-        # Extract elements from the list.
-        m = v[0]
-        if len(v) == 2:
-            n = v[1]
-        elif len(v) == 3:
-            n = v[1]
-            q = v[2]
-        elif len(v) == 4:
-            n = v[1]
-            q = v[2]
-            r = v[3]
-        else:
-            print('ERROR(ones): matrix dimension should be less than or equal to 4.')
-            exit()
-    elif isinstance(v,(int,np.int64)):
-        m=v
-        n=None
-        q=None
-        r=None
+    if len(dims) < 5:
+        d = dmat(dims, dmap)
     else:
-        print('ERROR(ones): data type, %s, is not supported for matrix size.'%(type(v)))
-        exit()
+        print('ERROR(map/ones): Incorrect number of inputs')
 
-    # print('Called ones(m,map) where m is a np.ndarray (vector)')
-    return grid_ones(m,n,q,r,map,dtype)
+    # Figure out local dimensions of dmat
+    # NOTE: This is recomputing information already computed within
+    # @dmat/dmat. Is there a cleaner way of getting this information?
+    # comm = my_MCW.MPI_COMM_WORLD
+    # my_rank = MPI_Comm_rank(comm)
+    
+    if DEBUG:
+        # print('ones: my_rank = %d'%(my_rank))
+        print(d.pitfalls)
+        print(pitfalls(d))
+    
+    # falls = get_local_falls(pitfalls(d), p.grid, my_rank)
+    # local_dims = localdims(falls, p.dim);
 
-@dispatch(object,object,GridMap,str)
-def ones(m,n,map,dtype):
-    """grid_ones() wrapper method.
-    """
-    if not isinstance(m,(int,np.int64)):
-        print('ERROR(ones): data type, %s, is not supported for matrix size.'%(type(m)))
-        exit()
-    if not isinstance(n,(int,np.int64)):
-        print('ERROR(ones): data type, %s, is not supported for matrix size.'%(type(n)))
-        exit()
-    q=None
-    r=None
-    # print('Called ones(m,n,map) with dtype')
-    return grid_ones(m,n,q,r,map,dtype)
+    # Allocating memory for the distributed matrix is no longer done
+    # by @dmat/dmat.
 
-@dispatch(object,object,object,GridMap,str)
-def ones(m,n,q,map,dtype):
-    """grid_ones() wrapper method.
-    """
-    if not isinstance(m,(int,np.int64)):
-        print('ERROR(ones): data type, %s, is not supported for matrix size.'%(type(m)))
-        exit()
-    if not isinstance(n,(int,np.int64)):
-        print('ERROR(ones): data type, %s, is not supported for matrix size.'%(type(n)))
-        exit()
-    if not isinstance(q,(int,np.int64)):
-        print('ERROR(ones): data type, %s, is not supported for matrix size.'%(type(q)))
-        exit()
-    r=None
-    # print('Called ones(m,n,q,map) with dtype')
-    return grid_ones(m,n,q,r,map,dtype)
+    # Allocate a ones matrix for the local portion of the dmat
+    # Determine Matlab version
 
-@dispatch(object,object,object,object,GridMap,str)
-def ones(m,n,q,r,map,dtype):
-    """grid_ones() wrapper method.
-    """
-    if not isinstance(m,(int,np.int64)):
-        print('ERROR(ones): data type, %s, is not supported for matrix size.'%(type(m)))
-        exit()
-    if not isinstance(n,(int,np.int64)):
-        print('ERROR(ones): data type, %s, is not supported for matrix size.'%(type(n)))
-        exit()
-    if not isinstance(q,(int,np.int64)):
-        print('ERROR(ones): data type, %s, is not supported for matrix size.'%(type(q)))
-        exit()
-    if not isinstance(r,(int,np.int64)):
-        print('ERROR(ones): data type, %s, is not supported for matrix size.'%(type(r)))
-        exit()
-    # print('Called ones(m,n,q,r,map) with dtype')
-    return grid_ones(m,n,q,r,map,dtype)
+    d.local = np.ones(d.local_dim, dtype)
+
+    if DEBUG:
+        print('<-- Exiting ones')
+    return d
+
 
