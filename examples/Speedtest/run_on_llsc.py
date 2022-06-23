@@ -35,7 +35,7 @@ n_proc = 4
 
 # Launch PythonMPI
 # print('Running: %s via pRUN().'%(py_file))
-pRUN( py_file, n_proc, 'grid&' )
-# pRUN( py_file, n_proc, 'grid' )
+# pRUN( py_file, n_proc, 'grid&' )
+pRUN( py_file, n_proc, 'grid-xeon-e5' )
 # pRUN( py_file, n_proc, {} )
 

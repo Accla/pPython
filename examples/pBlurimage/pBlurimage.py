@@ -16,6 +16,8 @@ UseGraphics = 1
 # Create communicator.
 # GridPython as GPC in gridPython.py
 comm = GPC.comm
+Np = GPC.comm_size
+Pid = GPC.my_rank 
 
 # Turn parallelism on or off.
 PARALLEL = 1   # Can be 1 or 0.  OK to change.
@@ -23,8 +25,6 @@ PARALLEL = 1   # Can be 1 or 0.  OK to change.
 # Check answer with an identical serial calculation.
 CHECK = 0   # Can be 1 or 0.  OK to change.
 
-# Initialize gridPython
-my_rank = GPC.my_rank 
 print('pBlurimage: my_rank = %d'%(Pid))
 
 # Scale image by number of cpus size (use powers of 2).
@@ -136,5 +136,8 @@ gigaflops = total_ops / total_time / 1.e9
 print('GigaFlops: %f'%(gigaflops))
 
 # Don't exist if we are the host.
+print('')
 print('SUCCESS') 
+print('')
+print('')
 

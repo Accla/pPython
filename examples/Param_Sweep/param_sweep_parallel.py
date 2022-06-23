@@ -56,7 +56,7 @@ print('my local length:')
 for i  in range(len(z.falls)):
     print_falls(z.falls[i])
 print('my size:')
-print(z.size)
+print(z.shape)
 
 # Get the local portion of the global indices
 my_i_global = global_ind(z, 0)

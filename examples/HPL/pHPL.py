@@ -99,3 +99,9 @@ if (VERIFY):
         else:
             print('Failure');
 
+print('')
+print('')
+print('SUCCESS')
+print('')
+print('')
+
