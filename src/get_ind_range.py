@@ -5,27 +5,30 @@ def get_ind_range(a,s):
     subs -- tuple of slice objects or [ToDo] string containing the actual subscripts.
      s = {'type':'()','subs':{0:(slice()), 1:':'}} 
      
-    Return ind as a list object with index ranges of each dimension
+    #obsolete: Return ind as a list object with index ranges of each dimension
+    IND - a dictionary of length equal to the number of dimensions, where each
+    entry specifies the global indices being referenced in that
+    dimension.
     
     Python version: Dr. Chansup Byun
     Author:   Nadya Travinin
     """
     
-    ind = []
+    ind = dict()
     if len(s['subs'])==2: # 2-D
-        ind.append( s['subs'][0] )
-        ind.append( s['subs'][1] )
+        ind['0'] = s['subs'][0]
+        ind['1'] = s['subs'][1]
 
     elif len(s['subs'])==3: # 3-D
-        ind.append( s['subs'][0] )
-        ind.append( s['subs'][1] )
-        ind.append( s['subs'][2] )
+        ind['0'] = s['subs'][0]
+        ind['1'] = s['subs'][1]
+        ind['2'] = s['subs'][2]
 
     elif len(s['subs'])==4: # 4-D
-        ind.append( s['subs'][0] )
-        ind.append( s['subs'][1] )
-        ind.append( s['subs'][2] )
-        ind.append( s['subs'][3] )
+        ind['0'] = s['subs'][0]
+        ind['1'] = s['subs'][1]
+        ind['2'] = s['subs'][2]
+        ind['3'] = s['subs'][3]
 
     else:
         print('GET_IND_RANGE: Only up to 4 dimensional objects are supported.')
