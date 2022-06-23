@@ -16,14 +16,13 @@ class GridDmat:
            self: LHS distributed array, GridDmat object, to be set by b 
         """
         # Invoke Python equivalent function similar to a MATLAB subsasgn operator 
-        DEBUG = 1
+        DEBUG = 0
         if DEBUG:
             print('--> Entering GridDmat.setitem() ')
             print('Class GridDmat: see if this is calleb by A[:,:] = B where A and B are GridDmat()')
             print('What is passed as index: ')
             print(index)
         # [:,:] -> (slice(None, None, None), slice(None, None, None))
-        print(' ')
         # check the dimension of the distributed array, b
         s = []
         ss = dict()
@@ -38,8 +37,18 @@ class GridDmat:
                     ss['subs'][0] = ':'
                     ss['subs'][1] = ':'
                     s.append(ss)
+                elif isinstance(index[0],(np.int32,int)) and isinstance(index[1],(np.int32,int)):
+                    if DEBUG:
+                        print('GridDmat: single element update')
+                    ss['type'] = '()'
+                    ss['subs'] = dict()
+                    ss['subs'][0] = slice(index[0],index[0]+1,None)
+                    ss['subs'][1] = slice(index[1],index[1]+1,None)
+                    s.append(ss)
                 else:
                     print('GridDmat: 2-D assignment, not implemented this index type yet.')
+                    print('type(index[0]')
+                    print(type(index[0]))
                     exit()
             elif len(index)==3: # 3-D distributed array
                 print('GridDmat: 3-D assignment, nOt implemented yet.')
@@ -64,7 +73,7 @@ class GridDmat:
         d = self.copy()
         if isinstance(other,(float,int)):
             # Extract local portion of a distributed array
-            d.local = local(self)
+            # Unnecessary: d.local = local(self)
             # update local array
             d.local = d.local + other
         elif isinstance(other,(GridDmat)):

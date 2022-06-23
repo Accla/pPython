@@ -24,7 +24,7 @@ def subsasgn_2D(a,s,b):
     Author:   Nadya Travinin
     """
     
-    DEBUG = 1
+    DEBUG = 0
     if DEBUG:
         print('--> Entering subsasgn_2D')
         print(b)
@@ -33,14 +33,16 @@ def subsasgn_2D(a,s,b):
     # allocated for a in the caller's workspace
     # Not needed with Python: assignin('caller', inputname(1), [])
     
-    if isinstance(b, (float, np.float64, np.ndarray)): 
+    if isinstance(b,(int,float,np.float64,np.float32,np.ndarray)):
         # RHS is a scalar (double) or an array
+        if DEBUG:
+            print('RHS is a scalar (double) or an array')
         if isinstance(s['subs'][0],str) and isinsttance(s['subs'][1],str):
             if (s['subs'][0] == ':') and (s['subs'][1] == ':'):
                 # A[:,:] = B
                 if (size(b) == a.shape): 
-                    # dimensions are the same
-                    a.local[:,:] = b[a.global_ind['0'], a.global_ind['1']]
+                    # dimensions are the same in global
+                    a.local[:,:] = b[a.global_ind['0']][:,a.global_ind['1']]
                 elif (size(b)==[1,1]):   
                     # b is a scalar
                     a.local[:,:] = b
@@ -50,12 +52,42 @@ def subsasgn_2D(a,s,b):
                     exit()
         else: 
             # A[i:j, k:l] = B
-            indr = get_ind_range(a,s)
-            local_ind = get_local_ind(a.global_ind, indr)
+            if DEBUG:
+                print('A[i:j, k:l] = B operation is being performed.')
+            ind = get_ind_range(a,s)
+            local_ind = get_local_ind(a.global_ind, ind)
             # Key for local_ind is numberic key
             # subslicing array is done differently between MATLAB and Python.
-            if size(b) == size(a.local[local_ind[0], local_ind[1]]):
-                a.local[local_ind[0], local_ind[1]] = b
+            if DEBUG > 1:
+                print('local_ind[0]')
+                print(local_ind[0])
+                print('local_ind[1]')
+                print(local_ind[1])
+            s0 = None; s1 = None
+            if len(local_ind[0]):
+                s0 = slice(local_ind[0][0],local_ind[0][-1]+1,None)
+            if len(local_ind[1]):
+                s1 = slice(local_ind[1][0],local_ind[1][-1]+1,None)
+            if (size(b)==[1,1]):  # Mimick behavior of size() in pMATLAB 
+                # b is a scalar
+                if s0  and s1:
+                    #wrong: a.local[ local_ind[0][0]:local_ind[0][-1]+1, local_ind[1][0]:local_ind[1][-1]+1 ] = b
+                    a.local[s0, s1] = b
+                if DEBUG:
+                    print('b is a scalar, assign to a.local')
+                    print('local_ind[0]')
+                    print(local_ind[0])
+                    print('local_ind[1]')
+                    print(local_ind[1])
+                    print('a.local[local_ind[0]][:,local_ind[1]]')
+                    print(a.local[local_ind[0]][:,local_ind[1]])
+            elif size(b) == size(a.local[local_ind[0]][:, local_ind[1]]):
+                if s1  and s1:
+                    #wrong: a.local[ local_ind[0][0]:local_ind[0][-1]+1, local_ind[1][0]:local_ind[1][-1]+1 ] = b
+                    a.local[s1, s2] = b
+            else:
+                print('DMAT/subsasgn_2D:  Subscripted assignment dimension mismatch.')
+                exit()
         # A(i:j, k:l) = B
         
     # The following caused undefined GridDmat error because its circular reference.

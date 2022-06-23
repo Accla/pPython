@@ -11,6 +11,12 @@ def dmat(v,p):
 
     """
     
+    DEBUG = 0
+    if DEBUG:
+        print('--> Entering dmat')
+        print('len(v): %d, p.dim=%d'%(len(v),p.dim))
+        print(v)
+
     # Check if len(v) is equal to p.dim
     if isinstance(p,GridMap) and not (len(v) == p.dim):
         print('ERROR(dmat): the dimensions of the given list and the map, p, does not match.')
@@ -36,6 +42,8 @@ def dmat(v,p):
         exit()
         
     # print('Called dmat(m,p) where m is a vector (list)')
+    if DEBUG:
+        print('--> Exiting dmat with calling grid_dmat(m,n,q,r,p)')
     
     return grid_dmat(m,n,q,r,p)
 

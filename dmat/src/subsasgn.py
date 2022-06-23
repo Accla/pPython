@@ -25,7 +25,7 @@ def subsasgn(a, ss, b):
     Author:   Nadya Travinin
     """
     
-    DEBUG = 1
+    DEBUG = 0
     if DEBUG:
         print('--> Entering subsasgn')
 
@@ -36,6 +36,8 @@ def subsasgn(a, ss, b):
                 a = subsasgn_1D(a, s, b)
             elif len(s['subs']) == a.dim:  # number of dimensions of indices must match the number of dimensions of the matrix
                 if len(s['subs'])==2:   # 2-D subscripted assignment
+                    if DEBUG:
+                        print('Calling a = subsasgn_2D(a,s,b)')
                     a = subsasgn_2D(a,s,b)
                 elif len(s['subs'])==3: # 3-D subscripted assignment
                     a = subsasgn_3D(a,s,b)
