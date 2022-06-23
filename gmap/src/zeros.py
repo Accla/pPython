@@ -43,7 +43,7 @@ def zeros(*array_sizes, **keywords):
 
     DEBUG = 0
     if DEBUG:
-        print('--> Entering grid_zero')
+        print('--> Entering zero')
     #
     m = n = q = r = None
     # Construct the array sizes:
@@ -52,16 +52,21 @@ def zeros(*array_sizes, **keywords):
         print('ERROR(zeros): array dimension larger than 4-D is not supported')
         exit()
     # form dims vector
-    dims = []
-    dims.append(array_sizes[0])
-    if ndim>1:
-        dims.append(array_sizes[1])
-    if ndim>2:
-        dims.append(array_sizes[2])
-    if ndim>3:
-        dims.append(array_sizes[3])
+    if isinstance(array_sizes[0],list):
+        ndim = len(array_sizes[0])
+        dims = array_sizes[0]
+    else:
+        dims = []
+        dims.append(array_sizes[0])
+        if ndim>1:
+            dims.append(array_sizes[1])
+        if ndim>2:
+            dims.append(array_sizes[2])
+        if ndim>3:
+            dims.append(array_sizes[3])
     if DEBUG:
         print('Dimension of distributed zeros: %d'%(len(dims)))
+        print(array_sizes)
         print(dims)
         
     dmap = None
@@ -107,7 +112,7 @@ def zeros(*array_sizes, **keywords):
     d.local = np.zeros(d.local_dim, dtype)
 
     if DEBUG:
-        print('<-- Exiting grid_zero')
+        print('<-- Exiting zero')
     return d
 
     """

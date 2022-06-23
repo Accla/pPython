@@ -42,25 +42,29 @@ def rand(*array_sizes, **keywords):
     if DEBUG:
         print('--> Entering rand')
     
-        #
     m = n = q = r = None
-    # Construct the array sizes:
-    ndim = len(array_sizes)
+    # form dims vector
+    if isinstance(array_sizes[0],list):
+        ndim = len(array_sizes[0])
+        dims = array_sizes[0]
+    else:
+        ndim = len(array_sizes)
+        dims = []
+        dims.append(array_sizes[0])
+        if ndim>1:
+            dims.append(array_sizes[1])
+        if ndim>2:
+            dims.append(array_sizes[2])
+        if ndim>3:
+            dims.append(array_sizes[3])
+    if DEBUG:
+        print('Dimension of distributed zeros: %d'%(len(dims)))
+        print(array_sizes)
+        print(dims)
+
     if ndim>4:
         print('ERROR(zeros): array dimension larger than 4-D is not supported')
         exit()
-    # form dims vector
-    dims = []
-    dims.append(array_sizes[0])
-    if ndim>1:
-        dims.append(array_sizes[1])
-    if ndim>2:
-        dims.append(array_sizes[2])
-    if ndim>3:
-        dims.append(array_sizes[3])
-    if DEBUG:
-        print('Dimension of distributed zeros: %d'%(len(dims)))
-        print(dims)
 
     dmap = None
     if 'dmap' in keywords:
@@ -74,10 +78,8 @@ def rand(*array_sizes, **keywords):
         dtype = keywords['dtype']
 
     if not isinstance(dmap,GridMap):
-        d = np.zeros(dims, dtype)
-        return d
-    
-    if not isinstance(p,GridMap):
+        if DEBUG:
+            print('<-- Exiting rand with non-Dmat array')
         d = np.random.random(dims)
         return d
     
