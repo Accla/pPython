@@ -79,14 +79,13 @@ def falls_intersection(f1, f2):
             if (f1.complete_block and f1.complete_cycle):
                 f1_last_ind  = f1.r+f1.s*(f1.n-1)+1
             elif f1.complete_block:
-                #CB f1_last_ind = f1.r+f1.s*(f1.n-2)
+                #CB: To fix empty work asignment with block distribution, subtract by 1 additionally 
                 f1_last_ind = f1.r+f1.s*(f1.n-1)
             else:
+                #CB: not sure when this case happens yet     
                 f1_block_size = f1.r-f1.l+1
                 f1_rem_block = f1.local_len%f1_block_size
-                #CB if f1.dist == 'b':
-                #CB else:
-                #CB     f1_last_ind = f1.r + f1.s*(f1.n-1) - (f1_block_size-f1_rem_block)
+                f1_last_ind = f1.r + f1.s*(f1.n-1) - (f1_block_size-f1_rem_block)
 
             # last global index of f2
             if (f2.complete_block and f2.complete_cycle):
