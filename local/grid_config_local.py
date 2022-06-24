@@ -30,7 +30,7 @@ def grid_config_local(grid_config):
     grid_config['HOME_PATH']: locally mounted path for GRID_HOME_PATH
     grid_config['GRIDPYTHON_PATH']: gridPython source installation path
     grid_config['PYTHONMPI_PATH']: PythonMPI source installation path
-    grid_config['GMAP_PATH']: distributed map source installation path
+    grid_config['DMAP_PATH']: distributed map source installation path
     grid_config['DMAT_PATH']: distributed array source installation path
     grid_config['USER_PYTHONMPI_PATH']: path for remote user configuration customization files
     grid_config['CWD_PATH']: current working directory path where you submit a job (automatically detected)
@@ -92,7 +92,7 @@ def grid_config_local(grid_config):
     CWD_PATH = os.getcwd()
 
     # Additional paths for PGAS using the distributed map and array construction
-    GMAP_PATH = GRIDPYTHON_HOME+os.sep+"gmap"+os.sep+"src"
+    DMAP_PATH = GRIDPYTHON_HOME+os.sep+"dmap"+os.sep+"src"
     DMAT_PATH = GRIDPYTHON_HOME+os.sep+"dmat"+os.sep+"src" 
 
     # Save in the grid_config variable
@@ -103,7 +103,7 @@ def grid_config_local(grid_config):
     grid_config['CWD_PATH'] = CWD_PATH
 
     # Additional paths for PGAS using the distributed map and array construction
-    grid_config['GMAP_PATH'] = GMAP_PATH
+    grid_config['DMAP_PATH'] = DMAP_PATH
     grid_config['DMAT_PATH'] = DMAT_PATH
 
     # Triples modes releated

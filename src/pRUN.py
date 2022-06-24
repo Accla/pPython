@@ -17,8 +17,8 @@ PYTHONMPI_PATH = GRIDPYTHON_HOME+os.sep+'PythonMPI'+os.sep+'src'
 sys.path.append(PYTHONMPI_PATH)
 
 # Additional path for distributed map and array support
-GMAP_PATH = GRIDPYTHON_HOME+os.sep+'gmap'+os.sep+'src'
-sys.path.append(GMAP_PATH)
+DMAP_PATH = GRIDPYTHON_HOME+os.sep+'dmap'+os.sep+'src'
+sys.path.append(DMAP_PATH)
 DMAT_PATH = GRIDPYTHON_HOME+os.sep+'dmat'+os.sep+'src'
 sys.path.append(DMAT_PATH)
 
@@ -124,7 +124,7 @@ def pRUN(py_file,n_proc,machines,sched_options=None):
     GRID_PATH = grid.grid_config['GRIDPYTHON_PATH']+sep_path \
         +grid.grid_config['PYTHONMPI_PATH']+sep_path \
         +grid.grid_config['USER_PYTHONMPI_PATH']+sep_path \
-        +grid.grid_config['GMAP_PATH']+sep_path \
+        +grid.grid_config['DMAP_PATH']+sep_path \
         +grid.grid_config['DMAT_PATH']+sep_path \
         +grid.grid_config['CWD_PATH']
     os.environ["PYTHONMPI_PATH"] = GRID_PATH

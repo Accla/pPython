@@ -15,7 +15,8 @@ HOME_PATH = "/home/gridsan/"+USER
 os.environ["HOME_PATH"] = HOME_PATH
 
 # Export the path to find gridPython & PythonMPI source code:
-GRIDPYTHON_HOME = "/home/gridsan/groups/llgrid_beta/gridPython/latest"
+# GRIDPYTHON_HOME = "/home/gridsan/groups/llgrid_beta/gridPython/latest"
+GRIDPYTHON_HOME = HOME_PATH+"/devtools/git/gridPython"
 GRIDPYTHON_PATH = GRIDPYTHON_HOME+os.sep+"src"
 os.environ["GRIDPYTHON_HOME"] = GRIDPYTHON_HOME
 sys.path.append(GRIDPYTHON_PATH)

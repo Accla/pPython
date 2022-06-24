@@ -48,5 +48,5 @@ from MPI_Send import *
 # PGAS implementation for distributed map and array
 #
 from dmatPython_all import *
-from gmapPython_all import *
+from dmapPython_all import *
 
