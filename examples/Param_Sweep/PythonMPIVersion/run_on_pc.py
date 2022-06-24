@@ -10,12 +10,12 @@ import os
 import sys
 
 # Export the path to find gridPython & PythonMPI source code:
-GRIDPYTHON_HOME = "Z:\\llgrid_beta\\gridPython\\latest"
-# PYTHONMPI_PATH = GRIDPYTHON_HOME+os.sep+"PythonMPI"+os.sep+"src"
+PPYTHON_HOME = "Z:\\llgrid_beta\\gridPython\\latest"
+# PYTHONMPI_PATH = PPYTHON_HOME+os.sep+"PythonMPI"+os.sep+"src"
 # sys.path.append(PYTHONMPI_PATH)
-GRIDPYTHON_PATH = GRIDPYTHON_HOME+os.sep+"src"
-os.environ["GRIDPYTHON_HOME"] = GRIDPYTHON_HOME
-sys.path.append(GRIDPYTHON_PATH)
+PPYTHON_PATH = PPYTHON_HOME+os.sep+"src"
+os.environ["PPYTHON_HOME"] = PPYTHON_HOME
+sys.path.append(PPYTHON_PATH)
 
 # To locate local configuration files
 HOME_PATH = "Z:"

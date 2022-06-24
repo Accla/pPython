@@ -13,10 +13,10 @@ USER = os.getenv('USER')
 HOME_PATH = "/export/home/"+USER
 os.environ["HOME_PATH"] = HOME_PATH
 
-GRIDPYTHON_HOME = HOME_PATH+"/llgrid_beta/gridPython/latest"
-GRIDPYTHON_PATH = GRIDPYTHON_HOME+os.sep+"src"
-os.environ["GRIDPYTHON_HOME"] = GRIDPYTHON_HOME
-sys.path.append(GRIDPYTHON_PATH)
+PPYTHON_HOME = HOME_PATH+"/llgrid_beta/gridPython/latest"
+PPYTHON_PATH = PPYTHON_HOME+os.sep+"src"
+os.environ["PPYTHON_HOME"] = PPYTHON_HOME
+sys.path.append(PPYTHON_PATH)
 
 # Import PythonMPI launch funciton
 from pRUN import *

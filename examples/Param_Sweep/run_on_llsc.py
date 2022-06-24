@@ -15,11 +15,11 @@ HOME_PATH = "/home/gridsan/"+USER
 os.environ["HOME_PATH"] = HOME_PATH
 
 # Export the path to find gridPython & PythonMPI source code:
-# GRIDPYTHON_HOME = "/home/gridsan/groups/llgrid_beta/gridPython/latest"
-GRIDPYTHON_HOME = "/home/gridsan/"+USER+"/devtools/git/gridPython"
-GRIDPYTHON_PATH = GRIDPYTHON_HOME+os.sep+"src"
-os.environ["GRIDPYTHON_HOME"] = GRIDPYTHON_HOME
-sys.path.append(GRIDPYTHON_PATH)
+# PPYTHON_HOME = "/home/gridsan/groups/llgrid_beta/gridPython/latest"
+PPYTHON_HOME = "/home/gridsan/"+USER+"/devtools/git/gridPython"
+PPYTHON_PATH = PPYTHON_HOME+os.sep+"src"
+os.environ["PPYTHON_HOME"] = PPYTHON_HOME
+sys.path.append(PPYTHON_PATH)
 
 # Import PythonMPI launch funciton
 from pRUN import *

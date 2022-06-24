@@ -6,12 +6,12 @@ Usage
 
 1. Go to an example directory
 
-   cd $GRIDPYTHON_HOME/examples/Param_Sweep
+   cd $PPYTHON_HOME/examples/Param_Sweep
 
 2. Edit the run_on_llsc.py script for your LLGrid account.
 
    Modify the following variables:
-   GRIDPYTHON_HOME = "/path/to/your/gridPython/installation/directory
+   PPYTHON_HOME = "/path/to/your/gridPython/installation/directory
    HOME_PATH = "/home/gridsan/LLID" (replace LLID with your actual LLID)
 
    Following variables can be modified to change the number of Python MPI processes:

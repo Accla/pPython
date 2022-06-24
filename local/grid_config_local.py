@@ -28,7 +28,7 @@ def grid_config_local(grid_config):
 
     grid_config['GRID_HOME_PATH']: home directory path on the grid for the remote user
     grid_config['HOME_PATH']: locally mounted path for GRID_HOME_PATH
-    grid_config['GRIDPYTHON_PATH']: gridPython source installation path
+    grid_config['PPYTHON_PATH']: gridPython source installation path
     grid_config['PYTHONMPI_PATH']: PythonMPI source installation path
     grid_config['DMAP_PATH']: distributed map source installation path
     grid_config['DMAT_PATH']: distributed array source installation path
@@ -82,24 +82,27 @@ def grid_config_local(grid_config):
             exit()
 
     # gridPython installation path
-    GRIDPYTHON_HOME = os.getenv('GRIDPYTHON_HOME')
-    GRIDPYTHON_PATH = GRIDPYTHON_HOME+os.sep+"src"
+    PPYTHON_HOME = os.getenv('PPYTHON_HOME')
+    PPYTHON_PATH = PPYTHON_HOME+os.sep+"src"
     # PythonMPI installation path
-    PYTHONMPI_PATH = GRIDPYTHON_HOME+os.sep+"PythonMPI"+os.sep+"src"
+    PYTHONMPI_PATH = PPYTHON_HOME+os.sep+"PythonMPI"+os.sep+"src"
     # PythonMPI customization path for an individual user
     USER_PYTHONMPI_PATH = HOME_PATH+os.sep+"pythonmpi"
+    # gridPython path (codes for scheduler integration)
+    GRIDPYTHON_PATH = PPYTHON_HOME+os.sep+"grid"
     # Current working directory path
     CWD_PATH = os.getcwd()
 
     # Additional paths for PGAS using the distributed map and array construction
-    DMAP_PATH = GRIDPYTHON_HOME+os.sep+"dmap"+os.sep+"src"
-    DMAT_PATH = GRIDPYTHON_HOME+os.sep+"dmat"+os.sep+"src" 
+    DMAP_PATH = PPYTHON_HOME+os.sep+"dmap"+os.sep+"src"
+    DMAT_PATH = PPYTHON_HOME+os.sep+"dmat"+os.sep+"src" 
 
     # Save in the grid_config variable
     grid_config['HOME_PATH'] =  HOME_PATH
-    grid_config['GRIDPYTHON_PATH'] = GRIDPYTHON_PATH
+    grid_config['PPYTHON_PATH'] = PPYTHON_PATH
     grid_config['PYTHONMPI_PATH'] = PYTHONMPI_PATH
     grid_config['USER_PYTHONMPI_PATH'] = USER_PYTHONMPI_PATH
+    grid_config['GRIDPYTHON_PATH'] = GRIDPYTHON_PATH
     grid_config['CWD_PATH'] = CWD_PATH
 
     # Additional paths for PGAS using the distributed map and array construction

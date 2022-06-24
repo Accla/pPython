@@ -10,10 +10,10 @@ import os
 import sys
 
 # Export the path to find gridPython & PythonMPI source code:
-GRIDPYTHON_HOME = "/home/gridsan/groups/llgrid_beta/gridPython/latest"
-GRIDPYTHON_PATH = GRIDPYTHON_HOME+os.sep+"src"
-os.environ["GRIDPYTHON_HOME"] = GRIDPYTHON_HOME
-sys.path.append(GRIDPYTHON_PATH)
+PPYTHON_HOME = "/home/gridsan/groups/llgrid_beta/gridPython/latest"
+PPYTHON_PATH = PPYTHON_HOME+os.sep+"src"
+os.environ["PPYTHON_HOME"] = PPYTHON_HOME
+sys.path.append(PPYTHON_PATH)
 
 # To locate local configuration files
 USER = os.getenv('USER')

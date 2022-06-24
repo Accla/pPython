@@ -13,6 +13,6 @@ It is also assumes that a local configuration is available from $HOME/pythonmpi 
 <br>
 <br>
 An example run script is available in the example directory. 
-The GRIDPYTHON_HOME environment in the example run script needs to be modified according to the user runtime environment.
+The PPYTHON_HOME environment in the example run script needs to be modified according to the user runtime environment.
 <br>
 
