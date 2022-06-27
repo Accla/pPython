@@ -1,7 +1,7 @@
 from multipledispatch import dispatch
 import numpy as np
 
-from GridMap import *
+from Dmap import *
 from grid_dmat import *
 
 def dmat(v,p):
@@ -18,7 +18,7 @@ def dmat(v,p):
         print(v)
 
     # Check if len(v) is equal to p.dim
-    if isinstance(p,GridMap) and not (len(v) == p.dim):
+    if isinstance(p,Dmap) and not (len(v) == p.dim):
         print('ERROR(dmat): the dimensions of the given list and the map, p, does not match.')
         exit()
         

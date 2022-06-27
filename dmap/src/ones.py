@@ -1,6 +1,6 @@
 import numpy as np
 
-from GridMap import *
+from Dmap import *
 from dmat import *
 
 def ones(*array_sizes, **keywords):
@@ -10,7 +10,7 @@ def ones(*array_sizes, **keywords):
     Input:
         array_sizes: array sizes 
         keywords: 
-            'dmap': 1 or distributed map, GridMap object
+            'dmap': 1 or distributed map, Dmap object
             'dtype': data type of array element
     
     NOTE: DIMENSION OF THE DISTRIBUTED ARRAY MUST BE CONSISTENT WITH THE
@@ -31,7 +31,7 @@ def ones(*array_sizes, **keywords):
  
     Example:
            Create a 100x10 dmat of 8-bit signed integers
-           p = GridMap([1,Ncpus], {}, range(Ncpus))
+           p = Dmap([1,Ncpus], {}, range(Ncpus))
            x = ones(100, 10, dmap=p, dtype=int8)
  
     Author:  Nadya Travinin
@@ -70,7 +70,7 @@ def ones(*array_sizes, **keywords):
 
     dmap = None
     if 'dmap' in keywords:
-        if isinstance(keywords['dmap'], GridMap):
+        if isinstance(keywords['dmap'], Dmap):
             dmap = keywords['dmap']
         elif isinstance(keywords['dmap'], int):
             dmap = 1
@@ -79,7 +79,7 @@ def ones(*array_sizes, **keywords):
     if 'dtype' in keywords:
         dtype = keywords['dtype']
 
-    if not isinstance(dmap,GridMap):
+    if not isinstance(dmap,Dmap):
         d = np.ones(dims, dtype)
         return d
     

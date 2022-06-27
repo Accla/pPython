@@ -21,7 +21,7 @@ import scipy.sparse
 import matplotlib.pyplot as plt
 
 import pPython as GPC
-from GridMap import *
+from Dmap import *
 from zeros import *
 from ones import *
 from synch import *
@@ -44,7 +44,7 @@ CHECK = 1      # Check answer with serial calculation.
 
 Zmap = 1       # Create serial map.
 if (PARALLEL):
-    Zmap = GridMap([Np,1],{},range(Np),[Nk,0])  # Create parallel map with overlap.
+    Zmap = Dmap([Np,1],{},range(Np),[Nk,0])  # Create parallel map with overlap.
 
 # Create starting image and working images..
 if (CHECK):

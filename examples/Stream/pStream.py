@@ -4,7 +4,7 @@ from timeit import default_timer as timer
 
 # from pPython_all import *
 import pPython as GPC
-from GridMap import *
+from Dmap import *
 from local import *
 from zeros import *
 from agg import *
@@ -88,8 +88,8 @@ ABCmap = 1
 SyncMap = 1
 if (PARALLEL):
     # Create map.
-    ABCmap  = GridMap([1,Np], {},range(Np))
-    SyncMap = GridMap([Np,1], {},range(Np))
+    ABCmap  = Dmap([1,Np], {},range(Np))
+    SyncMap = Dmap([Np,1], {},range(Np))
 
 # Allocate data structures
 tic = timer()

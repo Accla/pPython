@@ -3,7 +3,7 @@ import numpy as np
 
 import pyMPI_COMM_WORLD as pyMCW
 
-class GridMap:
+class Dmap:
     """Define Map class. 
 
     MAP(GRID_SPEC, DIST_SPEC, PROC_LIST, overlap)
@@ -24,7 +24,7 @@ class GridMap:
     PROC_LIST - array of processor ranks specifying on which ranks the
             object should be distributed. 
     
-    GridMap object p contains:
+    Dmap object p contains:
     p.dim: number of dimensions of the the distributed object
     p.proc_list: the list of processors on which the object should bedistributed
     p.dist_spec: the distribution description for each dimension
@@ -42,7 +42,7 @@ class GridMap:
         
         DEBUG = 0
         if DEBUG:
-            print('--> Entering GridMap.__init__()')
+            print('--> Entering Dmap.__init__()')
             print('proc_list')
             print(proc_list)
 
@@ -69,7 +69,7 @@ class GridMap:
                     dist_spec[str(d)]['dist'] ='b'
             elif isinstance(dist_spec,str):
                 if dist_spec == 'bc':
-                    print('ERROR (GridMap): block-cyclic distribution also needs block size.')
+                    print('ERROR (Dmap): block-cyclic distribution also needs block size.')
                     exit()
                 # 'b' for block & 'c' for cyclic distribution
                 tmp_dist_spec = dist_spec
@@ -81,7 +81,7 @@ class GridMap:
                 # distribution spec is provided for all directions individually
                 # dist_spec = {'0': {'dist': 'bc', 'b_size': 3}, '1': {'dist': 'b'}}
                 if len(grid_spec) != len(dist_spec):
-                    print('ERROR (GridMap): dimension does not match between grid_spec and dist_spec.')
+                    print('ERROR (Dmap): dimension does not match between grid_spec and dist_spec.')
                     exit()
             else:
                 # dist_spec is provided as a dictionary form
@@ -98,13 +98,13 @@ class GridMap:
                 if (dist_spec[str(i)]['dist'] != 'b') \
                 and (dist_spec[str(i)]['dist'] != 'c') \
                 and (dist_spec[str(i)]['dist'] != 'bc'):
-                    print('ERROR (GridMap): %s is not a valid distribution'%(dist_spec[str(i)]['dist']))
+                    print('ERROR (Dmap): %s is not a valid distribution'%(dist_spec[str(i)]['dist']))
                     exit()
                 else:
                     # check that block size is defined for block-cyclic distributions
                     if dist_spec[str(i)]['dist'] == 'bc':
                         if (not 'b_size' in dist_spec[str(i)]) or (dist_spec[str(i)]['b_size'] < 1):
-                            print('ERROR (GridMap): Block size must be specified for block-cyclic distibution')
+                            print('ERROR (Dmap): Block size must be specified for block-cyclic distibution')
                             exit()
             self.dist_spec = dist_spec
             
@@ -115,7 +115,7 @@ class GridMap:
             # the grid
             gsize = grid.size
             if (len(proc_list) != gsize):
-                print('ERROR (GridMap): Processor list does not match the size of the grid')
+                print('ERROR (Dmap): Processor list does not match the size of the grid')
                 exit()
             else:
                 grid.reshape(gsize)[:] = proc_list[:]
@@ -134,7 +134,7 @@ class GridMap:
                     # check that the length of the processor list matches the number of
                     # processors requested
                     if (len(proc_list) > n_procs):
-                        print('GridMap constructor: Processor list contains more processors '+\
+                        print('Dmap constructor: Processor list contains more processors '+\
                         'than number of processors requested.')
                 else:
                     n_procs = None
@@ -162,13 +162,13 @@ class GridMap:
                         dist_spec[str(d)] = dict()
                         dist_spec[str(d)]['dist'] = tmp_dist_spec
                 else:
-                    print('ERROR (GridMap): Overlap is only supported for block distributions.')
+                    print('ERROR (Dmap): Overlap is only supported for block distributions.')
                     exit()
             elif any(map(lambda x: isinstance(x,dict),dist_spec.values())):
                 # distribution spec is provided for all directions individually
                 # dist_spec = {'0': {'dist': 'bc', 'b_size': 3}, '1': {'dist': 'b'}}
                 if len(grid_spec) != len(dist_spec):
-                    print('ERROR (GridMap): dimension does not match between grid_spec and dist_spec.')
+                    print('ERROR (Dmap): dimension does not match between grid_spec and dist_spec.')
                     exit()
                 #
                 # Can we use overlap only certain direction with this?
@@ -177,7 +177,7 @@ class GridMap:
                 # dist_spec is provided as a dictionary form
                 # dist_spec['dist'] = 'b'
                 if dist_spec['dist'] != 'b':
-                        print('ERROR (GridMap): Overlap is only supported for block distributions.')
+                        print('ERROR (Dmap): Overlap is only supported for block distributions.')
                         exit()
                 tmp_dist_spec = dist_spec
                 dist_spec = dict()
@@ -187,7 +187,7 @@ class GridMap:
             for i in range(dim):
                 # check that distributions defined are consistent with {'b', 'c', 'bc'}
                 if dist_spec[str(i)]['dist'] != 'b':
-                    print('ERROR (GridMap): Overlap is only supported for block distributions.')
+                    print('ERROR (Dmap): Overlap is only supported for block distributions.')
                     exit()
             self.dist_spec = dist_spec
             
@@ -198,14 +198,14 @@ class GridMap:
             # the grid
             gsize = grid.size
             if (len(proc_list) != gsize):
-                print('ERROR (GridMap): Processor list does not match the size of the grid')
+                print('ERROR (Dmap): Processor list does not match the size of the grid')
                 exit()
             else:
                 grid.reshape(gsize)[:] = proc_list[:]
             self.grid = grid
         
             if len(overlap) != self.dim:
-                print('RROR (GridMap): Overlap must be specified for all of the dimensions of the map.')
+                print('RROR (Dmap): Overlap must be specified for all of the dimensions of the map.')
                 exit()
 
             # if the maps are created within the scope of MPI_COMM_WORLD
@@ -218,18 +218,18 @@ class GridMap:
                     # check that the length of the processor list matches the number of
                     # processors requested
                     if (len(proc_list) > n_procs):
-                        print('GridMap constructor: Processor list contains more processors '+\
+                        print('Dmap constructor: Processor list contains more processors '+\
                         'than number of processors requested.')
                 else:
                     n_procs = None
             self.overlap = overlap
 
         if DEBUG:
-            print('<-- Exiting GridMap.__init__()')
+            print('<-- Exiting Dmap.__init__()')
 
     def __eq__(self, other):
 
-        if isinstance(other, GridMap):
+        if isinstance(other, Dmap):
             if ((self.grid == other.grid).all()) and \
                 (self.dim == other.dim) and \
                 (self.dist_spec == other.dist_spec) and \

@@ -2,7 +2,7 @@ import numpy as np
 from timeit import default_timer as timer
 
 # Import pPython methods.
-from GridMap import *
+from Dmap import *
 import pPython as GPC
 from local import *
 from zeros import *
@@ -39,7 +39,7 @@ VERIFY = 1
 
 Amap = 1                                   # Serial map.
 if PARALLEL:
-    Amap = GridMap([1,Np],{},range(Np))    # Parallel map.
+    Amap = Dmap([1,Np],{},range(Np))    # Parallel map.
 
 #N = 2^14  # Largest on a single beta grid node ~600 seconds on 1 cpu.
 #N = Np*floor(floor(10000*sqrt(Np))/Np)

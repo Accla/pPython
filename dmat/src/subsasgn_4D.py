@@ -5,7 +5,7 @@ from MPI_Recv import *
 
 import pPython as GPC
 from GridDmat import *
-from GridMap import *
+from Dmap import *
 from size import *
 from get_ind_range import *
 from get_local_ind import *

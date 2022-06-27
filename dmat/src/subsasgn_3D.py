@@ -5,7 +5,7 @@ from MPI_Recv import *
 
 import pPython as GPC
 from GridDmat import *
-from GridMap import *
+from Dmap import *
 from size import *
 from get_ind_range import *
 from get_local_ind import *
@@ -210,7 +210,7 @@ def subsasgn_3D(a,s,b):
                     a_dist = amap.dist_spec
                     a_proc_list = np.transpose(a_grid_slice)
                     # create a 2D map for the grid slice
-                    amap_slice = GridMap(size(a_grid_slice), a_dist[1:2], a_proc_list)
+                    amap_slice = Dmap(size(a_grid_slice), a_dist[1:2], a_proc_list)
                     # NOTE: Might not even have to deal with map slices
                     # Algorithms for A(:,:,i) = B subsasgn
                     #    1. Subsref the relevant slice of A

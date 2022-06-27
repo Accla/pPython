@@ -1,7 +1,7 @@
 import numpy as np
 import scipy.fftpack 
 
-from GridMap import *
+from Dmap import *
 from grid import *
 from size import *
 from remap import *
@@ -70,7 +70,7 @@ def fft(x, *argv):
                     dist_spec = old_map.dist_spec
                     proc_list = list(g.flatten('F'))
                     #CB: now work in map equality check,  proc_list = g.flatten('F')
-                    new_map = GridMap(grid_spec, dist_spec, proc_list)
+                    new_map = Dmap(grid_spec, dist_spec, proc_list)
                     x = remap(x,new_map)
                     #>>REMAPPING CODE
                     x.local = scipy.fftpack.fft(x.local, N, 0)
@@ -91,7 +91,7 @@ def fft(x, *argv):
                         dist_spec = old_map.dist_spec
                         proc_list = list(g.flatten('F'))
                         # Not work: proc_list = g.flatten('F')
-                        new_map = GridMap(grid_spec, dist_spec, proc_list)
+                        new_map = Dmap(grid_spec, dist_spec, proc_list)
                         x = remap(x,new_map)
                         #>>REMAPPING CODE
                         x.local = scipy.fftpack.fft(x.local, N, 1)
@@ -107,7 +107,7 @@ def fft(x, *argv):
                         dist_spec = old_map.dist_spec
                         proc_list = list(g.flatten('F'))
                         # Not work: proc_list = g.flatten('F')
-                        new_map = GridMap(grid_spec, dist_spec, proc_list)
+                        new_map = Dmap(grid_spec, dist_spec, proc_list)
                         x = remap(x,new_map)
                         #>>REMAPPING CODE
                         x.local = scipy.fftpack.fft(x.local, N, 0)
@@ -135,7 +135,7 @@ def fft(x, *argv):
                     dist_spec = old_map.dist_spec
                     proc_list = list(g.flatten('F'))
                     # Not work: proc_list = g.flatten('F')
-                    new_map = GridMap(grid_spec, dist_spec, proc_list)
+                    new_map = Dmap(grid_spec, dist_spec, proc_list)
                     x = remap(x,new_map)
                     # >>REMAPPING CODE
                     x.local = scipy.fftpack.fft(x.local, N, 0)
@@ -161,7 +161,7 @@ def fft(x, *argv):
                         dist_spec = old_map.dist_spec
                         proc_list = list(g.flatten('F'))
                         # Not work: proc_list = g.flatten('F')
-                        new_map = GridMap(grid_spec, dist_spec, proc_list)
+                        new_map = Dmap(grid_spec, dist_spec, proc_list)
                         x = remap(x,new_map)
                         # >>REMAPPING CODE
                         x.local = scipy.fftpack.fft(x.local, N, 1)

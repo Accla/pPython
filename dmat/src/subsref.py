@@ -4,14 +4,14 @@ from math import ceil,floor
 
 import pPython as GPC
 from GridDmat import *
-from GridMap import *
+from Dmap import *
 from size import *
 from find import *
 from dmat import *
 from inmap import *
 from submat import *
 
-@dispatch(GridMap,object)
+@dispatch(Dmap,object)
 def subsref(a,s):
     """
     SUBSREF Subscripted reference.
@@ -28,7 +28,7 @@ def subsref(a,s):
     """
     DEBUG = 1
     if DEBUG:
-        print('--> Entering subsref for GridMap objects')
+        print('--> Entering subsref for Dmap objects')
         
     """
     Note: Matlab is flexible to deal with whether s is a single structure or an array.
@@ -53,7 +53,7 @@ def subsref(a,s):
             elif s[0]['subs']=='overlap':
                 b = a.overlap
             else:
-                print('%s is not a field of GridMap.'%(s['subs']))
+                print('%s is not a field of Dmap.'%(s['subs']))
                 exit()
         if DEBUG:
             print(b)
@@ -76,10 +76,10 @@ def subsref(a,s):
             elif s['subs']=='overlap':
                 b = a.overlap
             else:
-                print('%s is not a field of GridMap.'%(s['subs']))
+                print('%s is not a field of Dmap.'%(s['subs']))
                 exit()
     if DEBUG:
-        print('<--> Exiting subsref for GridMap objects')
+        print('<--> Exiting subsref for Dmap objects')
     return b
 
 @dispatch(GridDmat,object)
@@ -231,7 +231,7 @@ def subsref(a,s):
                 maxGenDim = max(find(sizeB != 1)+[2])
                 sizeB = sizeB[0:maxGenDim]
                 gridB = subsref(gridA, s_map)
-                mapB = GridMap(size(gridB), m.dist_spec[0:maxGenDim], reshape(gridB, 1, np.prod(size(gridB))))
+                mapB = Dmap(size(gridB), m.dist_spec[0:maxGenDim], reshape(gridB, 1, np.prod(size(gridB))))
                 b = dmat(sizeB, mapB)
     
                 #

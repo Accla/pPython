@@ -1,6 +1,6 @@
 import numpy as np
 
-from GridMap import *
+from Dmap import *
 from dmat import *
 from pitfalls import *
 
@@ -11,7 +11,7 @@ def zeros(*array_sizes, **keywords):
     Input:
         array_sizes: array sizes 
         keywords: 
-            'dmap': 1 or distributed map, GridMap object
+            'dmap': 1 or distributed map, Dmap object
             'dtype': data type of array element
 
     
@@ -33,7 +33,7 @@ def zeros(*array_sizes, **keywords):
  
     Example:
            Create a 100x10 dmat of 8-bit signed integers
-           p = GridMap([1,Ncpus], {}, range(Ncpus))
+           p = Dmap([1,Ncpus], {}, range(Ncpus))
            x = zeros(100, 10, dmap=p, dtype=int8)
  
     Author:  Nadya Travinin
@@ -71,7 +71,7 @@ def zeros(*array_sizes, **keywords):
         
     dmap = None
     if 'dmap' in keywords:
-        if isinstance(keywords['dmap'], GridMap):
+        if isinstance(keywords['dmap'], Dmap):
             dmap = keywords['dmap']
         elif isinstance(keywords['dmap'], int):
             dmap = 1
@@ -80,7 +80,7 @@ def zeros(*array_sizes, **keywords):
     if 'dtype' in keywords:
         dtype = keywords['dtype']
 
-    if not isinstance(dmap,GridMap):
+    if not isinstance(dmap,Dmap):
         d = np.zeros(dims, dtype)
         return d
 

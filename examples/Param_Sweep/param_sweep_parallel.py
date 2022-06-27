@@ -41,8 +41,8 @@ print('size: %d'%(Np))
 print('my_rank: %d'%(Pid))
 
 # Create a map
-# 'b': block distribution, for details help('GridMap')
-pmap = GridMap([Np,1],'b',range(Np))
+# 'b': block distribution, for details help('dmap')
+pmap = Dmap([Np,1],'b',range(Np))
 
 # Create a distributed matrix on individual rank
 m = 16

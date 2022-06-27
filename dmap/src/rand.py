@@ -1,7 +1,7 @@
 import numpy as np
 
 import pPython as GPC
-from GridMap import *
+from Dmap import *
 from dmat import *
 
 def rand(*array_sizes, **keywords):
@@ -11,7 +11,7 @@ def rand(*array_sizes, **keywords):
     Input:
         array_sizes: array sizes 
         keywords: 
-            'dmap': 1 or distributed map, GridMap object
+            'dmap': 1 or distributed map, Dmap object
             'dtype': data type of array element
 
     Distributed array of random numbers between 0 and 1 distributed uniformly.
@@ -68,7 +68,7 @@ def rand(*array_sizes, **keywords):
 
     dmap = None
     if 'dmap' in keywords:
-        if isinstance(keywords['dmap'], GridMap):
+        if isinstance(keywords['dmap'], Dmap):
             dmap = keywords['dmap']
         elif isinstance(keywords['dmap'], int):
             dmap = 1
@@ -77,7 +77,7 @@ def rand(*array_sizes, **keywords):
     if 'dtype' in keywords:
         dtype = keywords['dtype']
 
-    if not isinstance(dmap,GridMap):
+    if not isinstance(dmap,Dmap):
         if DEBUG:
             print('<-- Exiting rand with non-Dmat array')
         d = np.random.random(dims)

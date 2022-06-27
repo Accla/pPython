@@ -93,7 +93,7 @@ def subsasgn_2D(a,s,b):
     # The following caused undefined GridDmat error because its circular reference.
     # elif isinstance(b, GridDmat):
     # elif hasattr(b, 'GridDmat'):
-    # elif hasattr(b, 'GridMap'):
+    # elif hasattr(b, 'Dmap'):
     # elif isinstance(b, GridDmat.GridDmat):
     else:
         # RHS is a DMAT, assignment from a distributed matrix

@@ -4,7 +4,7 @@ from math import ceil
 import matplotlib.pyplot as plt
 
 import pPython as GPC
-from GridMap import *
+from Dmap import *
 from zeros import *
 from put_local import *
 from agg import *
@@ -45,13 +45,13 @@ sigma  = 0.5     # Width of blur kernel.
 PARALLEL = 1     # Set control flag.
 Zmap = 1         # Create serial map.
 if (PARALLEL):
-    Zmap = GridMap([1, 1, Np],{},range(Np))  # Create parallel map.
+    Zmap = Dmap([1, 1, Np],{},range(Np))  # Create parallel map.
     #  1-D Cyclic Distribution:
     #  dist = dict()
     #  dist['0']=dict(); dist['0']['dist']='b'
     #  dist['1']=dict(); dist['1']['dist']='b'
     #  dist['2']=dict(); dist['2']['dist']='c'
-    #  Zmap = GridMap([1, 1, Np],dist,range(Np))
+    #  Zmap = Dmap([1, 1, Np],dist,range(Np))
 
 Z = zeros(N,N,Ns,pmap=Zmap)           # Create distributed array.
 

@@ -3,7 +3,7 @@ from timeit import default_timer as timer
 
 # Import PythonMPI methods.
 import pPython as GPC
-from GridMap import *
+from Dmap import *
 from agg import *
 from zeros import *
 from global_ind import *
@@ -93,7 +93,7 @@ Pid = GPC.my_rank
 # Create maps.
 Xmap = 1
 if PARALLEL:
-    Xmap = GridMap([1,Np],{},range(Np))  # Map for table.
+    Xmap = Dmap([1,Np],{},range(Np))  # Map for table.
 
 tic = timer()
 X = zeros(1,N,dmap=Xmap)  # Allocate main table.

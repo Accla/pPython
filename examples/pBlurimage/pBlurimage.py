@@ -42,9 +42,9 @@ n_filter_y = int(2.**5)
 mapImOv = 1 
 if (PARALLEL):
     # Create map with 1D of overlap.
-    mapImOv = GridMap([Np, 1],{},range(Np),[n_filter_x, 0]) 
+    mapImOv = Dmap([Np, 1],{},range(Np),[n_filter_x, 0]) 
     # Create map with 2D of overlap.
-    # mapImOv = GridMap([Np, 1],{},range(Np),[n_filter_x, n_filter_y]) 
+    # mapImOv = Dmap([Np, 1],{},range(Np),[n_filter_x, n_filter_y]) 
 
 # Set the number of times to filter.
 n_trial = 2 

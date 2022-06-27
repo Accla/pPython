@@ -21,8 +21,8 @@ import matplotlib.pyplot as plt
 
 # Import PythonMPI methods.
 import pPython as GPC
-from GridMap import *
-from grid_complex import *
+from Dmap import *
+from dcomplex import *
 from local import *
 from size import *
 from rand import *
@@ -48,11 +48,11 @@ Nt = 100 # Debug.
 PARALLEL = 0    # Set control flag.
 Xmap = 1        # Create serial map.
 if (PARALLEL):
-    Xmap = GridMap([1,1,Np],{},range(Np))  # Create parallel map.
+    Xmap = Dmap([1,1,Np],{},range(Np))  # Create parallel map.
 
 # ALLOCATE PARALLEL DATA STRUCTURES ---------------------
 X0 = zeros(Nt,Nb,Nf,dmap=Xmap)   # Source array.
-X1 = np.sqrt(Ns)*grid_complex(rand(Nt,Ns,Nf,dmap=Xmap),rand(Nt,Ns,Nf,dmap=Xmap))  # Sensor input.
+X1 = np.sqrt(Ns)*dcomplex(rand(Nt,Ns,Nf,dmap=Xmap),rand(Nt,Ns,Nf,dmap=Xmap))  # Sensor input.
 X2 = zeros(Nt,Nb,Nf,dmap=Xmap)   # Beamformed output.
 X3 = zeros(Nt,Nb,Np,dmap=Xmap)   # Intermediate sum.
 #CB global_ind() returns a list, Should make it return a numpy array?

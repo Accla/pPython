@@ -16,7 +16,7 @@
 
 # pPython class
 import pPython as GPC
-from GridMap import *
+from Dmap import *
 
 from zeros import *
 from local import *
@@ -28,7 +28,7 @@ XYmap = 1     # Create serial map.
 
 if PARALLEL:
     Np = GPC.comm_size
-    XYmap = GridMap([Np, 1],{},range(Np))   # Create parallel map.
+    XYmap = Dmap([Np, 1],{},range(Np))   # Create parallel map.
 
 X = zeros(N,N,dmap=XYmap)     # Create distributed X.
 Y = zeros(N,N,dmap=XYmap)     # Create distributed Y.

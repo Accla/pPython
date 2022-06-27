@@ -6,14 +6,14 @@ from scipy.sparse import csr_matrix
 
 # Import PythonMPI methods.
 import pPython as GPC
-from GridMap import *
+from Dmap import *
 from rand import *
 from zeros import *
 from agg import *
 from global_ind import *
 from global_block_range import *
 from global_block_ranges import *
-from grid_complex import *
+from dcomplex import *
 from cos import *
 from sin import *
 from transpose_grid import *
@@ -62,7 +62,7 @@ ErrorRate = np.finfo(float).eps      # Set error to machine precision.
 
 Xmap = 1                             # Serial map.
 if PARALLEL:
-    Xmap = GridMap([1,Np],{},range(Np)) # Parallel map.
+    Xmap = Dmap([1,Np],{},range(Np)) # Parallel map.
 
 print('Np                                 = %d'%(Np))
 print('Pid                                = %d'%(Pid))
@@ -70,7 +70,7 @@ print('Distributed vector size (words)    = %d'%(N))
 print('Distributed vector size (bytes)    = %d'%(N*16))
 
 tic = timer()
-X = grid_complex(rand(1,N,dmap=Xmap),rand(1,N,dmap=Xmap)) # Create distributed vector.
+X = dcomplex(rand(1,N,dmap=Xmap),rand(1,N,dmap=Xmap)) # Create distributed vector.
 Xloc = local(X)                      # Get local part.
 Xshell = put_local(X,0)              # Create an empty X.
 
@@ -80,12 +80,12 @@ if VALIDATE:
     for i in range(len(phases)):
         # Add one to index values to match with Matlab version
         omega = (2*np.pi*phases[i]/N) * (np.array(global_ind(X,1))+1) # Compute angle.
-        Xloc = Xloc + grid_complex(cos(omega),sin(omega))             # Add wave to Xloc.
+        Xloc = Xloc + dcomplex(cos(omega),sin(omega))             # Add wave to Xloc.
     X = put_local(X,Xloc)           # Insert back into X.
 
 # Create twiddle factors
 omega = (-2*np.pi*Pid/N) * np.arange(M)
-omega = grid_complex(cos(omega),sin(omega))
+omega = dcomplex(cos(omega),sin(omega))
 Talloc = timer()-tic
 
 print('Local vector size (bytes)          = %d'%(len(Xloc)*16))

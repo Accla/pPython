@@ -5,7 +5,7 @@ from MPI_Send import *
 from MPI_Recv import *
 
 import pPython as GPC
-from GridMap import *
+from Dmap import *
 from GridDmat import *
 from ndims import *
 from size import *
@@ -14,7 +14,7 @@ from ones import *
 from local import *
 from put_local import *
 from global_block_ranges import *
-from grid_complex import *
+from dcomplex import *
 
 def transpose_grid(B):
     """
@@ -67,9 +67,9 @@ def transpose_grid(B):
     # Create map for A that is the same as B's but with a transposed grid.
     A_grid_spec = [B_grid_spec[1], B_grid_spec[0]]
     if not (B_overlap == None):
-        mapA = GridMap(A_grid_spec, B_dist_spec, B_proc_list)
+        mapA = Dmap(A_grid_spec, B_dist_spec, B_proc_list)
     else:
-        mapA = GridMap(A_grid_spec, B_dist_spec, B_proc_list, B_overlap)
+        mapA = Dmap(A_grid_spec, B_dist_spec, B_proc_list, B_overlap)
 
 
     if DEBUG:
@@ -84,7 +84,7 @@ def transpose_grid(B):
 
     # Construct A (for memory allocation)
     if (np.iscomplex(local(B))).any():
-        A = grid_complex(ones(B_size, dmap=mapA),ones(B_size, dmap=mapA))
+        A = dcomplex(ones(B_size, dmap=mapA),ones(B_size, dmap=mapA))
         if DEBUG:
             print('Creae dmat object, A, as a complex numbers in its local array')
             if isinstance(A,GridDmat):

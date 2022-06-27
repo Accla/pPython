@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 # Import PythonMPI methods.
 import pPython as GPC
-from GridMap import *
+from Dmap import *
 from zeros import *
 from local import *
 from put_local import *
@@ -41,7 +41,7 @@ N=800  # Debug
 PARALLEL = 1                   # Set control flag.
 Wmap = 1                       # Create serial map.
 if (PARALLEL):
-    Wmap = GridMap([Np,1],{},range(Np))        # Create parallel map.
+    Wmap = Dmap([Np,1],{},range(Np))        # Create parallel map.
     # dist = dict()
     # dist['0'] = {'dist':'c'}
     # dist['1'] = {'dist':'b'}

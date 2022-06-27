@@ -1,6 +1,6 @@
 import numpy as np
 
-from grid_complex import *
+from dcomplex import *
 from size import *
 from zeros import *
 
@@ -29,7 +29,7 @@ def remap(x, new_map):
 
     if len(s) == 2: # 2D array, 2D map
         if is_complex:
-            temp = grid_complex(zeros(s[0], s[1], dmap=new_map),zeros(s[0], s[1], dmap=new_map))
+            temp = dcomplex(zeros(s[0], s[1], dmap=new_map),zeros(s[0], s[1], dmap=new_map))
             temp[:,:] = x
             x = temp
         else:

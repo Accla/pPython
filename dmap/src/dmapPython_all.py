@@ -1,5 +1,5 @@
 # Class
-from GridMap import *
+from Dmap import *
 
 # Functions
 from inmap import *

@@ -3,7 +3,7 @@ import os
 from timeit import default_timer as timer
 
 import pPython as GPC
-from GridMap import *
+from Dmap import *
 from rand import *
 from zeros import *
 from local import *
@@ -49,7 +49,7 @@ PARALLEL = 1  # Set control flag.
 Xmap = 1  
 Ymap = 1      # Create serial maps.
 if (PARALLEL):
-    Xmap = GridMap([1,Np],{},range(Np))  
+    Xmap = Dmap([1,Np],{},range(Np))  
     Ymap = Xmap           # Create parallel maps.
 
 Xrand = rand(N,M,dmap=Xmap)    # Create distributed array.
