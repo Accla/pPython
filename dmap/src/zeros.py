@@ -1,7 +1,7 @@
 import numpy as np
 
 from Dmap import *
-from dmat import *
+from Dmat import *
 from pitfalls import *
 
 def zeros(*array_sizes, **keywords):
@@ -32,7 +32,7 @@ def zeros(*array_sizes, **keywords):
         TYPE mapped according to the map specified by P.
  
     Example:
-           Create a 100x10 dmat of 8-bit signed integers
+           Create a 100x10 Dmat of 8-bit signed integers
            p = Dmap([1,Ncpus], {}, range(Ncpus))
            x = zeros(100, 10, dmap=p, dtype=int8)
  
@@ -85,11 +85,11 @@ def zeros(*array_sizes, **keywords):
         return d
 
     if len(dims) < 5:
-        d = dmat(dims, dmap)
+        d = Dmat(dims, dmap=dmap)
     else:
         print('ERROR(map/zeros): Incorrect number of inputs')
 
-    # Figure out local dimensions of dmat
+    # Figure out local dimensions of Dmat
     # NOTE: This is recomputing information already computed within
     # @dmat/dmat. Is there a cleaner way of getting this information?
     # comm = my_MCW.MPI_COMM_WORLD
@@ -106,7 +106,7 @@ def zeros(*array_sizes, **keywords):
     # Allocating memory for the distributed matrix is no longer done
     # by @dmat/dmat.
 
-    # Allocate a zeros matrix for the local portion of the dmat
+    # Allocate a zeros matrix for the local portion of the Dmat
     # Determine Matlab version
 
     d.local = np.zeros(d.local_dim, dtype)

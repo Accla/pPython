@@ -1,7 +1,7 @@
 import numpy as np
 
 import pPython as GPC
-from GridDmat import *
+from Dmat import *
 from size import *
 from subsasgn_2D import *
 from subsasgn_3D import *
@@ -54,7 +54,7 @@ def subsasgn_1D(a,s,b):
             print('unsupported indexing')
             exit()
 
-    elif isinstance(b, GridDmat): # RHS is a DMAT
+    elif isinstance(b, Dmat): # RHS is a DMAT
         if isinstance(s['subs'][0], str):  # subscript is a CHAR
             if s['subs'][0] == ':': # subscript is a ':'
                 if a.dim == 2: # 2-D

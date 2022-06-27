@@ -3,11 +3,10 @@ import numpy as np
 from math import ceil,floor
 
 import pPython as GPC
-from GridDmat import *
 from Dmap import *
+from Dmat import *
 from size import *
 from find import *
-from dmat import *
 from inmap import *
 from submat import *
 
@@ -82,7 +81,7 @@ def subsref(a,s):
         print('<--> Exiting subsref for Dmap objects')
     return b
 
-@dispatch(GridDmat,object)
+@dispatch(Dmat,object)
 def subsref(a,s):
     """
     SUBSREF Subscripted reference. Called for syntax A(S).
@@ -232,7 +231,7 @@ def subsref(a,s):
                 sizeB = sizeB[0:maxGenDim]
                 gridB = subsref(gridA, s_map)
                 mapB = Dmap(size(gridB), m.dist_spec[0:maxGenDim], reshape(gridB, 1, np.prod(size(gridB))))
-                b = dmat(sizeB, mapB)
+                b = Dmat(sizeB, dmap=mapB)
     
                 #
                 # If local processor has data that needs to be sent, send it.

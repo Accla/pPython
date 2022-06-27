@@ -2,7 +2,7 @@ import numpy as np
 
 import pPython as GPC
 from Dmap import *
-from dmat import *
+from Dmat import *
 
 def rand(*array_sizes, **keywords):
     """
@@ -83,7 +83,7 @@ def rand(*array_sizes, **keywords):
         d = np.random.random(dims)
         return d
     
-    d = dmat(dims, dmap)
+    d = Dmat(dims, dmap=dmap)
     local_size = d.local_dim
 
     if DEBUG:
@@ -92,10 +92,10 @@ def rand(*array_sizes, **keywords):
 
     # Allocating memory for the distributed matrix is no longer done
     # by @dmat/dmat.  Therefore, we can no longer use the following
-    # line to get the dimensions of the local portion of the dmat
+    # line to get the dimensions of the local portion of the Dmat
     # local_size = size(local(d));
 
-    #   Figure out local dimensions of dmat
+    #   Figure out local dimensions of Dmat
     #   NOTE: This is recomputing information already computed within
     #   @dmat/dmat. Is there a cleaner way of getting this information?
     #CB falls = get_local_falls(pitfalls(d), p.grid, pMATLAB.my_rank);

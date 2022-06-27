@@ -1,4 +1,4 @@
-from GridDmat import *
+from Dmat import *
 
 def grid(d):
     """
@@ -7,7 +7,7 @@ def grid(d):
     Python version: Dr. Chansup Byun
     Author: Nadya Travinin
     """
-    if not isinstance(d,GridDmat):
+    if not isinstance(d,Dmat):
         print('ERROR(grid): it is not a DMAT object.')
         exit()
 

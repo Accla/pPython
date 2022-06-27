@@ -2,7 +2,7 @@ from MPI_Recv import *
 from MPI_Send import *
 
 import pPython as GPC
-from GridDmat import *
+from Dmat import *
 
 from inmap import *
 from reconstruct import *
@@ -29,7 +29,7 @@ def agg(d, leader=None):
     if DEBUG:
         print('--> Entering agg')
 
-    if not isinstance(d,GridDmat):
+    if not isinstance(d,Dmat):
         return d
 
     # Set the leader for aggregation

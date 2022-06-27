@@ -4,7 +4,7 @@ from MPI_Send import *
 from MPI_Recv import *
 
 import pPython as GPC
-from GridDmat import *
+from Dmat import *
 from size import *
 from get_ind_range import *
 from get_local_ind import *
@@ -90,11 +90,11 @@ def subsasgn_2D(a,s,b):
                 exit()
         # A(i:j, k:l) = B
         
-    # The following caused undefined GridDmat error because its circular reference.
-    # elif isinstance(b, GridDmat):
-    # elif hasattr(b, 'GridDmat'):
+    # The following caused undefined Dmat error because its circular reference.
+    # elif isinstance(b, Dmat):
+    # elif hasattr(b, 'Dmat'):
     # elif hasattr(b, 'Dmap'):
-    # elif isinstance(b, GridDmat.GridDmat):
+    # elif isinstance(b, Dmat.Dmat):
     else:
         # RHS is a DMAT, assignment from a distributed matrix
         # communication might be necessary

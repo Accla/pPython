@@ -4,7 +4,7 @@ from MPI_Send import *
 from MPI_Recv import *
 
 import pPython as GPC
-from GridDmat import *
+from Dmat import *
 from Dmap import *
 from size import *
 from get_ind_range import *
@@ -66,7 +66,7 @@ def subsasgn_3D(a,s,b):
                     a.local[local_ind['0'], local_ind['1'], local_ind['2']] = b
         # A(i:j, k:l, m:n) = B
         
-    elif isinstance(b, GridDmat):
+    elif isinstance(b, Dmat):
         # assignment from a distributed matrix
         # communication might be necessary
         if (s['subs'][0]==':') and (s['subs'][1]==':') and (s['subs'][2]==':'):

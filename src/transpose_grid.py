@@ -6,7 +6,7 @@ from MPI_Recv import *
 
 import pPython as GPC
 from Dmap import *
-from GridDmat import *
+from Dmat import *
 from ndims import *
 from size import *
 from zeros import *
@@ -87,10 +87,10 @@ def transpose_grid(B):
         A = dcomplex(ones(B_size, dmap=mapA),ones(B_size, dmap=mapA))
         if DEBUG:
             print('Creae dmat object, A, as a complex numbers in its local array')
-            if isinstance(A,GridDmat):
-                print('A complex dmat, A, is recognized as GridDmat')
+            if isinstance(A,Dmat):
+                print('A complex dmat, A, is recognized as Dmat')
             else:
-                print('A complex dmat, A, is NOT recognized as GridDmat')
+                print('A complex dmat, A, is NOT recognized as Dmat')
     else:
         if DEBUG:
             print('Creae dmat object, A, as a real numbers in its local array')

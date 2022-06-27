@@ -1,4 +1,4 @@
-from GridDmat import *
+from Dmat import *
 from size import *
 
 def global_ind(d, dim=None):
@@ -34,7 +34,7 @@ def global_ind(d, dim=None):
         else:
             dims = dim
 
-    if isinstance(d,GridDmat): 
+    if isinstance(d,Dmat): 
         #
         # distributed array
         #

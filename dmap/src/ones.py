@@ -1,7 +1,7 @@
 import numpy as np
 
 from Dmap import *
-from dmat import *
+from Dmat import *
 
 def ones(*array_sizes, **keywords):
     """
@@ -30,7 +30,7 @@ def ones(*array_sizes, **keywords):
         TYPE mapped according to the map specified by P.
  
     Example:
-           Create a 100x10 dmat of 8-bit signed integers
+           Create a 100x10 Dmat of 8-bit signed integers
            p = Dmap([1,Ncpus], {}, range(Ncpus))
            x = ones(100, 10, dmap=p, dtype=int8)
  
@@ -60,12 +60,12 @@ def ones(*array_sizes, **keywords):
         if ndim>3:
             dims.append(array_sizes[3])
     if DEBUG:
-        print('Dimension of distributed zeros: %d'%(len(dims)))
+        print('Dimension of distributed ones: %d'%(len(dims)))
         print(array_sizes)
         print(dims)
 
     if ndim>4:
-        print('ERROR(zeros): array dimension larger than 4-D is not supported')
+        print('ERROR(ones): array dimension larger than 4-D is not supported')
         exit()
 
     dmap = None
@@ -84,11 +84,11 @@ def ones(*array_sizes, **keywords):
         return d
     
     if len(dims) < 5:
-        d = dmat(dims, dmap)
+        d = Dmat(dims, dmap=dmap)
     else:
         print('ERROR(map/ones): Incorrect number of inputs')
 
-    # Figure out local dimensions of dmat
+    # Figure out local dimensions of Dmat
     # NOTE: This is recomputing information already computed within
     # @dmat/dmat. Is there a cleaner way of getting this information?
     # comm = my_MCW.MPI_COMM_WORLD
@@ -105,7 +105,7 @@ def ones(*array_sizes, **keywords):
     # Allocating memory for the distributed matrix is no longer done
     # by @dmat/dmat.
 
-    # Allocate a ones matrix for the local portion of the dmat
+    # Allocate a ones matrix for the local portion of the Dmat
     # Determine Matlab version
 
     d.local = np.ones(d.local_dim, dtype)

@@ -35,7 +35,7 @@ def remap(x, new_map):
         else:
             temp = zeros(s[0], s[1], dmap=new_map)
             if DEBUG:
-                if isinstance(temp,GridDmat):
+                if isinstance(temp,Dmat):
                     print('local array shape of temp: %s'%(str(temp.local.shape)))
                     print('local array shape of x: %s'%(str(x.local.shape)))
                 else:

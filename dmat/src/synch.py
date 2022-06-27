@@ -5,7 +5,7 @@ from MPI_Send import *
 from MPI_Recv import *
 
 import pPython as GPC
-from GridDmat import *
+from Dmat import *
 from n_dim_find import *
 from inmap import *
 
@@ -33,7 +33,7 @@ def synch(d):
     if DEBUG:
         print('--> Entering synch')
 
-    if not isinstance(d,GridDmat):
+    if not isinstance(d,Dmat):
         return d
 
     p = d.map

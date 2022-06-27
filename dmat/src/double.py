@@ -11,7 +11,7 @@ def double(d):
     Author:   Nadya Travinin
     Python version: Dr. Chansup Byun (cbyun@ll.mit.edu)
     """
-    if isinstance(d, GridDmat):
+    if isinstance(d, Dmat):
         d.local = np.float64(d.local)
     else:
         print('dmat/double: upsupported data type')

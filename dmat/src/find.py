@@ -4,7 +4,7 @@ from MPI_Send import *
 from MPI_Recv import *
 
 import pPython as GPC
-from GridDmat import *
+from Dmat import *
 from inmap import *
 from size import *
 
@@ -24,7 +24,7 @@ def find(x):
     if DEBUG:
         print('--> Entering find')
 
-    if not isinstance(x,GridDmat):
+    if not isinstance(x,Dmat):
         if DEBUG:
             print('... find for a non-distributed array')
         local_ij = np.argwhere(x)

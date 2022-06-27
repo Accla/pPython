@@ -1,7 +1,7 @@
 from multipledispatch import dispatch
 import numpy as np
 
-from GridDmat import *
+from Dmat import *
 
 #
 # For np.ndarray type variables
@@ -91,10 +91,10 @@ def global_block_range(d, dims):
     return ind
 
 #
-# For distributed array type (GridDmat) variables
+# For distributed array type (Dmat) variables
 #
 
-@dispatch(type(GridDmat()))
+@dispatch(type(Dmat()))
 def global_block_range(d):
     """Returns the ranges of global indices local to the current processor.
     
@@ -121,7 +121,7 @@ def global_block_range(d):
     return global_block_range(d, dims)
 
 
-@dispatch(type(GridDmat()),int)
+@dispatch(type(Dmat()),int)
 def global_block_range(d, dim):
     """Returns the ranges of global indices local to the current processor.
     
@@ -148,7 +148,7 @@ def global_block_range(d, dim):
     return global_block_range(d, dims)
 
 
-@dispatch(type(GridDmat()),list)
+@dispatch(type(Dmat()),list)
 def global_block_range(d, dims):
     """Returns the ranges of global indices local to the current processor.
     
