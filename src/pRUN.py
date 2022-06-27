@@ -2,7 +2,7 @@ import re
 import os
 import sys
 
-# Set gridPython & PythonMPI search path and import it
+# Set pPython & PythonMPI search path and import it
 PPYTHON_HOME = os.getenv('PPYTHON_HOME')
 if not PPYTHON_HOME:
     print('ERROR(pRUN): PPYTHON_HOME is not set.')
@@ -11,7 +11,7 @@ if not os.path.exists(PPYTHON_HOME):
     print('ERROR(pRUN): PPYTHON_HOME path, %s, does not exist.'%(PPYTHON_HOME))
     exit()
 
-# Assuming PythonMPI is distributed with gridPython as shown below
+# Assuming PythonMPI is distributed with pPython as shown below
 # PythonMPI path must be added first
 PYTHONMPI_PATH = PPYTHON_HOME+os.sep+'PythonMPI'+os.sep+'src'
 sys.path.append(PYTHONMPI_PATH)
@@ -54,16 +54,16 @@ else:
     print('ERROR(pRUN): PythonMPI package path, %s, does not exist.'%(PYTHONMPI_PATH))
     exit()
     
-if os.path.exists(PPYTHON_PATH):
+if os.path.exists(GRIDPYTHON_PATH):
     import grid_config as grid
-    # from gridPython import *
+    # from pPython import *
     from check_allowance import *
     from grid_abort import *
     from grid_config_init import *
     from grid_run import *
     print('gridPython functions are loaded......')
 else:
-    print('ERROR(pRUN): gridPython package path, %s, does not exist.'%(PPYTHON_PATH))
+    print('ERROR(pRUN): gridPython package path, %s, does not exist.'%(GRIDPYTHON_PATH))
     exit()
 
 def pRUN(py_file,n_proc,machines,sched_options=None):
@@ -126,6 +126,7 @@ def pRUN(py_file,n_proc,machines,sched_options=None):
         sep_path = ':'
         
     GRID_PATH = grid.grid_config['PPYTHON_PATH']+sep_path \
+        +grid.grid_config['GRIDPYTHON_PATH']+sep_path \
         +grid.grid_config['PYTHONMPI_PATH']+sep_path \
         +grid.grid_config['USER_PYTHONMPI_PATH']+sep_path \
         +grid.grid_config['DMAP_PATH']+sep_path \

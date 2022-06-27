@@ -3,7 +3,7 @@ from timeit import default_timer as timer
 import matplotlib.pyplot as plt
 
 # Import PythonMPI methods.
-import GridPython as GPC
+import pPython as GPC
 from GridMap import *
 from zeros import *
 from local import *

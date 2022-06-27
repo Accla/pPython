@@ -2,7 +2,7 @@ import numpy as np
 from timeit import default_timer as timer
 
 # Import PythonMPI methods.
-import GridPython as GPC
+import pPython as GPC
 from GridMap import *
 from agg import *
 from zeros import *

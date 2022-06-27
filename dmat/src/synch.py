@@ -4,7 +4,7 @@ import numpy as np
 from MPI_Send import *
 from MPI_Recv import *
 
-import GridPython as GPC
+import pPython as GPC
 from GridDmat import *
 from n_dim_find import *
 from inmap import *

@@ -1,6 +1,6 @@
 """RUN.py
 
-Example to run a PythonMPI code, param_sweep_parallel.py, with gridPython
+Example to run a PythonMPI code, param_sweep_parallel.py, with pPython
 To run, execute the following command.
 
     python RUN.py
@@ -13,10 +13,13 @@ USER = os.getenv('USER')
 HOME_PATH = "/Volumes/"+USER
 os.environ["HOME_PATH"] = HOME_PATH
 
-PPYTHON_HOME = HOME_PATH+"/llgrid_beta/gridPython/latest"
+PPYTHON_HOME = HOME_PATH+"/llgrid_beta/pPython/latest"
 PPYTHON_PATH = PPYTHON_HOME+os.sep+"src"
 os.environ["PPYTHON_HOME"] = PPYTHON_HOME
 sys.path.append(PPYTHON_PATH)
+
+GRIDPYTHON_PATH = PPYTHON_HOME+os.sep+"grid"
+sys.path.append(GRIDPYTHON_PATH)
 
 # Import PythonMPI launch funciton
 from pRUN import *

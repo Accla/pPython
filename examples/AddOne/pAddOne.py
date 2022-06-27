@@ -14,8 +14,8 @@
 #   eval(pRUN('pAddOne',2,'grid'))
 ######################################################
 
-# GridPython class
-import GridPython as GPC
+# pPython class
+import pPython as GPC
 from GridMap import *
 
 from zeros import *

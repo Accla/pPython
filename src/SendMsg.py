@@ -3,8 +3,8 @@ import numpy as np
 from MPI_Send import *
 from MPI_Mcast import *
 
-# GridPython class
-import GridPython as GPC
+# pPython class
+import pPython as GPC
 
 def SendMsg(dest, tag, *argv):
     """Send message from current process to dest.

@@ -20,7 +20,7 @@ def get_global_ind(falls, grid_dims=None):
         ToDo: should it be a list or a dictionary?
         
     Author:   Nadya Travinin (pMatlab)
-    Python version: Dr. Chansup Byun (gridPython)
+    Python version: Dr. Chansup Byun (pPython)
     """
     
     DEBUG = 0

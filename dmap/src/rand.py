@@ -1,6 +1,6 @@
 import numpy as np
 
-import GridPython as GPC
+import pPython as GPC
 from GridMap import *
 from dmat import *
 

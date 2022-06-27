@@ -105,11 +105,11 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD):
     # commands[0] = commands[0]+'from PythonMPI import *' + nl
     commands[0] = commands[0]+'import pyMPI_COMM_WORLD as pyMCW' + nl
     commands[0] = commands[0]+'from dict_to_hdf5 import *' + nl
-    commands[1] = 'from gridPython_init import *' + nl
+    commands[1] = 'from pPython_init import *' + nl
     commands[2] = 'pyMCW.MPI_COMM_WORLD = load_dict_from_hdf5('+q+comm_f5_file+q+')' + nl
     commands[3] = 'pyMCW.MPI_COMM_WORLD['+q+'rank'+q+'] = ' + str(rank) + nl
     # Additional to define global variables: 
-    commands[3] = commands[3]+'gridPython_init()' + nl
+    commands[3] = commands[3]+'pPython_init()' + nl
     # commands[3] = commands[3]+'id=CheckOS()' + nl
     # commands[4] = ['delete(' q defsfile q ');' nl];
     commands[5] = 'exec(open("'+py_file+'.py").read())'+nl

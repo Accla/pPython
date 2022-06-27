@@ -27,7 +27,7 @@ def gen_falls(pf, pid):
                     incomplete blocks
 
     Original Author: Nadya Travinin (pMatlab)
-    Author: Dr. Chansup Byun (gridPython)
+    Author: Dr. Chansup Byun (pPython)
 
     References: Shankar Ramaswamy and Prithviraj Banerjee. Automatic Generation of Efficient Array
                 Redistribution Routines for Distributed Memory Multicomputers. IEEE 1995.

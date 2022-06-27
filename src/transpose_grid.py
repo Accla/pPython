@@ -1,10 +1,10 @@
 import numpy as np
 
-# GridPython class
+# pPython class
 from MPI_Send import *
 from MPI_Recv import *
 
-import GridPython as GPC
+import pPython as GPC
 from GridMap import *
 from GridDmat import *
 from ndims import *

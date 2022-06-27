@@ -1,6 +1,6 @@
 """run_on_llsc_via_pc.py
 
-Example to run a PythonMPI code, param_sweep_parallel.py, with gridPython
+Example to run a PythonMPI code, param_sweep_parallel.py, with pPython
 To run, execute the following command.
 
     python run_on_llsc_via_pc.py
@@ -12,10 +12,13 @@ import sys
 HOME_PATH = "Z:"
 os.environ["HOME_PATH"] = HOME_PATH
 
-PPYTHON_HOME = HOME_PATH+"\\llgrid_beta\\gridPython\\latest"
+PPYTHON_HOME = HOME_PATH+"\\llgrid_beta\\pPython\\latest"
 PPYTHON_PATH = PPYTHON_HOME+os.sep+"src"
 os.environ["PPYTHON_HOME"] = PPYTHON_HOME
 sys.path.append(PPYTHON_PATH)
+
+GRIDPYTHON_PATH = PPYTHON_HOME+os.sep+"grid"
+sys.path.append(GRIDPYTHON_PATH)
 
 from pRUN import *
 

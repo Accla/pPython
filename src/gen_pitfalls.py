@@ -43,7 +43,7 @@ def gen_pitfalls(np, dist_spec, dim_len, overlap=None):
         p.dist: distribution spec ('b', 'c', or 'bc'  )
 
     Author: Nadya Travinin (pMatlab)
-    Python version: Dr. Chansup Byun (gridPython)
+    Python version: Dr. Chansup Byun (pPython)
 
     References: Shankar Ramaswamy and Prithviraj Banerjee. Automatic Generation of Efficient Array
         Redistribution Routines for Distributed Memory Multicomputers. IEEE 1995.

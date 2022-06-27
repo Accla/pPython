@@ -2,8 +2,8 @@ import numpy as np
 import os
 from timeit import default_timer as timer
 
-# from gridPython_all import *
-import GridPython as GPC
+# from pPython_all import *
+import pPython as GPC
 from GridMap import *
 from local import *
 from zeros import *

@@ -12,7 +12,7 @@ def ndims(a):
     return n
 
     """
-    gridPython: Dr. Chansup Byun
+    pPython: Dr. Chansup Byun
     pMatlab: Parallel Matlab Toolbox
     Software Engineer: Ms. Nadya Travinin (nt@ll.mit.edu)
     Architect: Dr. Jeremy Kepner (kepner@ll.mit.edu)

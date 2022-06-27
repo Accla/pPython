@@ -3,7 +3,7 @@ from timeit import default_timer as timer
 from math import ceil
 import matplotlib.pyplot as plt
 
-import GridPython as GPC
+import pPython as GPC
 from GridMap import *
 from zeros import *
 from put_local import *

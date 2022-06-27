@@ -60,7 +60,7 @@ def grid_run( py_file, n_proc, machines ):
     DEBUG = 0
 
     if DEBUG:
-        print('--> Entering MPI_Run (gridPython version).')
+        print('--> Entering MPI_Run (pPython version).')
         print('MPI_Run: isunix, ismac, islinux, ispc = %d,%d,%d,%d'%(OS.isunix, OS.ismac, OS.islinux, OS.ispc))
     
     # Set some strings for special characters.

@@ -20,7 +20,7 @@ import scipy.signal
 import scipy.sparse
 import matplotlib.pyplot as plt
 
-import GridPython as GPC
+import pPython as GPC
 from GridMap import *
 from zeros import *
 from ones import *

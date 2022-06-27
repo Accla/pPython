@@ -5,8 +5,8 @@ from pyMPI_Buffer_file import *
 from pyMPI_Lock_file import *
 from pyMPI_Sleep import *
 
-# GridPython class
-import GridPython as GPC
+# pPython class
+import pPython as GPC
 
 def MPI_Mcast(source, dest, tag, comm, *argv):
     """Broadcast variables to everyone.

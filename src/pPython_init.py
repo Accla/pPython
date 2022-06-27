@@ -1,15 +1,15 @@
-# import PythonMPI and gridPython
+# import PythonMPI and pPython
 import pyMPI_COMM_WORLD as pyMCW
 
-# from gridPython import *
+# from pPython import *
 from MPI_Init import *
 from MPI_Comm_rank import *
 from MPI_Comm_size import *
 
-# GridPython class
-import GridPython as GPC
+# pPython class
+import pPython as GPC
 
-def gridPython_init():
+def pPython_init():
     """Initialize Grid Python environment.
     """
 
@@ -20,7 +20,7 @@ def gridPython_init():
 
     # Create communicator. 
     # pyMCW is imported in PythonMPI.py
-    # GPC is imported in gridPython.py
+    # GPC is imported in pPython.py
     GPC.comm = pyMCW.MPI_COMM_WORLD
 
     # Get size and rank.

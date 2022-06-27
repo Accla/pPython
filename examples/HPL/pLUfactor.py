@@ -7,8 +7,8 @@ from pyMPI_Save_messages import *
 from SendMsg import *
 from RecvMsg import *
 
-# GridPython class
-import GridPython as GPC
+# pPython class
+import pPython as GPC
 
 from global_block_range import *
 from global_block_ranges import *

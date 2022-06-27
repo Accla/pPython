@@ -28,7 +28,7 @@ def grid_config_local(grid_config):
 
     grid_config['GRID_HOME_PATH']: home directory path on the grid for the remote user
     grid_config['HOME_PATH']: locally mounted path for GRID_HOME_PATH
-    grid_config['PPYTHON_PATH']: gridPython source installation path
+    grid_config['PPYTHON_PATH']: pPython source installation path
     grid_config['PYTHONMPI_PATH']: PythonMPI source installation path
     grid_config['DMAP_PATH']: distributed map source installation path
     grid_config['DMAT_PATH']: distributed array source installation path
@@ -81,14 +81,14 @@ def grid_config_local(grid_config):
             print('HOME_PATH is not set. Check OS type.')
             exit()
 
-    # gridPython installation path
+    # pPython installation path
     PPYTHON_HOME = os.getenv('PPYTHON_HOME')
     PPYTHON_PATH = PPYTHON_HOME+os.sep+"src"
     # PythonMPI installation path
     PYTHONMPI_PATH = PPYTHON_HOME+os.sep+"PythonMPI"+os.sep+"src"
     # PythonMPI customization path for an individual user
     USER_PYTHONMPI_PATH = HOME_PATH+os.sep+"pythonmpi"
-    # gridPython path (codes for scheduler integration)
+    # pPython path (codes for scheduler integration)
     GRIDPYTHON_PATH = PPYTHON_HOME+os.sep+"grid"
     # Current working directory path
     CWD_PATH = os.getcwd()

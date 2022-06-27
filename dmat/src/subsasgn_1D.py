@@ -1,6 +1,6 @@
 import numpy as np
 
-import GridPython as GPC
+import pPython as GPC
 from GridDmat import *
 from size import *
 from subsasgn_2D import *

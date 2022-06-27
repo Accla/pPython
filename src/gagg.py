@@ -4,7 +4,7 @@ from sympy import primefactors,factorint
 from RecvMsg import *
 from SendMsg import *
 
-import GridPython as GPC
+import pPython as GPC
 from D4M.assoc import Assoc
 
 from gagg_add import *

@@ -1,6 +1,6 @@
 import numpy as np
 
-# import gridPython functions
+# import pPython functions
 from uint64 import *
 
 def RandomAccessStarts(n):

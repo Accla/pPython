@@ -1,12 +1,12 @@
 # PythonMPI method
 from PythonMPI_all import *
 
-# GridPython class
-import GridPython as GPC
+# pPython class
+import pPython as GPC
 
-# gridPython methods
-from gridPython_init import *
-from gridPython_ver import *
+# pPython methods
+from pPython_init import *
+from pPython_ver import *
 
 from check_allowance import *
 from check_mount import *

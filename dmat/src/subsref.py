@@ -2,7 +2,7 @@ from multipledispatch import dispatch
 import numpy as np
 from math import ceil,floor
 
-import GridPython as GPC
+import pPython as GPC
 from GridDmat import *
 from GridMap import *
 from size import *

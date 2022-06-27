@@ -5,7 +5,7 @@ from scipy.fftpack import fft
 from scipy.sparse import csr_matrix
 
 # Import PythonMPI methods.
-import GridPython as GPC
+import pPython as GPC
 from GridMap import *
 from rand import *
 from zeros import *

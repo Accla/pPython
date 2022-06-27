@@ -5,8 +5,8 @@ from timeit import default_timer as timer
 from SendMsg import *
 from RecvMsg import *
 
-# GridPython class
-import GridPython as GPC
+# pPython class
+import pPython as GPC
 from global_block_range import *
 from local import *
 

@@ -32,7 +32,7 @@ m = 3   # number of output arguments
 n = 16  # number of independent iterations
 
 # Design data distribution among the MPI processes.
-# (partition_1d is distributed with gridPython)
+# (partition_1d is distributed with pPython)
 d_index,d_sizes = partition_1d(n,n_procs)
 # print(d_index)
 # print(d_sizes)

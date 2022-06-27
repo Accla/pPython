@@ -1,9 +1,9 @@
 import numpy as np
 from timeit import default_timer as timer
 
-# Import gridPython methods.
+# Import pPython methods.
 from GridMap import *
-import GridPython as GPC
+import pPython as GPC
 from local import *
 from zeros import *
 from rand import *

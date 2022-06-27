@@ -3,18 +3,18 @@ from scipy.signal import convolve
 from timeit import default_timer as timer
 import matplotlib.pyplot as plt
 
-# Import gridPython methods.
-from gridPython_all import *
+# Import pPython methods.
+from pPython_all import *
 
 """ pBlurimage
 
-    Python version: Dr. Chansup Byun
+    pPython version: Dr. Chansup Byun
 """
 
 UseGraphics = 1
 
 # Create communicator.
-# GridPython as GPC in gridPython.py
+# pPython as GPC in pPython.py
 comm = GPC.comm
 Np = GPC.comm_size
 Pid = GPC.my_rank 

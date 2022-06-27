@@ -43,7 +43,7 @@ def grid_dmat(m,n=None,q=None,r=None,p=None):
     D.LOCAL - numerical part of the distributed array stored on the local
         processor.  Memory for D.LOCAL will be allocated by constructor
         functions, such as ZEROS, ONES, RAND and SPARSE.
-    D.LOCAL_DIM - the size of local part of the distributed array (added with gridPython)
+    D.LOCAL_DIM - the size of local part of the distributed array (added with pPython)
     D.GLOBAL_IND - global indices of the distributed array local to the
         current processor.
  
@@ -135,7 +135,7 @@ def grid_dmat(m,n=None,q=None,r=None,p=None):
             print('grid_mat: FALLS in axis, i = %d'%(i))
             print_falls(f)
         
-    # figure out local dimensions (d.local_dim added with gridPython)
+    # figure out local dimensions (d.local_dim added with pPython)
     local_dim = local_dims(d.falls, d.dim);
     d.local_dim = local_dim
   

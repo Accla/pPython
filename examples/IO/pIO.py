@@ -2,7 +2,7 @@ import numpy as np
 import os
 from timeit import default_timer as timer
 
-import GridPython as GPC
+import pPython as GPC
 from GridMap import *
 from rand import *
 from zeros import *

@@ -1,7 +1,7 @@
 from MPI_Recv import *
 from MPI_Send import *
 
-import GridPython as GPC
+import pPython as GPC
 from GridDmat import *
 
 from inmap import *

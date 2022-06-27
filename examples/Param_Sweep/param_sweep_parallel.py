@@ -1,5 +1,5 @@
 """test_param_sweep.py
-    Test gridPython distributed array function, zeros()
+    Test pPython distributed array function, zeros()
 
     To run, start Pyhton and type:
 
@@ -11,13 +11,13 @@
         . . . 
         PythonMPI/test_zeros.3.out
 
-    gridPython
+    pPython
     Dr. Chansup Byun
     MIT Lincoln Laboratory
     cbyun@ll.mit.edu
 """
 
-from gridPython_all import *
+from pPython_all import *
 
 from sample_function import *
 
@@ -27,7 +27,7 @@ from sample_function import *
 # Create communicator.
 # pyMCW is imported in PythonMPI.py
 # comm = pyMCW.MPI_COMM_WORLD;
-# GridPython as GPC in gridPython.py
+# pPython as GPC in pPython.py
 comm = GPC.comm
 
 # Get size and rank.
