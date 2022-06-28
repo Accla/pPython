@@ -1,6 +1,6 @@
 from math import ceil,floor
 
-from GridFalls import *
+from Falls import *
 from LineSgmt import *
 from lcm import *
 from ls_intersection import *
@@ -19,7 +19,7 @@ def falls_intersection(f1, f2):
     F.S - strides between successive L's
     F.N - number of equally spaced, equally sized blocks
     
-    Returns fi as a list of GridFalls objects. returns an empty list 
+    Returns fi as a list of Falls objects. returns an empty list 
     when not a Falls instance or when no intersection.
     
     Python version: Dr. Chansup Byun
@@ -34,7 +34,7 @@ def falls_intersection(f1, f2):
         print('--> Entering falls_intersection')
     
     #  check to see if either f1 or f2 are -1's
-    if not isinstance(f1,GridFalls) or not isinstance(f2,GridFalls):
+    if not isinstance(f1,Falls) or not isinstance(f2,Falls):
         fi = []
         return fi
 
@@ -48,7 +48,7 @@ def falls_intersection(f1, f2):
     L1 = LineSgmt()
     L2 = LineSgmt()
     LS = LineSgmt()
-    temp = GridFalls()
+    temp = Falls()
     for i1 in range(I1,int(min(I1+m1-1, f1.n-1)+1)):
         #CB: This has to be modified for the recent update for FALLS fix 
         L1.l = f1.l+i1*f1.s

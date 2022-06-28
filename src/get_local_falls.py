@@ -1,7 +1,7 @@
 import math
 import numpy as np
 
-from GridFalls import *
+from Falls import *
 from n_dim_find import *
 from print_pitfalls import *
 from print_falls import *
@@ -66,8 +66,8 @@ def get_local_falls(pitfalls, grid, rank):
             
         if len(ind):
             for i in range(dim):
-                # Create an empty GridFalls class.
-                f = GridFalls()
+                # Create an empty Falls class.
+                f = Falls()
 
                 pid = ind[i]
                 pf = pitfalls[i]

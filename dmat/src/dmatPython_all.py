@@ -1,6 +1,6 @@
 # classes
-from GridPitFalls import *
-from GridFalls import *
+from PitFalls import *
+from Falls import *
 from Dmat import *
 
 # functions
@@ -12,7 +12,7 @@ from get_local_falls import *
 from global_ind import *
 from local import *
 from local_dims import *
-from pitfalls import *
+from dpitfalls import *
 from print_falls import *
 from print_pitfalls import *
 from put_local import *

@@ -1,9 +1,9 @@
-def pitfalls(d):
+def dpitfalls(d):
     """Returns the pitfalls structure associated with the distributed array.
     
     Usage:
     ------
-    pf = pitfalls(d)
+    pf = dpitfalls(d)
     
     d: a distributed array
     pf: pitfalls associated with the distributed array

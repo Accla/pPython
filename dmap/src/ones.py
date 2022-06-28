@@ -97,9 +97,9 @@ def ones(*array_sizes, **keywords):
     if DEBUG:
         # print('ones: my_rank = %d'%(my_rank))
         print(d.pitfalls)
-        print(pitfalls(d))
+        print(dpitfalls(d))
     
-    # falls = get_local_falls(pitfalls(d), p.grid, my_rank)
+    # falls = get_local_falls(dpitfalls(d), p.grid, my_rank)
     # local_dims = localdims(falls, p.dim);
 
     # Allocating memory for the distributed matrix is no longer done

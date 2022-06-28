@@ -98,7 +98,7 @@ def rand(*array_sizes, **keywords):
     #   Figure out local dimensions of Dmat
     #   NOTE: This is recomputing information already computed within
     #   @dmat/dmat. Is there a cleaner way of getting this information?
-    #CB falls = get_local_falls(pitfalls(d), p.grid, pMATLAB.my_rank);
+    #CB falls = get_local_falls(dpitfalls(d), p.grid, pMATLAB.my_rank);
     #CB local_size = localdims(falls, p.dim);
     
     dim = dmap.dim
