@@ -1,5 +1,6 @@
 from math import ceil,pi
 from scipy.signal import convolve
+import warnings
 
 from zeros import *
 
@@ -18,6 +19,9 @@ def zoom_frames(refFrame,scaleFactor,blurSigma):
     Output variables are as follows:
     zoomeFrames = 3D array of output images.
     """
+
+    # Supress overflow warning in np.exp()
+    warnings.filterwarnings('ignore')
 
     DEBUG = 0
     if DEBUG:

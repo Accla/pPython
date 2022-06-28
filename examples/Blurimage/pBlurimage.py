@@ -29,6 +29,7 @@ from find import *
 from global_ind import *
 from local import *
 from put_local import *
+from BcastMsg import *
 
 #  MPI information
 comm = GPC.comm
@@ -51,7 +52,14 @@ if (CHECK):
     im = zeros(Nx,Ny)
 
 Z = zeros(Nx,Ny,dmap=Zmap) + 1.e-4   # Create 2D distributed array.
-[ii,jj] = find(scipy.sparse.random(Nx, Ny, density=1.e-4))  # Create non-zeros.
+# Make sure the pertubation indices, ii and jj, are the same across all the MPI processes
+tag = 1004
+if Pid == 0:
+    [ii,jj] = find(scipy.sparse.random(Nx, Ny, density=1.e-4))  # Create non-zeros.
+    [ii,jj] = BcastMsg(0,tag,ii,jj)
+else:
+    ii = jj = None
+    [ii,jj] = BcastMsg(0,tag,ii,jj)
 ii = np.array(ii) # Convert as Numpy array for array indexing ops
 jj = np.array(jj) # Convert as Numpy array for array indexing ops
 for i in range(np.prod(size(ii))):

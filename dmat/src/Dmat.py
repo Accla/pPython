@@ -66,7 +66,7 @@ class Dmat:
         Python version: Dr. Chansup Byun
         """
         
-        DEBUG = 1
+        DEBUG = 0
         if DEBUG:
             print('--> Entering Dmat.init')
         #
@@ -187,7 +187,7 @@ class Dmat:
         
         self.global_ind = get_global_ind(self.falls, grid_dims)
         if DEBUG:
-            print('--> Exiting Dmat.init')
+            print('<-- Exiting Dmat.init')
 
     def __setitem__(self, index, d):
         """Implement __setitem__ with Dmat()
