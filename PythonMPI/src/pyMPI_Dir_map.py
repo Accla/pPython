@@ -27,8 +27,10 @@ def pyMPI_Dir_map(machine_db,path):
     dir_mac = path;
     dir_grid = path;
     dir_sgrp_1 = path;
+    dir_sgrp_2 = path;
+    dir_sgrp_3 = path;
 
-    # Check if a directory mapping has been defined.
+    # Check if a diresgrp_3_basectory mapping has been defined.
     # If so, convert directory names.
     if 'local_dir_map' in machine_db:
         pc_base = machine_db['local_dir_map'][0]
@@ -41,6 +43,10 @@ def pyMPI_Dir_map(machine_db,path):
         grid_n    = len(grid_base);
         sgrp_1_base = machine_db['local_dir_map'][4]
         sgrp_1_n    = len(sgrp_1_base);
+        sgrp_2_base = machine_db['local_dir_map'][5]
+        sgrp_2_n    = len(sgrp_2_base);
+        sgrp_3_base = machine_db['local_dir_map'][6]
+        sgrp_3_n    = len(sgrp_3_base);
 
         if path[0:pc_n].lower() == pc_base.lower():
             # Check if path has a pc base
@@ -98,6 +104,27 @@ def pyMPI_Dir_map(machine_db,path):
 
             dir_pc = replace_token('/','\\',dir_pc)
             
+        elif path[0:sgrp_2_n].lower() == sgrp_2_base.lower():
+            # Check if path has a shared group 1 base
+            # Convert all other paths accordingly.
+            # Swap bases for other path variables.
+            #
+            # shared group 2 path will be converted to dir_grid
+            # 
+            dir_pc = pc_base + path[sgrp_2_n:]
+            dir_linux = linux_base + path[sgrp_2_n:]
+            dir_mac = mac_base + path[sgrp_2_n:]
+            dir_grid = grid_base + path[sgrp_2_n:]
+
+            dir_pc = replace_token('/','\\',dir_pc)
+            
+        elif path[0:sgrp_3_n].lower() == sgrp_3_base.lower():
+            # user specified path on loacl machine when running locally
+            dir_pc = sgrp_3_base
+            dir_linux = sgrp_3_base
+            dir_mac = sgrp_3_base
+            dir_grid = sgrp_3_base
+
         else:
             print("ERROR(pyMPI_Dir_map): path, %s, does not match with any in machine_db['local_dir_map']"%(path))
             exit()
