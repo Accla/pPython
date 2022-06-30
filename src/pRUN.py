@@ -140,7 +140,7 @@ def pRUN(py_file,n_proc,machines,sched_options=None):
     # Launch the script.
     print('Running: %s'%(py_file))
 
-    # Clearn up an old PythonMPI run
+    # Clean up an old PythonMPI run
     if isinstance(machines, str):
         grid_abort(grid.grid_config)
     else:
