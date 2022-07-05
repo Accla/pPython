@@ -37,7 +37,7 @@ class Dmap:
     """
     name = 'grid_map_class'
     
-    def __init__(self,grid_spec=None,dist_spec=None,proc_list=None,overlap=None):
+    def __init__(self,grid_spec=None,dist_spec=None,proc_list=None,overlap=None,,**kwargs):
         """Init constructor."""
         
         DEBUG = 0
@@ -48,7 +48,12 @@ class Dmap:
 
         if not bool(grid_spec):
             return
-        
+        #
+        # Check ordering of processor grid
+        for key, value in kwargs.items():
+            if key == ‘order’:
+		order = value
+
         # set the comm as MPI_COMM_WORLD
         comm = pyMCW.MPI_COMM_WORLD
 
@@ -109,7 +114,10 @@ class Dmap:
             self.dist_spec = dist_spec
             
             # create the grid from the processor list
-            grid = np.zeros(grid_spec,int)
+            p_list = np.array(proc_list)
+            grid = np.zeros(np.prod(grid_spec),int)
+            grid[:] = p_list[:]
+            grid = grid.reshape(grid_spec,order=order)
 
             # check that the length of the processor list matches the size of
             # the grid
