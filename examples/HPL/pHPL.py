@@ -58,14 +58,14 @@ print('Distributed matrix size (bytes)    = %d'%((N**2)*8))
 
 zero_clock = timer()
 b = np.random.rand(N,1) - 0.5    # Create a replicated column vector.
-A = rand(N,N,dmap=Amap) - 0.5         # Create a distributed matrix.
+A = rand(N,N,map=Amap) - 0.5         # Create a distributed matrix.
 Talloc = timer()
 
 print('Local matrix size (bytes)          = %d'%(np.prod((local(A)).shape)*8))
 print('Allocation Time (sec)              = %f'%(Talloc-zero_clock))
 
 zero_clock = timer()
-sync = agg(zeros(1, Np, dmap=Amap))   # Synchronize start.
+sync = agg(zeros(1, Np, map=Amap))   # Synchronize start.
 Tlaunch = timer()
 print('Launch Time (sec)                  = %f'%(Tlaunch-zero_clock))
 

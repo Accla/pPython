@@ -30,8 +30,8 @@ if PARALLEL:
     Np = GPC.comm_size
     XYmap = Dmap([Np, 1],{},range(Np))   # Create parallel map.
 
-X = zeros(N,N,dmap=XYmap)     # Create distributed X.
-Y = zeros(N,N,dmap=XYmap)     # Create distributed Y.
+X = zeros(N,N,map=XYmap)     # Create distributed X.
+Y = zeros(N,N,map=XYmap)     # Create distributed Y.
 Xloc = local(X)          # Get local part of X.
 Yloc = local(Y)          # Get local part of Y.
 Yloc = Xloc + 1          # Add one to local part.

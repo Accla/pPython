@@ -51,7 +51,7 @@ if (PARALLEL):
 if (CHECK):
     im = zeros(Nx,Ny)
 
-Z = zeros(Nx,Ny,dmap=Zmap) + 1.e-4   # Create 2D distributed array.
+Z = zeros(Nx,Ny,map=Zmap) + 1.e-4   # Create 2D distributed array.
 # Make sure the pertubation indices, ii and jj, are the same across all the MPI processes
 tag = 1004
 if Pid == 0:

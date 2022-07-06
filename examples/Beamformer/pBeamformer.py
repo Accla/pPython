@@ -51,10 +51,10 @@ if (PARALLEL):
     Xmap = Dmap([1,1,Np],{},range(Np))  # Create parallel map.
 
 # ALLOCATE PARALLEL DATA STRUCTURES ---------------------
-X0 = zeros(Nt,Nb,Nf,dmap=Xmap)   # Source array.
-X1 = np.sqrt(Ns)*dcomplex(rand(Nt,Ns,Nf,dmap=Xmap),rand(Nt,Ns,Nf,dmap=Xmap))  # Sensor input.
-X2 = zeros(Nt,Nb,Nf,dmap=Xmap)   # Beamformed output.
-X3 = zeros(Nt,Nb,Np,dmap=Xmap)   # Intermediate sum.
+X0 = zeros(Nt,Nb,Nf,map=Xmap)   # Source array.
+X1 = np.sqrt(Ns)*dcomplex(rand(Nt,Ns,Nf,map=Xmap),rand(Nt,Ns,Nf,map=Xmap))  # Sensor input.
+X2 = zeros(Nt,Nb,Nf,map=Xmap)   # Beamformed output.
+X3 = zeros(Nt,Nb,Np,map=Xmap)   # Intermediate sum.
 #CB global_ind() returns a list, Should make it return a numpy array?
 myI_f = np.array(global_ind(X1,2))   # Get local indices.
 # Get local parts of arrays.

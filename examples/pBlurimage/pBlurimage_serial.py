@@ -47,7 +47,7 @@ if (CHECK):
     im = np.zeros(n_image_x,n_image_y)
 
 # Create a distributed matrix on individual rank
-imOv = zeros(n_image_x,n_image_y,dmap=mapImOv) 
+imOv = zeros(n_image_x,n_image_y,map=mapImOv) 
 
 # Get local indices.
 [myI,myJ] = global_ind(imOv) 

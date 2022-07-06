@@ -93,9 +93,9 @@ if (PARALLEL):
 
 # Allocate data structures
 tic = timer()
-Aloc = local(zeros(1, N, dmap=ABCmap)) + A0
-Bloc = local(zeros(1, N, dmap=ABCmap)) + B0
-Cloc = local(zeros(1, N, dmap=ABCmap)) + C0
+Aloc = local(zeros(1, N, map=ABCmap)) + A0
+Bloc = local(zeros(1, N, map=ABCmap)) + B0
+Cloc = local(zeros(1, N, map=ABCmap)) + C0
 
 Talloc = timer()
 print('Allocation Time (sec)              = %f'%(Talloc - tic))
@@ -105,7 +105,7 @@ Nloc = Cloc.size
 # Perform barrier synchronization with agg().
 #!!!!! DO WE NEED THIS?
 tic
-sync = agg(zeros(Np, 1, dmap=SyncMap))
+sync = agg(zeros(Np, 1, map=SyncMap))
 Tlaunch = timer()
 print('Launch  Time (sec)                 = %f'%(Tlaunch - Talloc))
 

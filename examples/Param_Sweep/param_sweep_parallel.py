@@ -47,7 +47,7 @@ pmap = Dmap([Np,1],'b',range(Np))
 # Create a distributed matrix on individual rank
 m = 16
 n = 3
-z = zeros(m,n,dmap=pmap)
+z = zeros(m,n,map=pmap)
 
 # Check the distributed z matrix
 print('Local portion of global indices on Pid = %d:'%(Pid))
