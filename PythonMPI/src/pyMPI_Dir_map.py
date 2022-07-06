@@ -20,6 +20,9 @@ def pyMPI_Dir_map(machine_db,path):
     """
 
     DEBUG = 0 
+    if DEBUG: 
+        print('--> Entering pyMPI_Dir_map')
+        print('Current working directory path: %s'%(path))
 
     # Default is to do nothing.
     dir_pc = path;
@@ -47,6 +50,9 @@ def pyMPI_Dir_map(machine_db,path):
         sgrp_2_n    = len(sgrp_2_base);
         sgrp_3_base = machine_db['local_dir_map'][6]
         sgrp_3_n    = len(sgrp_3_base);
+        if DEBUG:
+            print('sgrp_3_base: %s'%(sgrp_3_base))
+            print('sgrp_3_n: %d'%(sgrp_3_n))
 
         if path[0:pc_n].lower() == pc_base.lower():
             # Check if path has a pc base

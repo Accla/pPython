@@ -1,3 +1,5 @@
+import os
+
 import checkOS as OS
 
 def pyMPI_Comm_settings_local(machine_db_settings):
@@ -19,6 +21,8 @@ def pyMPI_Comm_settings_local(machine_db_settings):
                    for PC, Linux, and Mac OS environment
 
     """
+    # Grid user
+    USER = os.getenv('USER')
 
     # Set default type of remote machines to 'unix' (for linux and mac OSes) or 'pc'
     machine_db_settings['type'] = 'unix';     # [OK TO CHANGE.]
@@ -38,21 +42,24 @@ def pyMPI_Comm_settings_local(machine_db_settings):
         machine_db_settings['python_command'] = python_location + ' -u '
     elif OS.ismac:
         # python_location = '/usr/bin/python'
-        # python_location = '/state/partition1/llgrid/pkg/anaconda/anaconda3-2021b/bin/python'
+        # python_location = '/state/partition1/llgrid/pkg/anaconda/anaconda3-2022a/bin/python'
         python_location = '/opt/anaconda3/bin/python'
         machine_db_settings['python_command'] = python_location + ' -u '
     else:
         print('Error (pyMPI_Comm_settings_local): unsupported OS.')
         exit()
 
-    # LLSC python location
-    python_location = '/state/partition1/llgrid/pkg/anaconda/anaconda3-2021b/bin/python'
     machine_db_settings['python_command_llsc'] = python_location + ' -u '
     machine_db_settings['python_module_path'] = '/etc/environment-modules/modules'
-    machine_db_settings['python_module_name'] = 'anaconda/2021b'
 
-    # local directory mapping. (pc, linux, mac, grid)
-    machine_db_settings['local_dir_map'] = ['Z:', '/export/home/ch21778', '/Volumes/ch21778', '/home/gridsan/ch21778']
+    # LLSC python location
+    # python_location = '/state/partition1/llgrid/pkg/anaconda/anaconda3-2021b/bin/python'
+    # machine_db_settings['python_module_name'] = 'anaconda/2021b'
+    python_location = '/state/partition1/llgrid/pkg/anaconda/anaconda3-2022a/bin/python'
+    machine_db_settings['python_module_name'] = 'anaconda/2022a'
+
+    # local directory mapping. (pc, linux, mac, grid, sgrp_1, sgrp_2, sgrp_3)
+    machine_db_settings['local_dir_map'] = ['Z:', '/export/home/'+USER, '/Volumes/'+USER, '/home/gridsan/'+USER, '/home/gridsan/groups', '/data2/groups', '/state/partition1/user/'+USER]
 
     return machine_db_settings
 

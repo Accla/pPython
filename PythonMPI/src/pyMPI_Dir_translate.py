@@ -36,8 +36,12 @@ def pyMPI_Dir_translate(machine_db,path):
         mac_n    = len(mac_base);
         grid_base = machine_db['local_dir_map'][3]
         grid_n    = len(grid_base);
-        sgrp_1_base = machine_db['local_dir_map'][3]
+        sgrp_1_base = machine_db['local_dir_map'][4]
         sgrp_1_n    = len(sgrp_1_base);
+        sgrp_2_base = machine_db['local_dir_map'][5]
+        sgrp_2_n    = len(sgrp_2_base);
+        sgrp_3_base = machine_db['local_dir_map'][6]
+        sgrp_3_n    = len(sgrp_3_base);
     else:
         print('Error (pyMPI_Dir_translate): local directory map not defined in machine_db (local_dir_map)')
         exit()
