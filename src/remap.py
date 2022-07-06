@@ -29,11 +29,11 @@ def remap(x, new_map):
 
     if len(s) == 2: # 2D array, 2D map
         if is_complex:
-            temp = dcomplex(zeros(s[0], s[1], dmap=new_map),zeros(s[0], s[1], dmap=new_map))
+            temp = dcomplex(zeros(s[0], s[1], map=new_map),zeros(s[0], s[1], map=new_map))
             temp[:,:] = x
             x = temp
         else:
-            temp = zeros(s[0], s[1], dmap=new_map)
+            temp = zeros(s[0], s[1], map=new_map)
             if DEBUG:
                 if isinstance(temp,Dmat):
                     print('local array shape of temp: %s'%(str(temp.local.shape)))
@@ -44,11 +44,11 @@ def remap(x, new_map):
             temp[:,:] = x
             x = temp
     elif len(s) == 3: #3 D array, 3D map
-        temp = zeros(s[0], s[1], s[2], dmap=new_map)
+        temp = zeros(s[0], s[1], s[2], map=new_map)
         temp[:,:,:] = x
         x = temp
     elif len(s) == 4: # 4D array, 4D map
-        temp = zeros(s[0], s[1], s[2], s[3], dmap=new_map)
+        temp = zeros(s[0], s[1], s[2], s[3], map=new_map)
         temp[:,:,:,:] = x
         x = temp
     else:
