@@ -37,7 +37,7 @@ class Dmap:
     """
     name = 'grid_map_class'
     
-    def __init__(self,grid_spec=None,dist_spec=None,proc_list=None,overlap=None,,**kwargs):
+    def __init__(self,grid_spec=None,dist_spec=None,proc_list=None,overlap=None,**kwargs):
         """Init constructor."""
         
         DEBUG = 0
@@ -50,9 +50,10 @@ class Dmap:
             return
         #
         # Check ordering of processor grid
+        order = 'C' # default order
         for key, value in kwargs.items():
-            if key == ‘order’:
-		order = value
+            if key == 'order':
+                order = value
 
         # set the comm as MPI_COMM_WORLD
         comm = pyMCW.MPI_COMM_WORLD

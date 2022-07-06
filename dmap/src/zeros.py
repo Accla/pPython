@@ -34,7 +34,7 @@ def zeros(*array_sizes, **keywords):
     Example:
            Create a 100x10 Dmat of 8-bit signed integers
            p = Dmap([1,Ncpus], {}, range(Ncpus))
-           x = zeros(100, 10, dmap=p, dtype=int8)
+           x = zeros(100, 10, map=p, dtype=int8)
  
     Author:  Nadya Travinin
     Edited:  Edmund L. Wong (elwong@ll.mit.edu)
@@ -70,10 +70,10 @@ def zeros(*array_sizes, **keywords):
         print(dims)
         
     dmap = None
-    if 'dmap' in keywords:
-        if isinstance(keywords['dmap'], Dmap):
-            dmap = keywords['dmap']
-        elif isinstance(keywords['dmap'], int):
+    if 'map' in keywords:
+        if isinstance(keywords['map'], Dmap):
+            dmap = keywords['map']
+        elif isinstance(keywords['map'], int):
             dmap = 1
 
     dtype = np.float64
@@ -85,7 +85,7 @@ def zeros(*array_sizes, **keywords):
         return d
 
     if len(dims) < 5:
-        d = Dmat(dims, dmap=dmap)
+        d = Dmat(dims, map=dmap)
     else:
         print('ERROR(map/zeros): Incorrect number of inputs')
 

@@ -67,10 +67,10 @@ def rand(*array_sizes, **keywords):
         exit()
 
     dmap = None
-    if 'dmap' in keywords:
-        if isinstance(keywords['dmap'], Dmap):
-            dmap = keywords['dmap']
-        elif isinstance(keywords['dmap'], int):
+    if 'map' in keywords:
+        if isinstance(keywords['map'], Dmap):
+            dmap = keywords['map']
+        elif isinstance(keywords['map'], int):
             dmap = 1
 
     dtype = np.float64
@@ -83,7 +83,7 @@ def rand(*array_sizes, **keywords):
         d = np.random.random(dims)
         return d
     
-    d = Dmat(dims, dmap=dmap)
+    d = Dmat(dims, map=dmap)
     local_size = d.local_dim
 
     if DEBUG:

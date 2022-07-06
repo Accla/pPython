@@ -24,7 +24,7 @@ class Dmat:
         Input:
         array_sizes: array sizes
         keywords:
-            'dmap': 1 or distributed map, Dmap object
+            'map': 1 or distributed map, Dmap object
             'dtype': data type of array element
         
         NOTE: DMAT does not allocate memory for the distributed matrix
@@ -98,10 +98,10 @@ class Dmat:
             exit()
     
         dmap = None
-        if 'dmap' in keywords:
-            if isinstance(keywords['dmap'], Dmap):
-                dmap = keywords['dmap']
-            elif isinstance(keywords['dmap'], int):
+        if 'map' in keywords:
+            if isinstance(keywords['map'], Dmap):
+                dmap = keywords['map']
+            elif isinstance(keywords['map'], int):
                 dmap = 1
     
         dtype = np.float64
