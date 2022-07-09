@@ -72,7 +72,15 @@ def check_allowance(n_proc,cpu_type):
         q_avail = q_limit - sum
         # print('Quota limit: %d cores'%(q_limit))
     
-        if q_avail > n_proc:
+        if isinstance(n_proc,list):
+            n_proc_num = n_proc[0]*n_proc[1]
+        elif isinstance(n_proc,int):
+            n_proc_num = n_proc
+        else:
+            print('ERROR(check_allowance): n_proc must be either interger or list')
+            exit()
+
+        if q_avail > n_proc_num:
             # Resource limit can provide the requested resources
             status = 0
         else:
