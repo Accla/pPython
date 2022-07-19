@@ -24,6 +24,8 @@ def pyMPI_Dir_translate(machine_db,path):
     is_mac_path = 0
     is_grid_path = 0
     is_sgrp_1_path = 0
+    is_sgrp_2_path = 0
+    is_sgrp_3_path = 0
 
     # Check if a directory mapping has been defined.
     # If so, convert directory names.
@@ -62,8 +64,14 @@ def pyMPI_Dir_translate(machine_db,path):
     elif re.search(sgrp_1_base,path,re.IGNORECASE):
         n_base = sgrp_1_n
         is_sgrp_1_path = 1
+    elif re.search(sgrp_2_base,path,re.IGNORECASE):
+        n_base = sgrp_2_n
+        is_sgrp_2_path = 1
+    elif re.search(sgrp_3_base,path,re.IGNORECASE):
+        n_base = sgrp_3_n
+        is_sgrp_3_path = 1
     else:
-        print('Error (pyMPI_Dir_translate): given path, %s, is not compatible with local directory map.')
+        print('Error (pyMPI_Dir_translate): given path, %s, is not compatible with local directory map.'%(path))
         exit()
 
     if DEBUG:
@@ -74,7 +82,11 @@ def pyMPI_Dir_translate(machine_db,path):
         if is_grid_path:
             local_path = grid_base + path[n_base:]
         elif is_sgrp_1_path:
-            local_path = sgrp_1__base + path[n_base:]
+            local_path = sgrp_1_base + path[n_base:]
+        elif is_sgrp_2_path:
+            local_path = sgrp_2_base + path[n_base:]
+        elif is_sgrp_3_path:
+            local_path = sgrp_3_base + path[n_base:]
         # in case, local_path has Windows separator in path
         local_path = replace_token("\\","/",local_path)
     else:
