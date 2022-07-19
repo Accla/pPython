@@ -26,10 +26,10 @@ def pLUsolve(A,b):
     Np = GPC.comm_size
     Pid = GPC.my_rank
 
-    [N,N] = list(A.shape)              # Get size of distributed array A.  
+    [N,N] = list(A.shape)             # Get size of distributed array A.  
     #                                   Python index starts from 0. Hene -1
     #                                   global_block_range returns a 2-D array [ 1 or N dimens, 2 (start,end)]
-    myJ  = global_block_range(A,2-1)  # Get the local columns.
+    myJ  = global_block_range(A,1)    # Get the local columns.
 
     # zero_clock = timer()
     L,U,pivots = pLUfactor(A)         # Call parallel LU.
@@ -38,16 +38,17 @@ def pLUsolve(A,b):
     Lloc = local(L)                   # Get local L.
     Uloc = local(U)                   # Get local U.
     x = b[pivots,:]                   # Pivot rows of b.
+    print(x.shape)
 
     for p in range(Np):               # Loop up over each Pid.
-        tag = p%32                    # Set message tag.
+        tag = p%128                    # Set message tag.
         if Pid == p:
-            i = list(range((myJ[0][1]+1),N))          # Upper block of rows.
-            j = list(range((myJ[0][1]-myJ[0][0]+1)))  # Lower block of columns.
-            k = list(range(myJ[0][0],myJ[0][1]+1))    # Middle block of rows.
+            i = range((myJ[0][1]+1),N)          # Upper block of rows.
+            j = range((myJ[0][1]-myJ[0][0]+1))  # Lower block of columns.
+            k = range(myJ[0][0],myJ[0][1]+1)    # Middle block of rows.
             # Python way to extract sub-matrix
             temp_Lloc = Lloc[k[0]:k[-1]+1,j[0]:j[-1]+1]
-            x[k,:] = np.linalg.solve(temp_Lloc,x[k,:]) # Solve L x' = x.
+            x[k] = np.linalg.solve(temp_Lloc,x[k,:]) # Solve L x' = x.
             # Python way to extract sub-matrix
             if len(i)>0:
                 temp_Lloc = Lloc[i[0]:i[-1]+1,j[0]:j[-1]+1]
@@ -62,14 +63,14 @@ def pLUsolve(A,b):
             [x] = RecvMsg(p,tag)      # Recv x from the lower Pid.
                            
     for p in range((Np-1),-1,-1):     # Loop down over each Pid.
-        tag = p%32                    # Set message tag.
+        tag = p%128                    # Set message tag.
         if Pid == p:
-            i = list(range(myJ[0][0]))                 # Upper block of rows.
-            j = list(range((myJ[0][1]-myJ[0][0]+1)))   # Lower block of columns.
-            k = list(range(myJ[0][0],myJ[0][1]+1))     # Middle block of rows.
+            i = range(myJ[0][0])                 # Upper block of rows.
+            j = range((myJ[0][1]-myJ[0][0]+1))   # Lower block of columns.
+            k = range(myJ[0][0],myJ[0][1]+1)     # Middle block of rows.
             # Python way to extract sub-matrix
             temp_Uloc = Uloc[k[0]:k[-1]+1,j[0]:j[-1]+1]
-            x[k,:] = np.linalg.solve(temp_Uloc,x[k,:]) # Solve U x' = x.
+            x[k] = np.linalg.solve(temp_Uloc,x[k,:]) # Solve U x' = x.
             if len(i)>0:
                 temp_Uloc = Uloc[i[0]:i[-1]+1,j[0]:j[-1]+1]
                 x[i,:] = x[i,:] - np.matmul(temp_Uloc,x[k,:])

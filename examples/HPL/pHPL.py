@@ -1,4 +1,5 @@
 import numpy as np
+from math import floor,sqrt
 from timeit import default_timer as timer
 
 # Import pPython methods.
@@ -35,7 +36,7 @@ Pid = GPC.my_rank
 
 # Turn parallelism on or off.
 PARALLEL = 1  # Can be 1 or 0.
-VERIFY = 1
+VERIFY = 0
 
 Amap = 1                                   # Serial map.
 if PARALLEL:
