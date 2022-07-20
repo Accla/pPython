@@ -4,6 +4,7 @@ import sys
 
 # Set pPython & PythonMPI search path and import it
 PPYTHON_HOME = os.getenv('PPYTHON_HOME')
+PPYTHON_PATH = PPYTHON_HOME+os.sep+'src'
 if not PPYTHON_HOME:
     print('ERROR(pRUN): PPYTHON_HOME is not set.')
     exit()
@@ -17,9 +18,9 @@ PYTHONMPI_PATH = PPYTHON_HOME+os.sep+'PythonMPI'+os.sep+'src'
 sys.path.append(PYTHONMPI_PATH)
 
 # Additional paths for distributed map and array support
-DMAP_PATH = PPYTHON_HOME+os.sep+'dmap'+os.sep+'src'
+DMAP_PATH = PPYTHON_PATH+os.sep+'dmap'
 sys.path.append(DMAP_PATH)
-DMAT_PATH = PPYTHON_HOME+os.sep+'dmat'+os.sep+'src'
+DMAT_PATH = PPYTHON_PATH+os.sep+'dmat'
 sys.path.append(DMAT_PATH)
 
 # Additional path for gridPython (code for scheduler integration)
@@ -39,7 +40,6 @@ if not os.path.exists(USER_PYTHONMPI_PATH):
     exit()
 sys.path.append(USER_PYTHONMPI_PATH)
 
-PPYTHON_PATH = PPYTHON_HOME+os.sep+'src'
 sys.path.append(PPYTHON_PATH)
 
 # for p in sys.path:
