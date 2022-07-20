@@ -34,7 +34,7 @@ def pyMPI_Buffer_file(source,dest,tag,comm):
 
     # string concatenation
     sep = os.sep
-    buffer_file = dir+sep+'p'+str(source)+'_p'+str(dest)+'_t'+str(tag)+'_buffer.h5'
+    buffer_file = dir+sep+'p'+str(source)+'_p'+str(dest)+'_t'+str(tag)+'_buffer.pkl'
 
     if DEBUG:
         print('<-- exiting pyMPI_Buffer_file:')

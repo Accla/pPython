@@ -1,6 +1,6 @@
 import os
+from dict_with_pickle import load_dict_from_pickle
 
-from dict_to_hdf5 import *
 from StopExecution import *
 from pyMPI_Buffer_file import *
 from pyMPI_Lock_file import *
@@ -47,7 +47,7 @@ def MPI_Recv( source, tag, comm ):
         loop = loop + 1
             
     # Read all data out of buffer_file.
-    buf = load_dict_from_hdf5(buffer_file)
+    buf = load_dict_from_pickle(buffer_file)
     
     # Delete buffer and lock files.
     if (not(comm['save_message_flag'])):

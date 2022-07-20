@@ -1,5 +1,5 @@
 import checkOS as OS
-from dict_to_hdf5 import *
+from dict_with_pickle import save_dict_to_pickle
 from StopExecution import *
 from pyMPI_Buffer_file import *
 from pyMPI_Lock_file import *
@@ -54,7 +54,7 @@ def MPI_Mcast(source, dest, tag, comm, *argv):
             msg[ii] = arg
             ii = ii + 1
         # Write the message into a file.
-        save_dict_to_hdf5(msg, buffer_file)   
+        save_dict_to_pickle(msg, buffer_file)   
         
         # Loop over everyone in comm and create link to data file.
         if (OS.ispc):

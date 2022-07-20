@@ -24,7 +24,7 @@ def pyMPI_Lock_file(source,dest,tag,comm):
 
     # string concatenation
     sep = os.sep
-    lock_file = dir+sep+'p'+str(source)+'_p'+str(dest)+'_t'+str(tag)+'_lock.h5'
+    lock_file = dir+sep+'p'+str(source)+'_p'+str(dest)+'_t'+str(tag)+'_lock.pkl'
 
     return lock_file
 

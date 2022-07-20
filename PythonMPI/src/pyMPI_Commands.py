@@ -58,7 +58,7 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD):
     # Create filename each Python job will run at startup.
     defsbase = 'PythonMPI/PythonMPIdefs' + str(rank)
     defsfile = defsbase + '.py'
-    comm_f5_file = 'PythonMPI/MPI_COMM_WORLD.h5'
+    comm_pkl_file = 'PythonMPI/MPI_COMM_WORLD.pkl'
 
     # Replace my_script_file with py_file basename (withoutt .py)
     outfile = 'PythonMPI/' + py_file + '.' + str(rank) +'.out'
@@ -104,9 +104,9 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD):
     commands[0] = commands[0]+'os.environ["HDF5_USE_FILE_LOCKING"]="FALSE"' + nl
     # commands[0] = commands[0]+'from PythonMPI import *' + nl
     commands[0] = commands[0]+'import pyMPI_COMM_WORLD as pyMCW' + nl
-    commands[0] = commands[0]+'from dict_to_hdf5 import *' + nl
+    commands[0] = commands[0]+'from dict_with_pickle import load_dict_from_pickle' + nl
     commands[1] = 'from pPython_init import *' + nl
-    commands[2] = 'pyMCW.MPI_COMM_WORLD = load_dict_from_hdf5('+q+comm_f5_file+q+')' + nl
+    commands[2] = 'pyMCW.MPI_COMM_WORLD = load_dict_from_pickle('+q+comm_pkl_file+q+')' + nl
     commands[3] = 'pyMCW.MPI_COMM_WORLD['+q+'rank'+q+'] = ' + str(rank) + nl
     # Additional to define global variables: 
     commands[3] = commands[3]+'pPython_init()' + nl

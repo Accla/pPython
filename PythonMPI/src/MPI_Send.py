@@ -1,5 +1,7 @@
 #
-from dict_to_hdf5 import *
+from dict_with_pickle import save_dict_to_pickle
+
+from StopExecution import *
 from pyMPI_Buffer_file import *
 from pyMPI_Lock_file import *
 from MPI_Comm_rank import *
@@ -47,7 +49,7 @@ def MPI_Send(dest, tag, comm, *argv):
     if DEBUG:
         print(msg.values())
     try:
-        save_dict_to_hdf5(msg, buffer_file)   
+        save_dict_to_pickle(msg,buffer_file)
     except:
         print('MPI_Send: fail to create a message file')
         raise StopExecution
@@ -68,9 +70,6 @@ def MPI_Send(dest, tag, comm, *argv):
             raise StopExecution
         loop = loop + 1
 
-
-
-
-
     if DEBUG:
         print('<-- Exiting MPI_Send')
+

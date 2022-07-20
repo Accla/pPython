@@ -7,7 +7,7 @@ import os
 
 # Define global isunix, ismac, islinux, ispc 
 import checkOS as OS
-from dict_to_hdf5 import *
+from dict_with_pickle import save_dict_to_pickle
 from pyMPI_Comm_settings import *
 from pyMPI_Dir_map import *
 
@@ -186,8 +186,8 @@ def pyMPI_Comm_init(n_proc,machines):
         print('MPI_COMM_WORLD')
         print(MPI_COMM_WORLD)
     # Write out.
-    comm_h5_file = 'PythonMPI/MPI_COMM_WORLD.h5'
-    save_dict_to_hdf5(MPI_COMM_WORLD, comm_h5_file)   
+    comm_pkl_file = 'PythonMPI/MPI_COMM_WORLD.pkl'
+    save_dict_to_pickle(MPI_COMM_WORLD, comm_pkl_file)   
                    
     if DEBUG:
         print('<-- Exiting pyMPI_Comm_init')
