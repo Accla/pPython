@@ -94,7 +94,7 @@ def grid_config_local(grid_config):
     CWD_PATH = os.getcwd()
 
     # Additional paths for PGAS using the distributed map and array construction
-    DMAP_PATH = PPYTHON_PATH+os.sep+"dmap"
+    DMAP_PATH = PPYTHON_PATH+os.sep+"map"
     DMAT_PATH = PPYTHON_PATH+os.sep+"dmat"
 
     # Save in the grid_config variable

@@ -18,7 +18,7 @@ PYTHONMPI_PATH = PPYTHON_HOME+os.sep+'PythonMPI'+os.sep+'src'
 sys.path.append(PYTHONMPI_PATH)
 
 # Additional paths for distributed map and array support
-DMAP_PATH = PPYTHON_PATH+os.sep+'dmap'
+DMAP_PATH = PPYTHON_PATH+os.sep+'map'
 sys.path.append(DMAP_PATH)
 DMAT_PATH = PPYTHON_PATH+os.sep+'dmat'
 sys.path.append(DMAT_PATH)
