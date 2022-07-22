@@ -54,18 +54,17 @@ def agg(d, leader=None):
             # dim[0] - number of grid rows, dim[1] - number of grid cols
             temp_mat = dict()
             for i in range(dim[0]):
-                temp_mat[str(i)] = dict()
+                temp_mat[i] = dict()
                 for j in range(dim[1]):
                     if (GPC.my_rank==d.map.grid[i][j]):
-                        temp_mat[str(i)][str(j)] = d.local
+                        temp_mat[i][j] = d.local
                         if DEBUG>2:
                             print('Local array, d.local:')
                             print('type(d.local): %s'%(type(d.local)))
                             print('type(d.local[0,0]): %s'%(type(d.local[0,0])))
-
                     else:
                         [temp] = MPI_Recv(d.map.grid[i][j], GPC.tag, GPC.comm)
-                        temp_mat[str(i)][str(j)] = temp
+                        temp_mat[i][j] = temp
                         if DEBUG>2:
                             print('Leader received msg for (i,j) = (%d,%d) from Pid, %d, with the tag, %s.'%(i,j,d.map.grid[i][j],GPC.tag))
                             print('Received array, temp:')
@@ -79,27 +78,52 @@ def agg(d, leader=None):
             # dim[2] - number of grid 3rd dimension
             temp_mat = dict()
             for i in range(dim[0]):
-                temp_mat[str(i)] = dict()
+                temp_mat[i] = dict()
                 for j in range(dim[1]):
-                    temp_mat[str(i)][str(j)] = dict()
+                    temp_mat[i][j] = dict()
                     for k in range(dim[2]):
                         if (GPC.my_rank==d.map.grid[i][j][k]):
-                            temp_mat[str(i)][str(j)][str(k)] = d.local
+                            temp_mat[i][j][k] = d.local
                             if DEBUG>2:
                                 print('Local array, d.local:')
                                 print('type(d.local): %s'%(type(d.local)))
                                 print('type(d.local[0,0,0]): %s'%(type(d.local[0,0,0])))
                         else:
                             [temp] = MPI_Recv(d.map.grid[i][j][k], GPC.tag, GPC.comm)
-                            temp_mat[str(i)][str(j)][str(k)] = temp
+                            temp_mat[i][j][k] = temp
                             if DEBUG>2:
-                                print('Leader received msg for (i,j,k) = (%d,%d,%d) from Pid, %d, with the tag, %s.'%(i,j,d.map.grid[i][j][k],GPC.tag))
+                                print('Leader received msg for (i,j,k) = (%d,%d,%d) from Pid, %d, with the tag, %s.'%(i,j,k,d.map.grid[i][j][k],GPC.tag))
                                 print('Received array, temp:')
                                 print('type(temp): %s'%(type(temp)))
                                 print('type(temp[0,0,0]): %s'%(type(temp[0,0,0])))
         else:
-            print('ERROR(agg): map dimension, %d, is not yet supported.'%(d.dim))
-            
+            if DEBUG:
+                print('DMAT is 4-D')
+            dim = d.map.grid.shape
+            # dim[0] - number of grid rows, dim[1] - number of grid cols
+            # dim[2] - number of grid 3rd dimension
+            temp_mat = dict()
+            for i in range(dim[0]):
+                temp_mat[i] = dict()
+                for j in range(dim[1]):
+                    temp_mat[i][j] = dict()
+                    for k in range(dim[2]):
+                        temp_mat[i][j][k] = dict()
+                        for m in range(dim[3]):
+                            if (GPC.my_rank==d.map.grid[i][j][k][m]):
+                                temp_mat[i][j][k][m] = d.local
+                                if DEBUG>2:
+                                    print('Local array, d.local:')
+                                    print('type(d.local): %s'%(type(d.local)))
+                                    print('type(d.local[0,0,0,0]): %s'%(type(d.local[0,0,0,0])))
+                            else:
+                                [temp] = MPI_Recv(d.map.grid[i][j][k][m], GPC.tag, GPC.comm)
+                                temp_mat[i][j][k][m] = temp
+                                if DEBUG>2:
+                                    print('Leader received msg for (i,j,k,m) = (%d,%d,%d,%d) from Pid, %d, with the tag, %s.'%(i,j,k,m,d.map.grid[i][j][k][m],GPC.tag))
+                                    print('Received array, temp:')
+                                    print('type(temp): %s'%(type(temp)))
+                                    print('type(temp[0,0,0]): %s'%(type(temp[0,0,0,0])))
         if DEBUG>2:
             print('Leader: type of the received temp_mat is %s.'%(type(temp_mat)))
             print('The lengtth ofthe received temp_mat is %d.'%(len(temp_mat)))

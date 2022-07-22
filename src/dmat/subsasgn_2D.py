@@ -42,7 +42,7 @@ def subsasgn_2D(a,s,b):
                 # A[:,:] = B
                 if (size(b) == a.shape): 
                     # dimensions are the same in global
-                    a.local[:,:] = b[a.global_ind['0']][:,a.global_ind['1']]
+                    a.local[:,:] = b[a.global_ind[0]][:,a.global_ind[1]]
                 elif (size(b)==[1,1]):   
                     # b is a scalar
                     a.local[:,:] = b
@@ -185,7 +185,7 @@ def subsasgn_2D(a,s,b):
                                         for r in range(len(data)):
                                             ind = a_local_ind[r]
                                             # Different behavior compared to Matlab: a.local[ind[0], ind[1]] = data[r]
-                                            a.local[slice(ind[0][0],ind[0][-1]+1),slice(ind[1][0],ind[1][-1]+1)] = data[str(r)]
+                                            a.local[slice(ind[0][0],ind[0][-1]+1),slice(ind[1][0],ind[1][-1]+1)] = data[r]
                             elif b.map.proc_list[p1] == a.map.proc_list[p2]: # no comm
                                 if GPC.my_rank==a.map.proc_list[p2]:
                                     if len(b_row_fi[p2])>0 and len(b_col_fi[p2])>0:
@@ -198,7 +198,7 @@ def subsasgn_2D(a,s,b):
                                         for r in range(len(data)):
                                             ind = a_local_ind[r]
                                             # Different behavior compared to Matlab: a.local[ind[0], ind[1]] = data[r]
-                                            a.local[slice(ind[0][0],ind[0][-1]+1),slice(ind[1][0],ind[1][-1]+1)] = data[str(r)]
+                                            a.local[slice(ind[0][0],ind[0][-1]+1),slice(ind[1][0],ind[1][-1]+1)] = data[r]
                         # the local processor is either in a's or b's map, otherwise should just fall through
                     # iterate thorugh a's processor list
                 # iterate through b's processor list

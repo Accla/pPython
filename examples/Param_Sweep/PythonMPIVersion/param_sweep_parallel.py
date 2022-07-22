@@ -41,7 +41,7 @@ d_index,d_sizes = partition_1d(n,n_procs)
 z = np.zeros((n, m),dtype=float)
 
 # Get the local portion of the global indices
-my_i_global = range(d_index[str(my_rank)]['beg'],d_index[str(my_rank)]['end']+1)
+my_i_global = range(d_index[my_rank]['beg'],d_index[my_rank]['end']+1)
 
 # Get the local portion of the distributed matrix
 my_z = z[my_i_global,:]

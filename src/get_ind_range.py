@@ -16,19 +16,19 @@ def get_ind_range(a,s):
     
     ind = dict()
     if len(s['subs'])==2: # 2-D
-        ind['0'] = s['subs'][0]
-        ind['1'] = s['subs'][1]
+        ind[0] = s['subs'][0]
+        ind[1] = s['subs'][1]
 
     elif len(s['subs'])==3: # 3-D
-        ind['0'] = s['subs'][0]
-        ind['1'] = s['subs'][1]
-        ind['2'] = s['subs'][2]
+        ind[0] = s['subs'][0]
+        ind[1] = s['subs'][1]
+        ind[2] = s['subs'][2]
 
     elif len(s['subs'])==4: # 4-D
-        ind['0'] = s['subs'][0]
-        ind['1'] = s['subs'][1]
-        ind['2'] = s['subs'][2]
-        ind['3'] = s['subs'][3]
+        ind[0] = s['subs'][0]
+        ind[1] = s['subs'][1]
+        ind[2] = s['subs'][2]
+        ind[3] = s['subs'][3]
 
     else:
         print('GET_IND_RANGE: Only up to 4 dimensional objects are supported.')

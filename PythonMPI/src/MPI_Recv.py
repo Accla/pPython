@@ -46,6 +46,15 @@ def MPI_Recv( source, tag, comm ):
             raise StopExecution
         loop = loop + 1
             
+    # Spin on buffer file until it is created.
+    loop = 0;
+    while os.path.exists(buffer_file) == False :
+        # Sleep statement allows cleaner profiling, but adds latency.
+        pyMPI_Sleep(0.2);
+        if loop > 100:
+            print('MPI_Recv: failed to find the %s file.'%(buffer_file))
+            raise StopExecution
+        loop = loop + 1
     # Read all data out of buffer_file.
     buf = load_dict_from_pickle(buffer_file)
     

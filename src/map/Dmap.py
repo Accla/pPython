@@ -71,8 +71,8 @@ class Dmap:
                 # default distribution is block
                 dist_spec = dict()
                 for d in range(len(grid_spec)):
-                    dist_spec[str(d)] = dict()
-                    dist_spec[str(d)]['dist'] ='b'
+                    dist_spec[d] = dict()
+                    dist_spec[d]['dist'] ='b'
             elif isinstance(dist_spec,str):
                 if dist_spec == 'bc':
                     print('ERROR (Dmap): block-cyclic distribution also needs block size.')
@@ -81,8 +81,8 @@ class Dmap:
                 tmp_dist_spec = dist_spec
                 dist_spec = dict()
                 for d in range(len(grid_spec)):
-                    dist_spec[str(d)] = dict()
-                    dist_spec[str(d)]['dist'] = tmp_dist_spec
+                    dist_spec[d] = dict()
+                    dist_spec[d]['dist'] = tmp_dist_spec
             elif any(map(lambda x: isinstance(x,dict),dist_spec.values())):
                 # distribution spec is provided for all directions individually
                 # dist_spec = {'0': {'dist': 'bc', 'b_size': 3}, '1': {'dist': 'b'}}
@@ -97,19 +97,19 @@ class Dmap:
                 tmp_dist_spec = dist_spec
                 dist_spec = dict()
                 for d in range(len(grid_spec)):
-                    dist_spec[str(d)] = tmp_dist_spec
+                    dist_spec[d] = tmp_dist_spec
             # check for distribution spec
             for i in range(dim):
                 # check that distributions defined are consistent with {'b', 'c', 'bc'}
-                if (dist_spec[str(i)]['dist'] != 'b') \
-                and (dist_spec[str(i)]['dist'] != 'c') \
-                and (dist_spec[str(i)]['dist'] != 'bc'):
-                    print('ERROR (Dmap): %s is not a valid distribution'%(dist_spec[str(i)]['dist']))
+                if (dist_spec[i]['dist'] != 'b') \
+                and (dist_spec[i]['dist'] != 'c') \
+                and (dist_spec[i]['dist'] != 'bc'):
+                    print('ERROR (Dmap): %s is not a valid distribution'%(dist_spec[i]['dist']))
                     exit()
                 else:
                     # check that block size is defined for block-cyclic distributions
-                    if dist_spec[str(i)]['dist'] == 'bc':
-                        if (not 'b_size' in dist_spec[str(i)]) or (dist_spec[str(i)]['b_size'] < 1):
+                    if dist_spec[i]['dist'] == 'bc':
+                        if (not 'b_size' in dist_spec[i]) or (dist_spec[i]['b_size'] < 1):
                             print('ERROR (Dmap): Block size must be specified for block-cyclic distibution')
                             exit()
             self.dist_spec = dist_spec
@@ -158,8 +158,8 @@ class Dmap:
                 # default distribution is block
                 dist_spec = dict()
                 for d in range(len(grid_spec)):
-                    dist_spec[str(d)] = dict()
-                    dist_spec[str(d)]['dist'] ='b'
+                    dist_spec[d] = dict()
+                    dist_spec[d]['dist'] ='b'
             elif isinstance(dist_spec,str):
                 # if only one distribution is provided, then all dimensions are
                 # distributed that way
@@ -168,14 +168,14 @@ class Dmap:
                     tmp_dist_spec = dist_spec
                     dist_spec = dict()
                     for d in range(len(grid_spec)):
-                        dist_spec[str(d)] = dict()
-                        dist_spec[str(d)]['dist'] = tmp_dist_spec
+                        dist_spec[d] = dict()
+                        dist_spec[d]['dist'] = tmp_dist_spec
                 else:
                     print('ERROR (Dmap): Overlap is only supported for block distributions.')
                     exit()
             elif any(map(lambda x: isinstance(x,dict),dist_spec.values())):
                 # distribution spec is provided for all directions individually
-                # dist_spec = {'0': {'dist': 'bc', 'b_size': 3}, '1': {'dist': 'b'}}
+                # dist_spec = {0: {'dist': 'bc', 'b_size': 3}, 1: {'dist': 'b'}}
                 if len(grid_spec) != len(dist_spec):
                     print('ERROR (Dmap): dimension does not match between grid_spec and dist_spec.')
                     exit()
@@ -191,11 +191,11 @@ class Dmap:
                 tmp_dist_spec = dist_spec
                 dist_spec = dict()
                 for d in range(len(grid_spec)):
-                    dist_spec[str(d)] = tmp_dist_spec
+                    dist_spec[d] = tmp_dist_spec
             # check for distribution  for all directions (dimensions)
             for i in range(dim):
                 # check that distributions defined are consistent with {'b', 'c', 'bc'}
-                if dist_spec[str(i)]['dist'] != 'b':
+                if dist_spec[i]['dist'] != 'b':
                     print('ERROR (Dmap): Overlap is only supported for block distributions.')
                     exit()
             self.dist_spec = dist_spec

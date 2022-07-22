@@ -15,7 +15,7 @@ def agg_msg(z,my_z,d_index,leader,tag,comm):
     
     # Update my own results:
     my_rank = MPI_Comm_rank(comm)
-    my_i_global = range(d_index[str(my_rank)]['beg'],d_index[str(my_rank)]['end']+1)
+    my_i_global = range(d_index[my_rank]['beg'],d_index[my_rank]['end']+1)
     z[my_i_global,:] = my_z
 
     if my_rank == leader:
@@ -41,7 +41,7 @@ def agg_msg(z,my_z,d_index,leader,tag,comm):
                     [t1] = MPI_Recv(src,tag,comm)
                     # Reshape t1 to update a column vector
                     # Note the python index is from 0 to N-1
-                    my_i_global = range(d_index[str(src)]['beg'],d_index[str(src)]['end']+1)
+                    my_i_global = range(d_index[src]['beg'],d_index[src]['end']+1)
                     z[my_i_global,:] = t1
                     print('Received data packet number %d' %(recv_count))
                     recv_count = recv_count + 1

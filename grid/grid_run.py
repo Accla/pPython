@@ -196,10 +196,10 @@ def grid_run( py_file, n_proc, machines ):
 
         if (n_proc_i_m >= 1):
             # Get machine name, remote lauch command & flags, and type.
-            machine = pyMCW.MPI_COMM_WORLD['machine_db']['machine'][imstrm1]
-            remote_launch = pyMCW.MPI_COMM_WORLD['machine_db']['remote_launch'][imstrm1]
-            remote_flags = pyMCW.MPI_COMM_WORLD['machine_db']['remote_flags'][imstrm1]
-            type = pyMCW.MPI_COMM_WORLD['machine_db']['type'][imstrm1]
+            machine = pyMCW.MPI_COMM_WORLD['machine_db']['machine'][i_m-1]
+            remote_launch = pyMCW.MPI_COMM_WORLD['machine_db']['remote_launch'][i_m-1]
+            remote_flags = pyMCW.MPI_COMM_WORLD['machine_db']['remote_flags'][i_m-1]
+            type = pyMCW.MPI_COMM_WORLD['machine_db']['type'][i_m-1]
 
             # Set file extension of launch script to be run on
             # this target.

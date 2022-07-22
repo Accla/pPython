@@ -8,30 +8,23 @@ def convert_to_dict(input,host):
     host:  local machine name (dtype: str)
     output: a dictionary variable (dtype: dictionary)
     
-    Note: it turns out that any integer keys are turned into strings once it is loaded from 
-    a saved dictionary variable.  Use string keys always.
-    
-    Note: Convert any integer keys into string keys
-    
     """
     
     output = dict()
     if len(input) == 0:    # empty machines list, running locally
-        output = {'0':host}
+        output = {0:host}
         return output
     
     if type(input) == type(set()) or type(input) == type(list()):
         ii = 0
         for machine in input:
-            iistr = str(ii)
-            output[iistr] = machine
+            output[ii] = machine
             ii = ii + 1
         return output
     elif type(input) == type(dict()):
         ii = 0
         for machine in input:
-            iistr = str(ii)
-            output[iistr] = machine
+            output[ii] = machine
             ii = ii + 1
         return output
     else:

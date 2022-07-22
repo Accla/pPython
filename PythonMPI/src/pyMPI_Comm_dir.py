@@ -14,7 +14,6 @@ def pyMPI_Comm_dir(old_comm,dir):
     n = new_comm['machine_db']['n_machine']
 
     for ii in range(n):
-        iistr = str(ii)
-        new_comm['machine_db']['dir'][iistr] = dir
+        new_comm['machine_db']['dir'][ii] = dir
 
     return new_comm

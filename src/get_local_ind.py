@@ -9,7 +9,7 @@ def get_local_ind(global_ind, ind):
     that are being referenced.
     
     GET_LOCAL_IND(GLOBAL_IND, IND)
-    GLOBAL_IND - a dictionary with numeric string key of length equal to the number of dimensions.
+    GLOBAL_IND - a dictionary with numeric key of length equal to the number of dimensions.
     Each entry in the array specifies the global indices in the i-th
     dimension stored on the current processor.
     
@@ -22,7 +22,7 @@ def get_local_ind(global_ind, ind):
     LOCAL_IND[i] is of the form [ind1 ind2 ind3 ...] where ind_i is a
     local index of the data stored locally.
     
-    LOCAL_IND is a python dictionary with the numeric key for each dimension
+    LOCAL_IND is a Python dictionary with the numeric key for each dimension
     
     Python version: Dr. Chansup Byun
     Author:   Nadya Travinin
@@ -40,24 +40,24 @@ def get_local_ind(global_ind, ind):
     if dim <= 4: # number of dimensions of the distributed object is 4 or less
         for i in range(dim):
             local_ind[i] = []
-            if global_ind[str(i)] == ':': 
+            if global_ind[i] == ':': 
                 # dimension i is not distributed
-                loc_inds = ind[str(i)]
+                loc_inds = ind[i]
             else:  
                 # dimension i is distributed
-                if ind[str(i)] == ':':
+                if ind[i] == ':':
                     loc_inds = ':'
                 else:
-                    if isinstance(ind[str(i)],slice):
+                    if isinstance(ind[i],slice):
                         # Convert to a list of index
-                        ind_list = list(range(ind[str(i)].stop)[ind[str(i)]])
+                        ind_list = list(range(ind[i].stop)[ind[i]])
                     else:
                         # assuming it is a list already
-                        ind_list = ind[str(i)]
+                        ind_list = ind[i]
                     # PRESERVES THE ORDERING OF INDICES
                     loc_inds = []
                     #  vvvvv new code vvvvv
-                    [vals, i_global, i_ind] = intersect_mtlb(global_ind[str(i)], ind_list)
+                    [vals, i_global, i_ind] = intersect_mtlb(global_ind[i], ind_list)
                     i_ind_sorted = np.argsort(i_ind)
                     ind_sorted = i_ind[i_ind_sorted]
                     loc_inds = i_global[i_ind_sorted]

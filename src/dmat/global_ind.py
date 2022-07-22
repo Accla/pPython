@@ -47,11 +47,11 @@ def global_ind(d, dim=None):
             print(s)
     
         if len(dims)==1:
-            local_ind = my_inds[str(dims[0])]
+            local_ind = my_inds[dims[0]]
         else:
             local_ind = []
             for i in range(len(dims)):
-                local_ind.append(my_inds[str(dims[i])])
+                local_ind.append(my_inds[dims[i]])
     else:
         #
         # non-distributed array

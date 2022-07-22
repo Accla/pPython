@@ -118,7 +118,8 @@ class Dmat:
         
         self.map = dmap
         self.dim = len(dims)
-        #obsolete self.size = dims
+        # Use 'shape' instead of 'size' in order to be compatible with a NumPy array
+        # Deprecated: self.size = dims
         self.shape = dims
         if isinstance(dmap,Dmap) and (dmap.dim != len(dims)):
             print('ERROR(Dmat): Map and distributed object dimensions must match')
@@ -130,23 +131,23 @@ class Dmat:
             if DEBUG:
                 print('Dmat: axis, i = %d'%(i))
                 print(dmap.grid.shape[i])
-                print(dmap.dist_spec[str(i)])
+                print(dmap.dist_spec[i])
                 print(dims[i])
             if not (dmap.overlap):
                 # dmap.grid.shape: tuple of the dim length
                 # dmap.dist_spec: a dictionary of dictoary with key in str(dim)
                 # print('no overlap')
-                pitfalls.append(gen_pitfalls(dmap.grid.shape[i], dmap.dist_spec[str(i)], dims[i]))
+                pitfalls.append(gen_pitfalls(dmap.grid.shape[i], dmap.dist_spec[i], dims[i]))
             elif dmap.overlap[i]==0:
                 # Same as not defined dmap.overlap
                 # print('zero overlap')
-                pitfalls.append(gen_pitfalls(dmap.grid.shape[i], dmap.dist_spec[str(i)], dims[i]))
+                pitfalls.append(gen_pitfalls(dmap.grid.shape[i], dmap.dist_spec[i], dims[i]))
             else:
                 # non-zero dmap.overlap is defined.
                 if DEBUG:
                     print('non-zero overlap')
                     print('dmap.overlap: %d in axis, i = %d'%(dmap.overlap[i],i))
-                pitfalls.append(gen_pitfalls(dmap.grid.shape[i], dmap.dist_spec[str(i)], dims[i], dmap.overlap[i]))
+                pitfalls.append(gen_pitfalls(dmap.grid.shape[i], dmap.dist_spec[i], dims[i], dmap.overlap[i]))
         
         self.pitfalls = pitfalls
         if DEBUG:
@@ -192,7 +193,7 @@ class Dmat:
     def __setitem__(self, index, d):
         """Implement __setitem__ with Dmat()
            d: RHS distributed array, Dmat 
-           self: LHS distributed array, Dmat object, to be set by b 
+           self: LHS distributed array, Dmat object, to be set by d 
         """
         # Invoke Python equivalent function similar to a MATLAB subsasgn operator 
         DEBUG = 0
@@ -230,11 +231,51 @@ class Dmat:
                     print(type(index[0]))
                     exit()
             elif len(index)==3: # 3-D distributed array
-                print('Dmat: 3-D assignment, nOt implemented yet.')
-                exit()
+                if index[0]==slice(None, None, None) and index[1]==slice(None, None, None) and index[2]==slice(None, None, None):
+                    ss['type'] = '()'
+                    ss['subs'] = dict()
+                    ss['subs'][0] = ':'
+                    ss['subs'][1] = ':'
+                    ss['subs'][2] = ':'
+                    s.append(ss)
+                elif isinstance(index[0],(np.int32,int)) and isinstance(index[1],(np.int32,int)) and isinstance(index[2],(np.int32,int)):
+                    if DEBUG:
+                        print('Dmat: single element update')
+                    ss['type'] = '()'
+                    ss['subs'] = dict()
+                    ss['subs'][0] = slice(index[0],index[0]+1,None)
+                    ss['subs'][1] = slice(index[1],index[1]+1,None)
+                    ss['subs'][2] = slice(index[2],index[2]+1,None)
+                    s.append(ss)
+                else:
+                    print('Dmat: 3-D assignment, not implemented this index type yet.')
+                    print('type(index[0]')
+                    print(type(index[0]))
+                    exit()
             elif len(index)==4: # 4-D distributed array
-                print('Dmat: 4-D assignment, nOt implemented yet.')
-                exit()
+                if index[0]==slice(None, None, None) and index[1]==slice(None, None, None) and index[2]==slice(None, None, None) and index[3]==slice(None, None, None):
+                    ss['type'] = '()'
+                    ss['subs'] = dict()
+                    ss['subs'][0] = ':'
+                    ss['subs'][1] = ':'
+                    ss['subs'][2] = ':'
+                    ss['subs'][3] = ':'
+                    s.append(ss)
+                elif isinstance(index[0],(np.int32,int)) and isinstance(index[1],(np.int32,int)) and isinstance(index[2],(np.int32,int)) and isinstance(index[3],(np.int32,int)):
+                    if DEBUG:
+                        print('Dmat: single element update')
+                    ss['type'] = '()'
+                    ss['subs'] = dict()
+                    ss['subs'][0] = slice(index[0],index[0]+1,None)
+                    ss['subs'][1] = slice(index[1],index[1]+1,None)
+                    ss['subs'][2] = slice(index[2],index[2]+1,None)
+                    ss['subs'][3] = slice(index[3],index[3]+1,None)
+                    s.append(ss)
+                else:
+                    print('Dmat: 4-D assignment, not implemented this index type yet.')
+                    print('type(index[0]')
+                    print(type(index[0]))
+                    exit()
             else: # unsupported distributed array dimension
                 print('Dmat: supported distributed dimension.')
                 exit()

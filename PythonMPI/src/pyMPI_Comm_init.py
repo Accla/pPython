@@ -95,14 +95,13 @@ def pyMPI_Comm_init(n_proc,machines):
 
     # Set machine_db values.
     for ii in range(n_m):
-        iistr = str(ii)
         # ii now starts from 0 instead of 1
-        machine_db['type'][iistr] = default_type;
-        # redundant machine_db['machine'][iistr] = host;
-        machine_db['dir'][iistr] = pwd+sep+'PythonMPI'
-        # machine_db['python_command'][iistr] = machine_db_settings['python_command']
-        machine_db['remote_launch'][iistr] = machine_db_settings['remote_launch']
-        machine_db['remote_flags'][iistr]  = machine_db_settings['remote_flags']
+        machine_db['type'][ii] = default_type;
+        # redundant machine_db['machine'][ii] = host;
+        machine_db['dir'][ii] = pwd+sep+'PythonMPI'
+        # machine_db['python_command'][ii] = machine_db_settings['python_command']
+        machine_db['remote_launch'][ii] = machine_db_settings['remote_launch']
+        machine_db['remote_flags'][ii]  = machine_db_settings['remote_flags']
        
         # Starting index is zero with python
         if ii == 0:
@@ -122,58 +121,58 @@ def pyMPI_Comm_init(n_proc,machines):
 
         # Check if there is a machines list.
         if (n_machines > 0):
-            machine = machines[iistr]
+            machine = machines[ii]
             # Check if there is a directory appended.
             dir_sep = re.search(':',machine)
             if (dir_sep):
-                machine_db['machine'][iistr] = machine[0:dir_sep.start()]
-                machine_db['dir'][iistr]     = machine[dir_sep.start()+1:]
+                machine_db['machine'][ii] = machine[0:dir_sep.start()]
+                machine_db['dir'][ii]     = machine[dir_sep.start()+1:]
             else:
-                machine_db['machine'][iistr] = machine
+                machine_db['machine'][ii] = machine
  
             # Strip out '&' if present.
             amp_sep = re.search('&',machine)
             # remove from string.
             if (amp_sep):
                 machine = machine[:amp_sep.start()]+ machine[amp_sep.start()+1:]
-                machine_db['machine'][iistr] = machine
+                machine_db['machine'][ii] = machine
             
             # Check if same as host. DOES NOT HANDLE host:dir syntax.
             if DEBUG:
                 print('machine & host: %s,%s'%(machine,host))
             if re.search(host,machine):
                 # Set type to type of host.
-                machine_db['type'][iistr] = default_type
-                machine_db['python_command'][iistr] = machine_db_settings['python_command']
+                machine_db['type'][ii] = default_type
+                machine_db['python_command'][ii] = machine_db_settings['python_command']
 
                 if os.path.exists('/etc/llgrid.id'):
-                    machine_db['dir'][iistr] = pwd_grid+'/PythonMPI'
+                    machine_db['dir'][ii] = pwd_grid+'/PythonMPI'
                 else:
                     if OS.ispc:
-                        machine_db['dir'][iistr] = pwd_pc+'\PythonMPI'
+                        machine_db['dir'][ii] = pwd_pc+'\PythonMPI'
                     elif OS.islinux:
-                        machine_db['dir'][iistr] = pwd_linux+'/PythonMPI'
+                        machine_db['dir'][ii] = pwd_linux+'/PythonMPI'
                     else:
-                        machine_db['dir'][iistr] = pwd_mac+'/PythonMPI'
+                        machine_db['dir'][ii] = pwd_mac+'/PythonMPI'
             else:
                 # Use user specified default (probably 'unix').
-                machine_db['type'][iistr] = machine_db_settings['type']
+                machine_db['type'][ii] = machine_db_settings['type']
                 # Assuming the remote hosts are LLSC system for now
-                machine_db['python_command'][iistr] = machine_db_settings['python_command_llsc']
-                machine_db['dir'][iistr] = pwd_grid+'/PythonMPI'
+                machine_db['python_command'][ii] = machine_db_settings['python_command_llsc']
+                machine_db['dir'][ii] = pwd_grid+'/PythonMPI'
 
             if DEBUG:
-                print('python command updated: %s'%(machine_db['python_command'][iistr]))
+                print('python command updated: %s'%(machine_db['python_command'][ii]))
 
             # Check if ':unix' or ':pc' is appended, if so, override type.
             col_sep = re.search(':',machine)
             if (col_sep):
                 if DEBUG:
                     print('user provided machine type: %s'%(machine[col_sep.start()+1:]))
-                machine_db['type'][iistr] = machine[col_sep.start()+1:]
+                machine_db['type'][ii] = machine[col_sep.start()+1:]
                 # remove from string.
                 machine = machine[:col_sep.start()]
-                machine_db['machine'][iistr] = machine
+                machine_db['machine'][ii] = machine
 
             if machine == host:
                 if (amp_sep):

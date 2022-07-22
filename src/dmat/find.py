@@ -60,16 +60,16 @@ def find(x):
         if inmap(x.map, GPC.my_rank):
             local_ij = np.argwhere(x.local)
             # Note: local_ij[:,0] -> local_i, local_ij[:,1] -> local_j
-            # Note: the key in global_ind is numerical string -> comply with h5py save/load operations
-            if isinstance(x.global_ind['0'], str):
-                if x.global_ind['0'] == ':':
-                    x.global_ind['0'] = list(range(x.shape[1]+1))
-            if isinstance(x.global_ind['1'], str):
-                if x.global_ind['1'] == ':':
-                    x.global_ind['1'] = list(range(x.shape[2]+1))
+            if isinstance(x.global_ind[0], str):
+                if x.global_ind[0] == ':':
+                    # Send range() instead of list to save memory
+                    x.global_ind[0] = range(x.shape[1]+1)
+            if isinstance(x.global_ind[1], str):
+                if x.global_ind[1] == ':':
+                    x.global_ind[1] = range(x.shape[2]+1)
         
-            # When a processor is allocated a single row (column), x.global_ind['0']
-            # (x.global_ind['1']) contain a 1x1 matrix.  Since local_i and local_j
+            # When a processor is allocated a single row (column), x.global_ind[0]
+            # (x.global_ind[1]) contain a 1x1 matrix.  Since local_i and local_j
             # are
             # column vectors, global_i (global_j) will contain a column vector.
             # Transpose local_i and local_j so that global_i and global_j are row
@@ -79,10 +79,10 @@ def find(x):
             if DEBUG:
                 print('local_i')
                 print(local_i)
-                print('x.global_ind[\'0\']')
-                print(x.global_ind['0'])
-            global_i = np.array(x.global_ind['0'])[local_i]
-            global_j = np.array(x.global_ind['1'])[local_j]
+                print('x.global_ind[0]')
+                print(x.global_ind[0])
+            global_i = np.array(x.global_ind[0])[local_i]
+            global_j = np.array(x.global_ind[1])[local_j]
         
             data = []
             data.append(global_i)
@@ -94,8 +94,8 @@ def find(x):
             #send local finds to everyone
             for d1 in range(grid_size[0]):
                 for d2 in range(grid_size[1]):
-                    if (GPC.my_rank != x.map.grid[d1, d2]):
-                        MPI_Send(x.map.grid[d1, d2], GPC.tag, GPC.comm, data)
+                    if (GPC.my_rank != x.map.grid[d1,d2]):
+                        MPI_Send(x.map.grid[d1,d2], GPC.tag, GPC.comm, data)
 
             #receive finds from everyone
             for d1 in range(grid_size[0]):
@@ -104,17 +104,16 @@ def find(x):
                 for d2 in range(grid_size[1]):
                     if DEBUG:
                         print('x.map.grid[d1, d2]')
-                        print(x.map.grid[d1, d2])
-                    if (GPC.my_rank != x.map.grid[d1, d2]):
-                        [temp[d1][d2]] = MPI_Recv(x.map.grid[d1, d2], GPC.tag, GPC.comm)
+                        print(x.map.grid[d1,d2])
+                    if (GPC.my_rank != x.map.grid[d1,d2]):
+                        [temp[d1][d2]] = MPI_Recv(x.map.grid[d1,d2], GPC.tag, GPC.comm)
                     else:
                         temp[d1][d2] = data
             i = []
             j = []
-        
             for d2 in range(grid_size[1]): #grid cols
                 for d1 in range(grid_size[0]): #grid rows
-                    if (GPC.my_rank != x.map.grid[d1, d2]):
+                    if (GPC.my_rank != x.map.grid[d1,d2]):
                         if len(temp[d1][d2][0])>0:
                             i = i+list(temp[d1][d2][0])
                             j = j+list(temp[d1][d2][1])
@@ -128,7 +127,6 @@ def find(x):
         else:
             i = []
             j = []
-
         if DEBUG:
             print('<-- Exiting find')
         return [i,j]

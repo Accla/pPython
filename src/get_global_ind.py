@@ -17,7 +17,7 @@ def get_global_ind(falls, grid_dims=None):
         global index of the distributed object that is local to the current
         processor.
         
-        ToDo: should it be a list or a dictionary?
+        This is a dictionary variable
         
     Author:   Nadya Travinin (pMatlab)
     Python version: Dr. Chansup Byun (pPython)
@@ -87,7 +87,7 @@ def get_global_ind(falls, grid_dims=None):
                 print('falls instance is not Falls type.')
                 
             # store temp in ind
-            ind[str(i)] = temp
+            ind[i] = temp
                 
     else:
         print('ERROR(get_global_ind): Only objects up to 4-D are supported')

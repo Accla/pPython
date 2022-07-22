@@ -44,7 +44,7 @@ def reconstruct(pitfalls, grid, temp_mat, mat_size):
     """
 
     if dim==2:
-        # Get the datatype of temp_mat
+        # Get the datatype of temp_mat (additional in pPython)
         for ikey in temp_mat.keys():
             ival = temp_mat[ikey]
             ikeys = temp_mat.keys()
@@ -68,21 +68,19 @@ def reconstruct(pitfalls, grid, temp_mat, mat_size):
         # get local indices for each processor in the grid
         my_global_ind = dict()
         for i in range(grid_dims[0]):
-            my_global_ind[str(i)] = dict()
+            my_global_ind[i] = dict()
             for j in range(grid_dims[1]):
                 local_falls = get_local_falls(pitfalls, grid, grid[i][j])
-                my_global_ind[str(i)][str(j)] = get_global_ind(local_falls, grid_dims)
+                my_global_ind[i][j] = get_global_ind(local_falls, grid_dims)
 
         # !!!FOR NOW - assume MAT is of type DOUBLE
-        # for i in range(grid_dims[0]):
-        #     for j in range(grid_dims[1]):
         i = 0
         for ikey in ikeys:
             j = 0
             for jkey in jkeys:
                 if temp_mat[ikey][jkey].any() != 0.0:
-                    ii = my_global_ind[str(i)][str(j)][str(0)]
-                    jj = my_global_ind[str(i)][str(j)][str(1)]
+                    ii = my_global_ind[i][j][0]
+                    jj = my_global_ind[i][j][1]
                     if DEBUG:
                         print('mat index: ii,jj = %d,%d'%(len(ii),len(jj)))
                         print('temp_mat keys: ikey,jkey = %s,%s'%(ikey,jkey))
@@ -93,7 +91,7 @@ def reconstruct(pitfalls, grid, temp_mat, mat_size):
                 j +=1
             i +=1
     elif dim==3:
-        # Get the datatype of temp_mat
+        # Get the datatype of temp_mat (additional in pPython)
         for ikey in temp_mat.keys():
             ival = temp_mat[ikey]
             ikeys = temp_mat.keys()
@@ -121,16 +119,14 @@ def reconstruct(pitfalls, grid, temp_mat, mat_size):
         # get local indices for each processor in the grid
         my_global_ind = dict()
         for i in range(grid_dims[0]):
-            my_global_ind[str(i)] = dict()
+            my_global_ind[i] = dict()
             for j in range(grid_dims[1]):
-                my_global_ind[str(i)][str(j)] = dict()
+                my_global_ind[i][j] = dict()
                 for k in range(grid_dims[2]):
                     local_falls = get_local_falls(pitfalls, grid, grid[i][j][k])
-                    my_global_ind[str(i)][str(j)][str(k)] = get_global_ind(local_falls, grid_dims)
+                    my_global_ind[i][j][k] = get_global_ind(local_falls, grid_dims)
 
         # !!!FOR NOW - assume MAT is of type DOUBLE
-        # for i in range(grid_dims[0]):
-        #     for j in range(grid_dims[1]):
         i = 0
         for ikey in ikeys:
             j = 0
@@ -138,9 +134,9 @@ def reconstruct(pitfalls, grid, temp_mat, mat_size):
                 k = 0
                 for kkey in kkeys:
                     if temp_mat[ikey][jkey][kkey].any() != 0.0:
-                        ii = my_global_ind[str(i)][str(j)][str(k)][str(0)]
-                        jj = my_global_ind[str(i)][str(j)][str(k)][str(1)]
-                        kk = my_global_ind[str(i)][str(j)][str(k)][str(2)]
+                        ii = my_global_ind[i][j][k][0]
+                        jj = my_global_ind[i][j][k][1]
+                        kk = my_global_ind[i][j][k][2]
                         if DEBUG:
                             print('mat index: ii,jj,kk = %d,%d,%d'%(len(ii),len(jj),len(kk)))
                             print('temp_mat keys: ikey,jkeykkey = %s,%s,%s'%(ikey,jkey,kkey))
@@ -154,7 +150,75 @@ def reconstruct(pitfalls, grid, temp_mat, mat_size):
             i +=1
 
     elif dim==4:
-        print('RECONSTRUCT: Not implemented for 4-D supported');
+        print('RECONSTRUCT: Implemented for 4-D support but not tested yet.');
+        # Get the datatype of temp_mat (additional in pPython)
+        for ikey in temp_mat.keys():
+            ival = temp_mat[ikey]
+            ikeys = temp_mat.keys()
+            for jkey in ival.keys():
+                jval = ival[jkey]
+                jkeys = ival.keys()
+                for kkey in jval.keys():
+                    kval = jval[kkey]
+                    kkeys = jval.keys()
+                    for mkey in kval.keys():
+                        mval = kval[mkey]
+                        mkeys = kval.keys()
+                        dtype = type(mval[0,0,0,0])
+                        if DEBUG:
+                            print('dtype, %s, at ikey,jkey,kkey = %s,%s,%s,%s'%(dtype,ikey,jkey,kkey,mkey))
+                            print('mval:')
+                            # print(mval)
+                        break
+                    break
+                break
+            break
+        # Create a zeros array of the same type as temp_mat
+        mat = np.zeros(mat_size,dtype)
+        if DEBUG:
+            print('mat size: %s'%(str(mat_size)))
+            print('type(mat): %s'%(type(mat)))
+            print('type(mat[0,0,0,0]): %s'%(type(mat[0,0,0,0])))
+
+        # get local indices for each processor in the grid
+        my_global_ind = dict()
+        for i in range(grid_dims[0]):
+            my_global_ind[i] = dict()
+            for j in range(grid_dims[1]):
+                my_global_ind[i][j] = dict()
+                for k in range(grid_dims[2]):
+                    my_global_ind[i][j][k] = dict()
+                    for m in range(grid_dims[3]):
+                        local_falls = get_local_falls(pitfalls, grid, grid[i][j][k][m])
+                        my_global_ind[i][j][k][m] = get_global_ind(local_falls, grid_dims)
+
+        # !!!FOR NOW - assume MAT is of type DOUBLE
+        i = 0
+        for ikey in ikeys:
+            j = 0
+            for jkey in jkeys:
+                k = 0
+                for kkey in kkeys:
+                    m = 0
+                    for mkey in mkeys:
+                        if temp_mat[ikey][jkey][kkey][mkey].any() != 0.0:
+                            ii = my_global_ind[i][j][k][m][0]
+                            jj = my_global_ind[i][j][k][m][1]
+                            kk = my_global_ind[i][j][k][m][2]
+                            ll = my_global_ind[i][j][k][m][3]
+                            if DEBUG:
+                                print('mat index: ii,jj,kk,mm = %d,%d,%d,%d'%(len(ii),len(jj),len(kk),len(mm)))
+                                print('temp_mat keys: ikey,jkeykkey,mkey = %s,%s,%s,%s'%(ikey,jkey,kkey,mkey))
+                                print(ii)
+                                print(jj)
+                                print(kk)
+                                print(mm)
+                                # print(temp_mat[ikey][jkey][kkey][mkey])
+                            mat[ii[0]:ii[-1]+1,jj[0]:jj[-1]+1,kk[0]:kk[-1]+1,mm[0]:mm[-1]+1] = temp_mat[ikey][jkey][kkey][mkey]
+                        m +=1
+                    k +=1
+                j +=1
+            i +=1
     else:
         print('RECONSTRUCT: Only objects up to 4-D are supported');
 

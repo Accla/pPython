@@ -95,23 +95,23 @@ def grid_dmat(m,n=None,q=None,r=None,p=None):
         if DEBUG:
             print('grid_dmat: axis, i = %d'%(i))
             print(p.grid.shape[i])
-            print(p.dist_spec[str(i)])
+            print(p.dist_spec[i])
             print(dims[i])
         if not (p.overlap):
             # p.grid.shape: tuple of the dim length
-            # p.dist_spec: a dictionary of dictoary with key in str(dim)
+            # p.dist_spec: a dictionary of dictoary with key in (dim)
             # print('no overlap')
-            pitfalls.append(gen_pitfalls(p.grid.shape[i], p.dist_spec[str(i)], dims[i]))
+            pitfalls.append(gen_pitfalls(p.grid.shape[i], p.dist_spec[i], dims[i]))
         elif p.overlap[i]==0:
             # Same as not defined p.overlap
             # print('zero overlap')
-            pitfalls.append(gen_pitfalls(p.grid.shape[i], p.dist_spec[str(i)], dims[i]))
+            pitfalls.append(gen_pitfalls(p.grid.shape[i], p.dist_spec[i], dims[i]))
         else:
             # non-zero p.overlap is defined.
             if DEBUG:
                 print('non-zero overlap')
                 print('p.overlap: %d in axis, i = %d'%(p.overlap[i],i))
-            pitfalls.append(gen_pitfalls(p.grid.shape[i], p.dist_spec[str(i)], dims[i], p.overlap[i]))
+            pitfalls.append(gen_pitfalls(p.grid.shape[i], p.dist_spec[i], dims[i], p.overlap[i]))
 
     d.pitfalls = pitfalls
     if DEBUG:

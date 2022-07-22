@@ -175,7 +175,7 @@ def global_block_range(d, dims):
 
     my_inds = d.global_ind
     """
-    global_ind is a dictionary such as {'0': [0, 1, 2, 3], '1': [0, 1, 2]}
+    global_ind is a dictionary such as {0: [0, 1, 2, 3], 1: [0, 1, 2]}
     """
     myLocalLenghs = [d.falls[i].local_len  for i in range(len(d.falls))  ]
 
@@ -192,8 +192,8 @@ def global_block_range(d, dims):
         for i in range(len(dims)):
             # For python, index ranges from 0 to N-1
             # print(dims[i])
-            ind[i,0] = my_inds[str(dims[i])][0]
-            ind[i,1] = my_inds[str(dims[i])][-1]
+            ind[i,0] = my_inds[dims[i]][0]
+            ind[i,1] = my_inds[dims[i]][-1]
 
     if DEBUG:
         print('<-- Exiting global_block_range')

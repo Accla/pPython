@@ -35,25 +35,25 @@ def partition_1d(n,m):
         # if the size is NOT divisible by m
         icnt = 0
         for iam in range(m):
-            d_index[str(iam)] = dict()
+            d_index[iam] = dict()
             if icnt < remainder:
-                d_index[str(iam)]['beg'] = (d_size)*iam + icnt
-                d_index[str(iam)]['end'] = d_index[str(iam)]['beg'] + d_size
+                d_index[iam]['beg'] = (d_size)*iam + icnt
+                d_index[iam]['end'] = d_index[iam]['beg'] + d_size
                 icnt = icnt + 1
             else:
-                d_index[str(iam)]['beg'] = (d_size)*iam + icnt
-                d_index[str(iam)]['end'] = d_index[str(iam)]['beg'] + d_size - 1
+                d_index[iam]['beg'] = (d_size)*iam + icnt
+                d_index[iam]['end'] = d_index[iam]['beg'] + d_size - 1
     else:
         # if the size is divisible by m
         for iam in range(m):
-            d_index[str(iam)] = dict()
-            d_index[str(iam)]['beg'] = (d_size)*iam
-            d_index[str(iam)]['end'] = d_index[str(iam)]['beg'] + d_size - 1
+            d_index[iam] = dict()
+            d_index[iam]['beg'] = (d_size)*iam
+            d_index[iam]['end'] = d_index[iam]['beg'] + d_size - 1
         
     # Store the chunk size for each MPI process    
     for iam in range(m):
         # Calculate the chunk size of each MPI process
-        d_sizes[iam] = d_index[str(iam)]['end'] - d_index[str(iam)]['beg'] + 1
+        d_sizes[iam] = d_index[iam]['end'] - d_index[iam]['beg'] + 1
 
     return d_index,d_sizes
 

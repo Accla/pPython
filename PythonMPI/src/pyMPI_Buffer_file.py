@@ -24,7 +24,7 @@ def pyMPI_Buffer_file(source,dest,tag,comm):
         print('--> entering pyMPI_Buffer_file:')
         print(comm)
     machine_id = comm['machine_id'][dest]
-    dir = comm['machine_db']['dir'][str(machine_id)]
+    dir = comm['machine_db']['dir'][machine_id]
     if DEBUG:
         print('machine_id = %d'%(machine_id))
         print('dir = %s'%(dir))

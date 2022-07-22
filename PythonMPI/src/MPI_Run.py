@@ -122,10 +122,6 @@ def MPI_Run( py_file, n_proc, machines ):
     # Loop backwards over each machine target machine
     # so that we hit the host machine last (if it is a target).
     for i_m in range(n_m,0,-1):
-        # convert into string
-        imstr = str(i_m)
-        imstrm1 = str(i_m-1)
-        
         # Get number of processes to launch on this target machine.
         # Note: python indexing starts from zero, 0, to n_m-1
         n_proc_i_m = pyMCW.MPI_COMM_WORLD['machine_db']['n_proc'][i_m-1]
@@ -135,10 +131,10 @@ def MPI_Run( py_file, n_proc, machines ):
 
         if (n_proc_i_m >= 1):
             # Get machine name, remote lauch command & flags, and type.
-            machine = pyMCW.MPI_COMM_WORLD['machine_db']['machine'][imstrm1]
-            remote_launch = pyMCW.MPI_COMM_WORLD['machine_db']['remote_launch'][imstrm1]
-            remote_flags = pyMCW.MPI_COMM_WORLD['machine_db']['remote_flags'][imstrm1]
-            type = pyMCW.MPI_COMM_WORLD['machine_db']['type'][imstrm1]
+            machine = pyMCW.MPI_COMM_WORLD['machine_db']['machine'][i_m-1]
+            remote_launch = pyMCW.MPI_COMM_WORLD['machine_db']['remote_launch'][i_m-1]
+            remote_flags = pyMCW.MPI_COMM_WORLD['machine_db']['remote_flags'][i_m-1]
+            type = pyMCW.MPI_COMM_WORLD['machine_db']['type'][i_m-1]
 
             # Set file extension of launch script to be run on
             # this target.

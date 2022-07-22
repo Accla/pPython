@@ -194,7 +194,7 @@ def global_block_ranges(d, dims):
     
     my_inds = d.global_ind
     """
-    global_ind is a dictionary such as {'0': [0, 1, 2, 3], '1': [0, 1, 2]}
+    global_ind is a dictionary such as {0: [0, 1, 2, 3], 1: [0, 1, 2]}
     """
     s = d.shape
     
@@ -212,17 +212,17 @@ def global_block_ranges(d, dims):
         if dim==2: #2D array
             for g1 in range(grid_dims[0]): #grid cols
                 for g2 in range(grid_dims[1]): #grid rows
-                    curr_inds = global_ind[str(g1)][str(g2)]
+                    curr_inds = global_ind[g1][g2]
                     # print(curr_inds)
-                    dim_inds = curr_inds[str(dims[i])]
+                    dim_inds = curr_inds[dims[i]]
                     temp[proc_count,0:] = [grid[g1,g2], dim_inds[0], dim_inds[-1]] 
                     proc_count = proc_count+1 
         elif dim==3: #3D array
             for g1 in range(grid_dims[0]):
                 for g2 in range(grid_dims[1]):
                     for g3 in range(grid_dims[2]):
-                        curr_inds = global_ind[str(g1)][str(g2)][str(g3)]
-                        dim_inds = curr_inds[str(dims[i])]
+                        curr_inds = global_ind[g1][g2][g3]
+                        dim_inds = curr_inds[dims[i]]
                         temp[proc_count,0:] = [grid[g1,g2,g3], dim_inds[0], dim_inds[-1]] 
                         proc_count = proc_count+1 
         elif dim==4: #4D array
@@ -230,8 +230,8 @@ def global_block_ranges(d, dims):
                 for g2 in range(grid_dims[1]):
                     for g3 in range(grid_dims[2]):
                         for g4 in range(grid_dims[3]):
-                            curr_inds = global_ind[str(g1)][str(g2)][str(g3)][str(g4)]
-                            dim_inds = curr_inds[str(dims[i])]
+                            curr_inds = global_ind[g1][g2][g3][g4]
+                            dim_inds = curr_inds[dims[i]]
                             temp[proc_count,0:] = [grid[g1,g2,g3,g4], dim_inds[0], dim_inds[-1]] 
                             proc_count = proc_count+1 
         if len(dims)>1:

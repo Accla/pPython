@@ -41,13 +41,11 @@ def subsasgn_data(a, b, falls_index, fi):
                     print('b_local_ind')
                     print(b_local_ind)
                 if len(b_local_ind[0])>0 and len(b_local_ind[1])>0:
-                    # Different behavior as compared to Matlab: data[str(num_data)] = b.local[b_local_ind[0], b_local_ind[1]]
-                    # Use numeric string key because it will be converted as numberic string key duing the MPI message (hdf5 save)
-                    data[str(num_data)] = b.local[slice(b_local_ind[0][0],b_local_ind[0][-1]+1),slice(b_local_ind[1][0],b_local_ind[1][-1]+1)]
+                    # Different behavior as compared to Matlab: data[num_data] = b.local[b_local_ind[0], b_local_ind[1]]
+                    data[num_data] = b.local[slice(b_local_ind[0][0],b_local_ind[0][-1]+1),slice(b_local_ind[1][0],b_local_ind[1][-1]+1)]
                 else:
                     # Workaround for Matlab, which still works with empty index
-                    # Use numeric string key because it will be converted as numberic string key duing the MPI message (hdf5 save)
-                    data[str(num_data)] = None
+                    data[num_data] = None
                 a_local_ind[num_data] = get_local_ind(a.global_ind, g_ind)
                 num_data=num_data+1
 
@@ -64,12 +62,10 @@ def subsasgn_data(a, b, falls_index, fi):
                     b_local_ind = get_local_ind(b.global_ind, g_ind)
                     if len(b_local_ind[0])>0 and len(b_local_ind[1])>0 and len(b_local_ind[2])>0:
                         # Workaround for Matlab, which still works with empty index
-                        # Use numeric string key because it will be converted as numberic string key duing the MPI message (hdf5 save)
-                        data[str(num_data)] = b.local[b_local_ind[0], b_local_ind[1], b_local_ind[2]]
+                        data[num_data] = b.local[b_local_ind[0], b_local_ind[1], b_local_ind[2]]
                     else:
                         # Workaround for Matlab, which still works with empty index
-                        # Use numeric string key because it will be converted as numberic string key duing the MPI message (hdf5 save)
-                        data[str(num_data)] = None
+                        data[num_data] = None
                     a_local_ind[num_data] = get_local_ind(a.global_ind, g_ind)
                     num_data=num_data+1
 
@@ -88,12 +84,10 @@ def subsasgn_data(a, b, falls_index, fi):
                         b_local_ind = get_local_ind(b.global_ind, g_ind)
                         if len(b_local_ind[0])>0 and len(b_local_ind[1])>0 and len(b_local_ind[2])>0 and len(b_local_ind[3])>0:
                             # Workaround for Matlab, which still works with empty index
-                            # Use numeric string key because it will be converted as numberic string key duing the MPI message (hdf5 save)
-                            data[str(num_data)] = b.local[b_local_ind[0], b_local_ind[1], b_local_ind[2], b_local_ind[3]]
+                            data[num_data] = b.local[b_local_ind[0], b_local_ind[1], b_local_ind[2], b_local_ind[3]]
                         else:
                             # Workaround for Matlab, which still works with empty index
-                            # Use numeric string key because it will be converted as numberic string key duing the MPI message (hdf5 save)
-                            data[str(num_data)] = None
+                            data[num_data] = None
                         a_local_ind[num_data] = get_local_ind(a.global_ind, g_ind)
                         num_data=num_data+1
     else:

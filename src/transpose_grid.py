@@ -101,8 +101,8 @@ def transpose_grid(B):
     #      dist is block
     #      no overlap )
     if ( not( (B_grid_spec[0] == 1 or B_grid_spec[1] == 1) \
-            and (B_dist_spec['0']['dist'] == 'b') \
-            and (B_dist_spec['1']['dist'] == 'b') \
+            and (B_dist_spec[0]['dist'] == 'b') \
+            and (B_dist_spec[1]['dist'] == 'b') \
             and (B_overlap == None) ) ):
         # Revert to default.
         # ToDo:  how to implement MATTLAB subsasgn operator in Python?

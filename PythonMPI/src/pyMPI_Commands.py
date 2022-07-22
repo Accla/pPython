@@ -48,12 +48,11 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD):
 
     # Get info on the target machine.
     machine_id = pyMCW.MPI_COMM_WORLD['machine_id'][rank]
-    id_str = str(machine_id)
-    machine = pyMCW.MPI_COMM_WORLD['machine_db']['machine'][id_str]
-    remote_launch = pyMCW.MPI_COMM_WORLD['machine_db']['remote_launch'][id_str]
-    remote_flags = pyMCW.MPI_COMM_WORLD['machine_db']['remote_flags'][id_str]
-    python_base  = pyMCW.MPI_COMM_WORLD['machine_db']['python_command'][id_str]
-    type = pyMCW.MPI_COMM_WORLD['machine_db']['type'][id_str]
+    machine = pyMCW.MPI_COMM_WORLD['machine_db']['machine'][machine_id]
+    remote_launch = pyMCW.MPI_COMM_WORLD['machine_db']['remote_launch'][machine_id]
+    remote_flags = pyMCW.MPI_COMM_WORLD['machine_db']['remote_flags'][machine_id]
+    python_base  = pyMCW.MPI_COMM_WORLD['machine_db']['python_command'][machine_id]
+    type = pyMCW.MPI_COMM_WORLD['machine_db']['type'][machine_id]
 
     # Create filename each Python job will run at startup.
     defsbase = 'PythonMPI/PythonMPIdefs' + str(rank)
