@@ -9,5 +9,9 @@ def RecvMsg(source, tag):
 
     comm = GPC.comm
     
-    return MPI_Recv(source, tag, comm)
+    # SendMsg add an additional dictionary layer
+    # So unpack it before returning the message.
+    [buf] =  MPI_Recv(source, tag, comm)
+
+    return list(buf.values())
 

@@ -17,22 +17,21 @@ def SendMsg(dest, tag, *argv):
     comm = GPC.comm
     Pid = GPC.my_rank
     
-    # preserve the number of message counts
-    str_argv = ''
-    for ii in range(len(argv)):
-        str_argv += 'argv['+str(ii)+'],'
-    # remove the last comma
-    str_argv = str_argv[0:-1]
-        
+    # Send after packing the message into a dictionary
+    msg = dict()
+    ii = 0
     if DEBUG:
-        print('Sending message: %s'%(str_argv))
+        print('Length of argv: %d'%(len(argv)))
+    for arg in argv:
+        if DEBUG:
+            print(arg)
+        msg[ii] = arg
+        ii = ii + 1
 
     if isinstance(dest,(int,np.int64)):
-        cmd = 'MPI_Send(dest,tag,comm,'+str_argv+')'
-        exec(cmd)
+        MPI_Send(dest,tag,comm,msg)
     elif (len(dest) > 1):
-        cmd = 'MPI_Mcast(Pid,dest,tag,comm,'+str_argv+')'
-        exec(cmd)
+        MPI_Mcast(Pid,dest,tag,comm,msg)
 
     if DEBUG:
         print('<-- Exiting SendMsg')

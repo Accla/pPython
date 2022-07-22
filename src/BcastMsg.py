@@ -9,26 +9,33 @@ def BcastMsg(source, tag, *argv):
     """Broadcast message from current process to all other processes.
     """
 
-    DEBUG = 1
+    DEBUG = 0
     if DEBUG:
         print('--> Entering BcastMsg')
 
     comm = GPC.comm
     Pid = GPC.my_rank
-    
-    # preserve the number of message counts
-    str_argv = ''
-    for ii in range(len(argv)):
-        str_argv += 'argv['+str(ii)+'],'
-    # remove the last comma
-    str_argv = str_argv[0:-1]
-        
-    cmd = 'MPI_Bcast(source,tag,comm,'+str_argv+')'
+
+    # BcastMsg add an additional dictionary layer
+    # So unpack it before returning the message.
+
+    msg = dict()
+    if Pid == source:
+        # Send after packing the message into a dictionary
+        ii = 0
+        if DEBUG:
+            print('Length of argv: %d'%(len(argv)))
+        for arg in argv:
+            if DEBUG:
+                print(arg)
+            msg[ii] = arg
+            ii = ii + 1
+   
+    [out] = MPI_Bcast(source,tag,comm,msg)
 
     if DEBUG:
         print('source: %d, tag: %d'%(source,tag))
-        print('Broadcasting command: %s'%(cmd))
         print('<-- Exiting BcastMsg')
         
-    return eval(cmd)
+    return list(out.values())
 
