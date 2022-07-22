@@ -101,6 +101,7 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD):
     commands[0] = 'import os'+nl
     commands[0] = commands[0]+'import sys'+nl+add_path_str
     commands[0] = commands[0]+'os.environ["HDF5_USE_FILE_LOCKING"]="FALSE"' + nl
+    commands[0] = commands[0]+'os.environ["OMP_NUM_THREADS"]="1"' + nl
     # commands[0] = commands[0]+'from PythonMPI import *' + nl
     commands[0] = commands[0]+'import pyMPI_COMM_WORLD as pyMCW' + nl
     commands[0] = commands[0]+'from dict_with_pickle import load_dict_from_pickle' + nl
