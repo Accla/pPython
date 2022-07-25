@@ -46,6 +46,10 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD):
     # Get single quote character. 
     q = '\''
 
+    # Set OMP_NUM_THREADS to control the number of threads.
+    # The default is 1.
+    OMP_NUM_THREADS = os.environ.get('OMP_NUM_THREADS', '1')
+
     # Get info on the target machine.
     machine_id = pyMCW.MPI_COMM_WORLD['machine_id'][rank]
     machine = pyMCW.MPI_COMM_WORLD['machine_db']['machine'][machine_id]
@@ -101,7 +105,7 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD):
     commands[0] = 'import os'+nl
     commands[0] = commands[0]+'import sys'+nl+add_path_str
     commands[0] = commands[0]+'os.environ["HDF5_USE_FILE_LOCKING"]="FALSE"' + nl
-    commands[0] = commands[0]+'os.environ["OMP_NUM_THREADS"]="1"' + nl
+    commands[0] = commands[0]+'os.environ["OMP_NUM_THREADS"]="' + OMP_NUM_THREADS + '"' + nl
     # commands[0] = commands[0]+'from PythonMPI import *' + nl
     commands[0] = commands[0]+'import pyMPI_COMM_WORLD as pyMCW' + nl
     commands[0] = commands[0]+'from dict_with_pickle import load_dict_from_pickle' + nl
