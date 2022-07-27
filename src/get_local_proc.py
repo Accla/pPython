@@ -42,7 +42,7 @@ def get_local_proc(pitfalls, grid, ind):
         for i in range(g_dims[0]):
             for j in range(g_dims[1]):
                 if (  not np.array(find(global_ind[i][j][0]==ind[0])).size==0 \
-                      and not np.array(find(global_ind[i][j][1]==ind[2])).size==0):
+                      and not np.array(find(global_ind[i][j][1]==ind[1])).size==0):
                     r = grid[i,j]
 
         #  3D processor grid
@@ -59,7 +59,7 @@ def get_local_proc(pitfalls, grid, ind):
             for j in range(g_dims[1]):
                 for k in range(g_dims[2]):
                     if (  not np.array(find(global_ind[i,j,k][0]==ind[0])).size==0 \
-                          and not np.array(find(global_ind[i,j,k][1]==ind[2])).size==0 \
+                          and not np.array(find(global_ind[i,j,k][1]==ind[1])).size==0 \
                           and not np.array(find(global_ind[i,j,k][2]==ind[2])).size==0):
                         r = grid[i,j,k]
  
@@ -79,7 +79,7 @@ def get_local_proc(pitfalls, grid, ind):
                 for k in range(g_dims[2]):
                     for l in range(g_dims[3]):
                         if (  not np.array(find(global_ind[i,j,k,l][0]==ind[0])).size==0 \
-                              and not np.array(find(global_ind[i,j,k,l][1]==ind[2])).size==0 \
+                              and not np.array(find(global_ind[i,j,k,l][1]==ind[1])).size==0 \
                               and not np.array(find(global_ind[i,j,k,l][2]==ind[2])).size==0 \
                               and not np.array(find(global_ind[i,j,k,l][3]==ind[3])).size==0):
                             r = grid[i,j,k,l]
