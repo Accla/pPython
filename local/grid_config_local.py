@@ -49,7 +49,11 @@ def grid_config_local(grid_config):
 
     # Remote access
     grid_config['remote_host'] = 'txg-login.llgrid.ll.mit.edu'
-    grid_config['remote_user'] = USER
+    if isinstance(USER,None):
+        # The following needs to be updated
+        grid_config['remote_user'] = 'LLSC_username'
+    else:
+        grid_config['remote_user'] = USER
     grid_config['remote_launch'] = 'ssh'
     grid_config['remote_flags'] = '-q -x'
     #

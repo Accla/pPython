@@ -106,7 +106,7 @@ def pRUN(py_file,n_proc,machines,sched_options=None):
         print(grid.grid_config)
 
     # Check allowance 
-    cpu_type = grid.grid_config['default_cpu_type'] 
+    cpu_type = grid.grid_config['cpu_type'] 
     status = check_allowance(n_proc,cpu_type)
     if DEBUG:
         print('pRUN: n_proc,cpu_type = %d, %s'%(n_proc,cpu_type))

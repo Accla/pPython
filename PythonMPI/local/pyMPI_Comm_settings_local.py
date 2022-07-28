@@ -22,7 +22,10 @@ def pyMPI_Comm_settings_local(machine_db_settings):
 
     """
     # Grid user
-    USER = os.getenv('USER')
+    if OS.ispc:
+        USER = os.getenv('USERNAME')
+    else:
+        USER = os.getenv('USER')
 
     # Set default type of remote machines to 'unix' (for linux and mac OSes) or 'pc'
     machine_db_settings['type'] = 'unix';     # [OK TO CHANGE.]
