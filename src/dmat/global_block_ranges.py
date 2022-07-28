@@ -86,9 +86,8 @@ def global_block_ranges(d, dims):
     # 1st: its rank (for serial)
     # 2nd: starting index, which is always 0
     # 3rd: ending index (N-1)
+
     my_inds = list(d.shape)
-    # print(my_inds)
-    
     for i in range(len(dims)):
         # For python, index ranges from 0 to N-1
         # print(dims[i])
@@ -213,8 +212,12 @@ def global_block_ranges(d, dims):
             for g1 in range(grid_dims[0]): #grid cols
                 for g2 in range(grid_dims[1]): #grid rows
                     curr_inds = global_ind[g1][g2]
-                    # print(curr_inds)
-                    dim_inds = curr_inds[dims[i]]
+                    if DEBUG:
+                        print(curr_inds)
+                        # typical: {0: (range(0, 1),), 1: (range(0, 4194304),)}
+                    # Change due to switching from list to tuple of ranges
+                    # Select the 1st range element in the tuple
+                    dim_inds = curr_inds[dims[i]][0]
                     temp[proc_count,0:] = [grid[g1,g2], dim_inds[0], dim_inds[-1]] 
                     proc_count = proc_count+1 
         elif dim==3: #3D array
@@ -222,7 +225,9 @@ def global_block_ranges(d, dims):
                 for g2 in range(grid_dims[1]):
                     for g3 in range(grid_dims[2]):
                         curr_inds = global_ind[g1][g2][g3]
-                        dim_inds = curr_inds[dims[i]]
+                        # Change due to switching from list to tuple of ranges
+                        # Select the 1st range element in the tuple
+                        dim_inds = curr_inds[dims[i]][0]
                         temp[proc_count,0:] = [grid[g1,g2,g3], dim_inds[0], dim_inds[-1]] 
                         proc_count = proc_count+1 
         elif dim==4: #4D array
@@ -231,7 +236,9 @@ def global_block_ranges(d, dims):
                     for g3 in range(grid_dims[2]):
                         for g4 in range(grid_dims[3]):
                             curr_inds = global_ind[g1][g2][g3][g4]
-                            dim_inds = curr_inds[dims[i]]
+                            # Change due to switching from list to tuple of ranges
+                            # Select the 1st range element in the tuple
+                            dim_inds = curr_inds[dims[i]][0]
                             temp[proc_count,0:] = [grid[g1,g2,g3,g4], dim_inds[0], dim_inds[-1]] 
                             proc_count = proc_count+1 
         if len(dims)>1:

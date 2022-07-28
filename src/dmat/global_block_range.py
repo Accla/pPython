@@ -192,8 +192,12 @@ def global_block_range(d, dims):
         for i in range(len(dims)):
             # For python, index ranges from 0 to N-1
             # print(dims[i])
-            ind[i,0] = my_inds[dims[i]][0]
-            ind[i,1] = my_inds[dims[i]][-1]
+            if DEBUG:
+                print(my_inds[dims[i]])
+            # Change due to switch from list to tupler of ranges
+            # pick up the first and the last indices from the 1st range element in the tuple
+            ind[i,0] = my_inds[dims[i]][0][0]
+            ind[i,1] = my_inds[dims[i]][0][-1]
 
     if DEBUG:
         print('<-- Exiting global_block_range')

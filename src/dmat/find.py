@@ -81,8 +81,10 @@ def find(x):
                 print(local_i)
                 print('x.global_ind[0]')
                 print(x.global_ind[0])
-            global_i = np.array(x.global_ind[0])[local_i]
-            global_j = np.array(x.global_ind[1])[local_j]
+            # Change due to switch from list to tuple of range
+            # Select the first element of range lists in the tuple, x.global_ind[0][0], for the 1st dimension
+            global_i = np.array(list(x.global_ind[0][0]))[local_i]
+            global_j = np.array(list(x.global_ind[1][0]))[local_j]
         
             data = []
             data.append(global_i)

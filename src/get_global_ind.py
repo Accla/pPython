@@ -18,13 +18,13 @@ def get_global_ind(falls, grid_dims=None):
         processor.
         
         This is a dictionary variable
+        Each value is a tuple of ranges of indices instead of list of indices (save memory usage)
         
     Author:   Nadya Travinin (pMatlab)
     Python version: Dr. Chansup Byun (pPython)
     """
     
     DEBUG = 0
-    
     if DEBUG:
         print('--> Entering get_global_ind')
     
@@ -35,14 +35,15 @@ def get_global_ind(falls, grid_dims=None):
     if dim <= 4:
         ind = dict()
         for i in range(dim):
-            temp = []
+            # Change from a list to a tuple of ranges to save memory usage (pFFT benchmark)
+            temp = tuple()
             falls_i = falls[i]
             if isinstance(falls_i,Falls):
                 # falls is an instance of Falls class
                 if (len(grid_dims)>0) and (grid_dims[i] == 1): 
                     # dimension is not distributed
                     # print('get_global_ind: To be checked, am i here?')
-                    temp += list(range(int(falls_i.local_len)))
+                    temp += (range(int(falls_i.local_len)),)
                 else: #dimension is distributed
                     # get the indices for the first n-1 cycles
                     # NOTE: This takes care of the case when complete_cycle==0 and
@@ -52,7 +53,7 @@ def get_global_ind(falls, grid_dims=None):
                     for j in range(0,falls_i.n-1):
                         lval = falls_i.l+j*falls_i.s
                         rval = falls_i.r+j*falls_i.s+1
-                        temp += list(range(lval,rval))
+                        temp += (range(lval,rval),)
                         if DEBUG:
                             print('j = %d'%(j))
                             print('(Left,Right): %d,%d'%(lval,rval))
@@ -67,7 +68,7 @@ def get_global_ind(falls, grid_dims=None):
                             print(falls_i.r+(falls_i.n-1)*falls_i.s+1)
                         i_left = int(falls_i.l+(falls_i.n-1)*falls_i.s)
                         i_rght = int(falls_i.r+(falls_i.n-1)*falls_i.s+1)
-                        temp += list(range(i_left,i_rght))
+                        temp += (range(i_left,i_rght),)
  
                     elif (not falls_i.complete_cycle) and (not falls_i.complete_block):
                         if DEBUG:
@@ -77,12 +78,12 @@ def get_global_ind(falls, grid_dims=None):
                         block_size = falls_i.r-falls_i.l+1
                         rem_block = falls_i.local_len%block_size
                         if falls_i.dist == 'b':
-                            temp += list(range(falls_i.l,falls_i.r+1))
+                            temp += (range(falls_i.l,falls_i.r+1),)
                         else:
                             i_left = falls_i.l+(falls_i.n-1)*falls_i.s
                             i_rght = falls_i.l+(falls_i.n-1)*falls_i.s+rem_block
-                            temp += list(range(i_left,i_rght))
-                            # temp += list(range(falls_i.l+(falls_i.n-1)*falls_i.s,falls_i.l+(falls_i.n-1)*falls_i.s+rem_block))
+                            temp += (range(i_left,i_rght),)
+                            # temp += (range(falls_i.l+(falls_i.n-1)*falls_i.s,falls_i.l+(falls_i.n-1)*falls_i.s+rem_block),)
             else:
                 print('falls instance is not Falls type.')
                 
@@ -95,7 +96,7 @@ def get_global_ind(falls, grid_dims=None):
 
     if DEBUG:
         # print(ind)
-        print('<-- Eexiting get_global_ind')
+        print('<-- Exiting get_global_ind')
 
     return ind
 
