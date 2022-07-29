@@ -26,6 +26,9 @@ def pyMPI_Comm_settings_local(machine_db_settings):
         USER = os.getenv('USERNAME')
     else:
         USER = os.getenv('USER')
+    if isinstance(USER,type(None)):
+        # The following needs to be updated
+        USER = 'LLSC_username'
 
     # Set default type of remote machines to 'unix' (for linux and mac OSes) or 'pc'
     machine_db_settings['type'] = 'unix';     # [OK TO CHANGE.]

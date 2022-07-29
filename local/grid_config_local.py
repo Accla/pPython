@@ -45,15 +45,19 @@ def grid_config_local(grid_config):
         print('--> Entering grid_config_local')
 
     # Grid user
-    USER = os.getenv('USER')
-
-    # Remote access
-    grid_config['remote_host'] = 'txg-login.llgrid.ll.mit.edu'
-    if isinstance(USER,None):
+    if OS.ispc:
+        USER = os.getenv('USERNAME')
+    else:
+        USER = os.getenv('USER')
+    if isinstance(USER,type(None)):
         # The following needs to be updated
         grid_config['remote_user'] = 'LLSC_username'
     else:
+        # Assuming the local USER name is the same as LLSC username
         grid_config['remote_user'] = USER
+
+    # Remote access
+    grid_config['remote_host'] = 'txg-login.llgrid.ll.mit.edu'
     grid_config['remote_launch'] = 'ssh'
     grid_config['remote_flags'] = '-q -x'
     #
