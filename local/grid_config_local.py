@@ -1,4 +1,5 @@
 import os
+import re
 import platform
 
 import checkOS as OS
@@ -44,18 +45,51 @@ def grid_config_local(grid_config):
     if DEBUG:
         print('--> Entering grid_config_local')
 
-    # Grid user
+    # Am I on a LLGrid system?
+    with open('/etc/llgrid.id') as f:
+        lines = f.readlines()
+    for line in lines:
+        # print(line)
+        if re.search('txgreen',line,re.IGNORECASE):
+            cluster_name = 'txgreen'
+        elif re.search('txe1',line,re.IGNORECASE):
+            cluster_name = 'txe1'
+        elif re.search('txc',line,re.IGNORECASE):
+            cluster_name = 'txc'
+        else:
+            # Set the cluster name to work with
+            cluster_name = 'noname'
+    grid_config['cluster_name'] = cluster_name
+
+    # Grid user (ToDo: need a better way to set the grid username)
     USER = os.getenv('USER')
+    if isinstance(USER,type(None)):
+        if cluster_name == 'txgreen':
+            grid_config['remote_user'] = 'ch21778'
+        elif cluster_name == 'txe1':
+            grid_config['remote_user'] = 'cbyun'
+        else:
+            print('grid_config_local: Unsupported system. Exited.')
+            exit()
+    else:
+        # The following line will not work if local username is differen from the grid username
+        grid_config['remote_user'] = USER
 
     # Remote access
-    grid_config['remote_host'] = 'txg-login.llgrid.ll.mit.edu'
-    grid_config['remote_user'] = USER
+    if cluster_name == 'txgreen':
+        grid_config['remote_host'] = 'txg-login.llgrid.ll.mit.edu'
+    elif cluster_name == 'txe1':
+        grid_config['remote_host'] = 'txe1-login.mit.edu'
+    else:
+        print('grid_config_local: Unsupported system. Exited.')
+        exit()
+
     grid_config['remote_launch'] = 'ssh'
     grid_config['remote_flags'] = '-q -x'
     #
     # Cluster system
-    grid_config['default_q_name'] = 'normal'
-    grid_config['default_cpu_type'] = 'xeon-e5'
+    grid_config['default_q_name'] = 'xeon-p8'
+    grid_config['default_cpu_type'] = 'xeon-p8'
     grid_config['q_name'] = grid_config['default_q_name']
     grid_config['cpu_type'] = grid_config['default_cpu_type']
     #
@@ -63,7 +97,7 @@ def grid_config_local(grid_config):
     grid_config['GRID_HOME_PATH'] = '/home/gridsan/'+grid_config['remote_user']
     
     # LLGrid Filesystem
-    grid_config['LL_FILE_SERVER'] = 'txg-gridfs.llgrid.ll.mit.edu'
+    grid_config['LL_FILE_SERVER'] = 'txe1-login.mit.edu'
     
     # locally mounted GRID_HOME_PATH
     if os.path.exists('/etc/llgrid.id'):
@@ -74,7 +108,7 @@ def grid_config_local(grid_config):
         if OS.ispc:
             HOME_PATH = 'Z:'
         elif OS.islinux:
-            HOME_PATH = '/export/home/'+USER
+            HOME_PATH = '/home/gridsan/'+USER
         elif OS.ismac:
             HOME_PATH = '/Volumes/'+USER
         else:

@@ -61,7 +61,8 @@ def check_allowance(n_proc,cpu_type):
     cmdstr = ' '.join(cmdstr)
     ecmd.run(cmdstr)
     output = ecmd.get_output()
-    if len(output) == 0:
+    if len(output) == 0 or output.isspace():
+        # output is blank if sacctmgr command is disabled for general users
         status = 0
         # no limit enforced
         return status
