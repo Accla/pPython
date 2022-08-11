@@ -45,7 +45,6 @@ def zeros(*array_sizes, **keywords):
     if DEBUG:
         print('--> Entering zero')
     #
-    m = n = q = r = None
     # Construct the array sizes:
     ndim = len(array_sizes)
     if ndim>4:
@@ -57,13 +56,8 @@ def zeros(*array_sizes, **keywords):
         dims = array_sizes[0]
     else:
         dims = []
-        dims.append(array_sizes[0])
-        if ndim>1:
-            dims.append(array_sizes[1])
-        if ndim>2:
-            dims.append(array_sizes[2])
-        if ndim>3:
-            dims.append(array_sizes[3])
+        for i in range(ndim):
+            dims.append(array_sizes[i])
     if DEBUG:
         print('Dimension of distributed zeros: %d'%(len(dims)))
         print(array_sizes)
