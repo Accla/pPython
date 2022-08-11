@@ -22,7 +22,12 @@ def pyMPI_Comm_settings_local(machine_db_settings):
 
     """
     # Grid user
-    USER = os.getenv('USER')
+    if OS.ispc:
+        USER = os.getenv('USERNAME')
+    else:
+        USER = os.getenv('USER')
+    # SuperCloud test (TX-E1)
+    # USER = 'cbyun'
 
     # Set default type of remote machines to 'unix' (for linux and mac OSes) or 'pc'
     machine_db_settings['type'] = 'unix';     # [OK TO CHANGE.]
@@ -59,7 +64,7 @@ def pyMPI_Comm_settings_local(machine_db_settings):
     machine_db_settings['python_module_name'] = 'anaconda/2022a'
 
     # local directory mapping. (pc, linux, mac, grid, sgrp_1, sgrp_2, sgrp_3)
-    machine_db_settings['local_dir_map'] = ['Z:', '/export/home/'+USER, '/Volumes/'+USER, '/home/gridsan/'+USER, '/home/gridsan/groups', '/data2/groups', '/state/partition1/user/'+USER]
+    machine_db_settings['local_dir_map'] = ['Z:', '/home/gridsan/'+USER, '/Volumes/'+USER, '/home/gridsan/'+USER, '/home/gridsan/groups', '/data2/groups', '/state/partition1/user/'+USER]
 
     return machine_db_settings
 
