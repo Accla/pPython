@@ -46,19 +46,19 @@ def grid_config_local(grid_config):
         print('--> Entering grid_config_local')
 
     # Am I on a LLGrid system?
-    with open('/etc/llgrid.id') as f:
-        lines = f.readlines()
-    for line in lines:
-        # print(line)
-        if re.search('txgreen',line,re.IGNORECASE):
-            cluster_name = 'txgreen'
-        elif re.search('txe1',line,re.IGNORECASE):
-            cluster_name = 'txe1'
-        elif re.search('txc',line,re.IGNORECASE):
-            cluster_name = 'txc'
-        else:
-            # Set the cluster name to work with
-            cluster_name = 'noname'
+    # Set the cluster name to work with
+    cluster_name = 'noname'
+    if os.path.exists('/etc/llgrid.id'):
+        with open('/etc/llgrid.id') as f:
+            lines = f.readlines()
+        for line in lines:
+            # print(line)
+            if re.search('txgreen',line,re.IGNORECASE):
+                cluster_name = 'txgreen'
+            elif re.search('txe1',line,re.IGNORECASE):
+                cluster_name = 'txe1'
+            elif re.search('txc',line,re.IGNORECASE):
+                cluster_name = 'txc'
     grid_config['cluster_name'] = cluster_name
 
     # Grid user (ToDo: need a better way to set the grid username)
