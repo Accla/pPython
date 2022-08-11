@@ -21,14 +21,40 @@ def pyMPI_Comm_settings_local(machine_db_settings):
                    for PC, Linux, and Mac OS environment
 
     """
-    # Grid user
+    # Am I on a LLGrid system?
+    with open('/etc/llgrid.id') as f:
+        lines = f.readlines()
+    for line in lines:
+        # print(line)
+        if re.search('txgreen',line,re.IGNORECASE):
+            cluster_name = 'txgreen'
+        elif re.search('txe1',line,re.IGNORECASE):
+            cluster_name = 'txe1'
+        elif re.search('txc',line,re.IGNORECASE):
+            cluster_name = 'txc'
+        else:
+            # Set the cluster name to work with
+            cluster_name = 'noname'
+    grid_config['cluster_name'] = cluster_name
+
+    # Grid user (ToDo: need a better way to set the grid username)
+    # pick up the local username
     if OS.ispc:
         USER = os.getenv('USERNAME')
     else:
         USER = os.getenv('USER')
+
     if isinstance(USER,type(None)):
-        # The following needs to be updated
-        USER = 'LLSC_username'
+        if cluster_name == 'txgreen':
+            grid_config['remote_user'] = 'ch21778'
+        elif cluster_name == 'txe1':
+            grid_config['remote_user'] = 'cbyun'
+        else:
+            print('grid_config_local: Unsupported system. Exited.')
+            exit()
+    else:
+        # The following line will not work if local username is differen from the grid username
+        grid_config['remote_user'] = USER
 
     # Set default type of remote machines to 'unix' (for linux and mac OSes) or 'pc'
     machine_db_settings['type'] = 'unix';     # [OK TO CHANGE.]
@@ -65,7 +91,7 @@ def pyMPI_Comm_settings_local(machine_db_settings):
     machine_db_settings['python_module_name'] = 'anaconda/2022a'
 
     # local directory mapping. (pc, linux, mac, grid, sgrp_1, sgrp_2, sgrp_3)
-    machine_db_settings['local_dir_map'] = ['Z:', '/export/home/'+USER, '/Volumes/'+USER, '/home/gridsan/'+USER, '/home/gridsan/groups', '/data2/groups', '/state/partition1/user/'+USER]
+    machine_db_settings['local_dir_map'] = ['Z:', '/home/gridsan/'+USER, '/Volumes/'+USER, '/home/gridsan/'+USER, '/home/gridsan/groups', '/data2/groups', '/state/partition1/user/'+USER]
 
     return machine_db_settings
 

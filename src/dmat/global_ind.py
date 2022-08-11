@@ -47,11 +47,15 @@ def global_ind(d, dim=None):
             print(s)
     
         if len(dims)==1:
-            local_ind = my_inds[dims[0]]
+            # Change due to switching from list to tuple of ranges
+            # Select the 1st range element in the tuple
+            local_ind = list(my_inds[dims[0]][0])
         else:
             local_ind = []
             for i in range(len(dims)):
-                local_ind.append(my_inds[dims[i]])
+                # Change due to switching from list to tuple of ranges
+                # Select the 1st range element in the tuple
+                local_ind.append(list(my_inds[dims[i]][0]))
     else:
         #
         # non-distributed array
@@ -69,6 +73,6 @@ def global_ind(d, dim=None):
                     local_ind.append(list(range(my_inds[dims[i]])))
 
     if DEBUG:
-        print('--> Exiting global_ind')
+        print('<-- Exiting global_ind')
     return local_ind
 

@@ -39,7 +39,7 @@ def transpose_grid(B):
     if DEBUG:
         print('--> Entering transpose_grid')
     comm = GPC.comm
-    my_rank = GPC.my_rank
+    my_rank = GPC.Pid
     
     # Check that B is 2D
     if (ndims(B) != 2):

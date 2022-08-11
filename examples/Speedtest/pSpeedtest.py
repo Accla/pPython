@@ -15,8 +15,8 @@ import pPython as GPC
 
 #  MPI information
 comm = GPC.comm
-Np = GPC.comm_size
-Pid = GPC.my_rank
+Np = GPC.Np
+Pid = GPC.Pid
 
 Nmessage = 20  # Number of message sizes.
 Ntrial = 4     # Trials per message size.

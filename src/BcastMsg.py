@@ -14,7 +14,7 @@ def BcastMsg(source, tag, *argv):
         print('--> Entering BcastMsg')
 
     comm = GPC.comm
-    Pid = GPC.my_rank
+    Pid = GPC.Pid
 
     # BcastMsg add an additional dictionary layer
     # So unpack it before returning the message.

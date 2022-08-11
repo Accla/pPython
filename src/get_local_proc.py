@@ -36,6 +36,7 @@ def get_local_proc(pitfalls, grid, ind):
             for j in range(g_dims[1]):
                 local_falls = get_local_falls(pitfalls, grid, grid[i,j])
                 # get_global_ind() returns a dictionary with numerical string keys
+                #    and its dictiionary value is a tuple of ranges of indices
                 global_ind[i][j] = get_global_ind(local_falls)
     
         # search each processor's global indices for the requested indices

@@ -27,7 +27,7 @@ PARALLEL = 1  # Set control flag.
 XYmap = 1     # Create serial map.
 
 if PARALLEL:
-    Np = GPC.comm_size
+    Np = GPC.Np
     XYmap = Dmap([Np, 1],{},range(Np))   # Create parallel map.
 
 X = zeros(N,N,map=XYmap)     # Create distributed X.

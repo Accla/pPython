@@ -30,8 +30,8 @@ def MPI_Bcast( source, tag, comm, *argv ):
     """
 
     # Get processor rank.
-    my_rank = MPI_Comm_rank(comm);
-    comm_size = MPI_Comm_size(comm);
+    my_rank = MPI_Comm_rank(comm)
+    comm_size = MPI_Comm_size(comm)
 
     # If not the source, then receive the data.
     # Make sure to return a cell array for varargout

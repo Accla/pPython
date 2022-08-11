@@ -17,6 +17,10 @@ def pyMPI_Dir_translate(machine_db,path):
     """
 
     DEBUG = 0
+    if DEBUG:
+        print('--> Entering pyMPI_Dir_translate')
+        for ref_path in machine_db['local_dir_map']:
+            print(ref_path)
 
     # Initialize the path check
     is_pc_path = 0
@@ -87,6 +91,9 @@ def pyMPI_Dir_translate(machine_db,path):
             local_path = sgrp_2_base + path[n_base:]
         elif is_sgrp_3_path:
             local_path = sgrp_3_base + path[n_base:]
+        elif is_linux_path:
+            # if both linux and LLGrid share the same path
+            local_path = linux_base + path[n_base:]
         # in case, local_path has Windows separator in path
         local_path = replace_token("\\","/",local_path)
     else:
@@ -104,7 +111,9 @@ def pyMPI_Dir_translate(machine_db,path):
             local_path = replace_token("\\","/",local_path)
 
     if DEBUG:
-        print('after replace: %s'%(dir_linux))
+        print('after replace: %s'%(local_path))
 
+    if DEBUG:
+        print('<-- Exiting pyMPI_Dir_translate')
     return local_path
 

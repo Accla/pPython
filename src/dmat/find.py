@@ -57,7 +57,7 @@ def find(x):
         GPC.tag_num = GPC.tag_num+1
         GPC.tag = 'tag-'+str(GPC.tag_num)
         
-        if inmap(x.map, GPC.my_rank):
+        if inmap(x.map, GPC.Pid):
             local_ij = np.argwhere(x.local)
             # Note: local_ij[:,0] -> local_i, local_ij[:,1] -> local_j
             if isinstance(x.global_ind[0], str):
@@ -81,8 +81,10 @@ def find(x):
                 print(local_i)
                 print('x.global_ind[0]')
                 print(x.global_ind[0])
-            global_i = np.array(x.global_ind[0])[local_i]
-            global_j = np.array(x.global_ind[1])[local_j]
+            # Change due to switch from list to tuple of range
+            # Select the first element of range lists in the tuple, x.global_ind[0][0], for the 1st dimension
+            global_i = np.array(list(x.global_ind[0][0]))[local_i]
+            global_j = np.array(list(x.global_ind[1][0]))[local_j]
         
             data = []
             data.append(global_i)
@@ -94,7 +96,7 @@ def find(x):
             #send local finds to everyone
             for d1 in range(grid_size[0]):
                 for d2 in range(grid_size[1]):
-                    if (GPC.my_rank != x.map.grid[d1,d2]):
+                    if (GPC.Pid != x.map.grid[d1,d2]):
                         MPI_Send(x.map.grid[d1,d2], GPC.tag, GPC.comm, data)
 
             #receive finds from everyone
@@ -105,7 +107,7 @@ def find(x):
                     if DEBUG:
                         print('x.map.grid[d1, d2]')
                         print(x.map.grid[d1,d2])
-                    if (GPC.my_rank != x.map.grid[d1,d2]):
+                    if (GPC.Pid != x.map.grid[d1,d2]):
                         [temp[d1][d2]] = MPI_Recv(x.map.grid[d1,d2], GPC.tag, GPC.comm)
                     else:
                         temp[d1][d2] = data
@@ -113,7 +115,7 @@ def find(x):
             j = []
             for d2 in range(grid_size[1]): #grid cols
                 for d1 in range(grid_size[0]): #grid rows
-                    if (GPC.my_rank != x.map.grid[d1,d2]):
+                    if (GPC.Pid != x.map.grid[d1,d2]):
                         if len(temp[d1][d2][0])>0:
                             i = i+list(temp[d1][d2][0])
                             j = j+list(temp[d1][d2][1])

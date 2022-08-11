@@ -15,7 +15,7 @@ def SendMsg(dest, tag, *argv):
         print('--> Entering SendMsg')
 
     comm = GPC.comm
-    Pid = GPC.my_rank
+    Pid = GPC.Pid
     
     # Send after packing the message into a dictionary
     msg = dict()

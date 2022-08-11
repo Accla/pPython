@@ -34,8 +34,8 @@ from beamformer_vectors import *
 
 #  MPI information
 comm = GPC.comm
-Np = GPC.comm_size
-Pid = GPC.my_rank
+Np = GPC.Np
+Pid = GPC.Pid
 
 # Set number of time snapshots, sensors, beams and frequencies.
 Nt = 600 

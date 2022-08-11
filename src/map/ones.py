@@ -44,7 +44,6 @@ def ones(*array_sizes, **keywords):
         print('--> Entering ones')
 
     #
-    m = n = q = r = None
     # form dims vector
     if isinstance(array_sizes[0],list):
         ndim = len(array_sizes[0])
@@ -52,13 +51,8 @@ def ones(*array_sizes, **keywords):
     else:
         ndim = len(array_sizes)
         dims = []
-        dims.append(array_sizes[0])
-        if ndim>1:
-            dims.append(array_sizes[1])
-        if ndim>2:
-            dims.append(array_sizes[2])
-        if ndim>3:
-            dims.append(array_sizes[3])
+        for i in range(ndim):
+            dims.append(array_sizes[i])
     if DEBUG:
         print('Dimension of distributed ones: %d'%(len(dims)))
         print(array_sizes)

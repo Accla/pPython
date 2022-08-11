@@ -87,8 +87,8 @@ mask = uint64(N-1)
 
 #  MPI information
 comm = GPC.comm
-Np = GPC.comm_size
-Pid = GPC.my_rank
+Np = GPC.Np
+Pid = GPC.Pid
 
 # Create maps.
 Xmap = 1

@@ -42,7 +42,6 @@ def rand(*array_sizes, **keywords):
     if DEBUG:
         print('--> Entering rand')
     
-    m = n = q = r = None
     # form dims vector
     if isinstance(array_sizes[0],list):
         ndim = len(array_sizes[0])
@@ -50,13 +49,8 @@ def rand(*array_sizes, **keywords):
     else:
         ndim = len(array_sizes)
         dims = []
-        dims.append(array_sizes[0])
-        if ndim>1:
-            dims.append(array_sizes[1])
-        if ndim>2:
-            dims.append(array_sizes[2])
-        if ndim>3:
-            dims.append(array_sizes[3])
+        for i in range(ndim):
+            dims.append(array_sizes[i])
     if DEBUG:
         print('Dimension of distributed zeros: %d'%(len(dims)))
         print(array_sizes)
@@ -107,8 +101,8 @@ def rand(*array_sizes, **keywords):
         for j in range(g[1]):     # i 1
             for i in range(g[0]): # j 2
                 if DEBUG:
-                    print('my rank: %d, Process grid rank: %d'%(GPC.my_rank,dmap.grid[i][j]))
-                if (GPC.my_rank==dmap.grid[i][j]):
+                    print('my rank: %d, Process grid rank: %d'%(GPC.Pid,dmap.grid[i][j]))
+                if (GPC.Pid==dmap.grid[i][j]):
                     d.local = np.random.random(local_size)
                 else:
                     np.random.random(local_size)
@@ -116,7 +110,7 @@ def rand(*array_sizes, **keywords):
         for k in range(g[2]):
             for j in range(g[1]):
                 for i in range(g[0]):
-                    if (GPC.my_rank==dmap.grid[i][j][k]):
+                    if (GPC.Pid==dmap.grid[i][j][k]):
                         d.local = np.random.random(local_size)
                     else:
                         np.random.random(local_size)
@@ -125,7 +119,7 @@ def rand(*array_sizes, **keywords):
             for k in range(g[2]):
                 for j in range(g[1]):
                     for i in range(g[0]):
-                        if (GPC.my_rank==dmap.grid[i][j][k][l]):
+                        if (GPC.Pid==dmap.grid[i][j][k][l]):
                             d.local = np.random.random(local_size)
                         else:
                             np.random.random(local_size)

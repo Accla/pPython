@@ -31,7 +31,7 @@ def subsasgn_1D(a,s,b):
             if (len(size(b))==2) and (size(b)==[1,1]): 
                 # b is a scalar
                 # if (size(b)==[1 1])
-                if inmap(a.map, GPC.my_rank):
+                if inmap(a.map, GPC.Pid):
                     # assigment to a scalar
                     a.local[:] = b
 

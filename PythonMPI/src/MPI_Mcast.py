@@ -4,9 +4,8 @@ from StopExecution import *
 from pyMPI_Buffer_file import *
 from pyMPI_Lock_file import *
 from pyMPI_Sleep import *
-
-# pPython class
-import pPython as GPC
+from MPI_Comm_rank import *
+from MPI_Comm_size import *
 
 def MPI_Mcast(source, dest, tag, comm, *argv):
     """Broadcast variables to everyone.
@@ -21,9 +20,8 @@ def MPI_Mcast(source, dest, tag, comm, *argv):
     unless pyMPI_Save_messages(1) has been called.
     """
     # Get processor rank.
-    comm = GPC.comm
-    my_rank = GPC.my_rank
-    comm_size = GPC.comm_size
+    my_rank = MPI_Comm_rank(comm)
+    comm_size = MPI_Comm_size(comm)
 
     # If not the source, then receive the data.
     if (my_rank != source):

@@ -46,7 +46,7 @@ def agg(d, leader=None):
         GPC.tag_num = 0
     GPC.tag = 'tag-'+str(GPC.tag_num)
     
-    if GPC.my_rank == map_leader:
+    if GPC.Pid == map_leader:
         if d.dim==2:
             if DEBUG:
                 print('DMAT is 2-D')
@@ -56,7 +56,7 @@ def agg(d, leader=None):
             for i in range(dim[0]):
                 temp_mat[i] = dict()
                 for j in range(dim[1]):
-                    if (GPC.my_rank==d.map.grid[i][j]):
+                    if (GPC.Pid==d.map.grid[i][j]):
                         temp_mat[i][j] = d.local
                         if DEBUG>2:
                             print('Local array, d.local:')
@@ -82,7 +82,7 @@ def agg(d, leader=None):
                 for j in range(dim[1]):
                     temp_mat[i][j] = dict()
                     for k in range(dim[2]):
-                        if (GPC.my_rank==d.map.grid[i][j][k]):
+                        if (GPC.Pid==d.map.grid[i][j][k]):
                             temp_mat[i][j][k] = d.local
                             if DEBUG>2:
                                 print('Local array, d.local:')
@@ -110,7 +110,7 @@ def agg(d, leader=None):
                     for k in range(dim[2]):
                         temp_mat[i][j][k] = dict()
                         for m in range(dim[3]):
-                            if (GPC.my_rank==d.map.grid[i][j][k][m]):
+                            if (GPC.Pid==d.map.grid[i][j][k][m]):
                                 temp_mat[i][j][k][m] = d.local
                                 if DEBUG>2:
                                     print('Local array, d.local:')
@@ -140,7 +140,7 @@ def agg(d, leader=None):
             elif d.dim==3:
                 print('DMAT is 3-D')
         # send local data to the leader regardless of the matrix dimension
-        if inmap(d.map, GPC.my_rank): # only send data if processor is in the map
+        if inmap(d.map, GPC.Pid): # only send data if processor is in the map
             MPI_Send(map_leader, GPC.tag, GPC.comm, d.local)
             if DEBUG>2:
                 print('Sent msg to %d with tag, %s'%(map_leader,GPC.tag))

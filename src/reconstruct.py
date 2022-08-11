@@ -79,8 +79,10 @@ def reconstruct(pitfalls, grid, temp_mat, mat_size):
             j = 0
             for jkey in jkeys:
                 if temp_mat[ikey][jkey].any() != 0.0:
-                    ii = my_global_ind[i][j][0]
-                    jj = my_global_ind[i][j][1]
+                    # Change due to switch from list to tuple of ranges
+                    # Select the 1st range element in the tuple
+                    ii = my_global_ind[i][j][0][0]
+                    jj = my_global_ind[i][j][1][0]
                     if DEBUG:
                         print('mat index: ii,jj = %d,%d'%(len(ii),len(jj)))
                         print('temp_mat keys: ikey,jkey = %s,%s'%(ikey,jkey))
@@ -134,9 +136,11 @@ def reconstruct(pitfalls, grid, temp_mat, mat_size):
                 k = 0
                 for kkey in kkeys:
                     if temp_mat[ikey][jkey][kkey].any() != 0.0:
-                        ii = my_global_ind[i][j][k][0]
-                        jj = my_global_ind[i][j][k][1]
-                        kk = my_global_ind[i][j][k][2]
+                        # Change due to switch from list to tuple of ranges
+                        # Select the 1st range element in the tuple
+                        ii = my_global_ind[i][j][k][0][0]
+                        jj = my_global_ind[i][j][k][1][0]
+                        kk = my_global_ind[i][j][k][2][0]
                         if DEBUG:
                             print('mat index: ii,jj,kk = %d,%d,%d'%(len(ii),len(jj),len(kk)))
                             print('temp_mat keys: ikey,jkeykkey = %s,%s,%s'%(ikey,jkey,kkey))
@@ -202,10 +206,12 @@ def reconstruct(pitfalls, grid, temp_mat, mat_size):
                     m = 0
                     for mkey in mkeys:
                         if temp_mat[ikey][jkey][kkey][mkey].any() != 0.0:
-                            ii = my_global_ind[i][j][k][m][0]
-                            jj = my_global_ind[i][j][k][m][1]
-                            kk = my_global_ind[i][j][k][m][2]
-                            ll = my_global_ind[i][j][k][m][3]
+                            # Change due to switch from list to tuple of ranges
+                            # Select the 1st range element in the tuple
+                            ii = my_global_ind[i][j][k][m][0][0]
+                            jj = my_global_ind[i][j][k][m][1][0]
+                            kk = my_global_ind[i][j][k][m][2][0]
+                            ll = my_global_ind[i][j][k][m][3][0]
                             if DEBUG:
                                 print('mat index: ii,jj,kk,mm = %d,%d,%d,%d'%(len(ii),len(jj),len(kk),len(mm)))
                                 print('temp_mat keys: ikey,jkeykkey,mkey = %s,%s,%s,%s'%(ikey,jkey,kkey,mkey))

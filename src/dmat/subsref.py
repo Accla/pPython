@@ -236,7 +236,7 @@ def subsref(a,s):
                 #
                 # If local processor has data that needs to be sent, send it.
                 #
-                if np.prod(size(a.local)) > 0 and inmap(mapB, GPC.my_rank):
+                if np.prod(size(a.local)) > 0 and inmap(mapB, GPC.Pid):
                     b.local = subsref(a.local, s_data)
 
         else: #make a call to submat with a warning

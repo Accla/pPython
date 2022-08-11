@@ -44,8 +44,8 @@ at the Python prompt type
 
 #  MPI information
 comm = GPC.comm
-Np = GPC.comm_size
-Pid = GPC.my_rank
+Np = GPC.Np
+Pid = GPC.Pid
 
 PARALLEL=1                           # Turn parallelism on and off.
 

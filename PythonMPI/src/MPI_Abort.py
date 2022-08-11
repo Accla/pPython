@@ -34,6 +34,9 @@ def MPI_Abort():
     pid_files = glob('PythonMPI/pid.*.*')
     n_files = len(pid_files)
 
+    # Save the pid list for the same machine in a dictionary variable
+    pid_list = dict()
+
     # Set some strings for special characters.
     # Get single quote character. 
     q = '\''
@@ -57,6 +60,18 @@ def MPI_Abort():
                 # Parse file name.
                 machine = '.'.join(tstr[1:-1])
                 pid = tstr[-1]
+                if machine not in pid_list:
+                    pid_list[machine] = []
+                    pid_list[machine].append(pid)
+                else:
+                    pid_list[machine].append(pid)
+
+        # Loop over each machine.
+        for i_m in pid_list.keys():
+            # List all the process pid on the same machine
+            for i_m in pid_list.keys():
+                pid = ' '.join(pid_list[i_m])
+                machine = i_m
 
             # Check if the target machine is a PC
             if pid == 'pc':
