@@ -39,8 +39,8 @@ def gagg(m,dest=0,ops='+',plist=None):
 
     #  MPI information
     comm = GPC.comm
-    Np = GPC.comm_size
-    Pid = GPC.my_rank
+    Np = GPC.Np
+    Pid = GPC.Pid
     
     if Np == 1:
          return m

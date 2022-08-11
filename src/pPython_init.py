@@ -24,8 +24,8 @@ def pPython_init():
     GPC.comm = pyMCW.MPI_COMM_WORLD
 
     # Get size and rank.
-    GPC.comm_size = MPI_Comm_size(GPC.comm)
-    GPC.my_rank = MPI_Comm_rank(GPC.comm)
+    GPC.Np = MPI_Comm_size(GPC.comm)
+    GPC.Pid = MPI_Comm_rank(GPC.comm)
 
     # Set the default leader
     GPC.leader = 0

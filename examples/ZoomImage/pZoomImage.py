@@ -33,8 +33,8 @@ To run in parallel with distributed arrays at the Python prompt type
 
 #  MPI information
 comm = GPC.comm
-Np = GPC.comm_size
-Pid = GPC.my_rank
+Np = GPC.Np
+Pid = GPC.Pid
 
 # Set image size, number frames, start and stop scale.
 N = 512;  Ns  = 16; Sstart = 32; Send = 1

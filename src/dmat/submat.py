@@ -70,7 +70,7 @@ def submat(a, s):
             # create a PITFALLS for each dimension
             for i in range(new_map.dim):
                 b.pitfalls[i] = gen_pitfalls(size(new_map.grid,i), new_map.dist_spec[i], 1)
-            b.falls = get_local_falls(b.pitfalls, new_map.grid, GPC.my_rank)
+            b.falls = get_local_falls(b.pitfalls, new_map.grid, GPC.Pid)
             b.local = a.local[local_ind[0], local_ind[1]]
             b.local_dim = size(b.local)  # added with gridPython
             grid_dims = size(new_map.grid)

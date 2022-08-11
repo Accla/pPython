@@ -16,8 +16,8 @@ UseGraphics = 1
 # Create communicator.
 # pPython as GPC in pPython.py
 comm = GPC.comm
-Np = GPC.comm_size
-Pid = GPC.my_rank 
+Np = GPC.Np
+Pid = GPC.Pid 
 
 # Turn parallelism on or off.
 PARALLEL = 1   # Can be 1 or 0.  OK to change.

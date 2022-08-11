@@ -39,11 +39,11 @@ def synch(d):
     p = d.map
     # find current processor index in the grid
     proc_grid = p.grid
-    my_grid_ind = n_dim_find(proc_grid, GPC.my_rank)
+    my_grid_ind = n_dim_find(proc_grid, GPC.Pid)
     # obtain the process grid dimensions
     grid_dims = list(proc_grid.shape)
 
-    if inmap(p, GPC.my_rank):
+    if inmap(p, GPC.Pid):
         subs = []
         for i  in range(d.dim): # syncronize each dimension of distributed array
             if bool(p.overlap): # overlap description defined

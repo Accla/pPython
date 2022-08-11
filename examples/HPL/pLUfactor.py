@@ -28,8 +28,8 @@ def pLUfactor(A):
 
     #  MPI information
     comm = GPC.comm
-    Np = GPC.comm_size
-    Pid = GPC.my_rank
+    Np = GPC.Np
+    Pid = GPC.Pid
 
     N,N = A.shape                           # Get size of distributed array A.  
     # Python index starts from 0. Hene -1

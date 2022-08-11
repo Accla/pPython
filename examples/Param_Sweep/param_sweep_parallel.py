@@ -33,8 +33,8 @@ comm = GPC.comm
 # Get size and rank.
 # Np = MPI_Comm_size(comm)
 # Pid = MPI_Comm_rank(comm)
-Np = GPC.comm_size
-Pid = GPC.my_rank
+Np = GPC.Np
+Pid = GPC.Pid
 
 # Print rank.
 print('size: %d'%(Np))

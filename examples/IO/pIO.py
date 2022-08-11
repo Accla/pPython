@@ -29,8 +29,8 @@ at the PYthon prompt type
 
 #  MPI information
 comm = GPC.comm
-Np = GPC.comm_size
-Pid = GPC.my_rank
+Np = GPC.Np
+Pid = GPC.Pid
 
 # Print rank.
 print('size: %d'%(Np))

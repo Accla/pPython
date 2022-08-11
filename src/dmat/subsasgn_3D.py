@@ -84,14 +84,14 @@ def subsasgn_3D(a,s,b):
             else:
                 # maps not the same - redistribution
                 # compute falls intersections
-                if (inmap(a.map, GPC.my_rank)) or (inmap(b.map, GPC.my_rank)):
+                if (inmap(a.map, GPC.Pid)) or (inmap(b.map, GPC.Pid)):
                     # the local processor is either in a's or b's map
     
                     # if local processor belongs to b's map, get
                     # a's local falls and compute intersections
                     b_row_fi = dict()
                     b_col_fi = dict()
-                    if inmap(b.map, GPC.my_rank): 
+                    if inmap(b.map, GPC.Pid): 
                         # belongs to b's map
                          for i in range(len(a.map.proc_list)):
                             a_falls = get_local_falls(a.pitfalls, a.map.grid, a.map.proc_list[i])
@@ -106,7 +106,7 @@ def subsasgn_3D(a,s,b):
                     # intersections
                     a_row_fi = dict()
                     a_col_fi = dict()
-                    if inmap(a.map, GPC.my_rank):
+                    if inmap(a.map, GPC.Pid):
                         for i in range(len(b.map.proc_list)):
                             b_falls = get_local_falls(b.pitfalls, b.map.grid, b.map.proc_list[i])
                             # falls intersection on a's procs
@@ -125,10 +125,10 @@ def subsasgn_3D(a,s,b):
                         GPC.tag_num = GPC.tag_num+1
                         GPC.tag = 'tag-'+str(GPC.tag_num)
     
-                        if (inmap(a.map, GPC.my_rank)) or (inmap(b.map, GPC.my_rank)):
+                        if (inmap(a.map, GPC.Pid)) or (inmap(b.map, GPC.Pid)):
                             # the local processor is either in a's or b's map
                             if b.map.proc_list[p1] != a.map.proc_list[p2]: # comm is needed
-                                if GPC.my_rank==b.map.proc_list[p1]: # my rank is current B rank
+                                if GPC.Pid==b.map.proc_list[p1]: # my rank is current B rank
                                     # redistribute data
                                     if b_row_fi[p2].size and a_col_fi[p2].size and b_dim3_fi[p2].size :
                                         # all intersections not empty
@@ -142,7 +142,7 @@ def subsasgn_3D(a,s,b):
                                         # **************************************
                                         MPI_Send(a.map.proc_list[p2], GPC.tag, GPC.comm, data)
                                         # both intersections not empty
-                                elif GPC.my_rank==a.map.proc_list[p2]: # my_rank is current A rank
+                                elif GPC.Pid==a.map.proc_list[p2]: # my_rank is current A rank
                                     if a_row_fi[p1].size and a_col_fi[p1].size and a_dim3_fi[p1].size : 
                                         # all intersections not empty
                                         # [scratch, a_local_ind] = subsasgn_data(a, b, p1, a_row_fi, a_col_fi) 
@@ -160,7 +160,7 @@ def subsasgn_3D(a,s,b):
                                             # both intersections not empty
                                         # my_rank is current A rank
                             elif b.map.proc_list[p1] == a.map.proc_list[p2]: # no comm
-                                if GPC.my_rank==a.map.proc_list[p2]:
+                                if GPC.Pid==a.map.proc_list[p2]:
                                     if b_row_fi[p2].size and b_col_fi[p2].size and b_dim3_fi[p2].size : 
                                         # all intersections not empty
                                         # [data, a_local_ind] = subsasgn_data(a, b, p2, b_row_fi, b_col_fi) 
@@ -225,7 +225,7 @@ def subsasgn_3D(a,s,b):
                     s2D['subs'] = {0:':',1:':'}                                   
                     subsA2 = subsasgn_2D(subsA, s2D, b)
                     if amap_slice == subsA2.map:
-                        if inmap(amap_slice, GPC.my_rank):
+                        if inmap(amap_slice, GPC.Pid):
                             # get local indices
                             ind = get_ind_range(a,s)
                             local_ind = get_local_ind(a.global_ind, ind)
