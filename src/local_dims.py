@@ -17,7 +17,7 @@ def local_dims(falls, dim):
  
     LOCAL_SIZE:
         length(LOCAL_SIZE)is equal to the number of dimensions of the
-        distributed object.
+        distributed object. a NumPy array
  
     Author: Nadya Travinin
     Python version: Dr. Chansup Byun
@@ -33,6 +33,7 @@ def local_dims(falls, dim):
             for i in range(dim):
                 # local size is just the local_len field of the local falls
                 local_size = local_size + [int(falls[i].local_len)]
+            local_size = np.array(local_size)
         else: # no local data
             local_size = np.zeros(dim,dtype='int')
     else:
