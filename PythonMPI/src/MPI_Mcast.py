@@ -4,6 +4,7 @@ from StopExecution import *
 from pyMPI_Buffer_file import *
 from pyMPI_Lock_file import *
 from pyMPI_Sleep import *
+from pyMPI_Wait import *
 from MPI_Comm_rank import *
 from MPI_Comm_size import *
 
@@ -118,15 +119,7 @@ def MPI_Mcast(source, dest, tag, comm, *argv):
                     # Get lock file name.
                     lock_file = pyMPI_Lock_file(my_rank,ii,tag,comm);
                     # Spin on lock file until it is deleted.
-                    # Spin on lock file until it is created.
-                    loop = 0;
-                    while os.path.exists(lock_file) == True :
-                        loop = loop + 1;
-                        # Sleep statement allows cleaner profiling, but adds latency.
-                        pyMPI_Sleep(0.05);
-                        if loop > 200:
-                            print('MPI_Bcast: the %s file is not deleted yet.'%(lock_file))
-                            raise StopExecution
+                    pyMPI_Wait('MPI_Mcast', lock_file, True)
 
             # Now all processes have received the broadcasted message.
             # Delete the source buffer file.

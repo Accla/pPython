@@ -5,6 +5,7 @@ from StopExecution import *
 from pyMPI_Buffer_file import *
 from pyMPI_Lock_file import *
 from pyMPI_Sleep import *
+from pyMPI_Wait import *
 from MPI_Comm_rank import *
 
 def MPI_Recv( source, tag, comm ):
@@ -42,31 +43,10 @@ def MPI_Recv( source, tag, comm ):
         print(buffer_file)
 
     # Spin on lock file until it is created.
-    loop = 0;
-    sum = 0;
-    pause_time = pause_init
-    while os.path.exists(lock_file) == False :
-        # Sleep statement allows cleaner profiling, but adds latency.
-        sum += pause_time
-        pyMPI_Sleep(pause_time);
-        if loop > 100:
-            print('MPI_Recv: failed to find the %s file.'%(lock_file))
-            print('Loop: %d, total wait time: %f, last pause interval: %f'%(loop,sum,pause_time))
-            raise StopExecution
-        loop = loop + 1
-        pause_time += pause_time * pause_rate
+    pyMPI_Wait('MPI_Recv', lock_file, False)
             
     # Spin on buffer file until it is created.
-    loop = 0;
-    pause_time = pause_init
-    while os.path.exists(buffer_file) == False :
-        # Sleep statement allows cleaner profiling, but adds latency.
-        pyMPI_Sleep(pause_time);
-        if loop > 100:
-            print('MPI_Recv: failed to find the %s file.'%(buffer_file))
-            raise StopExecution
-        loop = loop + 1
-        pause_time += pause_time * pause_rate
+    pyMPI_Wait('MPI_Recv', buffer_file, False)
 
     # Read all data out of buffer_file.
     buf = load_dict_from_pickle(buffer_file)
