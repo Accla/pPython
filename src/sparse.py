@@ -62,7 +62,7 @@ def sparse(*argv,**kwargs):
     if nargin==1:
         d = argv[0]
         if isinstance(d,Dmat):
-            d.local = csc_matrix(d.local)
+            d.local = csr_matrix(d.local)
         else:
             print('Error: input argument is not a disbributed matrix or array.')
             raise StopExecution
