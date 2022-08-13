@@ -70,7 +70,6 @@ class Dmat:
         if DEBUG:
             print('--> Entering Dmat.init')
         #
-        m = n = q = r = None
         # form dims vector
         if array_sizes == None or len(array_sizes)==0:
             self.local = None
@@ -81,13 +80,8 @@ class Dmat:
         else:
             ndim = len(array_sizes)
             dims = []
-            dims.append(array_sizes[0])
-            if ndim>1:
-                dims.append(array_sizes[1])
-            if ndim>2:
-                dims.append(array_sizes[2])
-            if ndim>3:
-                dims.append(array_sizes[3])
+            for k in range(ndim):
+                dims.append(array_sizes[k])
         if DEBUG:
             print('Dimension of distributed dmat array: %d'%(len(dims)))
             print(array_sizes)
@@ -177,8 +171,8 @@ class Dmat:
         
         # Allocating memory is the responsibility of map functions
         # (e.g. ones, zeros, rand and sparse)
-        # d.local = zeros(local_dim);
-        self.local = []
+        # pPython: allocate memory for sparse method
+        self.local = np.array(self.local_dim, dtype)
         
         # get the local indices for the current processor
         grid_dims = dmap.grid_spec
@@ -375,6 +369,52 @@ class Dmat:
             print('The type, %s, is not supported for the subtraction operator with Dmat class yet.'%(type(other)))
             exit()
         return self
+
+    def __eq__(self,other):
+        """
+        == Equal (distributed matrices).
+        A==B compares dimensions, maps and data.
+        If maps are equal and dimensions agree then the output is a
+        distribituted array with 0 where elements are not equal and 1s where
+        elements are equal (similarly to serial MATLAB).
+        
+        If the maps are not equal, then a 0 is returned regardless of any
+        other properties. Also, if the dimensions and/or sizes are not equal,
+        then an error gets thrown (analogous to serial MATLAB behavior).
+        
+        Author:   Nadya Travinin
+        
+        NOTES:
+        A possible other approach to the case where the maps are not equal,
+        but the data is, is to return a distributed matrix (distributed along
+        A's or B's map with 0 and 1 as described above. However, this approach
+        would incur sever communication costs, additionally it is not clear
+        what the distribution of the output matrix should be. Thus for now,
+        this is left as an unimplemented open ended question.
+        """
+        
+        if (self.map == other.map): #compare maps
+            if (self.dim == other.dim): #compare dimensions
+                if (self.shape == other.shape): #compare shape (a.k.a. size)
+                    if self.dim == 2:
+                        c = Dmat(self.shape[0],self.shape[1], map=self.map)
+                    elif self.dim == 3:
+                        c = Dmat(self.shape[0], self.shape[1], self.shape[2], map=self.map)
+                    elif self.dim == 4:
+                        c = Dmat(self.shape[0], self.shape[1], self.shape[2], self.shape[3], map=self.map)
+                    else:
+                        print('Dmat/eq: Only distributed arrays of up to 4D are supported')
+                        exit(-1)
+                    c.local = (self.local == other.local)
+                else: #shape not equal
+                    print('dmat/eq:Matrix dimensions must agree')
+                    exit(-1)
+            else: #dimensions not equal
+                print('@dmat/eq:Matrix dimensions must agree')
+                exit(-1)
+        else: #maps not equal
+            c = False
+        return c
 
     def copy(self):
         """Copy the given dmat."""
