@@ -407,12 +407,17 @@ class Dmat:
                             print('Dmat/eq: Only distributed arrays of up to 4D are supported')
                             exit(-1)
                         c.local = (self.local == other.local)
+                        # Check if c.local is all True
+                        if (c.local).any():
+                            c = True
+                        else:
+                            c = False
                     else: #shape not equal
                         print('dmat/eq:Matrix dimensions must agree')
-                        exit(-1)
+                        c = False
                 else: #dimensions not equal
                     print('@dmat/eq:Matrix dimensions must agree')
-                    exit(-1)
+                    c = False
             else: #maps not equal
                 c = False
         else: #is not a Dmat object.
