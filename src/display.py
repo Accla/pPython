@@ -33,15 +33,12 @@ def display(m):
 
     elif isinstance(m,Dmat):
         # ToDo: is there any better way to find the input variable name in Python?
-        key_list=list(sys._getframe(1).f_locals.keys())
-        val_list=list(sys._getframe(1).f_locals.values())
-        # Look for the key pairing with the value of m
-        ind=val_list.index(m)
-        input_name = key_list[ind]
+        # Find all keys with same value
+        keys = [k for k,v in sys._getframe(1).f_locals.items() if v == m]
+
         if DEBUG:
-            print(ind)
-            print(input_name)
-        print('%s = '%(input_name))
+            print(keys)
+        print('%s = '%(keys[0]))
         print('  Distributed matrix object')
         print(agg(m))
 
