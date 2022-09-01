@@ -393,26 +393,29 @@ class Dmat:
         this is left as an unimplemented open ended question.
         """
         
-        if (self.map == other.map): #compare maps
-            if (self.dim == other.dim): #compare dimensions
-                if (self.shape == other.shape): #compare shape (a.k.a. size)
-                    if self.dim == 2:
-                        c = Dmat(self.shape[0],self.shape[1], map=self.map)
-                    elif self.dim == 3:
-                        c = Dmat(self.shape[0], self.shape[1], self.shape[2], map=self.map)
-                    elif self.dim == 4:
-                        c = Dmat(self.shape[0], self.shape[1], self.shape[2], self.shape[3], map=self.map)
-                    else:
-                        print('Dmat/eq: Only distributed arrays of up to 4D are supported')
+        if hasattr(other,'map'):
+            if (self.map == other.map): #compare maps
+                if (self.dim == other.dim): #compare dimensions
+                    if (self.shape == other.shape): #compare shape (a.k.a. size)
+                        if self.dim == 2:
+                            c = Dmat(self.shape[0],self.shape[1], map=self.map)
+                        elif self.dim == 3:
+                            c = Dmat(self.shape[0], self.shape[1], self.shape[2], map=self.map)
+                        elif self.dim == 4:
+                            c = Dmat(self.shape[0], self.shape[1], self.shape[2], self.shape[3], map=self.map)
+                        else:
+                            print('Dmat/eq: Only distributed arrays of up to 4D are supported')
+                            exit(-1)
+                        c.local = (self.local == other.local)
+                    else: #shape not equal
+                        print('dmat/eq:Matrix dimensions must agree')
                         exit(-1)
-                    c.local = (self.local == other.local)
-                else: #shape not equal
-                    print('dmat/eq:Matrix dimensions must agree')
+                else: #dimensions not equal
+                    print('@dmat/eq:Matrix dimensions must agree')
                     exit(-1)
-            else: #dimensions not equal
-                print('@dmat/eq:Matrix dimensions must agree')
-                exit(-1)
-        else: #maps not equal
+            else: #maps not equal
+                c = False
+        else: #is not a Dmat object.
             c = False
         return c
 
