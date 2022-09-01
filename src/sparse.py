@@ -6,7 +6,6 @@ import numpy as np
 import pPython as GPC
 from Dmat import *
 from Dmap import *
-from dmat import *
 from get_local_falls import *
 from local_dims import *
 from StopExecution import *
