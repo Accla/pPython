@@ -63,7 +63,7 @@ class Dmap:
         self.grid_spec = grid_spec
         self.proc_list = proc_list
  
-        if not overlap:
+        if overlap:
             # MAP(GRID_SPEC, DIST_SPEC, PROC_LIST)
             # ensure that distribution is specified
             if not bool(dist_spec):
