@@ -1,9 +1,11 @@
 import numpy as np
+import sys
 
 # pPython class
 import pPython as GPC
 from Dmat import *
 from Dmap import *
+from agg import *
 
 def display(m):
     """
@@ -30,6 +32,15 @@ def display(m):
             print('      Dim %d: %s'%(i,m.dist_spec[i]['dist']))
 
     elif isinstance(m,Dmat):
+        # ToDo: is there any better way to find the input variable name in Python?
+        key_list=list(sys._getframe(1).f_locals.keys())
+        val_list=list(sys._getframe(1).f_locals.values())
+        # Look for the key pairing with the value of m
+        ind=val_list.index(m)
+        input_name = key_list[ind]
+        if DEBUG:
+            print(ind)
+            print(input_name)
         print('%s = '%(input_name))
         print('  Distributed matrix object')
         print(agg(m))
