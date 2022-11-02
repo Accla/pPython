@@ -42,8 +42,8 @@ GRIDPYTHON_PATH = PPYTHON_HOME+os.sep+"grid"
 sys.path.append(GRIDPYTHON_PATH)
 
 # Local configuration setup
-LOCAL_PPYTHON_PATH = os.getenv('HOME')+os.sep+"pythonmpi"
-sys.path.append(LOCAL_PPYTHON_PATH)
+LOCAL_PYTHONMPI_CONFIG_PATH = os.getenv('HOME')+os.sep+"pythonmpi"
+sys.path.append(LOCAL_PYTHONMPI_CONFIG_PATH)
 
 # Import PythonMPI launch funciton
 from pRUN import *

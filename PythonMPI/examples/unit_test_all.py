@@ -50,7 +50,7 @@ HOME_PATH="/home/gridsan/ch21778"
 HOME_PATH="Z:"
 LLSC_PYTHONMPI_PATH = HOME_PATH+os.sep+"devtools"+os.sep+"git"+os.sep+"PythonMPI"+os.sep+"src"
 # Export the path to modify PythonMPI settings for an individual user
-USER_PYTHONMPI_PATH = HOME_PATH+os.sep+"pythonmpi"
+LOCAL_PYTHONMPI_CONFIG_PATH = HOME_PATH+os.sep+"pythonmpi"
 
 # Add the current working directory to the system path
 # so that any Python codes in the current working directory
@@ -58,7 +58,7 @@ USER_PYTHONMPI_PATH = HOME_PATH+os.sep+"pythonmpi"
 CWD_PATH = os.getcwd()
 
 sys.path.append(LLSC_PYTHONMPI_PATH)
-sys.path.append(USER_PYTHONMPI_PATH)
+sys.path.append(LOCAL_PYTHONMPI_CONFIG_PATH)
 sys.path.append(CWD_PATH)
 
 from unit_test import *
@@ -69,7 +69,7 @@ if OS.ispc:
     sep_path = ";"
 else:
     sep_path = ':'
-PYTHONMPI_PATH = LLSC_PYTHONMPI_PATH+sep_path+USER_PYTHONMPI_PATH+sep_path+CWD_PATH
+PYTHONMPI_PATH = LLSC_PYTHONMPI_PATH+sep_path+LOCAL_PYTHONMPI_CONFIG_PATH+sep_path+CWD_PATH
 os.environ["PYTHONMPI_PATH"] = PYTHONMPI_PATH
 
 # Disable HDF5 file locking

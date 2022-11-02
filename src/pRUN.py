@@ -34,11 +34,11 @@ if not HOME_PATH:
     print('ERROR(pRUN): HOME_PATH is not set.')
     exit()
 
-LOCAL_PPYTHON_CONFIG_PATH = os.getenv('HOME')+os.sep+'pythonmpi'
-if not os.path.exists(LOCAL_PPYTHON_CONFIG_PATH):
-    print('ERROR(pRUN): LOCAL_PPYTHON_CONFIG_PATH path, %s, does not exist.'%(LOCAL_PPYTHON_CONFIG_PATH))
+LOCAL_PYTHONMPI_CONFIG_PATH = os.getenv('HOME')+os.sep+'pythonmpi'
+if not os.path.exists(LOCAL_PYTHONMPI_CONFIG_PATH):
+    print('ERROR(pRUN): LOCAL_PYTHONMPI_CONFIG_PATH path, %s, does not exist.'%(LOCAL_PYTHONMPI_CONFIG_PATH))
     exit()
-sys.path.append(LOCAL_PPYTHON_CONFIG_PATH)
+sys.path.append(LOCAL_PYTHONMPI_CONFIG_PATH)
 
 sys.path.append(PPYTHON_PATH)
 
@@ -130,7 +130,7 @@ def pRUN(py_file,n_proc,machines,sched_options=None):
     GRID_PATH = grid.grid_config['PPYTHON_PATH']+sep_path \
         +grid.grid_config['GRIDPYTHON_PATH']+sep_path \
         +grid.grid_config['PYTHONMPI_PATH']+sep_path \
-        +grid.grid_config['LOCAL_PPYTHON_CONFIG_PATH']+sep_path \
+        +grid.grid_config['LOCAL_PYTHONMPI_CONFIG_PATH']+sep_path \
         +grid.grid_config['DMAP_PATH']+sep_path \
         +grid.grid_config['DMAT_PATH']+sep_path \
         +grid.grid_config['CWD_PATH']

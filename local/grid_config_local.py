@@ -33,7 +33,7 @@ def grid_config_local(grid_config):
     grid_config['PYTHONMPI_PATH']: PythonMPI source installation path
     grid_config['DMAP_PATH']: distributed map source installation path
     grid_config['DMAT_PATH']: distributed array source installation path
-    grid_config['LOCAL_PYTHONMPI_PATH']: path for remote user configuration customization files
+    grid_config['LOCAL_PYTHONMPI_CONFIG_PATH']: path for remote user configuration customization files
     grid_config['CWD_PATH']: current working directory path where you submit a job (automatically detected)
 
     """
@@ -131,7 +131,7 @@ def grid_config_local(grid_config):
         # PythonMPI installation path
         PYTHONMPI_PATH = PPYTHON_HOME+os.sep+"PythonMPI"+os.sep+"src"
         # PythonMPI customization path for an individual user
-        LOCAL_PYTHONMPI_PATH = HOME_PATH+os.sep+"pythonmpi"
+        LOCAL_PYTHONMPI_CONFIG_PATH = HOME_PATH+os.sep+"pythonmpi"
         # pPython path (codes for scheduler integration)
         GRIDPYTHON_PATH = PPYTHON_HOME+os.sep+"grid"
         # Current working directory path
@@ -149,7 +149,7 @@ def grid_config_local(grid_config):
     grid_config['HOME_PATH'] =  HOME_PATH
     grid_config['PPYTHON_PATH'] = PPYTHON_PATH
     grid_config['PYTHONMPI_PATH'] = PYTHONMPI_PATH
-    grid_config['LOCAL_PYTHONMPI_PATH'] = LOCAL_PYTHONMPI_PATH
+    grid_config['LOCAL_PYTHONMPI_CONFIG_PATH'] = LOCAL_PYTHONMPI_CONFIG_PATH
     grid_config['GRIDPYTHON_PATH'] = GRIDPYTHON_PATH
     grid_config['CWD_PATH'] = CWD_PATH
 
