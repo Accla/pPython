@@ -26,6 +26,9 @@ To run in parallel with distributed arrays at the Python prompt type
     eval(pRUN('pMandelbrot',2,{}))
 """
 
+# To display the figure 
+DISPLAY = 1
+
 #  MPI information
 comm = GPC.comm
 Np = GPC.Np
@@ -88,6 +91,8 @@ if (Pid == 0):
     npstr = str(Np)
     filename = 'mandelbrot_'+pstr+'_'+npstr
     plt.savefig(filename+'.png')
+    if DISPLAY:
+        plt.show()
 
 print('')
 print('')

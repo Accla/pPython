@@ -12,7 +12,7 @@ def pPython_ver():
     """
     
     location = pathlib.Path().absolute()
-    version = '0.8.2'
+    version = '0.8.3'
     
     print('pPython version: %s'%(version))
     print('          Location: %s'%(location))

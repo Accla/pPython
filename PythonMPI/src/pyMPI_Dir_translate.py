@@ -22,6 +22,13 @@ def pyMPI_Dir_translate(machine_db,path):
         for ref_path in machine_db['local_dir_map']:
             print(ref_path)
 
+    if OS.islocal:
+        # Running locally, local_path == path
+        if DEBUG:
+            print('pyMPI_Dir_translate: running locally, local_path == path')
+            print('<-- Exiting pyMPI_Dir_translate')
+        return path
+
     # Initialize the path check
     is_pc_path = 0
     is_linux_path = 0

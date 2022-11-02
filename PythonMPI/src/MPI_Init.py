@@ -22,6 +22,7 @@ def MPI_Init():
         print(pyMCW.MPI_COMM_WORLD)
 
     # Convert pc and unix directories.
+    OS.islocal = pyMCW.MPI_COMM_WORLD['islocal']
     for ii in range(pyMCW.MPI_COMM_WORLD['machine_db']['n_machine']):
         dir = pyMCW.MPI_COMM_WORLD['machine_db']['dir'][ii]
         dir_pc, dir_linux, dir_mac, dir_grid = pyMPI_Dir_map(pyMCW.MPI_COMM_WORLD['machine_db'],dir)

@@ -33,7 +33,7 @@ def grid_config_local(grid_config):
     grid_config['PYTHONMPI_PATH']: PythonMPI source installation path
     grid_config['DMAP_PATH']: distributed map source installation path
     grid_config['DMAT_PATH']: distributed array source installation path
-    grid_config['USER_PYTHONMPI_PATH']: path for remote user configuration customization files
+    grid_config['LOCAL_PYTHONMPI_PATH']: path for remote user configuration customization files
     grid_config['CWD_PATH']: current working directory path where you submit a job (automatically detected)
 
     """
@@ -86,8 +86,9 @@ def grid_config_local(grid_config):
     elif cluster_name == 'txe1':
         grid_config['remote_host'] = 'txe1-login.mit.edu'
     else:
-        print('grid_config_local: Unsupported system. Exited.')
-        exit()
+        # print('grid_config_local: Unsupported system. Exited.')
+        # exit()
+        print('grid_config_local: This is not a LLSC system. ')
 
     grid_config['remote_launch'] = 'ssh'
     grid_config['remote_flags'] = '-q -x'
@@ -116,21 +117,29 @@ def grid_config_local(grid_config):
             HOME_PATH = '/home/gridsan/'+USER
         elif OS.ismac:
             HOME_PATH = '/Volumes/'+USER
+        if not os.path.exists(HOME_PATH):
+            HOME_PATH = os.getenv('HOME')
         else:
             print('HOME_PATH is not set. Check OS type.')
             exit()
 
     # pPython installation path
-    PPYTHON_HOME = os.getenv('PPYTHON_HOME')
-    PPYTHON_PATH = PPYTHON_HOME+os.sep+"src"
-    # PythonMPI installation path
-    PYTHONMPI_PATH = PPYTHON_HOME+os.sep+"PythonMPI"+os.sep+"src"
-    # PythonMPI customization path for an individual user
-    USER_PYTHONMPI_PATH = HOME_PATH+os.sep+"pythonmpi"
-    # pPython path (codes for scheduler integration)
-    GRIDPYTHON_PATH = PPYTHON_HOME+os.sep+"grid"
-    # Current working directory path
-    CWD_PATH = os.getcwd()
+    try:
+        PPYTHON_HOME = os.getenv('PPYTHON_HOME')
+        print('grid_config_local: PPYTHON_HOME = %s'%(PPYTHON_HOME))
+        PPYTHON_PATH = PPYTHON_HOME+os.sep+"src"
+        # PythonMPI installation path
+        PYTHONMPI_PATH = PPYTHON_HOME+os.sep+"PythonMPI"+os.sep+"src"
+        # PythonMPI customization path for an individual user
+        LOCAL_PYTHONMPI_PATH = HOME_PATH+os.sep+"pythonmpi"
+        # pPython path (codes for scheduler integration)
+        GRIDPYTHON_PATH = PPYTHON_HOME+os.sep+"grid"
+        # Current working directory path
+        CWD_PATH = os.getcwd()
+    except Exception:
+        print('grid_config_local: Failed to setup environment variables')
+        exit()
+
 
     # Additional paths for PGAS using the distributed map and array construction
     DMAP_PATH = PPYTHON_PATH+os.sep+"map"
@@ -140,7 +149,7 @@ def grid_config_local(grid_config):
     grid_config['HOME_PATH'] =  HOME_PATH
     grid_config['PPYTHON_PATH'] = PPYTHON_PATH
     grid_config['PYTHONMPI_PATH'] = PYTHONMPI_PATH
-    grid_config['USER_PYTHONMPI_PATH'] = USER_PYTHONMPI_PATH
+    grid_config['LOCAL_PYTHONMPI_PATH'] = LOCAL_PYTHONMPI_PATH
     grid_config['GRIDPYTHON_PATH'] = GRIDPYTHON_PATH
     grid_config['CWD_PATH'] = CWD_PATH
 

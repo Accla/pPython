@@ -2,7 +2,13 @@ import inspect
 import os
 
 import checkOS as OS
-from pyMPI_Comm_settings_local import pyMPI_Comm_settings_local
+try:
+    loc = os.path.abspath(inspect.getfile(pyMPI_Comm_settings_local))
+    from pyMPI_Comm_settings_local import pyMPI_Comm_settings_local
+    is_local_pyMPI_Comm_settings = 1
+except Exception:
+    print('pyMPI_Comm_settings: Failed to find the local machine_db_settings.')
+    is_local_pyMPI_Comm_settings = 0
 
 def pyMPI_Comm_settings():
     """pyMPI_Comm_settings  -  Function for setting values in the MPI Communicator.
@@ -32,8 +38,10 @@ def pyMPI_Comm_settings():
     # machines.  If wrong, then this needs to be hard coded (see below).
     if OS.isunix:
         # python_location = '/usr/bin/python'
-        python_location = '/state/partition1/llgrid/pkg/anaconda/anaconda3-2021b/bin/python'
-
+        if os.path.exists('/etc/llgrid.id'):
+           python_location = '/state/partition1/llgrid/pkg/anaconda/anaconda3-2021b/bin/python'
+        else:
+           python_location = 'python'
 
     # Lincoln cluster common.
     # python_location = ' /tools/python/bin/python';
@@ -60,12 +68,13 @@ def pyMPI_Comm_settings():
     machine_db_settings['local_dir_map'] = ['Z:', '/home/gridsan/ch21778', '/Volumes/ch21778']
 
     # if there is local update, please update machine_db_settings
-    try:
+    if is_local_pyMPI_Comm_settings:
         machine_db_settings = pyMPI_Comm_settings_local(machine_db_settings)
         loc = os.path.abspath(inspect.getfile(pyMPI_Comm_settings_local))
         print('--> pyMPI_Comm_settings: updated machine_db_settings with a local configuration, %s.'%(loc))
-    except Exception:
+    else:
         print('pyMPI_Comm_settings: Failed to update the local machine_db_settings.')
+        # exit()
 
     return machine_db_settings
 

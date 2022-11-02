@@ -62,7 +62,9 @@ def MPI_Run( py_file, n_proc, machines ):
         host = os.getenv('computername')
 
     # Convert machines into a dictionary variable if needed
-    machines = convert_to_dict(machines,host)
+    machines,islocal = convert_to_dict(machines,host)
+    # pass islocal to pyMPI_Comm_init.py
+    OS.islocal = islocal
 
     # Check if the directory 'PythonMPI' exists
     checkPath = '.'+os.sep+'PythonMPI'

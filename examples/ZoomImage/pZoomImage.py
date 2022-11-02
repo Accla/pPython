@@ -2,6 +2,7 @@ import numpy as np
 from timeit import default_timer as timer
 from math import ceil
 import matplotlib.pyplot as plt
+from matplotlib import interactive
 
 import pPython as GPC
 from Dmap import *
@@ -77,12 +78,17 @@ print('Performance (Gigaflops)            = %f'%(GigaFlops))
 
 # Display on leader.
 if (Pid == 0):
+    f = dict()
     for frameIndex in range(Ns):
+        print('Frame index: %d'%(frameIndex))
         pimg = np.squeeze(Zagg[:,:,frameIndex])
+        f[frameIndex] = plt.figure(frameIndex)
         plt.imshow(pimg, origin = 'lower')
         # filename = 'zoom_frame_'+pstr+'_'+npstr+'-'+str(frameIndex)
-        # plt.savefig(filename+'.png')
-        plt.show()
+        filename = 'zoom_frame_'+str(frameIndex)
+        plt.savefig(filename+'.png')
+    # The following will keep the leader process running until all the figures are closed.
+    plt.show()
     
 print('')
 print('SUCCESS')

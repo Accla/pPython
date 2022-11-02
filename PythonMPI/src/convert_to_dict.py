@@ -10,23 +10,25 @@ def convert_to_dict(input,host):
     
     """
     
+    islocal = 0
     output = dict()
     if len(input) == 0:    # empty machines list, running locally
         output = {0:host}
-        return output
+        islocal = 1
+        return output,islocal
     
     if type(input) == type(set()) or type(input) == type(list()):
         ii = 0
         for machine in input:
             output[ii] = machine
             ii = ii + 1
-        return output
+        return output,islocal
     elif type(input) == type(dict()):
         ii = 0
         for machine in input:
             output[ii] = machine
             ii = ii + 1
-        return output
+        return output,islocal
     else:
         print('Error in convert_to_dict(). Input is neither list nor set variable.')
         raise StopExecution

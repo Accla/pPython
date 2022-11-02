@@ -27,6 +27,9 @@ def pyMPI_Comm_init(n_proc,machines):
     DEBUG = 0
     if DEBUG:
         print('--> Entering pyMPI_Comm_init')
+        print('machines:')
+        print(machines)
+        print('----------')
 
     # Set default machine.
     if (OS.isunix):
@@ -72,6 +75,7 @@ def pyMPI_Comm_init(n_proc,machines):
 
     # Get possibly user settings.
     machine_db_settings = pyMPI_Comm_settings()
+
     # Pass the python_module_path and python_module_name
     machine_db['python_module_path'] = machine_db_settings['python_module_path']
     machine_db['python_module_name'] = machine_db_settings['python_module_name']
@@ -80,7 +84,10 @@ def pyMPI_Comm_init(n_proc,machines):
         machine_db['local_dir_map'] = machine_db_settings['local_dir_map']
 
     if DEBUG:
-        print('LLSC python: %s'%(machine_db_settings['python_command_llsc']))
+        if OS.islocal:
+            print('Local python: %s'%(machine_db_settings['python_command']))
+        else:
+            print('LLSC python: %s'%(machine_db_settings['python_command_llsc']))
 
     # Set default type
     if (OS.ispc):
@@ -180,6 +187,7 @@ def pyMPI_Comm_init(n_proc,machines):
 
     # Add machine_db to communicator.
     MPI_COMM_WORLD['machine_db'] = machine_db
+    MPI_COMM_WORLD['islocal'] = OS.islocal
 
     if DEBUG:
         print('MPI_COMM_WORLD')
