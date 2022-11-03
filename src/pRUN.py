@@ -39,17 +39,14 @@ if not os.path.exists(LOCAL_PYTHONMPI_CONFIG_PATH):
     print('ERROR(pRUN): LOCAL_PYTHONMPI_CONFIG_PATH path, %s, does not exist.'%(LOCAL_PYTHONMPI_CONFIG_PATH))
     exit()
 sys.path.append(LOCAL_PYTHONMPI_CONFIG_PATH)
-
 sys.path.append(PPYTHON_PATH)
-
-# for p in sys.path:
-#     print(p)
 
 if os.path.exists(PYTHONMPI_PATH):
     import checkOS as OS
     # from PythonMPI import *
     from pyMPI_Delete_all import *
     from pyMPI_Sleep import *
+    print('Minimum PythonMPI functions are loaded for pRUN().')
 else:
     print('ERROR(pRUN): PythonMPI package path, %s, does not exist.'%(PYTHONMPI_PATH))
     exit()
@@ -108,6 +105,7 @@ def pRUN(py_file,n_proc,machines,sched_options=None):
     # Check allowance 
     cpu_type = grid.grid_config['cpu_type'] 
     chk_allowance = False
+    status = 0
     if chk_allowance:
         status = check_allowance(n_proc,cpu_type)
     if DEBUG:

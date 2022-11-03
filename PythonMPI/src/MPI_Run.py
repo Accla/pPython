@@ -65,6 +65,8 @@ def MPI_Run( py_file, n_proc, machines ):
     machines,islocal = convert_to_dict(machines,host)
     # pass islocal to pyMPI_Comm_init.py
     OS.islocal = islocal
+    if DEBUG:
+        print('MPI_Run: OS.islocal = %d'%(OS.islocal))
 
     # Check if the directory 'PythonMPI' exists
     checkPath = '.'+os.sep+'PythonMPI'
@@ -76,6 +78,10 @@ def MPI_Run( py_file, n_proc, machines ):
 
     # Get number of machines to launch on.
     n_machines = len(machines)
+
+    if DEBUG:
+        print('MPI_Run: OS.islocal = %d'%(OS.islocal))
+        print('... calling pyMPI_Comm_init')
 
     # Create generic comm. (Initialize global pyMCW.MPI_COMM_WORLD)
     pyMCW.MPI_COMM_WORLD = pyMPI_Comm_init(n_proc,machines);

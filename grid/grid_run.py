@@ -22,17 +22,19 @@ import grid_config as grid
 
 @dispatch(str,int,dict)
 def grid_run( py_file, n_proc, machines ):
-    """Wrapper for original pMatlab MPI_Run()."""
+    """Wrapper for original pPython MPI_Run()."""
+    print('grid_run: called the orginal pPython MPI_Run().')
     return MPI_Run(py_file, n_proc, machines)
 
 @dispatch(str,int,list)
 def grid_run( py_file, n_proc, machines ):
-    """Wrapper for original pMatlab MPI_Run()."""
+    """Wrapper for original pPython MPI_Run()."""
+    print('grid_run: called the orginal pPython MPI_Run().')
     return MPI_Run(py_file, n_proc, machines)
 
 @dispatch(str,int,str)
 def grid_run( py_file, n_proc, machines ):
-    """Wrapper for modified MPI_Run from gridMatlab
+    """Wrapper for modified MPI_Run from pPython
     
     MPI_Run  -  Run py_file on multiple processors on LLGrid.
 
@@ -111,6 +113,9 @@ def grid_run( py_file, n_proc, machines ):
             grid.grid_config['q_name'] = 'xeon-p8'
         elif (cpu_type == 'xeon-g6'):
             grid.grid_config['q_name'] = 'gaia'
+        elif (cpu_type == 'xeon-e5'):
+            # Only on TX-Green
+            grid.grid_config['q_name'] = 'normal'
 
     # number of cores to be allocated from the grid
     requested,unclaimed_procs,unclaimed_nodes = grid_resource_policy(grid.grid_config, n_proc, interactive)
@@ -147,7 +152,10 @@ def grid_run( py_file, n_proc, machines ):
     
         
     # Convert machines into a dictionary variable if needed
-    machines = convert_to_dict(machines,host)
+    machines,islocal = convert_to_dict(machines,host)
+    OS.islocal = islocal
+    if DEBUG:
+        print('OS.islocal = %d'%(OS.islocal))
 
     # Check if the directory 'PythonMPI' exists
     checkPath = '.'+os.sep+'PythonMPI'

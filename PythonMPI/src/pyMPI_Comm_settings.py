@@ -3,9 +3,16 @@ import os
 
 import checkOS as OS
 try:
-    loc = os.path.abspath(inspect.getfile(pyMPI_Comm_settings_local))
-    from pyMPI_Comm_settings_local import pyMPI_Comm_settings_local
-    is_local_pyMPI_Comm_settings = 1
+    # Why this is not working? 
+    # loc = os.path.abspath(inspect.getfile(pyMPI_Comm_settings_local))
+    # is_local_pyMPI_Comm_settings = 1
+
+    HOME = os.getenv('HOME')
+    if os.path.exists(HOME+os.sep+'pythonmpi'+os.sep+'pyMPI_Comm_settings_local.py'):
+        from pyMPI_Comm_settings_local import pyMPI_Comm_settings_local
+        is_local_pyMPI_Comm_settings = 1
+    else:
+        is_local_pyMPI_Comm_settings = 0
 except Exception:
     print('pyMPI_Comm_settings: Failed to find the local machine_db_settings.')
     is_local_pyMPI_Comm_settings = 0
@@ -23,6 +30,10 @@ def pyMPI_Comm_settings():
     machine_db_settings:   an internal machine database (dtype: dictionary)
 
     """
+
+    DEBUG = 0
+    if DEBUG:
+        print('--> Entering pyMPI_Comm_settings')
 
     machine_db_settings = dict()
     
@@ -76,5 +87,7 @@ def pyMPI_Comm_settings():
         print('pyMPI_Comm_settings: Failed to update the local machine_db_settings.')
         # exit()
 
+    if DEBUG:
+        print('<-- Exiting pyMPI_Comm_settings')
     return machine_db_settings
 

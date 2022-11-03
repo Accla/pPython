@@ -32,7 +32,7 @@ else:
 
 # Export the path to find pPython & PythonMPI source code:
 # PPYTHON_HOME = "/home/gridsan/groups/llgrid_beta/pPython/latest"
-PPYTHON_HOME = "/home/gridsan/"+USER+"/devtools/git/pPython"
+# PPYTHON_HOME = "/home/gridsan/"+USER+"/devtools/git/pPython"
 PPYTHON_PATH = PPYTHON_HOME+os.sep+"src"
 os.environ["PPYTHON_HOME"] = PPYTHON_HOME
 sys.path.append(PPYTHON_PATH)
