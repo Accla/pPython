@@ -28,7 +28,7 @@ def grid_config_local(grid_config):
     grid_config['LL_FILE_SERVER'] = file server name to mount grid home directory locally
 
     grid_config['GRID_HOME_PATH']: home directory path on the grid for the remote user
-    grid_config['HOME_PATH']: locally mounted path for GRID_HOME_PATH
+    grid_config['GRID_MOUNT_PATH']: locally mounted path for GRID_HOME_PATH
     grid_config['PPYTHON_PATH']: pPython source installation path
     grid_config['PYTHONMPI_PATH']: PythonMPI source installation path
     grid_config['DMAP_PATH']: distributed map source installation path
@@ -47,6 +47,7 @@ def grid_config_local(grid_config):
 
     # Am I on a LLGrid system?
     # Set the cluster name to work with
+    cluster_name = 'noname'
     if os.path.exists('/etc/llgrid.id'):
         with open('/etc/llgrid.id') as f:
             lines = f.readlines()
@@ -60,7 +61,6 @@ def grid_config_local(grid_config):
                 cluster_name = 'txc'
     else:
         # Manually define
-        cluster_name = 'noname'
         cluster_name = 'txgreen'
     grid_config['cluster_name'] = cluster_name
 
@@ -108,22 +108,21 @@ def grid_config_local(grid_config):
     # LLGrid Filesystem
     grid_config['LL_FILE_SERVER'] = 'txe1-login.mit.edu'
     
+    # HOME directory path
+    HOME= os.getenv('HOME')
+
     # locally mounted GRID_HOME_PATH
     if os.path.exists('/etc/llgrid.id'):
         # path on the grid
-        HOME_PATH = grid_config['GRID_HOME_PATH']
+        GRID_MOUNT_PATH = grid_config['GRID_HOME_PATH']
     else:
-        # path on the local machines
+        # path on the local machines (required to run jobs on the grid)
         if OS.ispc:
-            HOME_PATH = 'Z:'
+            GRID_MOUNT_PATH = 'Z:'
         elif OS.islinux:
-            HOME_PATH = '/home/gridsan/'+USER
+            GRID_MOUNT_PATH = '/home/gridsan/'+USER
         elif OS.ismac:
-            HOME_PATH = '/Volumes/'+USER
-        if not os.path.exists(HOME_PATH):
-            HOME_PATH = os.getenv('HOME')
-
-        print('HOME_PATH is  set: %s.'%(HOME_PATH))
+            GRID_MOUNT_PATH = '/Volumes/'+USER
 
     # pPython installation path
     try:
@@ -133,7 +132,10 @@ def grid_config_local(grid_config):
         # PythonMPI installation path
         PYTHONMPI_PATH = PPYTHON_HOME+os.sep+"PythonMPI"+os.sep+"src"
         # PythonMPI customization path for an individual user
-        LOCAL_PYTHONMPI_CONFIG_PATH = HOME_PATH+os.sep+"pythonmpi"
+        if os.path.exists(PPYTHON_PATH):
+            LOCAL_PYTHONMPI_CONFIG_PATH = GRID_MOUNT_PATH+os.sep+"pythonmpi"
+        else:
+            LOCAL_PYTHONMPI_CONFIG_PATH = HOME+os.sep+"pythonmpi"
         # pPython path (codes for scheduler integration)
         GRIDPYTHON_PATH = PPYTHON_HOME+os.sep+"grid"
         # Current working directory path
@@ -148,7 +150,7 @@ def grid_config_local(grid_config):
     DMAT_PATH = PPYTHON_PATH+os.sep+"dmat"
 
     # Save in the grid_config variable
-    grid_config['HOME_PATH'] =  HOME_PATH
+    grid_config['GRID_MOUNT_PATH'] =  GRID_MOUNT_PATH
     grid_config['PPYTHON_PATH'] = PPYTHON_PATH
     grid_config['PYTHONMPI_PATH'] = PYTHONMPI_PATH
     grid_config['LOCAL_PYTHONMPI_CONFIG_PATH'] = LOCAL_PYTHONMPI_CONFIG_PATH

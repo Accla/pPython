@@ -4,13 +4,11 @@ import sys
 
 # Set pPython & PythonMPI search path and import it
 PPYTHON_HOME = os.getenv('PPYTHON_HOME')
-PPYTHON_PATH = PPYTHON_HOME+os.sep+'src'
-if not PPYTHON_HOME:
-    print('ERROR(pRUN): PPYTHON_HOME is not set.')
-    exit()
+if isinstance(PPYTHON_HOME,type(None)):
+    raise Exception('ERROR(pRUN): PPYTHON_HOME is not set.')
 if not os.path.exists(PPYTHON_HOME):
-    print('ERROR(pRUN): PPYTHON_HOME path, %s, does not exist.'%(PPYTHON_HOME))
-    exit()
+    raise Exception('ERROR(pRUN): PPYTHON_HOME path, %s, does not exist.'%(PPYTHON_HOME))
+PPYTHON_PATH = PPYTHON_HOME+os.sep+'src'
 
 # Assuming PythonMPI is distributed with pPython as shown below
 # PythonMPI path must be added first
@@ -28,12 +26,6 @@ GRIDPYTHON_PATH = PPYTHON_HOME+os.sep+'grid'
 sys.path.append(GRIDPYTHON_PATH)
 
 # Assuming local configuration is available from $HOME/pythonmpi directory.
-# where $HOME is local path matching with GRID_HOME_PATH
-HOME_PATH = os.getenv('HOME_PATH')
-if not HOME_PATH:
-    print('ERROR(pRUN): HOME_PATH is not set.')
-    exit()
-
 LOCAL_PYTHONMPI_CONFIG_PATH = os.getenv('HOME')+os.sep+'pythonmpi'
 if not os.path.exists(LOCAL_PYTHONMPI_CONFIG_PATH):
     print('ERROR(pRUN): LOCAL_PYTHONMPI_CONFIG_PATH path, %s, does not exist.'%(LOCAL_PYTHONMPI_CONFIG_PATH))
