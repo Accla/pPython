@@ -38,7 +38,7 @@ def pyMPI_Dir_map(machine_db,path):
     dir_sgrp_3 = path;
 
     if OS.islocal:
-        print('pyMPI_Dir_map: running locally. Skip checking directory path.')
+        # print('pyMPI_Dir_map: running locally. Skip checking directory path.')
         if DEBUG: 
             print('<-- Exiting pyMPI_Dir_map')
         return dir_pc, dir_linux, dir_mac, dir_grid

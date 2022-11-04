@@ -48,17 +48,24 @@ def pyMPI_Comm_settings_local(machine_db_settings):
     	# If this is a unix system, we can
     	# try and guess a better location of python on remote
     	# machines.  If wrong, then this needs to be hard coded (see below).
-    	if OS.ispc:
-        	python_location = 'C:\ProgramData\Anaconda3\python.exe'
-    	elif OS.islinux:
-        	python_location = 'python'
-    	elif OS.ismac:
-        	# python_location = '/usr/bin/python'
-        	# python_location = '/state/partition1/llgrid/pkg/anaconda/anaconda3-2022a/bin/python'
-        	python_location = '/opt/anaconda3/bin/python'
+    	if OS.islocal:
+    	    if OS.ispc:
+            	python_location = 'C:\ProgramData\Anaconda3\python.exe'
+    	    elif OS.islinux:
+            	python_location = 'python'
+    	    elif OS.ismac:
+            	# python_location = '/usr/bin/python'
+            	# python_location = '/state/partition1/llgrid/pkg/anaconda/anaconda3-2022a/bin/python'
+            	python_location = '/opt/anaconda3/bin/python'
+    	    else:
+            	print('Error (pyMPI_Comm_settings_local): unsupported OS.')
+            	exit()
     	else:
-        	print('Error (pyMPI_Comm_settings_local): unsupported OS.')
-        	exit()
+            # Assuming running on LLSC
+         	python_location = 'python'
+         	machine_db_settings['python_module_path'] = '/etc/environment-modules/modules'
+         	machine_db_settings['python_module_name'] = 'anaconda/2022a'
+           
 
     machine_db_settings['python_command_llsc'] = python_location + ' -u '
 

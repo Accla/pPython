@@ -18,6 +18,10 @@ def MPI_Abort():
     """
 
     # global isunix, ismac, islinux, ispc
+
+    # return if PythonMPI directory does not exist
+    if not os.path.exists('PythoMPI'):
+        return
     
     # Get host name.
     if (OS.isunix):

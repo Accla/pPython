@@ -47,7 +47,6 @@ def grid_config_local(grid_config):
 
     # Am I on a LLGrid system?
     # Set the cluster name to work with
-    cluster_name = 'noname'
     if os.path.exists('/etc/llgrid.id'):
         with open('/etc/llgrid.id') as f:
             lines = f.readlines()
@@ -59,6 +58,10 @@ def grid_config_local(grid_config):
                 cluster_name = 'txe1'
             elif re.search('txc',line,re.IGNORECASE):
                 cluster_name = 'txc'
+    else:
+        # Manually define
+        cluster_name = 'noname'
+        cluster_name = 'txgreen'
     grid_config['cluster_name'] = cluster_name
 
     # Grid user (ToDo: need a better way to set the grid username)
@@ -119,9 +122,8 @@ def grid_config_local(grid_config):
             HOME_PATH = '/Volumes/'+USER
         if not os.path.exists(HOME_PATH):
             HOME_PATH = os.getenv('HOME')
-        else:
-            print('HOME_PATH is not set. Check OS type.')
-            exit()
+
+        print('HOME_PATH is  set: %s.'%(HOME_PATH))
 
     # pPython installation path
     try:

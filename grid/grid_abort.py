@@ -10,12 +10,12 @@ from set_remote_cc import *
 
 @dispatch()
 def grid_abort():
-    """Wrapper for MPI_Abort  -  Aborts any currently running MatlabMPI sessions."""
+    """Wrapper for MPI_Abort  -  Aborts any currently running PythonMPI sessions."""
     MPI_Abort()
 
 @dispatch(dict)
 def grid_abort(grid_config):
-    """MPI_Abort  -  Aborts any currently running MatlabMPI sessions.
+    """MPI_Abort  -  Aborts any currently running PythonMPI sessions.
 
     Usage:
     ------
@@ -26,6 +26,10 @@ def grid_abort(grid_config):
     Cannot be used after pyMPI_Delete_all. 
     
     """
+
+    # Check if PythonMPI exist and return if it does not
+    if not os.path.exists('PythonMPI'):
+        return
 
     # Set some strings for special characters.
     # Get single quote character. 

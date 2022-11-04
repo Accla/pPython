@@ -247,12 +247,13 @@ def MPI_Run( py_file, n_proc, machines ):
 
     # Execute launch script.
     if (OS.ispc):
-        # Convert Windows EOL characters to Unix EOL characters
-        fid = open(convert_file,'w')
-        cmd = 'start /b '+remote_launch+remote_machine+remote_flags+qq+'cd '+pwd_grid+'; '+convert_command
-        fid.write(cmd)
-        fid.close()
-        os.startfile(convert_file)
+        if not OS.islocal:
+            # Convert Windows EOL characters to Unix EOL characters
+            fid = open(convert_file,'w')
+            cmd = 'start /b '+remote_launch+remote_machine+remote_flags+qq+'cd '+pwd_grid+'; '+convert_command
+            fid.write(cmd)
+            fid.close()
+            os.startfile(convert_file)
         os.startfile(launch_file)
     else:
         os.system('/bin/bash '+launch_file)
