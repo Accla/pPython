@@ -132,7 +132,7 @@ def grid_config_local(grid_config):
         # PythonMPI installation path
         PYTHONMPI_PATH = PPYTHON_HOME+os.sep+"PythonMPI"+os.sep+"src"
         # PythonMPI customization path for an individual user
-        if os.path.exists(PPYTHON_PATH):
+        if os.path.exists(GRID_MOUNT_PATH):
             LOCAL_PYTHONMPI_CONFIG_PATH = GRID_MOUNT_PATH+os.sep+"pythonmpi"
         else:
             LOCAL_PYTHONMPI_CONFIG_PATH = HOME+os.sep+"pythonmpi"

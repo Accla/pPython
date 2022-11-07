@@ -28,7 +28,7 @@ def SendMsg(dest, tag, *argv):
         msg[ii] = arg
         ii = ii + 1
 
-    if isinstance(dest,(int,np.int64)):
+    if isinstance(dest,(int,np.int64,np.int32)):
         MPI_Send(dest,tag,comm,msg)
     elif (len(dest) > 1):
         MPI_Mcast(Pid,dest,tag,comm,msg)

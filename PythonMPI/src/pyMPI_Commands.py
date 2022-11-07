@@ -101,7 +101,12 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD):
             path = dir_grid
         if DEBUG:
             print('Translated path: %s'%(path))
-        add_path_str = add_path_str + 'sys.path.append('+q+path+q+')'+nl
+        if OS.ispc:
+           # Add prefix r to fix the error, unicodeescape codec annnot decode bytes in position 2-3: trauncate \UXXXXX escape
+           add_path_str = add_path_str + 'sys.path.append(r'+q+path+q+')'+nl
+        else:
+           add_path_str = add_path_str + 'sys.path.append('+q+path+q+')'+nl
+
     commands[0] = 'import os'+nl
     commands[0] = commands[0]+'import sys'+nl+add_path_str
     commands[0] = commands[0]+'os.environ["HDF5_USE_FILE_LOCKING"]="FALSE"' + nl
