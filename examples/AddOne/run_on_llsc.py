@@ -8,37 +8,26 @@ To run, execute the following command.
 
 import os
 import sys
+import platform
 
-# To locate local configuration files
-USER = os.getenv('USER')
-if os.getenv('HOME_PATH'):
-    HOME_PATH = os.environ["HOME_PATH"]
-    print('Obtained HOME_PATH from environment setup as %s'%(HOME_PATH))
+# PPYTHON_HOME environment variable should be set in order to find the pPython installation
+system_name = platform.system()
+if system_name in ['Windows']:
+    # For Windows OS environment, prefix with r to fix the unicodeunderscore codec issue
+    GRID_MOUNT_PATH = r"Z:"
+elif system_name in ['Darwin']:
+    # For Mac OS environment, the grid mount path includes the user name
+    GRID_MOUNT_PATH = "/Volumes/ch21778"
 else:
-    # On LLSC environment
-    HOME_PATH = "/home/gridsan/"+USER
-    os.environ["HOME_PATH"] = HOME_PATH
-    print('HOME_PATH is set in the run script as %s'%(HOME_PATH))
+    # For Linux OS environment, the grid mount path can be an arbitrary path
+    GRID_MOUNT_PATH = "/home/gridsan/ch21778"
 
-# Export the path to find pPython & PythonMPI source code:
-if os.getenv('PPYTHON_HOME'):
-    PPYTHON_HOME = os.getenv('PPYTHON_HOME')
-    print('Obtained PPYTHON_HOME from environment setup')
-    print('PPYTHON_HOME is set in the runtime environment as %s'%(PPYTHON_HOME))
-else:
-    PPYTHON_HOME = "/home/gridsan/groups/llgrid_beta/pPython/latest"
-    # PPYTHON_HOME = HOME_PATH+"/devtools/git/pPython"
-    print('PPYTHON_HOME is set in the run script as %s'%(PPYTHON_HOME))
-
-# Export the path to find pPython & PythonMPI source code:
-# PPYTHON_HOME = "/home/gridsan/groups/llgrid_beta/pPython/latest"
-# PPYTHON_HOME = "/home/gridsan/"+USER+"/devtools/git/pPython"
-PPYTHON_PATH = PPYTHON_HOME+os.sep+"src"
+PPYTHON_HOME = GRID_MOUNT_PATH + "/llgrid_beta/pPython/latest"
 os.environ["PPYTHON_HOME"] = PPYTHON_HOME
-sys.path.append(PPYTHON_PATH)
 
-GRIDPYTHON_PATH = PPYTHON_HOME+os.sep+"grid"
-sys.path.append(GRIDPYTHON_PATH)
+# Add Python search path for pPython main function
+PPYTHON_PATH = PPYTHON_HOME+os.sep+"src"
+sys.path.append(PPYTHON_PATH)
 
 # Import PythonMPI launch funciton
 from pRUN import *
@@ -55,6 +44,6 @@ n_proc = 4
 # print('Running: %s via pRUN().'%(py_file))
 # pRUN( py_file, n_proc, 'grid&' )
 # pRUN( py_file, n_proc, 'grid-xeon-p8&','--exclusive' )
-pRUN( py_file, n_proc, 'grid-xeon-e5')
-# pRUN( py_file, n_proc, {} )
+# pRUN( py_file, n_proc, 'grid-xeon-e5')
+pRUN( py_file, n_proc, {} )
 

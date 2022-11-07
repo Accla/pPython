@@ -14,36 +14,35 @@ import platform
 system_name = platform.system()
 if system_name in ['Windows']:
     # For Windows OS environment, prefix with r to fix the unicodeunderscore codec issue
-    GRID_MOUNT_PATH = r"Z:"
+    PPYTHON_HOME = r"C:\Users\CH21778\pPython\Ver-0.8.3"
 elif system_name in ['Darwin']:
     # For Mac OS environment, the grid mount path includes the user name
-    GRID_MOUNT_PATH = "/Volumes/ch21778"
+    PPYTHON_HOME = "/Users/ch21778/Documents/pPython/Ver-0.8.3"
 else:
     # For Linux OS environment, the grid mount path can be an arbitrary path
-    GRID_MOUNT_PATH = "/home/gridsan/ch21778"
+    PPYTHON_HOME = "/home/gridsan/ch2177/projects/python/pPython/Ver-0.8.38"
 
-PPYTHON_HOME = GRID_MOUNT_PATH + "/llgrid_beta/pPython/latest"
 os.environ["PPYTHON_HOME"] = PPYTHON_HOME
 
-# Add Python search path for pPython main function
 PPYTHON_PATH = PPYTHON_HOME+os.sep+"src"
 sys.path.append(PPYTHON_PATH)
+
+# Local configuration setup
+# LOCAL_PYTHONMPI_CONFIG_PATH = os.getenv('HOME')+os.sep+"pythonmpi"
+# sys.path.append(LOCAL_PYTHONMPI_CONFIG_PATH)
 
 # Import PythonMPI launch funciton
 from pRUN import *
 
 # Disable HDF5 file locking (Lustre parallel filesystem on LLSC)
-os.environ["HDF5_USE_FILE_LOCKING"]="FALSE"
+# os.environ["HDF5_USE_FILE_LOCKING"]="FALSE"
 
 # PythonMPI script filename
-py_file = 'pSpeedtest.py'
+py_file = 'pAddOne.py'
 # Define number of MPI processes
 n_proc = 4
 
-# Launch PythonMPI
+# Launch pPython
 # print('Running: %s via pRUN().'%(py_file))
-# pRUN( py_file, n_proc, 'grid&' )
-# pRUN( py_file, n_proc, 'grid-xeon-p8&','--exclusive' )
-pRUN( py_file, n_proc, 'grid-xeon-e5')
-# pRUN( py_file, n_proc, {} )
+pRUN( py_file, n_proc, {} )
 

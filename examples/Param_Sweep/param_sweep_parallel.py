@@ -25,14 +25,10 @@ from sample_function import *
 # MPI_Init()
 
 # Create communicator.
-# pyMCW is imported in PythonMPI.py
-# comm = pyMCW.MPI_COMM_WORLD;
 # pPython as GPC in pPython.py
 comm = GPC.comm
 
 # Get size and rank.
-# Np = MPI_Comm_size(comm)
-# Pid = MPI_Comm_rank(comm)
 Np = GPC.Np
 Pid = GPC.Pid
 
@@ -50,18 +46,18 @@ n = 3
 z = zeros(m,n,map=pmap)
 
 # Check the distributed z matrix
-print('Local portion of global indices on Pid = %d:'%(Pid))
-print(z.global_ind)
-print('my local length:')
-for i  in range(len(z.falls)):
-    print_falls(z.falls[i])
-print('my size:')
-print(z.shape)
+# print('Local portion of global indices on Pid = %d:'%(Pid))
+# print(z.global_ind)
+# print('my local length:')
+# for i  in range(len(z.falls)):
+#     print_falls(z.falls[i])
+# print('my size:')
+# print(z.shape)
 
 # Get the local portion of the global indices
 my_i_global = global_ind(z, 0)
-print('Local portion of global indices in the first direction:')
-print(my_i_global)
+# print('Local portion of global indices in the first direction:')
+# print(my_i_global)
 
 # Get the local portion of the distributed matrix
 my_z = local(z)
@@ -80,8 +76,8 @@ for i_local in range(len(my_i_global)):
 
 
 # print local results
-print('Local result:')
-print(my_z)
+# print('Local result:')
+# print(my_z)
 
 # Store the local portion of z into the distributed matrix z
 z = put_local(z, my_z)
