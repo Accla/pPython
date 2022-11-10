@@ -7,7 +7,11 @@ from set_remote_cc import *
 def slurm_submit_job(grid_config,sched_job_file,py_file,dir_llsc):
     """Submit PythonMPI job to run on LLGrid via Slurm."""  
     
-    DEBUG = 0
+    PPYTHON_DEBUG = os.getenv('PPYTHON_DEBUG')
+    if PPYTHON_DEBUG:
+        DEBUG = 1
+    else:
+        DEBUG = 0
     
     # Set some strings for special characters.
     # Get single quote character. 
