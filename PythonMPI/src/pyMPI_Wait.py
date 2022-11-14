@@ -15,7 +15,7 @@ def pyMPI_Wait(funcname,filename,logical_state):
     # How much the pause time gets increased each iteration
     pause_rate = 0.03
     # Initial pause time
-    pause_init = 0.3
+    pause_init = 0.1
     # max iteration
     max_iter = 100
 

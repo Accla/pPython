@@ -28,11 +28,6 @@ def MPI_Recv( source, tag, comm ):
     if DEBUG:
         print('--> Entering MPI_Recv')
    
-    # How much the pause time gets increased each iteration
-    pause_rate = 0.03
-    # Initial pause time
-    pause_init = 0.3
-
     # Get processor rank.
     my_rank = MPI_Comm_rank(comm)
 

@@ -1,5 +1,6 @@
 import numpy as np
 from sympy.ntheory import factorint
+from timeit import default_timer as timer
 
 from MPI_Recv import *
 from MPI_Send import *
@@ -68,7 +69,8 @@ def agg(d, leader=None):
     #    0     2     4     6     8      10      12     14    k = 2 (2 Units)
     #  0  1  2  3  4  5  6  7  8  9  10  11  12  13  14  15  k = 1 (1 Unit)
     #
-
+    if DEBUG:
+        zero_clock = timer()
     # Check if Np is power of two
     if( (Np & (Np-1) == 0) and (Np > 0)): # number is power of 2 
         POTN = Np
@@ -113,6 +115,10 @@ def agg(d, leader=None):
         print('agg: something went wrong with the hierachical agg. switched back to old agg.')
         return oagg(d)
 
+    if DEBUG:
+        time_01 = timer()
+        print('Setup time for hierarchical agg: %f (sec)'%(time_01-zero_clock))
+
     # Generate relation between process rank and grid map
     # gridIndex = mapGridRank(d);
     # No need to create this array, use np.where with d.map.grid processor grid array
@@ -130,9 +136,9 @@ def agg(d, leader=None):
             [i,j] = np.where(d.map.grid == Pid)
             # i & j are np.array
             i = int(i); j = int(j)
-            if DEBUG: 
-                print('Process position [i,j] = [%d, %d]'%(i,j))
-                print('Type: %s'%(type(i)))
+            # if DEBUG: 
+            #     print('Process position [i,j] = [%d, %d]'%(i,j))
+            #     print('Type: %s'%(type(i)))
             if i not in temp_mat:
                 temp_mat[i] = dict()
             if j not in temp_mat[i]:
@@ -143,7 +149,7 @@ def agg(d, leader=None):
             # Find the position in the processor grid for the given Pid
             [i,j,k] = np.where(d.map.grid == Pid)
             i = int(i); j = int(j); k = int(k)
-            if DEBUG: print('Process position [i,j,k] = [%d,%d,%d]'%(i,j,k))
+            # if DEBUG: print('Process position [i,j,k] = [%d,%d,%d]'%(i,j,k))
             if i not in temp_mat:
                 temp_mat[i] = dict()
             if j not in temp_mat[i]:
@@ -156,7 +162,7 @@ def agg(d, leader=None):
             # Find the position in the processor grid for the given Pid
             [i,j,k,m] = np.where(d.map.grid == Pid)
             i = int(i); j = int(j); k = int(k); m = int(m)
-            if DEBUG: print('Process position [i,j,k,m] = [%d,%d,%d,%d]'%(i,j,k,m))
+            # if DEBUG: print('Process position [i,j,k,m] = [%d,%d,%d,%d]'%(i,j,k,m))
             if i not in temp_mat:
                 temp_mat[i] = dict()
             if j not in temp_mat[i]:
@@ -176,6 +182,10 @@ def agg(d, leader=None):
         sendBuf[0] = d.local
         imsgLast = 0   # pointer to manage send buffer location
 
+    # if DEBUG:
+    #     time_03 = timer()
+    #     print('Initial op for local array for hierarchical agg: %f (sec)'%(time_03-time_01))
+
     # Walk up the binary tree.
     while (bt <= btMax):
         # Compute msg units transferred at this level
@@ -193,11 +203,17 @@ def agg(d, leader=None):
                 # Odd position from the left. In Python, first odd position is zero.
                 # Receive message from my right neighbor, pidList(myPidPos+1)
                 fromRank = pidList[myPidPos+1]
-                if DEBUG: print('  myPidPos+1 = %d, fromRank = %d)'%(myPidPos+1,fromRank))
+                # if DEBUG: print('  myPidPos+1 = %d, fromRank = %d)'%(myPidPos+1,fromRank))
                 if inmap(d.map, fromRank):  # Only receive data if fromRank is in the map
-                    if DEBUG: print('agg() recv: Pid = %d, fromRank %d w/ msg unit = %d'%(Pid,fromRank,msgUnit))
+                    # if DEBUG: print('agg() recv: Pid = %d, fromRank %d w/ msg unit = %d'%(Pid,fromRank,msgUnit))
+                    # if DEBUG:
+                    #     time_04 = timer()
                     [recvBuf] = MPI_Recv(fromRank, GPC.tag, GPC.comm)
-                    if DEBUG: print('  len(recvBuf) = %d' %(len(recvBuf)))
+                    # if DEBUG:
+                    #     time_05 = timer()
+                    #     print('Time for MPI_Recv call: %f (sec)'%(time_05-time_04))
+
+                    # if DEBUG: print('  len(recvBuf) = %d' %(len(recvBuf)))
                     if (Pid == map_leader):
                         # agg() leader puts the received msg into temp dmat
                         # imsg represents the number of Pid's who sent messages to me
@@ -210,7 +226,7 @@ def agg(d, leader=None):
                             for imsg in range(len(recvBuf)):
                                 if d.dim==2:
                                     # Two dimensional array
-                                    if DEBUG: print('imsg=%s, Msg from Pid = %d' %(imsg,pidKeep[recvPidPos+imsg]))
+                                    # if DEBUG: print('imsg=%s, Msg from Pid = %d' %(imsg,pidKeep[recvPidPos+imsg]))
                                     # Find the position in the processor grid for the given Pid
                                     [i,j] = np.where(d.map.grid == pidKeep[recvPidPos+imsg])
                                     i = int(i); j = int(j)
@@ -226,7 +242,7 @@ def agg(d, leader=None):
                                     i = int(i); j = int(j); k = int(k); m = int(m)
                                     temp_mat[i][j][k] = recvBuf[imsg]
                                     temp_mat[i][j][k][m] = recvBuf[imsg]
-                                    if DEBUG: print('i,j,k,m = %d,%d,%d,%d '%(i,j,k,m))
+                                    # if DEBUG: print('i,j,k,m = %d,%d,%d,%d '%(i,j,k,m))
                     else:
                         # Others puts the received msg to a buffer for the next level
                         # msg aggregation. Always store the local first and then, the
@@ -239,8 +255,8 @@ def agg(d, leader=None):
                 # Send message to my left neighbor, pidList(myPidPos-1)
                 toRank = pidList[myPidPos-1]
                 if inmap(d.map, Pid):   # Only send data if processor is in the map
-                    if DEBUG: print('agg() sent: Pid = %d, toRank %d w/ msg unit = %d'%(Pid,toRank,msgUnit))
-                    if DEBUG: print('  len(sendBuf) = %d' %(len(sendBuf)))
+                    # if DEBUG: print('agg() sent: Pid = %d, toRank %d w/ msg unit = %d'%(Pid,toRank,msgUnit))
+                    # if DEBUG: print('  len(sendBuf) = %d' %(len(sendBuf)))
                     MPI_Send(toRank, GPC.tag, GPC.comm, sendBuf);           
         #
         # Prepare for the next level (reduce size in half)
@@ -254,7 +270,10 @@ def agg(d, leader=None):
         # Reconstruct the matrix from the local pieces
         # This is a NO-OP for block distributions
         mat = reconstruct(d.pitfalls,  d.map.grid, temp_mat, d.shape)
+
     if DEBUG:
+        time_02 = timer()
+        print('Collection time for hierarchical agg: %f (sec)'%(time_02-time_01))
         print('d.local.shape')
         print(d.local.shape)
         print('mat.shape')
