@@ -171,7 +171,11 @@ def grid_run( py_file, n_proc, machines ):
         n_machines = n_machines-1
 
     # Create generic comm. (Initialize global pyMCW.MPI_COMM_WORLD)
-    pyMCW.MPI_COMM_WORLD = pyMPI_Comm_init(n_proc,machines);
+    #
+    # The grid.grid_config should be added to MPI_COMM_WORLD before calling pyMPI_Comm_init()
+    # because pyMPI_Comm_init() saves MPI_COMM_WORLD for pPython processes when they start.
+    #
+    pyMCW.MPI_COMM_WORLD = pyMPI_Comm_init(n_proc,machines,grid_config=grid.grid_config);
 
     # Set paths.
     if DEBUG:
@@ -340,6 +344,7 @@ def grid_run( py_file, n_proc, machines ):
         exec(defscommands)
 
     if DEBUG:
+        print(defscommands)
         print('. . .')
         print('<-- Exiting MPI_Run.')
         

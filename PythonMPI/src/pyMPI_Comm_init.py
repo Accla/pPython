@@ -11,7 +11,7 @@ from dict_with_pickle import save_dict_to_pickle
 from pyMPI_Comm_settings import *
 from pyMPI_Dir_map import *
 
-def pyMPI_Comm_init(n_proc,machines):
+def pyMPI_Comm_init(n_proc,machines,**argv):
     """pyMPI_Comm_init  -  Creates generic communicator.
     
     Usage:
@@ -189,6 +189,12 @@ def pyMPI_Comm_init(n_proc,machines):
     MPI_COMM_WORLD['machine_db'] = machine_db
     MPI_COMM_WORLD['islocal'] = OS.islocal
 
+    # Added to save grid_config
+    MPI_COMM_WORLD['grid_config'] = dict()
+    for key in argv:
+        if key == 'grid_config':
+            MPI_COMM_WORLD['grid_config'] = argv[key]
+    
     if DEBUG:
         print('MPI_COMM_WORLD')
         print(MPI_COMM_WORLD)

@@ -36,6 +36,10 @@ def grid_config_local(grid_config):
     grid_config['LOCAL_PYTHONMPI_CONFIG_PATH']: path for remote user configuration customization files
     grid_config['CWD_PATH']: current working directory path where you submit a job (automatically detected)
 
+    New pPython environment variables for additional features:
+    grid_config['PPYTHON_SRUN']: pPython uses Slrum srun to launch pPython job as a single Slurm job 
+                                 instead of a Slurm array job if it's set to yes
+
     """
 
     # Define grid configuration parameters
@@ -167,6 +171,10 @@ def grid_config_local(grid_config):
     # Scheduler information
     grid_config['scheduler'] = 'slurm'
     grid_config['ntasks'] = 1
+
+    # Additional pPython environment variables for new features
+    # It can be overridden by setting environment variable before pRUN()
+    grid_config['PPYTHON_SRUN'] = 'no'
 
     if DEBUG:
         print(grid_config)
