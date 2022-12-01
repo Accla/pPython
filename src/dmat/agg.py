@@ -32,7 +32,7 @@ def agg(d, leader=None):
     Python version: Dr. Chansup Byun
     """
     
-    DEBUG = 0
+    DEBUG = 1
     if DEBUG:
         print('--> Entering agg')
 
@@ -203,7 +203,7 @@ def agg(d, leader=None):
                 # Odd position from the left. In Python, first odd position is zero.
                 # Receive message from my right neighbor, pidList(myPidPos+1)
                 fromRank = pidList[myPidPos+1]
-                # if DEBUG: print('  myPidPos+1 = %d, fromRank = %d)'%(myPidPos+1,fromRank))
+                if DEBUG: print('  myPidPos+1 = %d, fromRank = %d)'%(myPidPos+1,fromRank))
                 if inmap(d.map, fromRank):  # Only receive data if fromRank is in the map
                     # if DEBUG: print('agg() recv: Pid = %d, fromRank %d w/ msg unit = %d'%(Pid,fromRank,msgUnit))
                     # if DEBUG:
@@ -230,17 +230,31 @@ def agg(d, leader=None):
                                     # Find the position in the processor grid for the given Pid
                                     [i,j] = np.where(d.map.grid == pidKeep[recvPidPos+imsg])
                                     i = int(i); j = int(j)
+                                    if DEBUG:
+                                        print('i,j,imsg=%d,%d,%d'%(i,j,imsg))
+                                        print('len(recvBuf) = %d'%(len(recvBuf)))
+                                    if i not in temp_mat:
+                                        temp_mat[i] = dict()
                                     temp_mat[i][j] = recvBuf[imsg]
                                 elif d.dim==3:
                                     # Three dimensional array
                                     [i,j,k] = np.where(d.map.grid == pidKeep[recvPidPos+imsg])
                                     i = int(i); j = int(j); k = int(k)
+                                    if i not in temp_mat:
+                                        temp_mat[i] = dict()
+                                    if j not in temp_mat[i]:
+                                        temp_mat[i][j] = dict()
                                     temp_mat[i][j][k] = recvBuf[imsg]
                                 elif d.dim==4:
                                     # Four dimensional array
                                     [i,j,k,m] = np.where(d.map.grid == pidKeep[recvPidPos+imsg])
                                     i = int(i); j = int(j); k = int(k); m = int(m)
-                                    temp_mat[i][j][k] = recvBuf[imsg]
+                                    if i not in temp_mat:
+                                        temp_mat[i] = dict()
+                                    if j not in temp_mat[i]:
+                                        temp_mat[i][j] = dict()
+                                    if k not in temp_mat[i][j]:
+                                        temp_mat[i][j][k] = dict()
                                     temp_mat[i][j][k][m] = recvBuf[imsg]
                                     # if DEBUG: print('i,j,k,m = %d,%d,%d,%d '%(i,j,k,m))
                     else:
