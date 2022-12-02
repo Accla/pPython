@@ -4,7 +4,10 @@ import os
 import sys
 
 # Import PythonMPI
-from PythonMPI import *
+from MPI_Abort import *
+from pyMPI_Delete_all import *
+from pyMPI_Sleep import *
+from MPI_Run import *
 
 """Test a PythonMPI example program
 
