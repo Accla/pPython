@@ -28,7 +28,12 @@ if GRID_PPYTHON:
     else:
         # For Linux OS environment, the grid mount path can be an arbitrary path
         GRID_MOUNT_PATH = "/home/gridsan/ch21778"
-    PPYTHON_HOME = GRID_MOUNT_PATH + "/llgrid_beta/pPython/latest"
+    QA_ON_GIT = os.getenv('QA_ON_GIT')
+    if QA_ON_GIT:
+        PPYTHON_HOME = GRID_MOUNT_PATH + "/devtools/git/pPython"
+    else:
+        PPYTHON_HOME = GRID_MOUNT_PATH + "/llgrid_beta/pPython/latest"
+    print('RUN.py: PPYTHON_HOME = %s'%(PPYTHON_HOME))
 else:
     # Use pPython installed locally
     # ToDo: update the path accordingly
