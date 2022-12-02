@@ -20,19 +20,6 @@ from slurm_write_job_script import *
 from slurm_submit_job import *
 import grid_config as grid
 
-@dispatch(str,int,dict)
-def grid_run( py_file, n_proc, machines ):
-    """Wrapper for original pPython MPI_Run()."""
-    print('grid_run: called the orginal pPython MPI_Run().')
-    return MPI_Run(py_file, n_proc, machines)
-
-@dispatch(str,int,list)
-def grid_run( py_file, n_proc, machines ):
-    """Wrapper for original pPython MPI_Run()."""
-    print('grid_run: called the orginal pPython MPI_Run().')
-    return MPI_Run(py_file, n_proc, machines)
-
-@dispatch(str,int,str)
 def grid_run( py_file, n_proc, machines ):
     """Wrapper for modified MPI_Run from pPython
     
@@ -82,15 +69,26 @@ def grid_run( py_file, n_proc, machines ):
         host = os.getenv('computername')
 
     # Determine whether it is an interactive or backgrounded job
-    # print('machines: %s'%(machines))
-    if machines.find('&')>0:
-        # Backgrounded job
-        endStr = '&'
-        interactive = 0
-    else:
-        # Interacttive job
+    if DEBUG:
+        print('machines: %s'%(machines))
+    if isinstance(machines,(dict,list)):
         endStr = ''
         interactive = 1
+        grid_job = False
+    else:
+        if machines.find('&')>0:
+            # Backgrounded job
+            endStr = '&'
+            interactive = 0
+            grid_job = True
+        else:
+            # Interacttive job
+            endStr = ''
+            interactive = 1
+            if machines.find('grid')>0:
+                grid_job = True
+            else:
+                grid_job = False
     
     # Determine if a specific CPU type is requested
     cpu_type = ''
@@ -153,7 +151,16 @@ def grid_run( py_file, n_proc, machines ):
         
     # Convert machines into a dictionary variable if needed
     machines,islocal = convert_to_dict(machines,host)
+    #
+    # Override islocal based on grid_job
+    if grid_job:
+        islocal = 0
+    else:
+        islocal = 1
     OS.islocal = islocal
+    # save to grid_config['islocal'] which will be saved in MPI_COMM_WORLD
+    grid.grid_config['islocal'] = islocal
+
     if DEBUG:
         print('OS.islocal = %d'%(OS.islocal))
 
@@ -180,6 +187,7 @@ def grid_run( py_file, n_proc, machines ):
     # Set paths.
     if DEBUG:
         # print(pyMCW.MPI_COMM_WORLD['machine_db'])
+        print(pyMCW.MPI_COMM_WORLD['grid_config'])
         print(os.getcwd())
     pwd_pc,pwd_linux,pwd_mac,pwd_grid = pyMPI_Dir_map(pyMCW.MPI_COMM_WORLD['machine_db'],os.getcwd())
 

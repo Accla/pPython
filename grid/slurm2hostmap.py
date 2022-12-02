@@ -13,19 +13,15 @@ import pPython as GPC
 
 def slurm2hostmap():
     """
-    Create a host to MPI rank mapping
+    Create a host to MPI rank mapping, PythonMPI/SLURM2HOSTMAP.pkl
+    Add the following additional information:
+        MPI_COMM_WORLD['tmpdir'] 
+        MPI_COMM_WORLD['leader'] for (nProcs)
+    Update MPI_COMM_WORLD['machine_db']['machine'] with the actual compute node name
     
     hostmap{i} contains "SLURM_ARRAY_TASK_ID JOBID(unique) NODELIST"
     which is obtained by the following Slurm command:
     squeue ... --format="#15K                #15A          #N"
-
-    The following Slurm environment variables are important
-    nodelist = os.getenv('SLURM_JOB_NODELIST')
-    cpus_per_node = os.getenv('SLURM_JOB_CPUS_PER_NODE')
-    
-    ## Based on partiton (queue) and interactive mode,
-    #  adjust the number of Slurm task
-    #  (On manycore, each Slurm task can run multiple Matlab instances)
 
     Date: November 28, 2022
     Author: Dr. Chansup Byun
@@ -54,7 +50,6 @@ def slurm2hostmap():
     #
     # Set the appropriate nTasks (number of Slurm compute task scripts)
     #
-    queueName = grid.grid_config['q_name']
     # The following should be modified for the triples mode jobs since ntasks != nprocs
     nProcs    = grid.grid_config['ntasks']  
     
@@ -100,20 +95,25 @@ def slurm2hostmap():
                 hostmap[i] = str(i)+' '+jobNumber+' '+host
                 i += 1
         else:
-            # An array job
             SLURM_ARRAY_JOB_ID = os.getenv('SLURM_ARRAY_JOB_ID')
-            cmdstr = 'squeue -h -j '+SLURM_ARRAY_JOB_ID+' --format="%15K %15A %N"'
-            ecmd.run(cmdstr)
-            output = ecmd.get_output().strip()
-            # print(output)
-            #
-            # Expect multiple lines
-            #
-            slurm_nodelist = ''
-            for line in output.split('\n'):
-                # print('Line: %s'%(line))
-                jobArrayIndex,jobNumber,slurm_node = line.split()
-                hostmap[int(jobArrayIndex)] = jobArrayIndex+' '+jobNumber+' '+slurm_node
+            if SLURM_ARRAY_JOB_ID:
+                # An array job
+                cmdstr = 'squeue -h -j '+SLURM_ARRAY_JOB_ID+' --format="%15K %15A %N"'
+                ecmd.run(cmdstr)
+                output = ecmd.get_output().strip()
+                # print(output)
+                #
+                # Expect multiple lines
+                #
+                slurm_nodelist = ''
+                for line in output.split('\n'):
+                    # print('Line: %s'%(line))
+                    jobArrayIndex,jobNumber,slurm_node = line.split()
+                    hostmap[int(jobArrayIndex)] = jobArrayIndex+' '+jobNumber+' '+slurm_node
+            else:
+                # Not a batch job
+                for j in range(nProcs):
+                    hostmat[j+1] = str(j+1)+' '+'not_a_batch_job localhost'
         if DEBUG:
             print(hostmap)
 
