@@ -16,7 +16,7 @@ def subsasgn_data(a, b, falls_index, fi):
     Python version: Dr. Chansup Byun
     Author:   Nadya Travinin
     """
-    DEBUG = 1
+    DEBUG = 0
     if DEBUG:
         print('--> Entering subsasgn_data')
     

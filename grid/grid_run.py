@@ -50,7 +50,7 @@ def grid_run( py_file, n_proc, machines ):
 
     if DEBUG:
         print('--> Entering MPI_Run (pPython version).')
-        print('MPI_Run: isunix, ismac, islinux, ispc = %d,%d,%d,%d'%(OS.isunix, OS.ismac, OS.islinux, OS.ispc))
+        print('grid_run(MPI_Run): isunix, ismac, islinux, ispc = %d,%d,%d,%d'%(OS.isunix, OS.ismac, OS.islinux, OS.ispc))
     
     # Set some strings for special characters.
     qq = '"'
@@ -76,7 +76,7 @@ def grid_run( py_file, n_proc, machines ):
         interactive = 1
         grid_job = False
     else:
-        if machines.find('&')>0:
+        if machines[-1] == '&':
             # Backgrounded job
             endStr = '&'
             interactive = 0
@@ -85,7 +85,7 @@ def grid_run( py_file, n_proc, machines ):
             # Interacttive job
             endStr = ''
             interactive = 1
-            if machines.find('grid')>0:
+            if machines[:4] == 'grid':
                 grid_job = True
             else:
                 grid_job = False
@@ -152,14 +152,16 @@ def grid_run( py_file, n_proc, machines ):
     # Convert machines into a dictionary variable if needed
     machines,islocal = convert_to_dict(machines,host)
     #
-    # Override islocal based on grid_job
-    if grid_job:
-        islocal = 0
-    else:
+    # Override islocal based on interactive
+    if interactive:
         islocal = 1
+    else:
+        islocal = 0
     OS.islocal = islocal
     # save to grid_config['islocal'] which will be saved in MPI_COMM_WORLD
     grid.grid_config['islocal'] = islocal
+    grid.grid_config['grid_job'] = grid_job
+    grid.grid_config['interactive'] = interactive
 
     if DEBUG:
         print('OS.islocal = %d'%(OS.islocal))

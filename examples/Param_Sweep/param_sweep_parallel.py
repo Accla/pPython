@@ -3,7 +3,7 @@
 
     To run, start Pyhton and type:
 
-        pRun('test_zeros.py',4,'grid')
+        pRUN('test_zeros.py',4,'grid')
 
     Output will be piped into two files:
 

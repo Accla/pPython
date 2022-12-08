@@ -35,6 +35,8 @@ def pRUN_Parallel_wrapper(py_file):
         grid_config = MPI_COMM_WORLD['grid_config']
         local_fs = grid_config['local_fs']
         islocal = grid_config['islocal']
+        grid_job = grid_config['grid_job']
+        interactive = grid_config['interactive']
     else:
         raise Exception('ERROR(pRUN_Parallel_wrapper): local_fs is not defined in grid_config with MPI_COMM_WORLD')
     #
@@ -52,7 +54,9 @@ def pRUN_Parallel_wrapper(py_file):
         print('pRUN_Parallel_Wrapper: local_fs = %d'%(local_fs))
         print(' ')
 
-    if local_fs and (islocal==0):
+    if local_fs and (grid_job==True):
+        if interactive:
+            raise Exception('ERROR(pRUN_Parallel_wrapper): Interactive grid job does not support message using local filesystem. Use backgrounded mode.')
         # update MPI_COMM_WORLD
         tic = timer()
         slurm2hostmap()

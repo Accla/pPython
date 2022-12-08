@@ -23,6 +23,8 @@ def slurm2hostmap():
     which is obtained by the following Slurm command:
     squeue ... --format="#15K                #15A          #N"
 
+    This is an auxiliary function to support message kernel using local filesystem.
+
     Date: November 28, 2022
     Author: Dr. Chansup Byun
     """
@@ -96,6 +98,12 @@ def slurm2hostmap():
                 i += 1
         else:
             SLURM_ARRAY_JOB_ID = os.getenv('SLURM_ARRAY_JOB_ID')
+            if DEBUG:
+                if SLURM_ARRAY_JOB_ID:
+                    print('slurm2host: SLURM_ARRAY_JOB_ID = %s'%(SLURM_ARRAY_JOB_ID))
+                else:
+                    raise Exception('ERROR(slurm2host): SLURM_ARRAY_JOB_ID is NOT defined.')
+
             if SLURM_ARRAY_JOB_ID:
                 # An array job
                 cmdstr = 'squeue -h -j '+SLURM_ARRAY_JOB_ID+' --format="%15K %15A %N"'
@@ -108,14 +116,20 @@ def slurm2hostmap():
                 slurm_nodelist = ''
                 for line in output.split('\n'):
                     # print('Line: %s'%(line))
-                    jobArrayIndex,jobNumber,slurm_node = line.split()
+                    tmp = line.split()
+                    if len(tmp)<3:
+                        continue
+                    else:
+                        jobArrayIndex = tmp[0]
+                        jobNumber = tmp[1]
+                        slurm_node = tmp[2]
                     hostmap[int(jobArrayIndex)] = jobArrayIndex+' '+jobNumber+' '+slurm_node
             else:
                 # Not a batch job
                 for j in range(nProcs):
-                    hostmat[j+1] = str(j+1)+' '+'not_a_batch_job localhost'
-        if DEBUG:
-            print(hostmap)
+                    hostmap[j+1] = str(j+1)+' '+'not_a_batch_job localhost'
+        #if DEBUG:
+        #    print(hostmap)
 
         ## Repeat until all the tasks are launched
         while len(hostmap) < nTasks:
@@ -133,13 +147,19 @@ def slurm2hostmap():
                 cmdstr = 'squeue -h -j '+SLURM_ARRAY_JOB_ID+' --format="%15K %15A %N"'
                 ecmd.run(cmdstr)
                 output = ecmd.get_output().strip()
-                print(output)
+                # print(output)
                 #
                 # Expect multiple lines
                 #
                 for line in output.split('\n'):
-                    print('Line: %s'%(line))
-                    jobArrayIndex,jobNumber,slurm_node = line.split()
+                    # print('Line: %s'%(line))
+                    tmp = line.split()
+                    if len(tmp)<3:
+                        continue
+                    else:
+                        jobArrayIndex = tmp[0]
+                        jobNumber = tmp[1]
+                        slurm_node = tmp[2]
                     hostmap[int(jobArrayIndex)] = jobArrayIndex+' '+jobNumber+' '+slurm_node            
             
             if iter > maxIteration:
@@ -186,7 +206,7 @@ def slurm2hostmap():
     # Modify MPI_COMM_WORLD to save the host to rank map along with TMPDIR
     MPI_COMM_WORLD['tmpdir'] = dict()
     # To store the leader Pid on each node for every pMatlab process
-    MPI_COMM_WORLD['leader'] = np.zeros(nProcs)
+    MPI_COMM_WORLD['leader'] = np.zeros(nProcs,dtype=int)
     tmpdir  = os.getenv('TMPDIR').split('.')
     
     if (PPYTHON_MANYCORE) and (PPYTHON_MANYCORE.lower() != 'no'):
