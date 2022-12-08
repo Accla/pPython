@@ -187,7 +187,7 @@ def pyMPI_Comm_init(n_proc,machines,**argv):
 
     # Add machine_db to communicator.
     MPI_COMM_WORLD['machine_db'] = machine_db
-    MPI_COMM_WORLD['islocal'] = OS.islocal
+    # MPI_COMM_WORLD['islocal'] = OS.islocal
 
     # Added to save grid_config
     MPI_COMM_WORLD['grid_config'] = dict()
