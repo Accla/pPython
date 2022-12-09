@@ -31,7 +31,6 @@ if ispc is None:
     elif systemName in listPCSystem:
         ispc = 1
     else:
-        print('Error in checking OS. Update OS names in _checkOS() with platform.system() output')
-        raise StopExecution 
+        raise Exception('Error in checking OS. Update OS names in _checkOS() with platform.system() output')
 
 

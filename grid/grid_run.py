@@ -8,7 +8,6 @@ import pyMPI_COMM_WORLD as pyMCW
 from MPI_Run import *
 
 from convert_to_dict import *
-from StopExecution import *
 from pyMPI_Comm_init import *
 from pyMPI_Commands import *
 from pyMPI_Dir_map import *
@@ -169,8 +168,7 @@ def grid_run( py_file, n_proc, machines ):
     # Check if the directory 'PythonMPI' exists
     checkPath = '.'+os.sep+'PythonMPI'
     if os.path.isdir(checkPath):
-        print('Error: PythonMPI directory already exists: rename or remove with pyMPI_Delete_all')
-        raise StopExecution
+        raise Exception('Error: PythonMPI directory already exists: rename or remove with pyMPI_Delete_all')
     else:
         os.makedirs(checkPath)
 

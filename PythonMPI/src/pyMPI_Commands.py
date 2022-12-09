@@ -70,8 +70,7 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD):
     # Find the location for PythonMPI modules
     python_mpi_path = os.getenv("PYTHONMPI_PATH")
     if not python_mpi_path:
-        print('pyMPI_Commands: PYTHONMPI_PATH is not set to find PythonMPI modules')
-        raise StopExecution
+        raise Exception('pyMPI_Commands: PYTHONMPI_PATH is not set to find PythonMPI modules')
         
     commands = dict()
     # split python_mpi_path individually

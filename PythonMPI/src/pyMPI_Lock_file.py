@@ -59,13 +59,9 @@ def pyMPI_Lock_file(source, dest, tag, comm, **argv):
                 dir = comm['tmpdir'][source]
         else:
             # Receive process
-            if innode:
-                # if in-node message, temporary directory is the same for the source process
-                dir = comm['tmpdir'][dest]
-            else:
-                # if out-of-node message, temporary directory is for the destination process
-                #CB dir = comm['tmpdir'][source]
-                dir = comm['tmpdir'][dest]
+            # Regardless of in-node or out-of-node messages, 
+            # temporary directory is the same for the destination process
+            dir = comm['tmpdir'][dest]
     else:
         # Using a central filesystem
         dir = comm['machine_db']['dir'][machine_id_dest]
