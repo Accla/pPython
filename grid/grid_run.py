@@ -22,11 +22,11 @@ import grid_config as grid
 def grid_run( py_file, n_proc, machines ):
     """Wrapper for modified MPI_Run from pPython
     
-    MPI_Run  -  Run py_file on multiple processors on LLGrid.
+    grid_run  -  Run py_file on multiple processors on LLGrid.
 
     Usage:
     ------
-    defscommands = MPI_Run( py_file, n_proc, machines )
+    defscommands = grid_run( py_file, n_proc, machines )
 
     Runs n_proc copies of py_file on machines, where
 
@@ -48,7 +48,7 @@ def grid_run( py_file, n_proc, machines ):
     DEBUG = 0
 
     if DEBUG:
-        print('--> Entering MPI_Run (pPython version).')
+        print('--> Entering grid_run (pPython version of MPI_Run).')
         print('grid_run(MPI_Run): isunix, ismac, islinux, ispc = %d,%d,%d,%d'%(OS.isunix, OS.ismac, OS.islinux, OS.ispc))
     
     # Set some strings for special characters.
@@ -70,7 +70,7 @@ def grid_run( py_file, n_proc, machines ):
     # Determine whether it is an interactive or backgrounded job
     if DEBUG:
         print('machines: %s'%(machines))
-    if isinstance(machines,(dict,list)):
+    if isinstance(machines,(dict,list,set)):
         endStr = ''
         interactive = 1
         grid_job = False
@@ -121,7 +121,7 @@ def grid_run( py_file, n_proc, machines ):
     # Create a fictious machine list when 'grid[&]' is used
     machines = []
     # set the Pid=0 machine for an interactive job
-    if interactive:
+    if interactive and grid_job:
         machines.append(host)
     if grid.grid_config['n_nodes'] > 0: 
         # Triples modes, local MPI processes aggregated into a single scheduler task
@@ -143,16 +143,17 @@ def grid_run( py_file, n_proc, machines ):
             n_digits = int(math.log10(grid.grid_config['ntasks'])+1)
         else:
             n_digits = 1
-        for i in range(grid.grid_config['ntasks']):
-            node_strid = str(i+1).zfill(n_digits)
-            machines.append('grid_slurm_'+node_strid)
+        if grid_job:
+            for i in range(grid.grid_config['ntasks']):
+                node_strid = str(i+1).zfill(n_digits)
+                machines.append('grid_slurm_'+node_strid)
     
         
     # Convert machines into a dictionary variable if needed
     machines,islocal = convert_to_dict(machines,host)
     #
     # Override islocal based on interactive
-    if interactive:
+    if interactive or (not grid_job):
         islocal = 1
     else:
         islocal = 0
@@ -184,6 +185,17 @@ def grid_run( py_file, n_proc, machines ):
     #
     pyMCW.MPI_COMM_WORLD = pyMPI_Comm_init(n_proc,machines,grid_config=grid.grid_config);
 
+    if not grid_job:
+        #
+        # Call PythonMPI MPI_Run
+        defscommands = MPI_Run(py_file, n_proc, machines, python_mpi_keep=True)
+        if DEBUG:
+            print(defscommands)
+            print('. . .')
+            print('<-- Exiting MPI_Run.')
+        return defscommands
+
+    # For grid jobs
     # Set paths.
     if DEBUG:
         # print(pyMCW.MPI_COMM_WORLD['machine_db'])
@@ -212,7 +224,7 @@ def grid_run( py_file, n_proc, machines ):
         n_proc_i_m = pyMCW.MPI_COMM_WORLD['machine_db']['n_proc'][i_m-1]
             
         if DEBUG:
-            print('MPI_Run: i_m=%d, n_proc_i_m=%d'%(i_m,n_proc_i_m))
+            print('grid_run: i_m=%d, n_proc_i_m=%d'%(i_m,n_proc_i_m))
 
         if (n_proc_i_m >= 1):
             # Get machine name, remote lauch command & flags, and type.
@@ -231,7 +243,7 @@ def grid_run( py_file, n_proc, machines ):
             # Get starting and stopping rank for this machine. [To be check if minus 1 is needed?]
             i_rank_start = pyMCW.MPI_COMM_WORLD['machine_db']['id_start'][i_m-1]
             i_rank_stop = pyMCW.MPI_COMM_WORLD['machine_db']['id_stop'][i_m-1]
-            # print('MPI_Run: i_rank_start=%d, i_rank_stop=%d'%(i_rank_start,i_rank_stop))
+            # print('grid_run: i_rank_start=%d, i_rank_stop=%d'%(i_rank_start,i_rank_stop))
 
             # Initialize command that will be run on each target node.
             python_module_path = pyMCW.MPI_COMM_WORLD['machine_db']['python_module_path']
@@ -248,7 +260,7 @@ def grid_run( py_file, n_proc, machines ):
             # Loop backwards over number of processes.
             for i_rank in range(i_rank_stop,i_rank_start-1,-1):
                 if DEBUG:
-                    print('--> MPI_Run: i_rank = %d'%(i_rank))
+                    print('--> grid_run: i_rank = %d'%(i_rank))
                 # Note: python index start zero to N-1.
                 # Check if i_rank value needs to be adjusted
 
@@ -354,7 +366,7 @@ def grid_run( py_file, n_proc, machines ):
     if DEBUG:
         print(defscommands)
         print('. . .')
-        print('<-- Exiting MPI_Run.')
+        print('<-- Exiting grid_run.')
         
     return defscommands
 

@@ -27,6 +27,7 @@ def pyMPI_Dir_map(machine_db,path):
         print('Current working directory path: %s'%(path))
         for ref_path in machine_db['local_dir_map']:
             print(ref_path)
+        print('OS.islocal = %s'%(OS.islocal))
 
     # Default is to do nothing.
     dir_pc = path;

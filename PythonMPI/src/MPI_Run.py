@@ -8,7 +8,7 @@ from pyMPI_Comm_init import *
 from pyMPI_Commands import *
 from pyMPI_Dir_map import *
 
-def MPI_Run( py_file, n_proc, machines ):
+def MPI_Run( py_file, n_proc, machines, **argv ):
     """MPI_Run  -  Run py_file on multiple processors.
 
     Usage:
@@ -50,6 +50,15 @@ def MPI_Run( py_file, n_proc, machines ):
     if DEBUG:
         print('--> Entering MPI_Run.')
         print('MPI_Run: isunix, ismac, islinux, ispc = %d,%d,%d,%d'%(OS.isunix, OS.ismac, OS.islinux, OS.ispc))
+ 
+    # Expand the additional argument for advanced features
+    # - check if MPI_Run() is called from grid_run to keep PythonMPI
+    python_mpi_keep = False
+    for key in argv:
+        if key == 'python_mpi_keep':
+            python_mpi_keep = argv[key]
+        else:
+            raise Exception('ERROR(MPI_Run): additional argument has a wrong key,value pair as input.')
     
     # Unix vs. Windows file seperator.
     dir_sep = os.sep
@@ -61,18 +70,19 @@ def MPI_Run( py_file, n_proc, machines ):
         host = os.getenv('computername')
 
     # Convert machines into a dictionary variable if needed
-    machines,islocal = convert_to_dict(machines,host)
-    # pass islocal to pyMPI_Comm_init.py
-    OS.islocal = islocal
+    if not isinstance(machines,(dict)):
+        machines,islocal = convert_to_dict(machines,host)
+        # pass islocal to pyMPI_Comm_init.py
+        OS.islocal = islocal
     if DEBUG:
         print('MPI_Run: OS.islocal = %d'%(OS.islocal))
 
     # Check if the directory 'PythonMPI' exists
     checkPath = '.'+os.sep+'PythonMPI'
-    if os.path.isdir(checkPath):
+    if os.path.isdir(checkPath) and not python_mpi_keep:
         raise Exception('Error: PythonMPI directory already exists: rename or remove with pyMPI_Delete_all')
     else:
-        os.makedirs(checkPath)
+        os.makedirs(checkPath, exist_ok=True)
 
     # Get number of machines to launch on.
     n_machines = len(machines)
@@ -82,7 +92,9 @@ def MPI_Run( py_file, n_proc, machines ):
         print('... calling pyMPI_Comm_init')
 
     # Create generic comm. (Initialize global pyMCW.MPI_COMM_WORLD)
-    pyMCW.MPI_COMM_WORLD = pyMPI_Comm_init(n_proc,machines);
+    # Do not call if called from pPython
+    if 'grid_config' not in pyMCW.MPI_COMM_WORLD:
+        pyMCW.MPI_COMM_WORLD = pyMPI_Comm_init(n_proc,machines);
 
     # Set paths.
     if DEBUG:

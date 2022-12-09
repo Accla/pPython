@@ -10,23 +10,28 @@ import os
 import sys
 import platform
 
+"""
+Customization for the user environment
+"""
 # Specify whether using pPython installed on the grid or locally
-GRID_PPYTHON = True  # True (grid installation)  or False(local  installation)
+GRID_PPYTHON = False  # True (grid installation) or False(local installation)
+USE_LATEST_VERSION = False
+PPYTHON_VER = 'Ver-0.9.0'
 
 # PPYTHON_HOME environment variable should be set in order to find the pPython installation
 system_name = platform.system()
 
 if GRID_PPYTHON:
     # Use pPython installed on the grid
-    # ToDo: update the path accordingly
+    # ToDo: update the GRID_MOUNT_PATH accordingly
     if system_name in ['Windows']:
         # For Windows OS environment, prefix with r to fix the unicodeunderscore codec issue
         GRID_MOUNT_PATH = r"Z:"
     elif system_name in ['Darwin']:
-        # For Mac OS environment, the grid mount path includes the user name
+        # For Mac OS environment, the GRID_MOUNT_PATH includes the user name
         GRID_MOUNT_PATH = "/Volumes/ch21778"
     else:
-        # For Linux OS environment, the grid mount path can be an arbitrary path
+        # For Linux OS environment, the GRID_MOUNT_PATH can be an arbitrary path
         GRID_MOUNT_PATH = "/home/gridsan/ch21778"
     QA_ON_GIT = os.getenv('QA_ON_GIT')
     if QA_ON_GIT:
@@ -36,16 +41,25 @@ if GRID_PPYTHON:
     print('RUN.py: PPYTHON_HOME = %s'%(PPYTHON_HOME))
 else:
     # Use pPython installed locally
-    # ToDo: update the path accordingly
+    # ToDo: update the GRID_MOUNT_PATH path accordingly
     if system_name in ['Windows']:
         # For Windows OS environment, prefix with r to fix the unicodeunderscore codec issue
-        PPYTHON_HOME = r"C:\Users\CH21778\pPython\Ver-0.8.3"
+        if USE_LATEST_VERSION:
+            PPYTHON_HOME = r"C:\Users\CH21778\pPython\latest"
+        else:
+            PPYTHON_HOME = r"C:\Users\CH21778\pPython\"+PPYTHON_VER
     elif system_name in ['Darwin']:
         # For Mac OS environment
-        PPYTHON_HOME = "/Users/ch21778/Documents/pPython/Ver-0.8.3"
+        if USE_LATEST_VERSION:
+            PPYTHON_HOME = "/Users/ch21778/Documents/pPython/latest"
+        else:
+            PPYTHON_HOME = "/Users/ch21778/Documents/pPython/"+PPYTHON_VER
     else:
         # For Linux OS environment
-        PPYTHON_HOME = "/home//cbyun/projects/python/pPython/Ver-0.8.38"
+        if USE_LATEST_VERSION:
+            PPYTHON_HOME = "/home//cbyun/projects/python/pPython/latest"
+        else:
+            PPYTHON_HOME = "/home//cbyun/projects/python/pPython/"+PPYTHON_VER
 
 os.environ["PPYTHON_HOME"] = PPYTHON_HOME
 
