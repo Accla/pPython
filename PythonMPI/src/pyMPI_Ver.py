@@ -12,7 +12,7 @@ def pyMPI_Ver():
     """
     
     location = pathlib.Path().absolute()
-    version = '0.0.1'
+    version = '0.1.0'
     
     print('PythonMPI version: %s'%(version))
     print('         Location: %s'%(location))

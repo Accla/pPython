@@ -2,7 +2,8 @@ import numpy as np
 import scipy.fftpack 
 
 from Dmap import *
-from grid import *
+#2022-12-08: changed to fix a TypeError: 'module' object is not callable
+from grid import grid as proc_grid
 from size import *
 from remap import *
 
@@ -55,7 +56,7 @@ def fft(x, *argv):
             scipy.fftpack.fft(x,N,argv[1])
     else:
         if x.dim == 2:  # distributed array is a matrix
-            g = grid(x)
+            g = proc_grid(x)
             grid_dims = size(g)
             if nargin==1:  #FFT(X): default calling convention - fft along the columns
                 N = x.local.shape[0]
@@ -116,7 +117,7 @@ def fft(x, *argv):
                 exit()
     
         elif x.dim == 3: # distributed array is 3-D
-            g = grid(x)
+            g = proc_grid(x)
             grid_dims = size(g)    
             if nargin==1: # FFT(X): default calling convention - fft along the columns
                 print('3D FFT: fft(x)')

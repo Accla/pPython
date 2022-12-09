@@ -12,7 +12,6 @@ import pyMPI_COMM_WORLD as pyMCW
 import checkOS as OS
 from dict_to_hdf5 import *
 from convert_to_dict import *
-from StopExecution import *
 from replace_token import *
 
 # Load all PythonMPI utility functions

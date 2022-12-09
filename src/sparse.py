@@ -8,7 +8,6 @@ from Dmat import *
 from Dmap import *
 from get_local_falls import *
 from local_dims import *
-from StopExecution import *
 
 def sparse(*argv,**kwargs):
     """
@@ -63,8 +62,7 @@ def sparse(*argv,**kwargs):
         if isinstance(d,Dmat):
             d.local = csr_matrix(d.local)
         else:
-            print('Error: input argument is not a disbributed matrix or array.')
-            raise StopExecution
+            raise Exception('Error: input argument is not a disbributed matrix or array.')
         return d
     
     # Check if map is proivded
@@ -74,8 +72,7 @@ def sparse(*argv,**kwargs):
             p = value
 
     if not isinstance(p,Dmap):
-        print('@map/sparse: At least 1 argument must be a map')
-        raise StopExecution
+        raise Exception('@map/sparse: At least 1 argument must be a map')
         
     # SPARSE(M,N,P)
     if nargin==2:

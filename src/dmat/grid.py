@@ -11,4 +11,5 @@ def grid(d):
         print('ERROR(grid): it is not a DMAT object.')
         exit()
 
+    print('Function grid(): called')
     return d.map.grid

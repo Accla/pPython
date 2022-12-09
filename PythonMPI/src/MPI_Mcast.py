@@ -1,12 +1,17 @@
+import os
+import numpy as np
+
 import checkOS as OS
+from set_remote_cc import *
+from exec_shell_cmd import *
+
 from dict_with_pickle import save_dict_to_pickle
-from StopExecution import *
 from pyMPI_Buffer_file import *
 from pyMPI_Lock_file import *
 from pyMPI_Sleep import *
 from pyMPI_Wait import *
 from MPI_Comm_rank import *
-from MPI_Comm_size import *
+from MPI_Recv import *
 
 def MPI_Mcast(source, dest, tag, comm, *argv):
     """Broadcast variables to everyone.
@@ -19,10 +24,38 @@ def MPI_Mcast(source, dest, tag, comm, *argv):
  
     Sender blocks until all the messages are received,
     unless pyMPI_Save_messages(1) has been called.
+    
+    Python author: Dr. Chansup Byun
+    2022-12-06: Update to support the message kernel using local filesystem
     """
+    
+    DEBUG = 0
+    if DEBUG:
+        print('--> Entering MPI_Mcast.')
+    
     # Get processor rank.
     my_rank = MPI_Comm_rank(comm)
-    comm_size = MPI_Comm_size(comm)
+
+    # Check whether to use local filesystem or not
+    grid_config = comm['grid_config']
+    if grid_config['local_fs'] == 1 :
+        local_fs  = 1
+        tmpdir = comm['tmpdir']
+        machines =  comm['machine_db']['machine']
+    else:
+        local_fs  = 0
+
+    if DEBUG:
+        if local_fs:
+            print('Use local filesystem:')
+            print('--> MPI_Mcast: source rank = %d, host = %s, local path = %s' %(my_rank,machines[my_rank],tmpdir[my_rank]))
+            if isinstance(dest,(int,np.int32,np.int64)):
+                print('--> MPI_Mcast: destination rank = %d, host = %s, local path = %s' %(dest,machines[dest],tmpdir[dest]))
+            else:
+                for ii in dest:
+                    if ii == source:
+                        continue
+                    print('--> MPI_Mcast: destination rank = %d, host = %s, local path = %s' %(ii,machines[ii],tmpdir[ii]))
 
     # If not the source, then receive the data.
     if (my_rank != source):
@@ -38,8 +71,9 @@ def MPI_Mcast(source, dest, tag, comm, *argv):
 
     # If the source, then send the data.
     if (my_rank == source):
-        # Create data file.
-        buffer_file = pyMPI_Buffer_file(my_rank,source,tag,comm)
+        # Create data buffer file.
+        innode = 1
+        buffer_file = pyMPI_Buffer_file(my_rank,source,tag,comm,local_fs=local_fs,msg_type='send',innode=innode)
 
         # Save msg_dict to file.
         # print(buffer_file)
@@ -55,28 +89,96 @@ def MPI_Mcast(source, dest, tag, comm, *argv):
         # Write the message into a file.
         save_dict_to_pickle(msg, buffer_file)   
         
+        if DEBUG:
+            print('Messae is saved to %s'%(buffer_file))
+
         # Loop over everyone in comm and create link to data file.
         if (OS.ispc):
             link_command = 'echo off'+nl
         else:
             link_command = ''
+            
+        if local_fs:
+            # open a shell script to control the scp processes as background jobs
+            shcmd = '#!/bin/bash'+nl
+            shcmd = shcmd+'# generate all backgrounded scp processes to send the lock files'+nl
+        
+        # Create the remote execution command object
+        ecmd = ExecShellCmd(set_remote_cc())
+        if (OS.ispc):
+            myhostname = os.getenv('computername')
+        else:
+            myhostname = os.uname()[1]
+
+        if DEBUG:
+            print('My hostname is %s'%(myhostname))
+
         for ii in dest:
             # Don't do source.
-            if ii != source:
-                # Create buffer link name.
-                buffer_link = pyMPI_Buffer_file(my_rank,ii,tag,comm);
-                if (OS.ismac):
-                    # Append to link_command. MacOS sym links are not recognized by Linux.
-                    link_command = link_command+'cp '+buffer_file+' '+buffer_link+'; '
-                elif (OS.islinux):
-                    # Append to link_command.
-                    link_command = link_command+'ln -s '+buffer_file+' '+buffer_link+'; '
-                elif (OS.ispc):
-                    # Append to link_command.
-                    link_command = link_command+'copy '+qq+buffer_file+qq+' '+qq+buffer_link+qq+nl
-                else:
-                    print('MPI_Mcast: none of ismac, islinux and ispc defined.')
-                    raise StopExecution
+            if ii == source:
+                continue
+                
+            if DEBUG:
+                print('MPI_Mcast: Message to my_rank = %d',ii)
+            # identify whether the message communication is in-node or out-of-node
+            innode = 0
+            if local_fs:
+                if machines[ii] == machines[source]:
+                    innode = 1
+            
+            # Create buffer link name.
+            buffer_link = pyMPI_Buffer_file(my_rank,ii,tag,comm,local_fs=local_fs,msg_type='send',innode=innode)
+            if DEBUG:
+                print(buffer_link)
+            buffer_link_basename = os.path.basename(buffer_link)            
+            if (OS.ismac):
+                # Append to link_command. MacOS sym links are not recognized by Linux.
+                link_command = link_command+'cp '+buffer_file+' '+buffer_link+nl
+            elif (OS.islinux):
+                # Append to link_command.
+                link_command = link_command+'ln -s '+buffer_file+' '+buffer_link+nl
+            elif (OS.ispc):
+                # Append to link_command.
+                link_command = link_command+'copy '+qq+buffer_file+qq+' '+qq+buffer_link+qq+nl
+            else:
+                raise Execution('MPI_Mcast: none of ismac, islinux and ispc defined.')
+
+            # out-of-node message, scp the buffer and lock files to the remote receiver
+            if local_fs and (not innode):
+                # when using local filesystem and the message needs to be sent out of node
+                status = 0
+
+                # scp may cause DDoS attack if too many instances opened to the same host
+                # 3 sec delay may not able to fix the issue with 48 scp calls at the same time.
+                pauseTime = 4
+                done_scp = False
+                try_counter = 0
+                try_max = 10
+                scp_cmd = 'scp '
+                # Copy the message before the actual link gets created.
+                cmd1 = scp_cmd+buffer_file+' '+machines[ii]+':'+tmpdir[ii]+'/'+buffer_link_basename
+                # generate a shell command
+                shcmd = shcmd+cmd1+'&'+nl
+    
+                if DEBUG:
+                    print('command: %s'%(cmd1))
+
+                while not done_scp:
+                    try_counter = try_counter + 1
+                    # transfer the message to the remote host
+                    status = True
+                    ecmd.run(cmd1)
+                    status = ecmd.get_stderr()
+                    if status:
+                        print('Error [MPI_Mcast]: failed to scp the message to the remote host.')
+                        if try_counter >= try_max:
+                            raise Exception('Error (MPI_Mcast): fail to scp a buffer file.')
+                        else:
+                            if DEBUG:
+                                print('. . . scp failed. continue for next scp . . . ')
+                            pyMPI_Sleep(pauseTime)
+                    else:
+                        done_scp = True
 
         # Write unix commands to .sh text file
         # [Was used to fix Matlab's problem with very long commands sent to unix().
@@ -85,6 +187,10 @@ def MPI_Mcast(source, dest, tag, comm, *argv):
             link_script = 'PythonMPI'+dir_sep+'Link_Commands_t'+str(tag)+'.bat'
         else:
             link_script = 'PythonMPI'+dir_sep+'Link_Commands_t'+str(tag)+'.sh'
+        if DEBUG:
+            print('Link script name: %s'%(link_script))
+            print('Link command: %s'%(link_command))
+
         fid = open(link_script,'w')
         fid.write(link_command)
         fid.close()
@@ -98,33 +204,99 @@ def MPI_Mcast(source, dest, tag, comm, *argv):
         pyMPI_Sleep(0.5)
         os.remove(link_script)
 
+        rmcmd = ''
+        # Loop over everyone in dest and create lock file.
+        # generate a shell command
+        if local_fs and (not innode):
+            shcmd = shcmd+'# wait for all backgrounded scp processes to send the buffer files'+nl 
+            shcmd = shcmd+'wait'+nl 
+            shcmd = shcmd+'# generate all backgrounded scp processes to send the lock files'+nl
+    
         # Loop over everyone in comm and create lock file.
         for ii in dest:
             # Don't do source.
-            if (ii != source):
-                # Create lock file.
-                lock_file = pyMPI_Lock_file(my_rank,ii,tag,comm)
-                fid = open(lock_file,'w+')
-                fid.close()
-  
-        # Check if the message is to be saved.
-        if not(comm['save_message_flag']):
-            # Loop over lock files.
-            # Wait until all lock files are gone, which means that all receiving processes
-            # have received the broadcasted message
-            # Loop over everyone in comm and create lock file.
-            for ii in dest:
-                # Don't do source.
-                if ii != source:
-                    # Get lock file name.
-                    lock_file = pyMPI_Lock_file(my_rank,ii,tag,comm);
-                    # Spin on lock file until it is deleted.
-                    pyMPI_Wait('MPI_Mcast', lock_file, True)
+            if (ii == source):
+                continue
+            # identify whether the message communication is in-node or out-of-node
+            innode = 0
+            if local_fs:
+                if machines[ii] == machines[source]:
+                    innode = 1    
+            # Create lock file.
+            lock_file = pyMPI_Lock_file(my_rank,ii,tag,comm,local_fs=local_fs,msg_type='send',innode=innode)
+            fid = open(lock_file,'w+')
+            fid.close()
 
-            # Now all processes have received the broadcasted message.
+            
+            # if out-of-node message, scp the buffer and lock files to the remote receiver
+            if local_fs and (not innode):
+                done_scp = False
+                try_counter = 0;
+                cmd1 = scp_cmd+lock_file+' '+machines[ii]+':'+tmpdir[ii]
+                # generate a shell command
+                rmcmd = rmcmd+'rm -f '+lock_file+nl
+                # generate a shell command
+                shcmd = shcmd+cmd1+'&'+nl
+                while not done_scp:
+                    try_counter = try_counter + 1
+                    # transfer the lock to the remote host
+                    ecmd.run(cmd1)
+                    status = ecmd.get_stderr()
+                    if status:
+                        print('Error [MPI_Mcast]: failed to scp the lock file to the remote host.')
+                        if try_counter >= 3:
+                            raise Exception('Error (MPI_Mcast): fail to scp lock file.')
+                        else:
+                            pyMPI_Sleep(1)
+                    else:
+                        done_scp = True                
+                        # remove lock file once both buffer and lock files are copied to the out-of-node receiver
+                        os.remove(lock_file)
+                
+                # Create buffer link name.
+                buffer_link = pyMPI_Buffer_file(my_rank,ii,tag,comm,local_fs=local_fs,msg_type='send',innode=innode)
+                if os.path.exists(buffer_link):
+                    os.remove(buffer_link)
+                    rmcmd = rmcmd+'rm -f '+buffer_link+nl
+
+        # generate a shell command
+        if local_fs and (not innode):
+            shcmd = shcmd+'# wait for all backgrounded scp processes to send the lock files'+nl
+            shcmd = shcmd+'wait'+nl
+            shcmd = shcmd+'#'+nl
+            shcmd = shcmd+'# End of scp commands. Now you can delete the buffer and lock files.'+nl
+            shcmd = shcmd+'#'+nl
+            shcmd = shcmd+rmcmd+nl
+            # Future update for backgrounding scp calls
+            if DEBUG:
+                print(shcmd)
+            
+        # Check if the message is to be saved.
+        # Loop over lock files.
+        # Wait until all lock files are gone, which means that all receiving processes
+        # have received the broadcasted message
+        # Loop over everyone in comm and create lock file.
+        for ii in dest:
+            # Don't do source.
+            if ii == source:
+                continue
+            # identify whether the message communication is in-node or out-of-node
+            innode = 0
+       	    if local_fs:
+                if machines[ii] == machines[source]:
+                     innode = 1
+            # Get lock file name.
+            lock_file = pyMPI_Lock_file(my_rank,ii,tag,comm,local_fs=local_fs,msg_type='send',innode=innode)
+            # Spin on lock file until it is deleted.
+            pyMPI_Wait('MPI_Mcast', lock_file, True)
+
+        # Now all processes have received the broadcasted message.
+        if not(comm['save_message_flag']):
             # Delete the source buffer file.
             os.remove(buffer_file)
 
+    if DEBUG:
+        print('<-- Exiting MPI_Mcast.')
     return argv
 
     """
@@ -137,4 +309,3 @@ def MPI_Mcast(source, dest, tag, comm, *argv):
     MIT Lincoln Laboratory
     kepner@ll.mit.edu
     """
-

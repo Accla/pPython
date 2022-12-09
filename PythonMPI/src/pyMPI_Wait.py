@@ -1,7 +1,6 @@
 import os
 
 from pyMPI_Sleep import *
-from StopExecution import *
 
 def pyMPI_Wait(funcname,filename,logical_state):
     """
@@ -28,9 +27,8 @@ def pyMPI_Wait(funcname,filename,logical_state):
         sum += pause_time
         pyMPI_Sleep(pause_time);
         if loop > max_iter:
-            print('%s: failed to find the %s file.'%(funcname,filename))
             print('Loop: %d, total wait time: %f, last pause interval: %f'%(loop,sum,pause_time))
-            raise StopExecution
+            raise Exception('%s: failed to find the %s file.'%(funcname,filename))
         loop = loop + 1
         pause_time += pause_time * pause_rate
     return

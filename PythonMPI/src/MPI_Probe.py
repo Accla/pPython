@@ -25,6 +25,8 @@ def MPI_Probe(source, tag, comm, nargout=2):
 
     # Control debugging message
     DEBUG = 0
+    if DEBUG:
+        print('--> Entering MPI_Probe')
     
     # Create arrays to store rank and tag.
     rank = list()
@@ -36,23 +38,35 @@ def MPI_Probe(source, tag, comm, nargout=2):
     # Get processor rank.
     my_rank = MPI_Comm_rank(comm);
 
+    # MPI_Probe is always checking the incoming message either on a central filesystem 
+    # or a local filesystem connected to my own rank
+    innode = 1
+    # ToDo: how to handle if source is a wildcard (*)?
+        
+    grid_config = comm['grid_config']
+    if grid_config['local_fs'] == 1 :
+        local_fs  = 1
+        tmpdir = comm['tmpdir']
+        machines =  comm['machine_db']['machine']
+        #CB if not (grid_config['PPYTHON_MANYCORE'].lower() == 'yes'):
+        #CB     raise Exception('ERROR(MPI_Probe): no support for using a local filesystem without the manycore optimization')   
+    else:
+        local_fs  = 0
+
     # Get lock file names.
-    lock_file = pyMPI_Lock_file(source, my_rank, tag, comm);
+    lock_file = pyMPI_Lock_file(source, my_rank, tag, comm, local_fs=local_fs,msg_type='recv',innode=innode)
+
+    if DEBUG:
+        print('locak_file: %s'%(lock_file))
 
     # Get and count the pending messages.
     message_files = glob(lock_file)
     n_files = len(message_files)
-    if not n_files:
-        # return empty lists
-        pyMPI_Sleep(0.05)
-        if nargout == 2:
-            return message_rank, numeric_tag
-        else:
-            return message_rank, numeric_tag, string_tag
-
+    if DEBUG:
+        print('Number of incoming messages: %d'%(n_files))
 
     # Parse out the source rank and tag for each message.
-    pattern = r'.*p(\d+)_p\d+_t(.*)_lock.h5'
+    pattern = r'.*p(\d+)_p\d+_t(.*)_lock.pkl'
     if DEBUG:
         print('MPI_Probe: pattern = %s'%(pattern))
 
@@ -78,11 +92,12 @@ def MPI_Probe(source, tag, comm, nargout=2):
     str_map = map(int,list_str_tag)
     numeric_tag = list(str_map)
 
-    # Check if there are no files
-    if not len(message_rank):
-        # Sleep statement allows cleaner profiling, but adds latency.
-        pyMPI_Sleep(0.05)
+    # The frequency of calling MPI_Probe is set by the programmer
+    # in the code where MPI_Probe is called.
 
+    if DEBUG:
+        print('<-- Exiting MPI_Probe')
+    
     if nargout == 2:
         return message_rank, numeric_tag
     else:

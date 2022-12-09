@@ -16,7 +16,7 @@ def remap(x, new_map):
     Author:   Nadya Travinin
     """
     
-    DEBUG = 1
+    DEBUG = 0
     if DEBUG:
         print('--> Entering remap')
 

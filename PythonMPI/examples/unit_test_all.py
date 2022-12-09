@@ -42,12 +42,12 @@ import sys
 # Modify the following variables according to your runtime environment
 #
 # Machines list (dtype: list)
-cpus = ['a-15-0.llgrid.ll.mit.edu','a-15-1.llgrid.ll.mit.edu']
+cpus = ['c-3-2-3.llgrid.ll.mit.edu','c-3-2-4.llgrid.ll.mit.edu']
 # Export the path to find PythonMPI source code:
 # For Linux OS
 HOME_PATH="/home/gridsan/ch21778"
 # For Windows OS
-HOME_PATH="Z:"
+# HOME_PATH="Z:"
 LLSC_PYTHONMPI_PATH = HOME_PATH+os.sep+"devtools"+os.sep+"git"+os.sep+"PythonMPI"+os.sep+"src"
 # Export the path to modify PythonMPI settings for an individual user
 LOCAL_PYTHONMPI_CONFIG_PATH = HOME_PATH+os.sep+"pythonmpi"
@@ -80,50 +80,62 @@ all_status = 'SUCCESS';
 
 # Unit test all the scripts.
 
+print(" Executing unit_test('basic', 4, cpus, 200, 20)")
 status = unit_test('basic', 4, cpus, 200, 20)
 if status == 'FAIL':
     all_status = 'FAIL';
 
+print(" Executing unit_test('xbasic', 4, cpus, 200, 20)")
 status = unit_test('xbasic', 4, cpus, 200, 20)
 if status == 'FAIL':
     all_status = 'FAIL';
 
+print(" Executing unit_test('broadcast', 4, cpus, 200, 20)")
 status = unit_test('broadcast', 4, cpus, 200, 20)
 if status == 'FAIL':
     all_status = 'FAIL';
 
+print(" Executing unit_test('basic_app', 4, cpus, 200, 20)")
 status = unit_test('basic_app', 4, cpus, 200, 20)
 if status == 'FAIL':
     all_status = 'FAIL';
 
+print(" Executing unit_test('basic_app2', 4, cpus, 200, 20)")
 status = unit_test('basic_app2', 4, cpus, 200, 20)
 if status == 'FAIL':
     all_status = 'FAIL';
 
+print(" Executing unit_test('basic_app3', 4, cpus, 200, 20)")
 status = unit_test('basic_app3', 4, cpus, 200, 20)
 if status == 'FAIL':
     all_status = 'FAIL';
 
+print(" Executing unit_test('basic_app4', 4, cpus, 200, 20)")
 status = unit_test('basic_app4', 4, cpus, 200, 20)
 if status == 'FAIL':
     all_status = 'FAIL';
 
+print(" Executing unit_test('basic_app5', 4, cpus, 200, 20)")
 status = unit_test('basic_app5', 4, cpus, 200, 20)
 if status == 'FAIL':
     all_status = 'FAIL';
 
+print(" Executing unit_test('basic_app6', 4, cpus, 200, 20)")
 status = unit_test('basic_app6', 4, cpus, 200, 20)
 if status == 'FAIL':
     all_status = 'FAIL';
 
+print(" Executing unit_test('probe', 2, cpus, 200, 20)")
 status = unit_test('probe', 2, cpus, 200, 20)
 if status == 'FAIL':
     all_status = 'FAIL';
 
+print(" Executing unit_test('speedtest', 2, cpus, 200, 20)")
 status = unit_test('speedtest', 2, cpus, 200, 20)
 if status == 'FAIL':
     all_status = 'FAIL';
 
+print(" Executing unit_test('blurimage', 2, cpus, 200, 20)")
 status = unit_test('blurimage', 4, cpus, 200, 20)
 if status == 'FAIL':
     all_status = 'FAIL';

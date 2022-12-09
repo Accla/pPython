@@ -82,8 +82,7 @@ my_rank = MPI_Comm_rank(comm)
 
 # Since the leader only manages, there must be at least 2 processes
 if comm_size <= 1:
-    print('Error: cannot be run with only one process')
-    raise StopExecution 
+    raise Exception('Error: cannot be run with only one process')
 
 # Print rank.
 print('my_rank: %d'%(my_rank))

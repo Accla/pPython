@@ -70,8 +70,7 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD):
     # Find the location for PythonMPI modules
     python_mpi_path = os.getenv("PYTHONMPI_PATH")
     if not python_mpi_path:
-        print('pyMPI_Commands: PYTHONMPI_PATH is not set to find PythonMPI modules')
-        raise StopExecution
+        raise Exception('pyMPI_Commands: PYTHONMPI_PATH is not set to find PythonMPI modules')
         
     commands = dict()
     # split python_mpi_path individually
@@ -114,14 +113,15 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD):
     # commands[0] = commands[0]+'from PythonMPI import *' + nl
     commands[0] = commands[0]+'import pyMPI_COMM_WORLD as pyMCW' + nl
     commands[0] = commands[0]+'from dict_with_pickle import load_dict_from_pickle' + nl
-    commands[1] = 'from pPython_init import *' + nl
+    commands[1] = 'from pRUN_Parallel_wrapper import *' + nl
     commands[2] = 'pyMCW.MPI_COMM_WORLD = load_dict_from_pickle('+q+comm_pkl_file+q+')' + nl
     commands[3] = 'pyMCW.MPI_COMM_WORLD['+q+'rank'+q+'] = ' + str(rank) + nl
     # Additional to define global variables: 
-    commands[3] = commands[3]+'pPython_init()' + nl
+    commands[3] = commands[3]+'pRUN_Parallel_wrapper('+q+py_file+'.py'+q+')' + nl
     # commands[3] = commands[3]+'id=CheckOS()' + nl
     # commands[4] = ['delete(' q defsfile q ');' nl];
-    commands[5] = 'exec(open("'+py_file+'.py").read())'+nl
+    # commands[5] = 'exec(open("'+py_file+'.py").read())'+nl
+    commands[5] = ' '
 
     defscommands = '';
 

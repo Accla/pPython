@@ -8,7 +8,6 @@ import pyMPI_COMM_WORLD as pyMCW
 from MPI_Run import *
 
 from convert_to_dict import *
-from StopExecution import *
 from pyMPI_Comm_init import *
 from pyMPI_Commands import *
 from pyMPI_Dir_map import *
@@ -20,19 +19,6 @@ from slurm_write_job_script import *
 from slurm_submit_job import *
 import grid_config as grid
 
-@dispatch(str,int,dict)
-def grid_run( py_file, n_proc, machines ):
-    """Wrapper for original pPython MPI_Run()."""
-    print('grid_run: called the orginal pPython MPI_Run().')
-    return MPI_Run(py_file, n_proc, machines)
-
-@dispatch(str,int,list)
-def grid_run( py_file, n_proc, machines ):
-    """Wrapper for original pPython MPI_Run()."""
-    print('grid_run: called the orginal pPython MPI_Run().')
-    return MPI_Run(py_file, n_proc, machines)
-
-@dispatch(str,int,str)
 def grid_run( py_file, n_proc, machines ):
     """Wrapper for modified MPI_Run from pPython
     
@@ -63,7 +49,7 @@ def grid_run( py_file, n_proc, machines ):
 
     if DEBUG:
         print('--> Entering MPI_Run (pPython version).')
-        print('MPI_Run: isunix, ismac, islinux, ispc = %d,%d,%d,%d'%(OS.isunix, OS.ismac, OS.islinux, OS.ispc))
+        print('grid_run(MPI_Run): isunix, ismac, islinux, ispc = %d,%d,%d,%d'%(OS.isunix, OS.ismac, OS.islinux, OS.ispc))
     
     # Set some strings for special characters.
     qq = '"'
@@ -82,15 +68,26 @@ def grid_run( py_file, n_proc, machines ):
         host = os.getenv('computername')
 
     # Determine whether it is an interactive or backgrounded job
-    # print('machines: %s'%(machines))
-    if machines.find('&')>0:
-        # Backgrounded job
-        endStr = '&'
-        interactive = 0
-    else:
-        # Interacttive job
+    if DEBUG:
+        print('machines: %s'%(machines))
+    if isinstance(machines,(dict,list)):
         endStr = ''
         interactive = 1
+        grid_job = False
+    else:
+        if machines[-1] == '&':
+            # Backgrounded job
+            endStr = '&'
+            interactive = 0
+            grid_job = True
+        else:
+            # Interacttive job
+            endStr = ''
+            interactive = 1
+            if machines[:4] == 'grid':
+                grid_job = True
+            else:
+                grid_job = False
     
     # Determine if a specific CPU type is requested
     cpu_type = ''
@@ -153,15 +150,25 @@ def grid_run( py_file, n_proc, machines ):
         
     # Convert machines into a dictionary variable if needed
     machines,islocal = convert_to_dict(machines,host)
+    #
+    # Override islocal based on interactive
+    if interactive:
+        islocal = 1
+    else:
+        islocal = 0
     OS.islocal = islocal
+    # save to grid_config['islocal'] which will be saved in MPI_COMM_WORLD
+    grid.grid_config['islocal'] = islocal
+    grid.grid_config['grid_job'] = grid_job
+    grid.grid_config['interactive'] = interactive
+
     if DEBUG:
         print('OS.islocal = %d'%(OS.islocal))
 
     # Check if the directory 'PythonMPI' exists
     checkPath = '.'+os.sep+'PythonMPI'
     if os.path.isdir(checkPath):
-        print('Error: PythonMPI directory already exists: rename or remove with pyMPI_Delete_all')
-        raise StopExecution
+        raise Exception('Error: PythonMPI directory already exists: rename or remove with pyMPI_Delete_all')
     else:
         os.makedirs(checkPath)
 
@@ -171,11 +178,16 @@ def grid_run( py_file, n_proc, machines ):
         n_machines = n_machines-1
 
     # Create generic comm. (Initialize global pyMCW.MPI_COMM_WORLD)
-    pyMCW.MPI_COMM_WORLD = pyMPI_Comm_init(n_proc,machines);
+    #
+    # The grid.grid_config should be added to MPI_COMM_WORLD before calling pyMPI_Comm_init()
+    # because pyMPI_Comm_init() saves MPI_COMM_WORLD for pPython processes when they start.
+    #
+    pyMCW.MPI_COMM_WORLD = pyMPI_Comm_init(n_proc,machines,grid_config=grid.grid_config);
 
     # Set paths.
     if DEBUG:
         # print(pyMCW.MPI_COMM_WORLD['machine_db'])
+        print(pyMCW.MPI_COMM_WORLD['grid_config'])
         print(os.getcwd())
     pwd_pc,pwd_linux,pwd_mac,pwd_grid = pyMPI_Dir_map(pyMCW.MPI_COMM_WORLD['machine_db'],os.getcwd())
 
@@ -340,6 +352,7 @@ def grid_run( py_file, n_proc, machines ):
         exec(defscommands)
 
     if DEBUG:
+        print(defscommands)
         print('. . .')
         print('<-- Exiting MPI_Run.')
         

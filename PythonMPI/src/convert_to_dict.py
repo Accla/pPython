@@ -30,6 +30,5 @@ def convert_to_dict(input,host):
             ii = ii + 1
         return output,islocal
     else:
-        print('Error in convert_to_dict(). Input is neither list nor set variable.')
-        raise StopExecution
+        raise Exception('Error in convert_to_dict(). Input is neither list nor set variable.')
 
