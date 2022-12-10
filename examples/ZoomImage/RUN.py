@@ -47,7 +47,7 @@ else:
         if USE_LATEST_VERSION:
             PPYTHON_HOME = r"C:\Users\CH21778\pPython\latest"
         else:
-            PPYTHON_HOME = r"C:\Users\CH21778\pPython\"+PPYTHON_VER
+            PPYTHON_HOME = r"C:\Users\CH21778\pPython"+os.sep+PPYTHON_VER
     elif system_name in ['Darwin']:
         # For Mac OS environment
         if USE_LATEST_VERSION:
