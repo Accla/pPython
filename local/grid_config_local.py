@@ -175,8 +175,8 @@ def grid_config_local(grid_config):
     # Additional pPython environment variables for new features
     # It can be overridden by setting environment variable before pRUN()
     grid_config['PPYTHON_SRUN'] = 'no'
-    # use message kernel with local filesystem. PPYTHON_LOCAL_FS='no' can make to use the central filesystem
-    grid_config['local_fs'] = 1
+    # if set to 1, use message kernel with local filesystem. PPYTHON_LOCAL_FS='no' can make to use the central filesystem
+    grid_config['local_fs'] = 0
     # For now, no mnaycore optimization
     grid_config['PPYTHON_MANYCORE'] = 'no'
 
