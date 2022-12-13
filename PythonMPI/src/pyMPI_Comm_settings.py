@@ -50,7 +50,7 @@ def pyMPI_Comm_settings():
     if OS.isunix:
         # python_location = '/usr/bin/python'
         if os.path.exists('/etc/llgrid.id'):
-           python_location = '/state/partition1/llgrid/pkg/anaconda/anaconda3-2021b/bin/python'
+           python_location = '/state/partition1/llgrid/pkg/anaconda/anaconda3-2022a/bin/python'
         else:
            python_location = 'python'
 
@@ -66,7 +66,7 @@ def pyMPI_Comm_settings():
     # -u: unbuffered standard output
     machine_db_settings['python_command'] = python_location + ' -u '
     machine_db_settings['python_module_path'] = '/etc/environment-modules/modules'
-    machine_db_settings['python_module_name'] = 'anaconda/2021b'
+    machine_db_settings['python_module_name'] = 'anaconda/2022a'
 
     # Remote launch command.
     # To use ssh, change ' rsh ' to ' ssh ' in line below.
