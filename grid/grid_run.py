@@ -265,7 +265,7 @@ def grid_run( py_file, n_proc, machines ):
                 # Check if i_rank value needs to be adjusted
 
                 # Build commands that lauch multiple matlab on target nodes.
-                defscommands, unix_cmd_i_rank = pyMPI_Commands(py_file_basename,i_rank,pyMCW.MPI_COMM_WORLD)
+                defscommands, unix_cmd_i_rank = pyMPI_Commands(py_file_basename,i_rank,pyMCW.MPI_COMM_WORLD,grid_config=grid.grid_config)
                 unix_commands = unix_commands+unix_cmd_i_rank
 
             # Create a file name to hold script that will be run on target.

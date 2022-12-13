@@ -7,7 +7,7 @@ import checkOS as OS
 from pyMPI_Host_rank import *
 from pyMPI_Dir_map import *
 
-def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD):
+def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD,**argv):
     """pyMPI_Commands  -  Commands to launch a python script remotely.
 
     Usage:
@@ -27,6 +27,11 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD):
     if DEBUG:
         print('--> Entering pyMPI_Commands:')
         print('rank = %d'%(rank))
+
+    for key in argv:
+        if key == 'grid_config':
+            grid_config = argv[key]
+            grid_job = grid_config['grid_job']
 
     Np = MPI_Comm_size(MPI_COMM_WORLD)
 
@@ -139,6 +144,8 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD):
     python_command = python_base+' '+defsfile+' &> '+outfile
 
     # Determine how to run script and where to send output.
+    if DEBUG:
+        print('Launch from %s to machine, %s'%(host,machine))
     if machine == host: # Target is host.
         # Check if running with host& set.
         if ((rank == 0) and (pyMPI_Host_rank(pyMCW.MPI_COMM_WORLD) == 0)):
@@ -171,17 +178,24 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD):
         fid = open(defsfile,'w');
         n_command = len(commands)
         for k,v in commands.items():
-            #print('k,v: %d, %s'%(k,v))
+            # if DEBUG:
+            #     print('k,v: %d, %s'%(k,v))
             fid.write(v)
         fid.close()
 
         # Create command to run defsfile locally and pipe output to another file.
         if type == 'pc':
+            if DEBUG:
+                print('-> Remote machine is a pc')
             # Remote machine is a pc.
             # PC equivalent to touch is 'copy nul filename.tx&t'
             python_command = python_base+' '+defsfile+' > '+outfile
             unix_command = 'start /b '+python_command+nl+'copy nul PythonMPI\pid.'+machine+'.pc'+nl 
         else:
+            if DEBUG:
+                print('-> Remote machine is NOT a pc')
+            if grid_job and rank>0:
+                python_command = 'python '+defsfile+' &> '+outfile
             unix_command = python_command+' &'+nl+'touch PythonMPI/pid.'+machine+'.$!'+nl
 
     if DEBUG:

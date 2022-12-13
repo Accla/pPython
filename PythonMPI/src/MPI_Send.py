@@ -36,14 +36,14 @@ def MPI_Send(dest, tag, comm, *argv):
     my_rank = MPI_Comm_rank(comm)
     
     # save locally and read by scp remotely if out-of-node or read locally if in-node msg.
-    innode = 0
+    innode = 1
     grid_config = comm['grid_config']
     if grid_config['local_fs'] == 1 :
         local_fs  = 1;
         tmpdir = comm['tmpdir']
         machines =  comm['machine_db']['machine']
-        if machines[my_rank] == machines[dest] :
-            innode = 1
+        if machines[my_rank] != machines[dest] :
+            innode = 0
     else:
         local_fs  = 0
 
@@ -81,7 +81,7 @@ def MPI_Send(dest, tag, comm, *argv):
     try:
         save_dict_to_pickle(msg,buffer_file)
     except:
-        raise Execution('MPI_Send: fail to create a message file, %s'%(buffer_file))
+        raise Exception('MPI_Send: fail to create a message file, %s'%(buffer_file))
     
     # Create lock file.
     fid = open(lock_file,'w+')

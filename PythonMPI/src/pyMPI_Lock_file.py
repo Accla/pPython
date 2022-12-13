@@ -41,15 +41,16 @@ def pyMPI_Lock_file(source, dest, tag, comm, **argv):
             innode = argv[key]
         else:
             raise Exception('ERROR(pyMPI_Lock_file): additional argument has a wrong key,value pair as input.')
-            
-    # Destination machine ID
-    machine_id_dest = comm['machine_id'][dest]
+
+    # grid_job
+    grid_job = False
+    if 'grid_config' in comm:
+        grid_job = comm['grid_config']['grid_job']
+
     if local_fs:
         # if using local filesystem
         if (msg_type == 'send'):
             # Send process
-            # temporary directory for the source process
-            #CB dir = comm['tmpdir'][source]
             if innode:
                 # if in-node message, temporary directory is the same for the destination process
                 # this allows for source process to exit before the message is received by the receiver
@@ -64,10 +65,11 @@ def pyMPI_Lock_file(source, dest, tag, comm, **argv):
             dir = comm['tmpdir'][dest]
     else:
         # Using a central filesystem
-        dir = comm['machine_db']['dir'][machine_id_dest]
+        machine_id_source = comm['machine_id'][source]
+        dir = comm['machine_db']['dir'][machine_id_source]
 
     # Translate dir if needed
-    if not local_fs:
+    if grid_job and (not local_fs):
         dir = pyMPI_Dir_translate(comm['machine_db'],dir)
 
     if DEBUG:

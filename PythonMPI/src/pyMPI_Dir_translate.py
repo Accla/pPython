@@ -2,6 +2,7 @@ import os
 import re
 
 import checkOS as OS
+import pyMPI_COMM_WORLD as pyMCW
 from replace_token import *
 
 def pyMPI_Dir_translate(machine_db,path):
@@ -22,7 +23,11 @@ def pyMPI_Dir_translate(machine_db,path):
         for ref_path in machine_db['local_dir_map']:
             print(ref_path)
 
-    if OS.islocal:
+    grid_job = False
+    if 'grid_config' in pyMCW.MPI_COMM_WORLD:
+        grid_job = pyMCW.MPI_COMM_WORLD['grid_config']['grid_job']
+
+    if OS.islocal and (not grid_job):
         # Running locally, local_path == path
         if DEBUG:
             print('pyMPI_Dir_translate: running locally, local_path == path')

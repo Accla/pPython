@@ -34,14 +34,14 @@ def MPI_Recv( source, tag, comm ):
 
     # read messages locally, which was securely transferred via scp from a remote host 
     # or saved by a local process on the same node.
-    innode = 0
+    innode = 1
     grid_config = comm['grid_config']
     if grid_config['local_fs'] == 1 :
         local_fs  = 1;
         tmpdir = comm['tmpdir']
         machines =  comm['machine_db']['machine']
-        if machines[my_rank] == machines[source] :
-            innode = 1
+        if machines[my_rank] != machines[source] :
+            innode = 0
     else:
         local_fs  = 0
 

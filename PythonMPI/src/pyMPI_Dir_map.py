@@ -1,6 +1,7 @@
 from replace_token import *
 
 import checkOS as OS
+import pyMPI_COMM_WORLD as pyMCW
 
 def pyMPI_Dir_map(machine_db,path):
     """pyMPI_Dir_map  -  Takes care of pc/linux/mac/grid path translation for a given patth.
@@ -38,9 +39,13 @@ def pyMPI_Dir_map(machine_db,path):
     dir_sgrp_2 = path;
     dir_sgrp_3 = path;
 
-    if OS.islocal:
-        # print('pyMPI_Dir_map: running locally. Skip checking directory path.')
+    grid_job = False
+    if 'grid_config' in pyMCW.MPI_COMM_WORLD:
+        grid_job = pyMCW.MPI_COMM_WORLD['grid_config']['grid_job']
+
+    if OS.islocal and (not grid_job):
         if DEBUG: 
+            print('pyMPI_Dir_map: Skip checking directory path.')
             print('<-- Exiting pyMPI_Dir_map')
         return dir_pc, dir_linux, dir_mac, dir_grid
         
