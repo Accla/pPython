@@ -8,14 +8,14 @@ Installation
    export PPYTHON_HOME=/path/to/your/desired/location/pPython-$VERSION 
    ($VERSION is the additional string for the unpacked directory name.)
 
-2. Create ~/pythonmpi directory
+2. Create ~/ppython_conf directory
 
-   mkdir ~/pythonmpi
+   mkdir ~/ppython_conf
 
-3. Copy the following local configuratiton files to ~/pythonmpi
+3. Copy the following local configuratiton files to ~/ppython_conf
 
-   cp $PPYTHON_HOME/local/grid_config_local.py ~/pythonmpi
-   cp $PPYTHON_HOME/PythonMPI/local/pyMPI_Comm_settings_local.py ~/pythonmpi
+   cp $PPYTHON_HOME/local/grid_config_local.py ~/ppython_conf
+   cp $PPYTHON_HOME/PythonMPI/local/pyMPI_Comm_settings_local.py ~/ppython_conf
 
 4. Edit the local configuration files for your LLGrid account.
 

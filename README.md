@@ -8,7 +8,7 @@ There are a couple of requireemnts to use the pPython package
 It assumes that PythonMPI is distributed with pPython at its root directory. <br>
 </li>
 <li>
-It is also assumes that a local configuration is available from $HOME/pythonmpi directory.
+It is also assumes that a local configuration is available from $HOME/ppython_conf directory.
 </li>
 <br>
 <br>
