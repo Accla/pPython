@@ -8,7 +8,7 @@ try:
     # is_local_pyMPI_Comm_settings = 1
 
     HOME = os.getenv('HOME')
-    if os.path.exists(HOME+os.sep+'pythonmpi'+os.sep+'pyMPI_Comm_settings_local.py'):
+    if os.path.exists(HOME+os.sep+'ppython_conf'+os.sep+'pyMPI_Comm_settings_local.py'):
         from pyMPI_Comm_settings_local import pyMPI_Comm_settings_local
         is_local_pyMPI_Comm_settings = 1
     else:

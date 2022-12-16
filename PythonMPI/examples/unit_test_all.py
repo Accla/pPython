@@ -50,7 +50,7 @@ HOME_PATH="/home/gridsan/ch21778"
 # HOME_PATH="Z:"
 LLSC_PYTHONMPI_PATH = HOME_PATH+os.sep+"devtools"+os.sep+"git"+os.sep+"PythonMPI"+os.sep+"src"
 # Export the path to modify PythonMPI settings for an individual user
-LOCAL_PYTHONMPI_CONFIG_PATH = HOME_PATH+os.sep+"pythonmpi"
+LOCAL_PYTHONMPI_CONFIG_PATH = HOME_PATH+os.sep+"ppython_conf"
 
 # Add the current working directory to the system path
 # so that any Python codes in the current working directory
