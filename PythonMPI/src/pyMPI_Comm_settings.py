@@ -53,6 +53,8 @@ def pyMPI_Comm_settings():
            python_location = '/state/partition1/llgrid/pkg/anaconda/anaconda3-2022a/bin/python'
         else:
            python_location = 'python'
+    elif OS.ispc:
+        python_location = 'python.exe '
 
     # Lincoln cluster common.
     # python_location = ' /tools/python/bin/python';

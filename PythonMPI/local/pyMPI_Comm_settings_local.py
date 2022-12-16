@@ -41,31 +41,32 @@ def pyMPI_Comm_settings_local(machine_db_settings):
     	machine_db_settings['python_module_name'] = 'anaconda/2022a'
 
     else:
-    	# Set location of python on unix systems.
-    	# Generic location.  
-    	python_location = ' python ';   # [OK TO CHANGE.]
+        # Set location of python on unix systems.
+        # Generic location.  
+        python_location = 'python';   # [OK TO CHANGE.]
 
-    	# If this is a unix system, we can
-    	# try and guess a better location of python on remote
-    	# machines.  If wrong, then this needs to be hard coded (see below).
-    	if OS.islocal:
-    	    if OS.ispc:
-            	python_location = 'C:\ProgramData\Anaconda3\python.exe'
+        # If this is a unix system, we can
+        # try and guess a better location of python on remote
+        # machines.  If wrong, then this needs to be hard coded (see below).
+        if OS.islocal:
+            if OS.ispc:
+                python_location = 'C:\ProgramData\Anaconda3\python.exe'
+                machine_db_settings['python_command'] = python_location + ' -u '
     	    elif OS.islinux:
-            	python_location = 'python'
-    	    elif OS.ismac:
-            	# python_location = '/usr/bin/python'
-            	# python_location = '/state/partition1/llgrid/pkg/anaconda/anaconda3-2022a/bin/python'
-            	python_location = '/opt/anaconda3/bin/python'
+                python_location = 'python'
+                machine_db_settings['python_command'] = python_location + ' -u '
+            elif OS.ismac:
+                # python_location = '/usr/bin/python'
+                # python_location = '/state/partition1/llgrid/pkg/anaconda/anaconda3-2022a/bin/python'
+                python_location = '/opt/anaconda3/bin/python'
+                machine_db_settings['python_command'] = python_location + ' -u '
     	    else:
             	print('Error (pyMPI_Comm_settings_local): unsupported OS.')
             	exit()
     	else:
             # Assuming running on LLSC
-         	python_location = 'python'
          	machine_db_settings['python_module_path'] = '/etc/environment-modules/modules'
          	machine_db_settings['python_module_name'] = 'anaconda/2022a'
-           
 
     machine_db_settings['python_command_llsc'] = python_location + ' -u '
 

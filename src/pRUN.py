@@ -27,13 +27,14 @@ sys.path.append(GRIDPYTHON_PATH)
 
 # Assuming local configuration is available from $HOME/ppython_conf directory.
 LOCAL_PYTHONMPI_CONFIG_PATH = os.getenv('HOME')+os.sep+'ppython_conf'
-if not os.path.exists(LOCAL_PYTHONMPI_CONFIG_PATH):
+if os.path.exists(LOCAL_PYTHONMPI_CONFIG_PATH):
+    sys.path.append(LOCAL_PYTHONMPI_CONFIG_PATH)
+else:
     print('ERROR(pRUN): LOCAL_PYTHONMPI_CONFIG_PATH path, %s, does not exist.'%(LOCAL_PYTHONMPI_CONFIG_PATH))
     exit()
-sys.path.append(LOCAL_PYTHONMPI_CONFIG_PATH)
-sys.path.append(PPYTHON_PATH)
 
 if os.path.exists(PYTHONMPI_PATH):
+    sys.path.append(PPYTHON_PATH)
     import checkOS as OS
     # from PythonMPI import *
     from pyMPI_Delete_all import *
