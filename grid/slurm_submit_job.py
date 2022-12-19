@@ -3,6 +3,7 @@ import sys
 import checkOS as OS
 from exec_shell_cmd import *
 from set_remote_cc import *
+from pPython_ver import *
 
 def slurm_submit_job(grid_config,sched_job_file,py_file,dir_llsc):
     """Submit PythonMPI job to run on LLGrid via Slurm."""  
@@ -51,7 +52,8 @@ def slurm_submit_job(grid_config,sched_job_file,py_file,dir_llsc):
     # Additional job informaiton
     tmp = sys.version
     version = tmp.split()[0]
-    cmdstr = cmdstr+' --comment='+q+'Python:%s,PythonMPI,'%(version)+q
+    ppython_ver = pPython_ver()
+    cmdstr = cmdstr+' --comment='+q+'Python:%s,pPython: %s, PythonMPI,'%(version,ppython_version)+q
         
     # Construct the final sbatch command
     
