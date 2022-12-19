@@ -2,20 +2,7 @@ import inspect
 import os
 
 import checkOS as OS
-try:
-    # Why this is not working? 
-    # loc = os.path.abspath(inspect.getfile(pyMPI_Comm_settings_local))
-    # is_local_pyMPI_Comm_settings = 1
-
-    HOME = os.getenv('HOME')
-    if os.path.exists(HOME+os.sep+'ppython_conf'+os.sep+'pyMPI_Comm_settings_local.py'):
-        from pyMPI_Comm_settings_local import pyMPI_Comm_settings_local
-        is_local_pyMPI_Comm_settings = 1
-    else:
-        is_local_pyMPI_Comm_settings = 0
-except Exception:
-    print('pyMPI_Comm_settings: Failed to find the local machine_db_settings.')
-    is_local_pyMPI_Comm_settings = 0
+from pyMPI_Comm_settings_local import *
 
 def pyMPI_Comm_settings():
     """pyMPI_Comm_settings  -  Function for setting values in the MPI Communicator.
@@ -81,11 +68,11 @@ def pyMPI_Comm_settings():
     machine_db_settings['local_dir_map'] = ['Z:', '/home/gridsan/ch21778', '/Volumes/ch21778']
 
     # if there is local update, please update machine_db_settings
-    if is_local_pyMPI_Comm_settings:
+    try:
         machine_db_settings = pyMPI_Comm_settings_local(machine_db_settings)
         loc = os.path.abspath(inspect.getfile(pyMPI_Comm_settings_local))
         print('--> pyMPI_Comm_settings: updated machine_db_settings with a local configuration, %s.'%(loc))
-    else:
+    except:
         print('pyMPI_Comm_settings: Failed to update the local machine_db_settings.')
         # exit()
 
