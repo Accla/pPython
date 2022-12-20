@@ -171,7 +171,7 @@ def grid_run( py_file, n_proc, machines ):
     if os.path.isdir(checkPath):
         raise Exception('Error: PythonMPI directory already exists: rename or remove with pyMPI_Delete_all')
     else:
-        os.makedirs(checkPath)
+        os.makedirs(checkPath, exist_ok=True)
 
     # Get number of machines to launch on.
     n_machines = len(machines)

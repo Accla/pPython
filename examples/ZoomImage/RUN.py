@@ -14,8 +14,9 @@ import platform
 Customization for the user environment
 """
 # Specify whether using pPython installed on the grid or locally
+RUN_ON_GRID = False  # True (run with grid installation) or False(run on local installation)
 GRID_PPYTHON = False  # True (grid installation) or False(local installation)
-USE_LATEST_VERSION = True
+USE_LATEST_VERSION = False
 PPYTHON_VER = 'v0.9.2'
 
 # PPYTHON_HOME environment variable should be set in order to find the pPython installation
@@ -81,7 +82,7 @@ n_proc = 4
 
 # Launch PythonMPI
 # print('Running: %s via pRUN().'%(py_file))
-if GRID_PPYTHON:
+if GRID_PPYTHON and RUN_ON_GRID:
     pRUN( py_file, n_proc, 'grid' )
 else:
     pRUN( py_file, n_proc, {} )
