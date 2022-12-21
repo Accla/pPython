@@ -1,6 +1,17 @@
+import datetime
 import re
 import os
 import sys
+from timeit import default_timer as timer
+
+LAUNCH_TIMING = True
+if LAUNCH_TIMING:
+    # Current time
+    t = datetime.datetime.now()
+    print(' ')
+    print('pRUN start time (Epoch in sec) = %d'%(int(t.strftime('%s'))))
+    print('pRUN (Current time) = %s' %(t))
+    print(' ')
 
 # Set pPython & PythonMPI search path and import it
 PPYTHON_HOME = os.getenv('PPYTHON_HOME')
@@ -91,6 +102,10 @@ def pRUN(py_file,n_proc,machines,sched_options=None):
 
     if sched_options:
         grid.grid_config['sched_options'] = sched_options
+
+    grid.grid_config['LAUNCH_TIMING'] = False
+    if LAUNCH_TIMING:
+        grid.grid_config['LAUNCH_TIMING'] = LAUNCH_TIMING
 
     if DEBUG:
         print(grid.grid_config)

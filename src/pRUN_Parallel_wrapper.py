@@ -21,15 +21,6 @@ def pRUN_Parallel_wrapper(py_file):
     
     MPI_COMM_WORLD = pyMCW.MPI_COMM_WORLD
     LAUNCH_TIMING = False
-    if LAUNCH_TIMING:
-        # Current time
-        t = datetime.datetime.now()
-        print('pRUN_Parallel_Wrapper: after pPython started. (Epoch in sec) = %d'%(int(t.strftime('%s'))))
-        print('pRUN_Parallel_Wrapper: after pPython started. (Current time) = %s' %(t))
-    
-    pPython_init()
-    
-    # Generat the host-to-rank map with TMPDIR only if using local filesystem
     if 'grid_config' in MPI_COMM_WORLD:
         # The default mode is defined in the grid_config_local
         grid_config = MPI_COMM_WORLD['grid_config']
@@ -37,8 +28,22 @@ def pRUN_Parallel_wrapper(py_file):
         islocal = grid_config['islocal']
         grid_job = grid_config['grid_job']
         interactive = grid_config['interactive']
+        # Passed from pRUN()
+        LAUNCH_TIMING = grid_config['LAUNCH_TIMING']
     else:
         raise Exception('ERROR(pRUN_Parallel_wrapper): local_fs is not defined in grid_config with MPI_COMM_WORLD')
+    
+    if LAUNCH_TIMING:
+        # Current time
+        t = datetime.datetime.now()
+        print(' ')
+        print('pRUN_Parallel_Wrapper: after pPython started. (Epoch in sec) = %d'%(int(t.strftime('%s'))))
+        print('pRUN_Parallel_Wrapper: after pPython started. (Current time) = %s' %(t))
+        print(' ')
+    
+    # Generat the host-to-rank map with TMPDIR only if using local filesystem
+    pPython_init()
+    
     #
     # Override if PPYTHON_LOCAL_FS is defined
     PPYTHON_LOCAL_FS = os.getenv('PPYTHON_LOCAL_FS')
@@ -104,6 +109,14 @@ def pRUN_Parallel_wrapper(py_file):
     pPython_finalize()
     GPC.Pid = 0
     GPC.Np = 1
+    
+    if LAUNCH_TIMING:
+        # Current time
+        t = datetime.datetime.now()
+        print(' ')
+        print('pRUN_Parallel_Wrapper: after pPython finished. (Epoch in sec) = %d'%(int(t.strftime('%s'))))
+        print('pRUN_Parallel_Wrapper: after pPython finished. (Current time) = %s' %(t))
+        print(' ')
     
     if DEBUG:
         # Current time
