@@ -53,7 +53,7 @@ def slurm_submit_job(grid_config,sched_job_file,py_file,dir_llsc):
     tmp = sys.version
     version = tmp.split()[0]
     ppython_ver = pPython_ver()
-    cmdstr = cmdstr+' --comment='+q+'Python:%s,pPython: %s, PythonMPI,'%(version,ppython_version)+q
+    cmdstr = cmdstr+' --comment='+q+'Python:%s,pPython: %s, PythonMPI,'%(version,ppython_ver)+q
         
     # Construct the final sbatch command
     
