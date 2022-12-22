@@ -28,6 +28,10 @@ def check_allowance(n_proc,cpu_type):
     USERNAME   xeon-p8                         cpu=3072
  
     """
+    DEBUG = 1
+    if DEBUG:
+        print('--> Entering check_allowance')
+
     status = 0
     
     # Create the remote execution command object
@@ -50,7 +54,9 @@ def check_allowance(n_proc,cpu_type):
     output = ecmd.get_output()
     sum = 0
     for line in output.splitlines():
-        # print(line)
+        if DEBUG:
+            print('squeue output:')
+            print(line)
         tmp = line.split(',')
         sum += int(tmp[1])
     # print('Quota in use: %d cores'%(sum))
@@ -67,11 +73,20 @@ def check_allowance(n_proc,cpu_type):
         # no limit enforced
         return status
     else:
-        # print(output)
-        tmp = output.split('=')
-        q_limit = int(tmp[1])
-        q_avail = q_limit - sum
-        # print('Quota limit: %d cores'%(q_limit))
+        if DEBUG:
+            print('sacctmgr output:')
+            print(output)
+        tmp = output.split(',')
+        cpu_q_limit = 0
+        mem_q_limit = '0T'
+        for arg in tmp:
+            tmp2 = arg.strip().split('=')
+            if tmp2[0] == 'cpu':
+                cpu_q_limit = int(tmp2[1])
+            elif tmp2[0] == 'mem':
+                mem_q_limit = tmp2[1]
+        cpu_q_avail = cpu_q_limit - sum
+        # print('Quota limit: %d cores'%(cpu_q_limit))
     
         if isinstance(n_proc,list):
             n_proc_num = n_proc[0]*n_proc[1]
@@ -81,7 +96,7 @@ def check_allowance(n_proc,cpu_type):
             print('ERROR(check_allowance): n_proc must be either interger or list')
             exit()
 
-        if q_avail > n_proc_num:
+        if cpu_q_avail > n_proc_num:
             # Resource limit can provide the requested resources
             status = 0
         else:

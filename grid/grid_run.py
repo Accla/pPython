@@ -7,7 +7,6 @@ import checkOS as OS
 import pyMPI_COMM_WORLD as pyMCW
 from MPI_Run import *
 
-from convert_to_dict import *
 from pyMPI_Comm_init import *
 from pyMPI_Commands import *
 from pyMPI_Dir_map import *
@@ -38,8 +37,8 @@ def grid_run( py_file, n_proc, machines ):
 
     py_file:  the python script name (dtype: string)
     n_proc:   total number of MPI processes (dtype: int)
-    machines: 'grid' or 'grid&'
-              extended to 'grid-cpu_type' or 'grid-cpu_type&'
+    machines: a dictionary variable
+              preprocessed in check_runtime()
     
     defscommands: command to run locally if machine is a local machine
 
@@ -70,99 +69,14 @@ def grid_run( py_file, n_proc, machines ):
     # Determine whether it is an interactive or backgrounded job
     if DEBUG:
         print('machines: %s'%(machines))
-    if isinstance(machines,(dict,list,set)):
-        endStr = ''
-        interactive = 1
-        grid_job = False
-    else:
-        if machines[-1] == '&':
-            # Backgrounded job
-            endStr = '&'
-            interactive = 0
-            grid_job = True
-        else:
-            # Interacttive job
-            endStr = ''
-            interactive = 1
-            if machines[:4] == 'grid':
-                grid_job = True
-            else:
-                grid_job = False
-    
-    # Determine if a specific CPU type is requested
-    cpu_type = ''
-    if len(machines) > 5:
-        # 'grid-xeon-e5[&]'
-        if endStr == '&':
-            cpu_type = machines[5:-1]
-        else:
-            cpu_type = machines[5:]
-            
-    # Modify the default value if cpu_type is specified
-    if len(cpu_type):
-        if DEBUG:
-            print('CPU type, grid.grid_config[\'cpu_type\' ] = %s'%(cpu_type))
-        grid.grid_config['cpu_type'] = cpu_type
-        # Update the queue name (partition name) accordingly
-        if (cpu_type == 'xeon64c'):
-            grid.grid_config['q_name'] = 'manycore'
-        elif (cpu_type == 'xeon-p8'):
-            grid.grid_config['q_name'] = 'xeon-p8'
-        elif (cpu_type == 'xeon-g6'):
-            grid.grid_config['q_name'] = 'gaia'
-        elif (cpu_type == 'xeon-e5'):
-            # Only on TX-Green
-            grid.grid_config['q_name'] = 'normal'
 
-    # number of cores to be allocated from the grid
-    requested,unclaimed_procs,unclaimed_nodes = grid_resource_policy(grid.grid_config, n_proc, interactive)
-    n_proc = requested + interactive
+    # Recover variables processed in check_runtime()
+    islocal = grid.grid_config['islocal']
+    cpu_type = grid.grid_config['cpu_type']
+    grid_job = grid.grid_config['grid_job']
+    interactive = grid.grid_config['interactive']
 
-    # Create a fictious machine list when 'grid[&]' is used
-    machines = []
-    # set the Pid=0 machine for an interactive job
-    if interactive and grid_job:
-        machines.append(host)
-    if grid.grid_config['n_nodes'] > 0: 
-        # Triples modes, local MPI processes aggregated into a single scheduler task
-        grid.grid_config['ntasks'] = grid.grid_config['n_nodes']
-        n_digits = int(math.log10(grid.grid_config['n_nodes'])+1)
-        for i in range(grid.grid_config['n_nodes']):
-            node_strid = str(i+1).zfill(n_digits)
-            machines.append('grid_slurm_'+node_strid)
-    else:
-        # Non-triple modes
-        if interactive:
-            grid.grid_config['ntasks'] = n_proc-1
-        else:
-            grid.grid_config['ntasks'] = n_proc
-        if DEBUG:
-            print('n_proc = %d'%(n_proc))
-            print("grid.grid_config['ntasks'] = %d"%(grid.grid_config['ntasks']))
-        if grid.grid_config['ntasks']>0:
-            n_digits = int(math.log10(grid.grid_config['ntasks'])+1)
-        else:
-            n_digits = 1
-        if grid_job:
-            for i in range(grid.grid_config['ntasks']):
-                node_strid = str(i+1).zfill(n_digits)
-                machines.append('grid_slurm_'+node_strid)
-    
-        
-    # Convert machines into a dictionary variable if needed
-    machines,islocal = convert_to_dict(machines,host)
-    #
-    # Override islocal based on interactive
-    if interactive or (not grid_job):
-        islocal = 1
-    else:
-        islocal = 0
     OS.islocal = islocal
-    # save to grid_config['islocal'] which will be saved in MPI_COMM_WORLD
-    grid.grid_config['islocal'] = islocal
-    grid.grid_config['grid_job'] = grid_job
-    grid.grid_config['interactive'] = interactive
-
     if DEBUG:
         print('OS.islocal = %d'%(OS.islocal))
 
@@ -173,15 +87,11 @@ def grid_run( py_file, n_proc, machines ):
     else:
         os.makedirs(checkPath, exist_ok=True)
 
-    # Get number of machines to launch on.
-    n_machines = len(machines)
-    if interactive:
-        n_machines = n_machines-1
-
     # Create generic comm. (Initialize global pyMCW.MPI_COMM_WORLD)
     #
-    # The grid.grid_config should be added to MPI_COMM_WORLD before calling pyMPI_Comm_init()
-    # because pyMPI_Comm_init() saves MPI_COMM_WORLD for pPython processes when they start.
+    # The grid.grid_config should be passed to pyMPI_Comm_init()
+    # because pyMPI_Comm_init() saves MPI_COMM_WORLD.
+    # When each pPython process starts, it read MPI_COMM_WORLD.
     #
     pyMCW.MPI_COMM_WORLD = pyMPI_Comm_init(n_proc,machines,grid_config=grid.grid_config);
 
