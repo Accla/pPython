@@ -28,7 +28,7 @@ def check_allowance(n_proc,cpu_type):
     USERNAME   xeon-p8                         cpu=3072
  
     """
-    DEBUG = 1
+    DEBUG = 0
     if DEBUG:
         print('--> Entering check_allowance')
 

@@ -38,8 +38,8 @@ def pRUN_Parallel_wrapper(py_file):
         # Current time
         time_now = time.time()
         print(' ')
-        print('pRUN_Parallel_Wrapper: after pPython started. (Epoch in sec) = %d'%(int(time_now)))
-        print('pRUN_Parallel_Wrapper: after pPython started. (Current time) = %s' %(datetime.fromtimestamp(time_now)))
+        print('pRUN_Parallel_Wrapper: after pPython parallel wrapper started (Epoch in sec) = %d'%(int(time_now)))
+        print('pRUN_Parallel_Wrapper: after pPython parallel wrapper started (Current time) = %s' %(datetime.fromtimestamp(time_now)))
         print(' ')
     
     # Generat the host-to-rank map with TMPDIR only if using local filesystem
@@ -75,7 +75,7 @@ def pRUN_Parallel_wrapper(py_file):
         myhostname = os.uname()[1]
         print('MANYCORE JOB, BEGIN: on %s'%(myhostname))
 
-    if DEBUG:
+    if LAUNCH_TIMING:
         time_now = time.time()
         print(' ')
         print('pRUN_Parallel_Wrapper: Application starts at (Epoch in sec) = %d'%(int(time_now)))

@@ -1,6 +1,6 @@
 import pathlib
 
-def pPython_ver():
+def pPython_ver(default_display = None):
     """pPython_ner - Return the current pPython version.
     
     Usage:
@@ -14,8 +14,9 @@ def pPython_ver():
     location = pathlib.Path().absolute()
     version = '0.9.3'
     
-    print('pPython version: %s'%(version))
-    print('          Location: %s'%(location))
+    if default_display:
+        print('pPython version: %s'%(version))
+        print('          Location: %s'%(location))
     
     return version
 

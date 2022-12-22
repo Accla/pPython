@@ -32,7 +32,7 @@ def check_runtime( n_proc, machines, grid_config ):
     Python author: Dr. Chansup Byun
     """
 
-    DEBUG = 1
+    DEBUG = 0
 
     if DEBUG:
         print('--> Entering check_runtime.')

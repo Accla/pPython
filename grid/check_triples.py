@@ -4,7 +4,7 @@ import os
 #from get_cpu_info import *
 
 def check_triples(cluster_name,cpu_type,n_proc,grid_config):
-    DEBUG = 1
+    DEBUG = 0
     # If needed, preprocess triples mode resource request
     # check if n_proc is not an integer but an array of numerals
     if not isinstance(n_proc,(int,np.int64,np.int32)):
