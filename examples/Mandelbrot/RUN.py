@@ -14,8 +14,8 @@ import platform
 Customization for the user environment
 """
 # Specify whether using pPython installed on the grid or locally
-RUN_ON_GRID = False  # True (run with grid installation) or False(run on local installation)
-GRID_PPYTHON = False  # True (grid installation) or False(local installation)
+RUN_ON_GRID = True  # True (run with grid installation) or False(run on local installation)
+GRID_PPYTHON = True  # True (grid installation) or False(local installation)
 USE_LATEST_VERSION = False
 PPYTHON_VER = 'v0.9.3'
 
@@ -38,7 +38,10 @@ if GRID_PPYTHON:
     if QA_ON_GIT:
         PPYTHON_HOME = GRID_MOUNT_PATH + "/devtools/git/pPython"
     else:
-        PPYTHON_HOME = GRID_MOUNT_PATH + "/llgrid_beta/pPython/latest"
+        if USE_LATEST_VERSION:
+            PPYTHON_HOME = GRID_MOUNT_PATH + "/llgrid_beta/pPython/latest"
+        else:
+            PPYTHON_HOME = GRID_MOUNT_PATH + "/llgrid_beta/pPython"+os.sep+PPYTHON_VER
     print('RUN.py: PPYTHON_HOME = %s'%(PPYTHON_HOME))
 else:
     # Use pPython installed locally
