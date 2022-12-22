@@ -17,7 +17,7 @@ Customization for the user environment
 RUN_ON_GRID = False  # True (run with grid installation) or False(run on local installation)
 GRID_PPYTHON = False  # True (grid installation) or False(local installation)
 USE_LATEST_VERSION = False
-PPYTHON_VER = 'v0.9.2'
+PPYTHON_VER = 'v0.9.3'
 
 # PPYTHON_HOME environment variable should be set in order to find the pPython installation
 system_name = platform.system()
