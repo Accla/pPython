@@ -1,4 +1,5 @@
-import datetime
+import time
+from datetime import datetime
 import os
 from timeit import default_timer as timer
 
@@ -35,10 +36,10 @@ def pRUN_Parallel_wrapper(py_file):
     
     if LAUNCH_TIMING:
         # Current time
-        t = datetime.datetime.now()
+        time_now = time.time()
         print(' ')
-        print('pRUN_Parallel_Wrapper: after pPython started. (Epoch in sec) = %d'%(int(t.strftime('%s'))))
-        print('pRUN_Parallel_Wrapper: after pPython started. (Current time) = %s' %(t))
+        print('pRUN_Parallel_Wrapper: after pPython started. (Epoch in sec) = %d'%(int(time_now)))
+        print('pRUN_Parallel_Wrapper: after pPython started. (Current time) = %s' %(datetime.fromtimestamp(time_now)))
         print(' ')
     
     # Generat the host-to-rank map with TMPDIR only if using local filesystem
@@ -75,16 +76,25 @@ def pRUN_Parallel_wrapper(py_file):
         print('MANYCORE JOB, BEGIN: on %s'%(myhostname))
 
     if DEBUG:
-        t = datetime.datetime.now()
-        print('pRUN_Parallel_Wrapper: Program starts. (Epoch in sec) = %d'%(int(t.strftime('%s'))))
-        print('pRUN_Parallel_Wrapper: Program starts. (Current time) = %s' %(t))
+        time_now = time.time()
+        print(' ')
+        print('pRUN_Parallel_Wrapper: Application starts at (Epoch in sec) = %d'%(int(time_now)))
+        print('pRUN_Parallel_Wrapper: Application starts at (Current time) = %s' %(datetime.fromtimestamp(time_now)))
     
     # Start the program
     exec(open(py_file).read())
     
+    if LAUNCH_TIMING:
+        # Current time
+        time_now = time.time()
+        print(' ')
+        print('pRUN_Parallel_Wrapper: Application finished at (Epoch in sec) = %d'%(int(time_now)))
+        print('pRUN_Parallel_Wrapper: Application finished at (Current time) = %s' %(datetime.fromtimestamp(time_now)))
+        print(' ')
+    
     # Display the end of the program for the many-core jobs
     if grid_config['PPYTHON_MANYCORE'].lower() == 'yes':
-        print('MANYCORE JOB, END: on %s'%(myhostname))
+        print('MANYCORE JOB, DONE: on %s'%(myhostname))
 
         if grid_config['manycore_implicit']:
             if DEBUG:
@@ -110,19 +120,7 @@ def pRUN_Parallel_wrapper(py_file):
     GPC.Pid = 0
     GPC.Np = 1
     
-    if LAUNCH_TIMING:
-        # Current time
-        t = datetime.datetime.now()
-        print(' ')
-        print('pRUN_Parallel_Wrapper: after pPython finished. (Epoch in sec) = %d'%(int(t.strftime('%s'))))
-        print('pRUN_Parallel_Wrapper: after pPython finished. (Current time) = %s' %(t))
-        print(' ')
-    
     if DEBUG:
-        # Current time
-        t = datetime.datetime.now()
-        print('pRUN_Parallel_Wrapper: Exited. (Epoch in sec) = %d'%(int(t.strftime('%s'))))
-        print('pRUN_Parallel_Wrapper: Exited. (Current time) = %s' %(t))
         print('<-- Exiting pRUN_Parallel_wrapper.')
 
     return

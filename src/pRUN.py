@@ -1,4 +1,5 @@
-import datetime
+import time
+from datetime import datetime
 import re
 import os
 import sys
@@ -7,10 +8,10 @@ from timeit import default_timer as timer
 LAUNCH_TIMING = True
 if LAUNCH_TIMING:
     # Current time
-    t = datetime.datetime.now()
+    time_now = time.time()
     print(' ')
-    print('pRUN start time (Epoch in sec) = %d'%(int(t.strftime('%s'))))
-    print('pRUN (Current time) = %s' %(t))
+    print('pRUN start time (Epoch in sec) = %d'%(int(time_now)))
+    print('pRUN (Current time) = %s' %(datetime.fromtimestamp(time_now)))
     print(' ')
 
 # Set pPython & PythonMPI search path and import it
