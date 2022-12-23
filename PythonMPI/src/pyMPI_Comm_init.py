@@ -49,6 +49,7 @@ def pyMPI_Comm_init(n_proc,machines,**argv):
     MPI_COMM_WORLD['group'] = np.arange(0,n_proc,dtype=int)
     MPI_COMM_WORLD['machine_id'] = np.zeros((n_proc,),dtype=int)
     MPI_COMM_WORLD['host_rank'] = 0
+    MPI_COMM_WORLD['host_name'] = host
     MPI_COMM_WORLD['machine_db'] = dict()
     
     # Added to save grid_config

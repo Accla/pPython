@@ -5,7 +5,7 @@ import os
 import sys
 from timeit import default_timer as timer
 
-LAUNCH_TIMING = True
+LAUNCH_TIMING = False
 if LAUNCH_TIMING:
     # Current time
     time_now = time.time()

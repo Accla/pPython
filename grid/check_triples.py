@@ -45,7 +45,7 @@ def check_triples(cluster_name,cpu_type,n_proc,grid_config):
         grid_config['nnode'] = nnode
         grid_config['nppn'] = nppn
         grid_config['ntpp'] = ntpp
-        
+        grid_config['EPPAC'] = True
         #
         # ToDo: should check and limit the total number of threads < max_threads?
         #
@@ -68,6 +68,7 @@ def check_triples(cluster_name,cpu_type,n_proc,grid_config):
         # Check if n_proc cores available for the user
         # Exit with an error if not
         #
+        grid_config['EPPAC'] = False
         n_proc_req = n_proc
 
     return n_proc_req, grid_config
