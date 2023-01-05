@@ -1,16 +1,20 @@
 import numpy as np
 import os
 
-#from get_cpu_info import *
+from get_cpu_info import *
 
 def check_triples(cluster_name,cpu_type,n_proc,grid_config):
     DEBUG = 0
+    if DEBUG:
+        print('--> Entering check_triples')
+
     # If needed, preprocess triples mode resource request
     # check if n_proc is not an integer but an array of numerals
     if not isinstance(n_proc,(int,np.int64,np.int32)):
         # Triples mode resource request
         if DEBUG:
             print(' ')
+            print('Triples mode jobs:')
             print('check_runtime: Turn on the manycore optimization by default unless specified otherwise')
             print(' ')
         [max_slots, default_slots, max_cores, max_threads] = get_cpu_info(cpu_type,cluster_name)
@@ -43,6 +47,7 @@ def check_triples(cluster_name,cpu_type,n_proc,grid_config):
         
         # update grid_config for triples mode job
         grid_config['nnode'] = nnode
+        grid_config['ntasks'] = nnode
         grid_config['nppn'] = nppn
         grid_config['ntpp'] = ntpp
         grid_config['EPPAC'] = True
@@ -70,6 +75,11 @@ def check_triples(cluster_name,cpu_type,n_proc,grid_config):
         #
         grid_config['EPPAC'] = False
         n_proc_req = n_proc
+
+    if DEBUG:
+        print('returning grid_config as')
+        print(grid_config)
+        print('<-- Exiting check_triples')
 
     return n_proc_req, grid_config
 

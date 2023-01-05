@@ -41,7 +41,10 @@ def slurm_submit_job(grid_config,sched_job_file,py_file,dir_llsc):
     cmdstr = cmdstr+' -J '+py_file
         
     # Array job
-    cmdstr = cmdstr+' -a 1-%d'%(grid_config['ntasks'])
+    if grid_config['EPPAC']:
+        cmdstr = cmdstr+' --exclusive -a 1-%d'%(grid_config['ntasks'])
+    else:
+        cmdstr = cmdstr+' -a 1-%d'%(grid_config['ntasks'])
         
     # Standard output or Slurm log
     cmdstr = cmdstr+' -o '+dir_llsc+'/PythonMPI/pRUN.log'

@@ -4,13 +4,18 @@ import checkOS as OS
 from pyMPI_Dir_map import *
 from pyMPI_Host_name import *
 
-def gen_commands(py_file,python_mpi_path,rank,machine,comm,EPPAC=None):
+def gen_commands(py_file,python_mpi_path,rank,machine,comm,EPPAC=False):
     """
     Generate Python commands to be executed before calling pPUN_Parallel_wrapper()
+
+    Author: Dr. Chansup Byun
     """
-    DEBUG = 1
+    DEBUG = 0
     if DEBUG:
         print('--> Entering gen_commands')
+        # print('EPPAC = ',end=" ")
+        # print(EPPAC)
+        # print(" ")
     
     # Set variables for special string.
     nl = '\n'
@@ -67,13 +72,24 @@ def gen_commands(py_file,python_mpi_path,rank,machine,comm,EPPAC=None):
     commands[0] = 'import os'+nl
     commands[0] = commands[0]+'import sys'+nl+add_path_str
     commands[0] = commands[0]+'os.environ["HDF5_USE_FILE_LOCKING"]="FALSE"' + nl
-    commands[0] = commands[0]+'os.environ["OMP_NUM_THREADS"]="' + OMP_NUM_THREADS + '"' + nl
+    if EPPAC:
+        # For the triples mode, a single script launches many pPython MPI processes.
+        # Each process will inherit OMP_NUM_THREADS environment variable exported by the script
+        # So no need to set.
+        commands[0] = commands[0] + nl
+    else:
+        commands[0] = commands[0]+'os.environ["OMP_NUM_THREADS"]="' + OMP_NUM_THREADS + '"' + nl
     # commands[0] = commands[0]+'from PythonMPI import *' + nl
     commands[0] = commands[0]+'import pyMPI_COMM_WORLD as pyMCW' + nl
     commands[0] = commands[0]+'from dict_with_pickle import load_dict_from_pickle' + nl
     commands[1] = 'from pRUN_Parallel_wrapper import *' + nl
     commands[2] = 'pyMCW.MPI_COMM_WORLD = load_dict_from_pickle('+q+comm_pkl_file+q+')' + nl
-    commands[3] = 'pyMCW.MPI_COMM_WORLD['+q+'rank'+q+'] = ' + rank_str + nl
+    if EPPAC:
+        # For the triples mode, a single script launches many pPython MPI processes.
+        # Each process will get its rank from MPI_COMM_WORLD_RANK environment variable exported by the script
+        commands[3] = 'pyMCW.MPI_COMM_WORLD['+q+'rank'+q+'] = ' + 'int(os.getenv('+q+'MPI_COMM_WORLD_RANK'+q+'))' + nl
+    else:
+        commands[3] = 'pyMCW.MPI_COMM_WORLD['+q+'rank'+q+'] = ' + rank_str + nl
     # Additional to define global variables: 
     commands[3] = commands[3]+'pRUN_Parallel_wrapper('+q+py_file+'.py'+q+')' + nl
     # commands[3] = commands[3]+'id=CheckOS()' + nl

@@ -52,11 +52,18 @@ def pyMPI_Comm_init(n_proc,machines,**argv):
     MPI_COMM_WORLD['host_name'] = host
     MPI_COMM_WORLD['machine_db'] = dict()
     
+    # Default: EPPAC = 0 (non triples mode job)
+    EPPAC = False
     # Added to save grid_config
     MPI_COMM_WORLD['grid_config'] = dict()
     for key in argv:
         if key == 'grid_config':
             MPI_COMM_WORLD['grid_config'] = argv[key]
+            # Check if EPPAC (triples mode jobs) is used.
+            EPPAC = MPI_COMM_WORLD['grid_config']['EPPAC']
+            interactive = MPI_COMM_WORLD['grid_config']['interactive']
+            nnode = MPI_COMM_WORLD['grid_config']['nnode']
+            nppn = MPI_COMM_WORLD['grid_config']['nppn']
     
     # Initialize machine database.
     machine_db = dict()
@@ -73,12 +80,28 @@ def pyMPI_Comm_init(n_proc,machines,**argv):
    
     # Start setting up machine OS.
     #
+
     # Evaluate how many processes per each machine
-    for i_rank in range(n_proc):
-        i_machine = i_rank % n_m
-        machine_db['n_proc'][i_machine] = machine_db['n_proc'][i_machine] + 1;
-        # print('i_rank=%d,machine_db.n_proc=%d'%(i_rank,machine_db['n_proc'][i_rank]))
-        # MPI_COMM_WORLD['machine_id'][i_rank] = i_machine
+    if EPPAC:
+        # For the triples mode jobs, take care of the node where the interactive process runs
+        # The first node on the grid will have one less processes running due to the interactive process
+        if interactive:
+            for i_machine in range(nnode+1):
+                if i_machine == 0:
+                    machine_db['n_proc'][i_machine] = 1
+                elif i_machine == 1:
+                    machine_db['n_proc'][i_machine] = nppn - 1
+                else:
+                    machine_db['n_proc'][i_machine] = nppn
+        else:
+            for i_machine in range(nnode):
+                machine_db['n_proc'][i_machine] = nppn
+    else:
+        for i_rank in range(n_proc):
+            i_machine = i_rank % n_m
+            machine_db['n_proc'][i_machine] = machine_db['n_proc'][i_machine] + 1;
+            # print('i_rank=%d,machine_db.n_proc=%d'%(i_rank,machine_db['n_proc'][i_rank]))
+            # MPI_COMM_WORLD['machine_id'][i_rank] = i_machine
 
     # Get possibly user settings.
     machine_db_settings = pyMPI_Comm_settings()

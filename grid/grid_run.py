@@ -103,7 +103,7 @@ def grid_run( py_file, n_proc, machines ):
         if DEBUG:
             print(defscommands)
             print('. . .')
-            print('<-- Exiting MPI_Run.')
+            print('<-- Exiting grid_run (MPI_Run).')
         return defscommands
 
     # For grid jobs
@@ -123,15 +123,19 @@ def grid_run( py_file, n_proc, machines ):
         #
         # Triples mode job
         #
+        if DEBUG:
+            print('grid_run: call launch_with_triples')
         # defscommands = MPI_RunG_MC()
-        defscommands = launch_with_triples()
+        defscommands = launch_with_triples(py_file,pyMCW.MPI_COMM_WORLD,grid.grid_config)
         
     else:
         #
         # Non-triples mode job
         #
+        if DEBUG:
+            print('grid_run: call launch_non_triples')
         # defscommands = MPI_RunG()
-        defscommands = launch_non_triples(py_file, pyMCW.MPI_COMM_WORLD,grid.grid_config)
+        defscommands = launch_non_triples(py_file,pyMCW.MPI_COMM_WORLD,grid.grid_config)
     
     
     
