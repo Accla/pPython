@@ -13,9 +13,17 @@ import platform
 """
 Customization for the user environment
 """
+# Uncomment to enable the debug mode to see some additional output
+# os.environ['PPYTHON_DEBUG'] = 'yes'
+# Uncomment to disable process bining
+# os.environ['PPYTHON_PROC_BIND'] = 'no'
+# Uncomment to use the git repository source code
+os.environ['QA_ON_GIT'] = 'yes'
+# Specify whether to run on the grid with the scheduler or run locally without the scheduler
+RUN_ON_GRID = True  # True (run with grid installation) or False(run locally without scheduler)
 # Specify whether using pPython installed on the grid or locally
-RUN_ON_GRID = False  # True (run with grid installation) or False(run on local installation)
-GRID_PPYTHON = False  # True (grid installation) or False(local installation)
+GRID_PPYTHON = True  # True (grid installation) or False(local installation)
+# Specify whether to use the latest pPython version (True) or a specific version (False)
 USE_LATEST_VERSION = False
 PPYTHON_VER = 'v0.9.3'
 
@@ -82,11 +90,20 @@ if GRID_PPYTHON:
 py_file = 'pSpeedtest.py'
 # Define number of MPI processes
 n_proc = 4
+n_proc_triples = [4,2,24]
 
 # Launch PythonMPI
 # print('Running: %s via pRUN().'%(py_file))
 if GRID_PPYTHON and RUN_ON_GRID:
-    pRUN( py_file, n_proc, 'grid' )
+    print('Running on grid ...')
+    if os.getenv('PPYTHON_LOCAL_FS',default='no').lower() == 'no':
+        pRUN( py_file, n_proc, 'grid' )
+    else:
+        if os.getenv('PPYTHON_TRIPLES',default='no').lower() == 'no':
+            pRUN( py_file, n_proc, 'grid&' )
+        else:
+            pRUN( py_file, n_proc_triples, 'grid&' )
 else:
+    print('Running locally ...')
     pRUN( py_file, n_proc, {} )
 
