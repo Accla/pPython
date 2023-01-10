@@ -21,7 +21,7 @@ def submat(a, s):
     Python version: Dr. Chansup Byun
     Author:   Nadya Travinin
     """
-    DEBUG = 1
+    DEBUG = 0
     if DEBUG:
         print('--> Entering submat')
 

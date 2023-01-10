@@ -24,7 +24,7 @@ def subsasgn_3D(a,s,b):
     Author:   Nadya Travinin
     """
     
-    DEBUG = 1
+    DEBUG = 0
     if DEBUG:
         print('--> Entering subsasgn_3D')
 
