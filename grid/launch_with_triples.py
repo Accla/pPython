@@ -137,7 +137,8 @@ def launch_with_triples(py_file, comm, grid_config):
                 # print(proc_bind_cmd)
 
                 # Build commands that lauch multiple matlab on target nodes.
-                defscommands, unix_cmd_i_rank = pyMPI_Commands(py_file_basename,i_rank,comm,grid_config=grid_config)
+                defscommands, unix_cmd_i_rank = pyMPI_Commands(py_file_basename,i_rank,comm,grid_config=grid_config,\
+                                                               start=i_rank_start,stop=i_rank_stop)
                 if proc_bind:
                     # Enforce process pinning
                     unix_commands = unix_commands+'export TASKSET_CMD='+proc_bind_cmd+nl+unix_cmd_i_rank

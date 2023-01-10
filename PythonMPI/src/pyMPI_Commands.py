@@ -37,6 +37,10 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD,**argv):
             grid_config = argv[key]
             grid_job = grid_config['grid_job']
             EPPAC = grid_config['EPPAC']
+        elif key == 'start':
+            i_rank_start = argv[key]
+        elif key == 'stop':
+            i_rank_stop = argv[key]
 
     Np = MPI_Comm_size(MPI_COMM_WORLD)
 
@@ -92,13 +96,24 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD,**argv):
 
     # Print name of the target machine we are launching on.
     # CB: Reduce the output when Np > 16
-    if (Np>=16):
-        if (rank > (Np-3)) or (rank < 2):
-            print('Launching MPI rank: %d on %s.' %(rank,machine))
-        elif (rank==(Np-3)):
-            print('Continuing to launch MPI processes ......')
+    if EPPAC:
+       nnode = grid_config['nnode']
+       if (nnode>=8):
+           if ((machine_id > (nnode-3)) or (nnode < 2)) and (rank == i_rank_stop):
+               print('Launching MPI rank: %d to %d on %s.' %(i_rank_stop,i_rank_start,machine))
+           elif (machine_id==(nnode-3)):
+               print('Continuing to launch MPI processes ......')
+       else:
+           if (rank == i_rank_stop):
+               print('Launching MPI rank: %d to %d on %s.' %(i_rank_stop,i_rank_start,machine))
     else:
-        print('Launching MPI rank: %d on %s.' %(rank,machine))
+        if (Np>=16):
+            if (rank > (Np-3)) or (rank < 2):
+                print('Launching MPI rank: %d on %s.' %(rank,machine))
+            elif (rank==(Np-3)):
+                print('Continuing to launch MPI processes ......')
+        else:
+            print('Launching MPI rank: %d on %s.' %(rank,machine))
 
     # Create base python command.
     python_command = python_base+' '+defsfile+' &> '+outfile
@@ -113,8 +128,7 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD,**argv):
             defscommands = commands[0]+commands[1]+commands[2]+commands[3]+commands[5]
             unix_command = '';
             defscommands = defscommands
-            if DEBUG:
-                print('Rank 0: defscommands = %s'%(defscommands))
+
         else:
             # Write commands to a .py text file.
             if EPPAC:
