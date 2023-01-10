@@ -1,4 +1,5 @@
 import os
+import numpy as np
 
 from pyMPI_Dir_translate import *
 
@@ -44,7 +45,13 @@ def pyMPI_Lock_file(source, dest, tag, comm, **argv):
     #
     # With the triples mode, we need to use machine id, instead of rank.
     #
-    machine_id_source = comm['machine_id'][source]
+    if DEBUG:
+        print('source:',end="")
+        print(source)
+        print("")
+        print('destination:',end="")
+        print(dest)
+        print("")
     machine_id_dest = comm['machine_id'][dest]
 
     # grid_job
@@ -62,7 +69,11 @@ def pyMPI_Lock_file(source, dest, tag, comm, **argv):
                 dir = comm['tmpdir'][machine_id_dest]
             else:
                 # if out-of-node message, temporary directory is for the source process before scp
-                dir = comm['tmpdir'][machine_id_source]
+                if source == '*':
+                    dir = '*'
+                else:
+                    machine_id_source = comm['machine_id'][source]
+                    dir = comm['tmpdir'][machine_id_source]
         else:
             # Receive process
             # Regardless of in-node or out-of-node messages, 
@@ -70,12 +81,16 @@ def pyMPI_Lock_file(source, dest, tag, comm, **argv):
             dir = comm['tmpdir'][machine_id_dest]
     else:
         # Using a central filesystem
-        machine_id_source = comm['machine_id'][source]
-        dir = comm['machine_db']['dir'][machine_id_source]
+        if source == '*':
+            dir = '*'
+        else:
+            machine_id_source = comm['machine_id'][source]
+            dir = comm['machine_db']['dir'][machine_id_source]
 
     # Translate dir if needed
     if grid_job and (not local_fs):
-        dir = pyMPI_Dir_translate(comm['machine_db'],dir)
+        if dir != '*':
+            dir = pyMPI_Dir_translate(comm['machine_db'],dir)
 
     if DEBUG:
         print('machine_id_dest = %d'%(machine_id_dest))
