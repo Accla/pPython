@@ -63,7 +63,8 @@ def pyMPI_Comm_init(n_proc,machines,**argv):
             EPPAC = MPI_COMM_WORLD['grid_config']['EPPAC']
             interactive = MPI_COMM_WORLD['grid_config']['interactive']
             nnode = MPI_COMM_WORLD['grid_config']['nnode']
-            nppn = MPI_COMM_WORLD['grid_config']['nppn']
+            if EPPAC:
+               nppn = MPI_COMM_WORLD['grid_config']['nppn']
     
     # Initialize machine database.
     machine_db = dict()

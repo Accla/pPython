@@ -42,20 +42,26 @@ def MPI_Mcast(source, dest, tag, comm, *argv):
         local_fs  = 1
         tmpdir = comm['tmpdir']
         machines =  comm['machine_db']['machine']
+        #
+        # With the triples mode, we need to use machine id, instead of rank.
+        #
+        machine_id_rank = comm['machine_id'][my_rank]
     else:
         local_fs  = 0
 
     if DEBUG:
         if local_fs:
             print('Use local filesystem:')
-            print('--> MPI_Mcast: source rank = %d, host = %s, local path = %s' %(my_rank,machines[my_rank],tmpdir[my_rank]))
+            print('--> MPI_Mcast: source rank = %d, host = %s, local path = %s' %(my_rank,machines[machine_id_rank],tmpdir[machine_id_rank]))
             if isinstance(dest,(int,np.int32,np.int64)):
-                print('--> MPI_Mcast: destination rank = %d, host = %s, local path = %s' %(dest,machines[dest],tmpdir[dest]))
+                machine_id_dest = comm['machine_id'][dest]
+                print('--> MPI_Mcast: destination rank = %d, host = %s, local path = %s' %(dest,machines[machine_id_dest],tmpdir[machine_id_dest]))
             else:
                 for ii in dest:
                     if ii == source:
                         continue
-                    print('--> MPI_Mcast: destination rank = %d, host = %s, local path = %s' %(ii,machines[ii],tmpdir[ii]))
+                    machine_id_ii = comm['machine_id'][ii]
+                    print('--> MPI_Mcast: destination rank = %d, host = %s, local path = %s' %(ii,machines[machine_id_ii],tmpdir[machine_id_ii]))
 
     # If not the source, then receive the data.
     if (my_rank != source):
@@ -117,13 +123,15 @@ def MPI_Mcast(source, dest, tag, comm, *argv):
             # Don't do source.
             if ii == source:
                 continue
+            machine_id_ii = comm['machine_id'][ii]
                 
             if DEBUG:
                 print('MPI_Mcast: Message to my_rank = %d',ii)
             # identify whether the message communication is in-node or out-of-node
             innode = 0
             if local_fs:
-                if machines[ii] == machines[source]:
+                machine_id_source = comm['machine_id'][source]
+                if machines[machine_id_ii] == machines[machine_id_source]:
                     innode = 1
             
             # Create buffer link name.
@@ -156,7 +164,7 @@ def MPI_Mcast(source, dest, tag, comm, *argv):
                 try_max = 10
                 scp_cmd = 'scp '
                 # Copy the message before the actual link gets created.
-                cmd1 = scp_cmd+buffer_file+' '+machines[ii]+':'+tmpdir[ii]+'/'+buffer_link_basename
+                cmd1 = scp_cmd+buffer_file+' '+machines[machine_id_ii]+':'+tmpdir[machine_id_ii]+'/'+buffer_link_basename
                 # generate a shell command
                 shcmd = shcmd+cmd1+'&'+nl
     
@@ -183,10 +191,17 @@ def MPI_Mcast(source, dest, tag, comm, *argv):
         # Write unix commands to .sh text file
         # [Was used to fix Matlab's problem with very long commands sent to unix().
         # Maybe not applicable to Python but needs to check [ToDo]
+        TMPDIR = os.getenv('TMPDIR',default='')
         if OS.ispc:
-            link_script = 'PythonMPI'+dir_sep+'Link_Commands_t'+str(tag)+'.bat'
+            if len(TMPDIR)>0:
+                link_script = TMPDIR+dir_sep+'Link_Commands_t'+str(tag)+'.bat'
+            else:
+                link_script = 'PythonMPI'+dir_sep+'Link_Commands_t'+str(tag)+'.bat'
         else:
-            link_script = 'PythonMPI'+dir_sep+'Link_Commands_t'+str(tag)+'.sh'
+            if len(TMPDIR)>0:
+               link_script = TMPDIR+dir_sep+'Link_Commands_t'+str(tag)+'.sh'
+            else:
+               link_script = 'PythonMPI'+dir_sep+'Link_Commands_t'+str(tag)+'.sh'
         if DEBUG:
             print('Link script name: %s'%(link_script))
             print('Link command: %s'%(link_command))
@@ -220,7 +235,9 @@ def MPI_Mcast(source, dest, tag, comm, *argv):
             # identify whether the message communication is in-node or out-of-node
             innode = 0
             if local_fs:
-                if machines[ii] == machines[source]:
+                machine_id_ii = comm['machine_id'][ii]
+                machine_id_source = comm['machine_id'][source]
+                if machines[machine_id_ii] == machines[machine_id_source]:
                     innode = 1    
             # Create lock file.
             lock_file = pyMPI_Lock_file(my_rank,ii,tag,comm,local_fs=local_fs,msg_type='send',innode=innode)
@@ -232,7 +249,7 @@ def MPI_Mcast(source, dest, tag, comm, *argv):
             if local_fs and (not innode):
                 done_scp = False
                 try_counter = 0;
-                cmd1 = scp_cmd+lock_file+' '+machines[ii]+':'+tmpdir[ii]
+                cmd1 = scp_cmd+lock_file+' '+machines[machine_id_ii]+':'+tmpdir[machine_id_ii]
                 # generate a shell command
                 rmcmd = rmcmd+'rm -f '+lock_file+nl
                 # generate a shell command
@@ -283,7 +300,9 @@ def MPI_Mcast(source, dest, tag, comm, *argv):
             # identify whether the message communication is in-node or out-of-node
             innode = 0
        	    if local_fs:
-                if machines[ii] == machines[source]:
+                machine_id_ii = comm['machine_id'][ii]
+                machine_id_source = comm['machine_id'][source]
+                if machines[machine_id_ii] == machines[machine_id_source]:
                      innode = 1
             # Get lock file name.
             lock_file = pyMPI_Lock_file(my_rank,ii,tag,comm,local_fs=local_fs,msg_type='send',innode=innode)

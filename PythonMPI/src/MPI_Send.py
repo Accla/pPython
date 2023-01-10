@@ -42,7 +42,18 @@ def MPI_Send(dest, tag, comm, *argv):
         local_fs  = 1;
         tmpdir = comm['tmpdir']
         machines =  comm['machine_db']['machine']
-        if machines[my_rank] != machines[dest] :
+        #
+        # With the triples mode, we need to use machine id, instead of rank.
+        #
+        machine_id_rank = comm['machine_id'][my_rank]
+        machine_id_dest = comm['machine_id'][dest]
+        if DEBUG:
+            print('With using local filesystem:')
+            print(machines)
+            print(tmpdir)
+            print('source = %d, destition rank = %d'%(my_rank,dest))
+            print('machine_id_source = %d, machine_id_destination = %d'%(machine_id_rank,machine_id_dest))
+        if machines[machine_id_rank] != machines[machine_id_dest] :
             innode = 0
     else:
         local_fs  = 0
@@ -54,8 +65,8 @@ def MPI_Send(dest, tag, comm, *argv):
             print('MPI_Send: in-node message from source rank=%d to destination rank=%d'%(my_rank,dest))
         if local_fs:
             print('Use local filesystem:')
-            print('--> MPI_Send: source rank = %d, host = %s, local path = %s' %(my_rank,machines[my_rank],tmpdir[my_rank]))
-            print('--> MPI_Send: destination rank = %d, host = %s, local path = %s' %(dest,machines[dest],tmpdir[dest]))
+            print('--> MPI_Send: source rank = %d, host = %s, local path = %s'   %(my_rank,machines[machine_id_rank],tmpdir[machine_id_rank]))
+            print('--> MPI_Send: destination rank = %d, host = %s, local path = %s' %(dest,machines[machine_id_dest],tmpdir[machine_id_dest]))
 
     # Create buffer and lock files [updated to support message kernel using local filesystem]
     buffer_file = pyMPI_Buffer_file(my_rank,dest,tag,comm,local_fs=local_fs,msg_type='send',innode=innode)
@@ -117,8 +128,8 @@ def MPI_Send(dest, tag, comm, *argv):
         try_counter = 0
         try_max = 10
         scp_cmd = 'scp '
-        cmd1 = scp_cmd+buffer_file+' '+machines[dest]+':'+tmpdir[dest]
-        cmd2 = scp_cmd+lock_file+' '+machines[dest]+':'+tmpdir[dest]
+        cmd1 = scp_cmd+buffer_file+' '+machines[machine_id_dest]+':'+tmpdir[machine_id_dest]
+        cmd2 = scp_cmd+lock_file+' '+machines[machine_id_dest]+':'+tmpdir[machine_id_dest]
         # Create the remote execution command object
         ecmd = ExecShellCmd(set_remote_cc())
 
