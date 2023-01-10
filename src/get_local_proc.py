@@ -17,7 +17,7 @@ def get_local_proc(pitfalls, grid, ind):
     Author: Nadya Travinin
     Python version: Dr. Chansup Byun
     """
-    DEBUG = 1
+    DEBUG = 0
     if DEBUG:
         print('--> Entering get_local_proc')
         
