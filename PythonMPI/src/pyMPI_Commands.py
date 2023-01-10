@@ -72,7 +72,10 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD,**argv):
     defsfile = defsbase + '.py'
 
     # Replace my_script_file with py_file basename (withoutt .py)
-    outfile = '$OUTPUT_DIR/' + py_file + '.' + str(rank) +'.out'
+    if EPPAC:
+       outfile = '$OUTPUT_DIR/' + py_file + '.' + str(rank) +'.out'
+    else:
+       outfile = 'PythonMPI/' + py_file + '.' + str(rank) +'.out'
 
     # Create Python MPI setup commands.
     # Find the location for PythonMPI modules
@@ -176,7 +179,8 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD,**argv):
             unix_command = python_command+' &'+nl+'touch PythonMPI/pid.'+machine+'.$!'+nl
     if EPPAC:
         # prepend to export MPI_COMM_WORLD_RANK=<mpi_rank>
-        unix_command = 'export MPI_COMM_WORLD_RANK='+str(rank)+nl+unix_command
+        unix_command = 'export MPI_COMM_WORLD_RANK='+str(rank)+nl+ \
+                       '$TASKSET_CMD '+unix_command
 
     if DEBUG:
         print('unix_command: %s'%(unix_command))

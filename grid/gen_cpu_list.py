@@ -36,15 +36,15 @@ def gen_cpu_list(max_cores, ntpc, nppn, OMP_NUM_THREADS):
         # print('start=%d end=%d' %(j1,j2))
         inum = []
         if ntpc == 1:
-            inum += list(np.arange(j1,j2))
+            inum += list(np.arange(j1,j2).astype(str))
         elif ntpc == 2:
-            inum += list(np.arange(j1,j2))
-            inum += list(np.arange(j1+max_cores,j2+max_cores))
+            inum += list(np.arange(j1,j2).astype(str))
+            inum += list(np.arange(j1+max_cores,j2+max_cores).astype(str))
         elif ntpc == 4:
-            inum += list(np.arange(j1,j2))
-            inum += list(np.arange(j1+max_cores,j2+max_cores))
-            inum += list(np.arange(j1+max_cores*2,j2+max_cores*2))
-            inum += list(np.arange(j1+max_cores*3,j2+max_cores*3))
+            inum += list(np.arange(j1,j2).astype(str))
+            inum += list(np.arange(j1+max_cores,j2+max_cores).astype(str))
+            inum += list(np.arange(j1+max_cores*2,j2+max_cores*2).astype(str))
+            inum += list(np.arange(j1+max_cores*3,j2+max_cores*3).astype(str))
         else:
             print(' ')
             raise Exception('gen_cpu_list: Number of physical threads per coe, %d, is not supported!'%(ntpc))

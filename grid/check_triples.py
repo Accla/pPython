@@ -51,6 +51,10 @@ def check_triples(cluster_name,cpu_type,n_proc,grid_config):
         grid_config['nppn'] = nppn
         grid_config['ntpp'] = ntpp
         grid_config['EPPAC'] = True
+        if os.getenv('PPYTHON_PROC_BIND',default='Yes').lower() == 'no':
+            grid_config['proc_bind'] = False
+        else:
+            grid_config['proc_bind'] = True
         #
         # ToDo: should check and limit the total number of threads < max_threads?
         #
