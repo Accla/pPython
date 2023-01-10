@@ -38,6 +38,7 @@ def launch_with_triples(py_file, comm, grid_config):
     nl = '\n'
 
     interactive = grid_config['interactive']
+    proc_bind = grid_config['proc_bind']
     
     pwd_pc,pwd_linux,pwd_mac,pwd_grid = pyMPI_Dir_map(comm['machine_db'],os.getcwd())
 
@@ -72,7 +73,6 @@ def launch_with_triples(py_file, comm, grid_config):
 
     # Loop backwards over each machine target machine
     # so that we hit the host machine last (if it is a target).
-    inodes = 0
     for i_m in range(n_m,0,-1):
         # convert into string
         imstr = str(i_m)
@@ -127,15 +127,23 @@ def launch_with_triples(py_file, comm, grid_config):
             unix_commands_prefix = unix_commands_prefix+'mkdir $OUTPUT_DIR'+nl+nl
 
             # Loop backwards over number of processes.
+            ipos = 0
             for i_rank in range(i_rank_stop,i_rank_start-1,-1):
                 if DEBUG:
                     print('--> launch_with_triples: i_rank = %d'%(i_rank))
                 # Note: python index start zero to N-1.
                 # Check if i_rank value needs to be adjusted
+                proc_bind_cmd = '"taskset --cpu-list '+','.join(cpu_list[ipos])+'" '
+                # print(proc_bind_cmd)
 
                 # Build commands that lauch multiple matlab on target nodes.
                 defscommands, unix_cmd_i_rank = pyMPI_Commands(py_file_basename,i_rank,comm,grid_config=grid_config)
-                unix_commands = unix_commands+unix_cmd_i_rank
+                if proc_bind:
+                    # Enforce process pinning
+                    unix_commands = unix_commands+'export TASKSET_CMD='+proc_bind_cmd+nl+unix_cmd_i_rank
+                else:
+                    unix_commands = unix_commands+'export TASKSET_CMD='+nl+unix_cmd_i_rank
+                ipos += 1
 
             # Create a file name to hold script that will be run on target.
             # Make sure to use the correct directory separator for Unix and DOS
