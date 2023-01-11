@@ -46,23 +46,13 @@ def pRUN_Parallel_wrapper(py_file):
     pPython_init()
     
     #
-    # Override if PPYTHON_LOCAL_FS is defined
-    PPYTHON_LOCAL_FS = os.getenv('PPYTHON_LOCAL_FS')
-    if (PPYTHON_LOCAL_FS):
-        if (PPYTHON_LOCAL_FS.lower() == 'yes'):
-            local_fs = 1
-        else:
-            local_fs = 0
-        grid_config['local_fs'] = local_fs
-
+    local_fs = grid_config['local_fs']
     if DEBUG:
         print(' ')
         print('pRUN_Parallel_Wrapper: local_fs = %d'%(local_fs))
         print(' ')
 
     if local_fs and (grid_job==True):
-        if interactive:
-            raise Exception('ERROR(pRUN_Parallel_wrapper): Interactive grid job does not support message using local filesystem. Use backgrounded mode.')
         # update MPI_COMM_WORLD
         tic = timer()
         slurm2hostmap()

@@ -180,6 +180,21 @@ def check_runtime( n_proc, machines, grid_config ):
     grid_config['grid_job'] = grid_job
     grid_config['interactive'] = interactive
 
+    #
+    # Override if PPYTHON_LOCAL_FS is defined
+    PPYTHON_LOCAL_FS = os.getenv('PPYTHON_LOCAL_FS',default='yes')
+    if DEBUG:
+        print('PPYTHON_LOCAL_FS: %s'%(PPYTHON_LOCAL_FS))
+    if (PPYTHON_LOCAL_FS.lower() == 'no'):
+        local_fs = 0
+    else:
+        local_fs = 1
+    grid_config['local_fs'] = local_fs
+    # Check compatibality between interactive job versus messaging kernel using local filesystem
+    if local_fs and (grid_job==True):
+        if interactive:
+            raise Exception('ERROR(pRUN_Parallel_wrapper): Interactive grid job does not support message using local filesystem. Use backgrounded mode.')
+
     if DEBUG:
         print('OS.islocal = %d'%(OS.islocal))
         print('<-- Exiting check_runtime')
