@@ -36,6 +36,7 @@ def launch_with_triples(py_file, comm, grid_config):
 
     # Set some strings for special characters.
     nl = '\n'
+    qq = '"'
 
     interactive = grid_config['interactive']
     proc_bind = grid_config['proc_bind']
