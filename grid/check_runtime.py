@@ -189,6 +189,9 @@ def check_runtime( n_proc, machines, grid_config ):
         local_fs = 0
     else:
         local_fs = 1
+    # Set local_fs = 0 for non grid jobs
+    if not grid_job:
+        local_fs = 0
     grid_config['local_fs'] = local_fs
     # Check compatibality between interactive job versus messaging kernel using local filesystem
     if local_fs and (grid_job==True):
