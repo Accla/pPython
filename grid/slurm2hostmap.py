@@ -17,6 +17,8 @@ def slurm2hostmap():
     Add the following additional information:
         MPI_COMM_WORLD['tmpdir'] 
         MPI_COMM_WORLD['leader'] for (nProcs)
+        MPI_COMM_WORLD['pidmax'] for (nProcs)
+        MPI_COMM_WORLD['local_pids'][hostname] saves the local pid list for the given machine name as key
     Update MPI_COMM_WORLD['machine_db']['machine'] with the actual compute node name
     
     hostmap{i} contains "SLURM_ARRAY_TASK_ID JOBID(unique) NODELIST"
@@ -52,18 +54,18 @@ def slurm2hostmap():
     #
     # Set the appropriate nTasks (number of Slurm compute task scripts)
     #
-    # The following should be modified for the triples mode jobs since ntasks != nprocs
-    nProcs    = grid.grid_config['ntasks']  
+    # For the triples mode jobs, ntasks != nprocs
+    nTasks = grid.grid_config['ntasks'] 
+    EPPAC    = grid.grid_config['EPPAC']  
     
-    PPYTHON_MANYCORE = os.getenv('PPYTHON_MANYCORE')
-    if PPYTHON_MANYCORE and (PPYTHON_MANYCORE.lower() != 'no'):
+    if EPPAC:
         nppn   = grid.grid_config['nppn']
         # Only 1 slurm task script per each compute node with PPYTHON_MANYCORE mode
         # nTasks = grid.grid_config['nnodes']?
-        nTasks = ceil(nProcs/nppn)
+        nProcs    = nppn * nTasks
     else:
         # Traditional jobs (number of Slurm tasks == Np of pPython)
-        nTasks = grid.grid_config['ntasks'] 
+        nProcs    = grid.grid_config['ntasks']  
 
     if DEBUG:
         print('slurm2hostmap: nTasks = %d' %(nTasks))
@@ -109,7 +111,8 @@ def slurm2hostmap():
                 cmdstr = 'squeue -h -j '+SLURM_ARRAY_JOB_ID+' --format="%15K %15A %N"'
                 ecmd.run(cmdstr)
                 output = ecmd.get_output().strip()
-                # print(output)
+                if DEBUG:
+                    print(output)
                 #
                 # Expect multiple lines
                 #
@@ -128,8 +131,9 @@ def slurm2hostmap():
                 # Not a batch job
                 for j in range(nProcs):
                     hostmap[j+1] = str(j+1)+' '+'not_a_batch_job localhost'
-        #if DEBUG:
-        #    print(hostmap)
+        if DEBUG:
+            print('Hostmap:')
+            print(hostmap)
 
         ## Repeat until all the tasks are launched
         while len(hostmap) < nTasks:
@@ -205,40 +209,58 @@ def slurm2hostmap():
     #
     # Modify MPI_COMM_WORLD to save the host to rank map along with TMPDIR
     MPI_COMM_WORLD['tmpdir'] = dict()
-    # To store the leader Pid on each node for every pMatlab process
+    MPI_COMM_WORLD['local_pids'] = dict()
+    # To store the leader Pid on each node for every pPython process
     MPI_COMM_WORLD['leader'] = np.zeros(nProcs,dtype=int)
+    MPI_COMM_WORLD['pidmax'] = np.zeros(nProcs,dtype=int)
     tmpdir  = os.getenv('TMPDIR').split('.')
     
-    if (PPYTHON_MANYCORE) and (PPYTHON_MANYCORE.lower() != 'no'):
+    if EPPAC:
         # For the triples mode jobs
         # nTasks is equivalent to number of compute nodes
         for i in range(nTasks):
             # hostmap key is a positive integer 
-            tmp = hostmap[i].split()
+            tmp = hostmap[i+1].split()
+            if DEBUG:
+                print('Slurm TaskID: %s, JobID: %s, Hostname: %s'%(tmp[0],tmp[1],tmp[2]))
             my_node_rank = int(tmp[0])-1
+            MPI_COMM_WORLD['local_pids'][tmp[2]]=[]
             for j in range(nppn):
                 ipos = my_node_rank*nppn+j
                 if (ipos > nProcs-1):
                     # skip
                     continue
-                MPI_COMM_WORLD['machine_db']['machine'][ipos] = tmp[2]
+                # ToDo: determine which one is better, machine_id or rank?
+                # MPI_COMM_WORLD['machine_db']['machine'][ipos] = tmp[2]
+                MPI_COMM_WORLD['machine_db']['machine'][i] = tmp[2]
                 if grid.grid_config['PPYTHON_SRUN'].lower() == 'yes':
-                    MPI_COMM_WORLD['tmpdir'][ipos] = '/state/partition1/slurm_tmp/'+tmp[1]+'.'+tmpdir[1]+'.'+my_node_rank
+                    # ToDo: determine which one is better, machine_id or rank?
+                    # MPI_COMM_WORLD['tmpdir'][ipos] = '/state/partition1/slurm_tmp/'+tmp[1]+'.'+tmpdir[1]+'.'+my_node_rank
+                    MPI_COMM_WORLD['tmpdir'][i] = '/state/partition1/slurm_tmp/'+tmp[1]+'.'+tmpdir[1]+'.'+my_node_rank
                     if DEBUG:
                         print("slurm2hostmap: MPI_COMM_WORLD['tmpdir'][%d] = %s"%(ipos,MPI_COMM_WORLD['tmpdir'][ipos]))
                 else:
-                    MPI_COMM_WORLD['tmpdir'][ipos] = '/state/partition1/slurm_tmp/'+tmp[1]+'.'+tmpdir[1]+'.'+tmpdir[2]
+                    # ToDo: determine which one is better, machine_id or rank?
+                    # MPI_COMM_WORLD['tmpdir'][ipos] = '/state/partition1/slurm_tmp/'+tmp[1]+'.'+tmpdir[1]+'.'+tmpdir[2]
+                    MPI_COMM_WORLD['tmpdir'][i] = '/state/partition1/slurm_tmp/'+tmp[1]+'.'+tmpdir[1]+'.'+tmpdir[2]
+                # Introduce pid list for those on the same compute ndoe 
+                MPI_COMM_WORLD['local_pids'][tmp[2]].append(ipos)
+        machines = MPI_COMM_WORLD['machine_db']['machine']
     else:
-        # As Slurm array job
+        # As a Slurm array job (not a triples mode job, though)
         for i in range(nProcs):
             # The key is equivalent to Slurm task number, starting from 1
             tmp = hostmap[i+1].split()
             ipos = int(tmp[0])-1
             MPI_COMM_WORLD['machine_db']['machine'][ipos] = tmp[2]
             MPI_COMM_WORLD['tmpdir'][ipos] = '/state/partition1/slurm_tmp/'+tmp[1]+'.'+tmpdir[1]+'.'+tmpdir[2]
+        # Generate pid list on the same node
+        machines = MPI_COMM_WORLD['machine_db']['machine']
+        for hostname in sorted( set( machines.values() ) ):
+            member_keys = [key for key, val in machines.items() if val == hostname]
+            MPI_COMM_WORLD['local_pids'][hostname] = member_keys
 
     # Generate the leader Pid information
-    machines = MPI_COMM_WORLD['machine_db']['machine']
     pidlist  = MPI_COMM_WORLD['group']
     if DEBUG:
         print('machines:')
@@ -247,12 +269,14 @@ def slurm2hostmap():
         print(pidlist)
         # print(grid.grid_config)
     for hostname in sorted( set( machines.values() ) ):
-        member_keys = [key for key, val in machines.items() if val == hostname]
+        local_pid_list = MPI_COMM_WORLD['local_pids'][hostname]
         # Assuming that the key is equivalent the Pid of pPython process
-        pidmin      = min(member_keys)
         # save the leader Pid for all pPyton processes on the same compute node 
-        for i in member_keys:
+        for i in local_pid_list:
+            pidmin      = min(local_pid_list)
+            pidmax      = max(local_pid_list)
             MPI_COMM_WORLD['leader'][i] = pidmin
+            MPI_COMM_WORLD['pidmax'][i] = pidmax
 
     if DEBUG:
         print("MPI_COMM_WORLD['machine_db']['machine']")
@@ -261,6 +285,10 @@ def slurm2hostmap():
         print(MPI_COMM_WORLD['tmpdir'])
         print("MPI_COMM_WORLD['leader']")
         print(MPI_COMM_WORLD['leader'])
+        print("MPI_COMM_WORLD['pidmax']")
+        print(MPI_COMM_WORLD['pidmax'])
+        print("MPI_COMM_WORLD['local_pids']")
+        print(MPI_COMM_WORLD['local_pids'])
         print('<-- Exiting slurm2hostmap')
     return
 

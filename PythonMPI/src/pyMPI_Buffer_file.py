@@ -46,6 +46,12 @@ def pyMPI_Buffer_file(source, dest, tag, comm, **argv):
     if 'grid_config' in comm:
         grid_job = comm['grid_config']['grid_job']
             
+    #
+    # With the triples mode, we need to use machine id, instead of rank.
+    #
+    machine_id_source = comm['machine_id'][source]
+    machine_id_dest = comm['machine_id'][dest]
+
     if local_fs:
         # if using local filesystem
         if (msg_type == 'send'):
@@ -53,19 +59,19 @@ def pyMPI_Buffer_file(source, dest, tag, comm, **argv):
             if innode:
                 # if in-node message, temporary directory is the same for the destination process
                 # this allows for source process to exit before the message is received by the receiver
-                dir = comm['tmpdir'][dest]
+                dir = comm['tmpdir'][machine_id_dest]
             else:
                 # if out-of-node message, temporary directory is for the source process before scp
-                dir = comm['tmpdir'][source]
+                dir = comm['tmpdir'][machine_id_source]
         else:
             # Receive process
             if innode:
                 # if in-node message, temporary directory is the same for the source process
-                dir = comm['tmpdir'][dest]
-                #CB dir = comm['tmpdir'][source]
+                dir = comm['tmpdir'][machine_id_dest]
+                #CB dir = comm['tmpdir'][machine_id_source]
             else:
                 # if out-of-node message, temporary directory is for the destination process
-                dir = comm['tmpdir'][dest]
+                dir = comm['tmpdir'][machine_id_dest]
     else:
         # Using a central filesystem
         if DEBUG:

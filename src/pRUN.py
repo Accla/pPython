@@ -1,6 +1,18 @@
+import time
+from datetime import datetime
 import re
 import os
 import sys
+from timeit import default_timer as timer
+
+LAUNCH_TIMING = False
+if LAUNCH_TIMING:
+    # Current time
+    time_now = time.time()
+    print(' ')
+    print('pRUN start time (Epoch in sec) = %d'%(int(time_now)))
+    print('pRUN (Current time) = %s' %(datetime.fromtimestamp(time_now)))
+    print(' ')
 
 # Set pPython & PythonMPI search path and import it
 PPYTHON_HOME = os.getenv('PPYTHON_HOME')
@@ -51,6 +63,7 @@ if os.path.exists(GRIDPYTHON_PATH):
     from grid_abort import *
     from grid_config_init import *
     from grid_run import *
+    from check_runtime import *
     print('gridPython functions are loaded......')
 else:
     print('ERROR(pRUN): gridPython package path, %s, does not exist.'%(GRIDPYTHON_PATH))
@@ -92,17 +105,28 @@ def pRUN(py_file,n_proc,machines,sched_options=None):
     if sched_options:
         grid.grid_config['sched_options'] = sched_options
 
+    grid.grid_config['LAUNCH_TIMING'] = False
+    if LAUNCH_TIMING:
+        grid.grid_config['LAUNCH_TIMING'] = LAUNCH_TIMING
+
     if DEBUG:
         print(grid.grid_config)
 
+    n_proc_req, machines, grid.grid_config = check_runtime( n_proc, machines, grid.grid_config )
+
     # Check allowance 
     cpu_type = grid.grid_config['cpu_type'] 
-    chk_allowance = False
+
+    # If pPython job is launched with Slurm srun, do not check allowance for the user
+    chk_allowance = True
+    if (grid.grid_config['PPYTHON_SRUN'].lower() == 'yes'):
+        chk_allowance = False
+
     status = 0
     if chk_allowance:
-        status = check_allowance(n_proc,cpu_type)
+        status = check_allowance(n_proc_req,cpu_type)
     if DEBUG:
-        print('pRUN: n_proc,cpu_type = %d, %s'%(n_proc,cpu_type))
+        print('pRUN: n_proc_req,cpu_type = %d, %s'%(n_proc_req,cpu_type))
         print('check_allowance status: %d'%(status))
     
     # For PC, use ;, For Mac & Linux, use :
@@ -147,7 +171,7 @@ def pRUN(py_file,n_proc,machines,sched_options=None):
     # Launch PythonMPI
     if DEBUG:
         print('grid_run called . . .')
-    cmd = grid_run(py_file, n_proc, machines)
+    cmd = grid_run(py_file, n_proc_req, machines)
 
     if DEBUG:
         print('<-- Exiting pRUN')

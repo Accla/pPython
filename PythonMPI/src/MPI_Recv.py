@@ -40,7 +40,18 @@ def MPI_Recv( source, tag, comm ):
         local_fs  = 1;
         tmpdir = comm['tmpdir']
         machines =  comm['machine_db']['machine']
-        if machines[my_rank] != machines[source] :
+        #
+        # With the triples mode, we need to use machine id, instead of rank.
+        #
+        machine_id_rank = comm['machine_id'][my_rank]
+        machine_id_source = comm['machine_id'][source]
+        if DEBUG:
+            print('With using local filesystem:')
+            print(machines)
+            print(tmpdir)
+            print('source = %d, my rank = %d'%(source,my_rank))
+            print('machine_id_source = %d, machine_id_rank = %d'%(machine_id_source,machine_id_rank))
+        if machines[machine_id_rank] != machines[machine_id_source] :
             innode = 0
     else:
         local_fs  = 0
@@ -52,8 +63,8 @@ def MPI_Recv( source, tag, comm ):
             print('MPI_Recv: in-node message from source rank=%d to destination rank=%d'%(source,my_rank))
         if local_fs:
             print('Use local filesystem:')
-            print('--> MPI_Recv: source rank = %d, host = %s, local path = %s'%(source,machines[source],tmpdir[source])) 
-            print('--> MPI_Recv: destination rank = %d, host = %s, local path = %s'%(my_rank,machines[my_rank],tmpdir[my_rank]))
+            print('--> MPI_Recv: source rank = %d, host = %s, local path = %s'%(source,machines[machine_id_source],tmpdir[machine_id_source])) 
+            print('--> MPI_Recv: destination rank = %d, host = %s, local path = %s'%(my_rank,machines[machine_id_rank],tmpdir[machine_id_rank]))
 
     # Create buffer and lock files [updated to support message kernel using local filesystem]
     buffer_file = pyMPI_Buffer_file(source,my_rank,tag,comm,local_fs=local_fs,msg_type='recv',innode=innode)

@@ -41,7 +41,11 @@ def slurm_submit_job(grid_config,sched_job_file,py_file,dir_llsc):
     cmdstr = cmdstr+' -J '+py_file
         
     # Array job
-    cmdstr = cmdstr+' -a 1-%d'%(grid_config['ntasks'])
+    ntasks = grid_config['ntasks']
+    if grid_config['EPPAC']:
+        cmdstr = cmdstr+' --exclusive -a 1-%d'%(ntasks)
+    else:
+        cmdstr = cmdstr+' -a 1-%d'%(ntasks)
         
     # Standard output or Slurm log
     cmdstr = cmdstr+' -o '+dir_llsc+'/PythonMPI/pRUN.log'
@@ -52,8 +56,18 @@ def slurm_submit_job(grid_config,sched_job_file,py_file,dir_llsc):
     # Additional job informaiton
     tmp = sys.version
     version = tmp.split()[0]
-    ppython_ver = pPython_ver()
-    cmdstr = cmdstr+' --comment='+q+'Python:%s,pPython: %s, PythonMPI,'%(version,ppython_version)+q
+    ppython_ver = pPython_ver(False)
+    interactive = grid_config['interactive']
+    local_fs = grid_config['local_fs']
+    if grid_config['EPPAC']:
+        str_eppac = 'EPPAC=1,[%d,%d,%d]'%(grid_config['nnode'],grid_config['nppn'],grid_config['ntpp'])
+    else:
+        str_eppac = 'EPPAC=0'
+    if grid_config['grid_job']:
+        grid_job = 1
+    else:
+        grid_job = 0
+    cmdstr = cmdstr+' --comment='+q+'Python:%s,pPython:%s,nTasks=%d,grid_job:%d,isInteractive=%d,isLocalFS=%d,%s'%(version,ppython_ver,ntasks,grid_job,interactive,local_fs,str_eppac)+q
         
     # Construct the final sbatch command
     

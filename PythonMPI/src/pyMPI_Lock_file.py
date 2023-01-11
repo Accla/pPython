@@ -1,4 +1,5 @@
 import os
+import numpy as np
 
 from pyMPI_Dir_translate import *
 
@@ -41,6 +42,17 @@ def pyMPI_Lock_file(source, dest, tag, comm, **argv):
             innode = argv[key]
         else:
             raise Exception('ERROR(pyMPI_Lock_file): additional argument has a wrong key,value pair as input.')
+    #
+    # With the triples mode, we need to use machine id, instead of rank.
+    #
+    if DEBUG:
+        print('source:',end="")
+        print(source)
+        print("")
+        print('destination:',end="")
+        print(dest)
+        print("")
+    machine_id_dest = comm['machine_id'][dest]
 
     # grid_job
     grid_job = False
@@ -54,23 +66,31 @@ def pyMPI_Lock_file(source, dest, tag, comm, **argv):
             if innode:
                 # if in-node message, temporary directory is the same for the destination process
                 # this allows for source process to exit before the message is received by the receiver
-                dir = comm['tmpdir'][dest]
+                dir = comm['tmpdir'][machine_id_dest]
             else:
                 # if out-of-node message, temporary directory is for the source process before scp
-                dir = comm['tmpdir'][source]
+                if source == '*':
+                    dir = '*'
+                else:
+                    machine_id_source = comm['machine_id'][source]
+                    dir = comm['tmpdir'][machine_id_source]
         else:
             # Receive process
             # Regardless of in-node or out-of-node messages, 
             # temporary directory is the same for the destination process
-            dir = comm['tmpdir'][dest]
+            dir = comm['tmpdir'][machine_id_dest]
     else:
         # Using a central filesystem
-        machine_id_source = comm['machine_id'][source]
-        dir = comm['machine_db']['dir'][machine_id_source]
+        if source == '*':
+            dir = '*'
+        else:
+            machine_id_source = comm['machine_id'][source]
+            dir = comm['machine_db']['dir'][machine_id_source]
 
     # Translate dir if needed
     if grid_job and (not local_fs):
-        dir = pyMPI_Dir_translate(comm['machine_db'],dir)
+        if dir != '*':
+            dir = pyMPI_Dir_translate(comm['machine_db'],dir)
 
     if DEBUG:
         print('machine_id_dest = %d'%(machine_id_dest))

@@ -11,12 +11,30 @@ import sys
 import platform
 
 """
-Customization for the user environment
+Customization for the user runtime environment
 """
+# Uncomment to enable the debug mode to see some additional output
+# os.environ['PPYTHON_DEBUG'] = 'yes'
+
+# Uncomment to disable the messaging kernel using the TMPDIR local filesystem (which is the default).
+os.environ['PPYTHON_LOCAL_FS'] = 'no'
+
+# Uncomment to enable the triples mode jobs
+os.environ['PPYTHON_TRIPLES'] = 'yes'
+
+# Uncomment to disable process bining
+# os.environ['PPYTHON_PROC_BIND'] = 'no'
+
+# Uncomment to use the git repository source code
+# os.environ['QA_ON_GIT'] = 'yes'
+
+# Specify whether to run on the grid with the scheduler or run locally without the scheduler
+RUN_ON_GRID = True  # True (run with grid installation) or False(run locally without scheduler)
 # Specify whether using pPython installed on the grid or locally
-GRID_PPYTHON = False  # True (grid installation) or False(local installation)
-USE_LATEST_VERSION = True
-PPYTHON_VER = 'v0.9.2'
+GRID_PPYTHON = True  # True (grid installation) or False(local installation)
+# Specify whether to use the latest pPython version (True) or a specific version (False)
+USE_LATEST_VERSION = False
+PPYTHON_VER = 'v0.9.3'
 
 # PPYTHON_HOME environment variable should be set in order to find the pPython installation
 system_name = platform.system()
@@ -37,7 +55,10 @@ if GRID_PPYTHON:
     if QA_ON_GIT:
         PPYTHON_HOME = GRID_MOUNT_PATH + "/devtools/git/pPython"
     else:
-        PPYTHON_HOME = GRID_MOUNT_PATH + "/llgrid_beta/pPython/latest"
+        if USE_LATEST_VERSION:
+            PPYTHON_HOME = GRID_MOUNT_PATH + "/llgrid_beta/pPython/latest"
+        else:
+            PPYTHON_HOME = GRID_MOUNT_PATH + "/llgrid_beta/pPython"+os.sep+PPYTHON_VER
     print('RUN.py: PPYTHON_HOME = %s'%(PPYTHON_HOME))
 else:
     # Use pPython installed locally
@@ -78,11 +99,23 @@ if GRID_PPYTHON:
 py_file = 'pStream.py'
 # Define number of MPI processes
 n_proc = 4
+n_proc_triples = [4,2,24]
 
 # Launch PythonMPI
 # print('Running: %s via pRUN().'%(py_file))
-if GRID_PPYTHON:
-    pRUN( py_file, n_proc, 'grid' )
+if GRID_PPYTHON and RUN_ON_GRID:
+    print('Running on grid ...')
+    if os.getenv('PPYTHON_LOCAL_FS',default='no').lower() == 'no':
+        if os.getenv('PPYTHON_TRIPLES',default='no').lower() == 'no':
+            pRUN( py_file, n_proc, 'grid' )
+        else:
+            pRUN( py_file, n_proc_triples, 'grid' )
+    else:
+        if os.getenv('PPYTHON_TRIPLES',default='no').lower() == 'no':
+            pRUN( py_file, n_proc, 'grid&' )
+        else:
+            pRUN( py_file, n_proc_triples, 'grid&' )
 else:
+    print('Running locally ...')
     pRUN( py_file, n_proc, {} )
 

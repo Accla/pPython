@@ -39,7 +39,7 @@ def fft(x, *argv):
     remapping
     """
 
-    DEBUG = 1
+    DEBUG = 0
     if DEBUG:
         print('--> Entering fft')
     

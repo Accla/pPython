@@ -48,7 +48,7 @@ def sparse(*argv,**kwargs):
     Author:   Hahn Kim
     Python version: Dr. Chansup Byun
     """
-    DEBUG = 1
+    DEBUG = 0
     if DEBUG:
         print('--> Entering sparse')
     

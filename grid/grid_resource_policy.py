@@ -12,7 +12,7 @@ def grid_resource_policy(grid_config, n_proc, interactive):
     
     requested = n_proc - interactive
     if requested <= unclaimed_procs:
-        if grid_config['n_nodes'] > unclaimed_nodes:
+        if grid_config['nnode'] > unclaimed_nodes:
             # Triple mode jobs cannot be launched.
             print('!!! The triple-mode job launch can currently only offer a total of %d idle nodes.'\
             %(unclaimed_nodes))

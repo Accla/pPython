@@ -10,6 +10,11 @@ def convert_to_dict(input,host):
     
     """
     
+    DEBUG = 0
+    if DEBUG:
+        print('--> Entering convert_to_dict')
+        print(input)
+
     islocal = 0
     output = dict()
     if len(input) == 0:    # empty machines list, running locally

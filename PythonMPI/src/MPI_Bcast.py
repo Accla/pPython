@@ -29,7 +29,7 @@ def MPI_Bcast( source, tag, comm, *argv ):
     var1,var2,...: variable number of MPI messages 
     
     """
-    DEBUG = 1
+    DEBUG = 0
     if DEBUG:
         print('--> Entering MPI_Bcast.')
     
@@ -51,7 +51,10 @@ def MPI_Bcast( source, tag, comm, *argv ):
     if DEBUG:
         if local_fs:
             print('Use local filesystem:')
-            print('--> MPI_Bcast: source rank = %d, host = %s, local path = %s' %(my_rank,machines[my_rank],tmpdir[my_rank]))
+            #
+            # With the triples mode, we need to use machine id, instead of rank.
+            #
+            print('--> MPI_Bcast: source rank = %d, host = %s, local path = %s' %(my_rank,machines[machine_id_rank],tmpdir[machine_id_rank]))
 
     # Set some strings for special characters.
     qq = '"'
@@ -94,9 +97,10 @@ def MPI_Bcast( source, tag, comm, *argv ):
         #
         # Figure out the list of processes on the same nodes
         # my compute node
-        hostname = machines[my_rank]
+        machine_id_rank = comm['machine_id'][my_rank]
+        hostname = machines[machine_id_rank]
         # list of Pid's on the same compute node
-        destINN = [pidkey for pidkey,machine in machines.items() if machine == hostname]
+        destINN = comm['local_pids'][hostname]
         # source is the smallest Pid among the destination
         source = min(destINN)
         if DEBUG:

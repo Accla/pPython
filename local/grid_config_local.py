@@ -166,7 +166,7 @@ def grid_config_local(grid_config):
     grid_config['DMAT_PATH'] = DMAT_PATH
 
     # Triples modes releated
-    grid_config['n_nodes'] = 0
+    grid_config['nnode'] = 0
 
     # Scheduler information
     grid_config['scheduler'] = 'slurm'
