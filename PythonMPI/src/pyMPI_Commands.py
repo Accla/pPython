@@ -80,6 +80,8 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD,**argv):
        outfile = '$OUTPUT_DIR/' + py_file + '.' + str(rank) +'.out'
     else:
        outfile = 'PythonMPI/' + py_file + '.' + str(rank) +'.out'
+    # Store redirected errors from MPI processes
+    errfile = 'PythonMPI/pRUN.err'
 
     # Create Python MPI setup commands.
     # Find the location for PythonMPI modules
@@ -132,6 +134,7 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD,**argv):
         else:
             # Write commands to a .py text file.
             if EPPAC:
+                # Write only once when the triples mdoe job is launched
                if not DONE:
                   fid = open(defsfile,'w')
                   n_command = len(commands)
@@ -141,6 +144,7 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD,**argv):
                   fid.close()
                   DONE = True
             else:
+               # Non-triples mode jobs. Each MPI process has its own defsfile
                fid = open(defsfile,'w')
                n_command = len(commands)
                for k,v in commands.items():
@@ -155,7 +159,12 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD,**argv):
                 python_command = python_base+' '+defsfile+' > '+outfile
                 unix_command = 'start /b '+python_command+nl+'copy nul PythonMPI\pid.'+machine+'.pc'+nl 
             else:
-                unix_command = python_command+' &'+nl+'touch PythonMPI/pid.'+machine+'.$!'+nl
+                # Forward standard error output to the log and err file on Unix environment
+                if EPPAC:
+                    FORWARD_ERR = ' 2> >(awk '+q+'BEGIN{FS="\\n"}{print "Pid=" ENVIRON["MPI_COMM_WORLD_RANK"] ": " $1}'+q+' |tee -a '+errfile+' >&2)'
+                else:
+                    FORWARD_ERR = ' 2> >(awk '+q+'BEGIN{FS="\\n"}{print "Pid='+str(rank)+': " $1}'+q+' |tee -a '+errfile+' >&2)'
+                unix_command = python_command+FORWARD_ERR+' &'+nl+'touch PythonMPI/pid.'+machine+'.$!'+nl
     else:
         # Target is a remote machine.
         # Write commands to a .py text file.
@@ -190,7 +199,12 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD,**argv):
                 print('-> Remote machine is NOT a pc')
             if grid_job and rank>0:
                 python_command = 'python '+defsfile+' &> '+outfile
-            unix_command = python_command+' &'+nl+'touch PythonMPI/pid.'+machine+'.$!'+nl
+            # Forward standard error output to the log and err file on Unix environment
+            if EPPAC:
+                FORWARD_ERR = ' 2> >(awk '+q+'BEGIN{FS="\\n"}{print "Pid=" ENVIRON["MPI_COMM_WORLD_RANK"] ": " $1}'+q+' |tee -a '+errfile+' >&2)'
+            else:
+                FORWARD_ERR = ' 2> >(awk '+q+'BEGIN{FS="\\n"}{print "Pid='+str(rank)+': " $1}'+q+' |tee -a '+errfile+' >&2)'
+            unix_command = python_command+FORWARD_ERR+' &'+nl+'touch PythonMPI/pid.'+machine+'.$!'+nl
     if EPPAC:
         # prepend to export MPI_COMM_WORLD_RANK=<mpi_rank>
         unix_command = 'export MPI_COMM_WORLD_RANK='+str(rank)+nl+ \
