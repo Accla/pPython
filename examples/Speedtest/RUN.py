@@ -11,14 +11,23 @@ import sys
 import platform
 
 """
-Customization for the user environment
+Customization for the user runtime environment
 """
 # Uncomment to enable the debug mode to see some additional output
 # os.environ['PPYTHON_DEBUG'] = 'yes'
+
+# Uncomment to disable the messaging kernel using the TMPDIR local filesystem (which is the default).
+os.environ['PPYTHON_LOCAL_FS'] = 'no'
+
+# Uncomment to enable the triples mode jobs
+os.environ['PPYTHON_TRIPLES'] = 'yes'
+
 # Uncomment to disable process bining
 # os.environ['PPYTHON_PROC_BIND'] = 'no'
+
 # Uncomment to use the git repository source code
-os.environ['QA_ON_GIT'] = 'yes'
+# os.environ['QA_ON_GIT'] = 'yes'
+
 # Specify whether to run on the grid with the scheduler or run locally without the scheduler
 RUN_ON_GRID = True  # True (run with grid installation) or False(run locally without scheduler)
 # Specify whether using pPython installed on the grid or locally
@@ -97,7 +106,10 @@ n_proc_triples = [4,2,24]
 if GRID_PPYTHON and RUN_ON_GRID:
     print('Running on grid ...')
     if os.getenv('PPYTHON_LOCAL_FS',default='no').lower() == 'no':
-        pRUN( py_file, n_proc, 'grid' )
+        if os.getenv('PPYTHON_TRIPLES',default='no').lower() == 'no':
+            pRUN( py_file, n_proc, 'grid' )
+        else:
+            pRUN( py_file, n_proc_triples, 'grid' )
     else:
         if os.getenv('PPYTHON_TRIPLES',default='no').lower() == 'no':
             pRUN( py_file, n_proc, 'grid&' )
