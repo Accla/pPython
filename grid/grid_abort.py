@@ -26,7 +26,9 @@ def grid_abort(grid_config):
     Cannot be used after pyMPI_Delete_all. 
     
     """
-
+    DEBUG = 0
+    if DEBUG:
+        print('--> Entering grid_abort(grid_config): MPI_Abort for grid job')
     # Check if PythonMPI exist and return if it does not
     if not os.path.exists('PythonMPI'):
         return
@@ -77,4 +79,6 @@ def grid_abort(grid_config):
             ecmd = ExecShellCmd(set_remote_cc())
             ecmd.run(unix_command)
 
+    if DEBUG:
+        print('<-- Exiting grid_abort(grid_config)')
 
