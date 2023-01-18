@@ -117,9 +117,14 @@ def pRUN(py_file,n_proc,machines,sched_options=None):
     # Check allowance 
     cpu_type = grid.grid_config['cpu_type'] 
 
-    # If pPython job is launched with Slurm srun, do not check allowance for the user
+    # If a backgrounded triples mode job is launched with the environment variable PPYTHON_SRUN=yes,
+    # do not check allowance for the job and the job will be submitted as a batch job using srun.
     chk_allowance = True
-    if (grid.grid_config['PPYTHON_SRUN'].lower() == 'yes'):
+    if (os.getenv('PPYTHON_SRUN',default='no').lower() == 'yes'):
+        grid.grid_config['srun'] = True
+    else:
+        grid.grid_config['srun'] = False
+    if grid.grid_config['srun'] and grid.grid_config['EPPAC'] and (grid.grid_config['interactive']==0):
         chk_allowance = False
 
     status = 0

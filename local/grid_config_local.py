@@ -37,8 +37,10 @@ def grid_config_local(grid_config):
     grid_config['CWD_PATH']: current working directory path where you submit a job (automatically detected)
 
     New pPython environment variables for additional features:
-    grid_config['PPYTHON_SRUN']: pPython uses Slrum srun to launch pPython job as a single Slurm job 
-                                 instead of a Slurm array job if it's set to yes
+    grid_config['srun']: [Only for backgrounded triples mode jobs] pPython uses Slrum srun to launch 
+                         pPython job as a single Slurm job instead of a Slurm array job if it's set 
+                         to True (automatically set when there is no resources available for immediate job 
+                         launch for backgrounded triples mode job)
 
     """
 
@@ -174,7 +176,7 @@ def grid_config_local(grid_config):
 
     # Additional pPython environment variables for new features
     # It can be overridden by setting environment variable before pRUN()
-    grid_config['PPYTHON_SRUN'] = 'no'
+    grid_config['srun'] = False
     # if set to 1, use message kernel with local filesystem. PPYTHON_LOCAL_FS='no' can make to use the central filesystem
     grid_config['local_fs'] = 0
     # For now, no mnaycore optimization

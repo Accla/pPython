@@ -101,12 +101,30 @@ def check_allowance(n_proc,cpu_type):
             status = 0
         else:
             # Requested resource is more than what is currently available
-            status = -1
-            print(' ')
-            strfmt = '''Error: Currently available cores for your job is %d cores.
+            # Check if the job is a bachgrounded triples mode job and
+            # if it is, instead of rejecting the job, submit the job as a batch job
+            # with Slurm srun command
+            # 
+            if (grid.grid_config['interactive']==0) and grid.grid_config['grid_job']:
+                status = 0
+                grid.grid_config['srun'] = True
+                print(' ')
+                strfmt = '''Note: Currently available cores for your job is %d cores.
+But your job requested %d cores.
+Therefor, you job has been submitted as a batch job and it will be executed when the resources become available.'''%( q_avail,n_proc)
+                print(strfmt)
+            else:
+                status = -1
+                grid.grid_config['srun'] = False
+                print(' ')
+                strfmt = '''Error: Currently available cores for your job is %d cores.
 But your job requested %d cores.
 Please reduce your job size ...'''%(q_avail,n_proc)
-            print(strfmt)
+                print(strfmt)
             
+        # Debug run for the srun job launch
+        # status = 0
+        # grid.grid_config['srun'] = True
+
         return status
 

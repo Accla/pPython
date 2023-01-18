@@ -124,6 +124,9 @@ def launch_with_triples(py_file, comm, grid_config):
             unix_commands_prefix = unix_commands_prefix+'export PIDSTART='+PIDSTART+nl
             unix_commands_prefix = unix_commands_prefix+'export PIDEND='+PIDEND+nl
             unix_commands_prefix = unix_commands_prefix+'export PIDSTR='+PIDSTR+nl
+            # Override HOSTNAME when launching with srun
+            if grid_config['srun']:
+                unix_commands_prefix = unix_commands_prefix+'export HOSTNAME=`hostname`'+nl
             unix_commands_prefix = unix_commands_prefix+'export OUTPUT_DIR="PythonMPI/${PIDSTR}_$HOSTNAME"'+nl
             unix_commands_prefix = unix_commands_prefix+'mkdir $OUTPUT_DIR'+nl+nl
 
@@ -203,7 +206,7 @@ def launch_with_triples(py_file, comm, grid_config):
     # It may not present with python, though
     sched_job_file = 'PythonMPI/Unix_Commands.sh'
     if grid_config['scheduler'] == 'slurm':
-        slurm_write_job_script(sched_job_file,py_file,pwd_grid)
+        slurm_write_job_script(grid_config,sched_job_file,py_file,pwd_grid)
     else:
         print('Error: unsupported scheduler, %s'%(grid_config['scheduler']))
         exit()
