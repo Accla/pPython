@@ -13,6 +13,9 @@ import platform
 """
 Customization for the user runtime environment
 """
+# User name on LLGrid
+USER = 'ch21778'
+
 # Uncomment to enable the debug mode to see some additional output
 # os.environ['PPYTHON_DEBUG'] = 'yes'
 
@@ -33,8 +36,8 @@ RUN_ON_GRID = True  # True (run with grid installation) or False(run locally wit
 # Specify whether using pPython installed on the grid or locally
 GRID_PPYTHON = True  # True (grid installation) or False(local installation)
 # Specify whether to use the latest pPython version (True) or a specific version (False)
-USE_LATEST_VERSION = False
-PPYTHON_VER = 'v0.9.3'
+USE_LATEST_VERSION = True
+PPYTHON_VER = 'v0.9.4'
 
 # PPYTHON_HOME environment variable should be set in order to find the pPython installation
 system_name = platform.system()
@@ -47,10 +50,10 @@ if GRID_PPYTHON:
         GRID_MOUNT_PATH = r"Z:"
     elif system_name in ['Darwin']:
         # For Mac OS environment, the GRID_MOUNT_PATH includes the user name
-        GRID_MOUNT_PATH = "/Volumes/ch21778"
+        GRID_MOUNT_PATH = '/Volumes/'+USER
     else:
         # For Linux OS environment, the GRID_MOUNT_PATH can be an arbitrary path
-        GRID_MOUNT_PATH = "/home/gridsan/ch21778"
+        GRID_MOUNT_PATH = '/home/gridsan/'+USER
     QA_ON_GIT = os.getenv('QA_ON_GIT')
     if QA_ON_GIT:
         PPYTHON_HOME = GRID_MOUNT_PATH + "/devtools/git/pPython"
@@ -66,15 +69,15 @@ else:
     if system_name in ['Windows']:
         # For Windows OS environment, prefix with r to fix the unicodeunderscore codec issue
         if USE_LATEST_VERSION:
-            PPYTHON_HOME = r"C:\Users\CH21778\pPython\latest"
+            PPYTHON_HOME = r"C:\Users"+os.sep+USER+os.sep+"pPython"+os.sep+"latest"
         else:
-            PPYTHON_HOME = r"C:\Users\CH21778\pPython"+os.sep+PPYTHON_VER
+            PPYTHON_HOME = r"C:\Users"+os.sep+USER+os.sep+"pPython"+os.sep+PPYTHON_VER
     elif system_name in ['Darwin']:
         # For Mac OS environment
         if USE_LATEST_VERSION:
-            PPYTHON_HOME = "/Users/ch21778/Documents/pPython/latest"
+            PPYTHON_HOME = '/Users/'+USER+'/Documents/pPython/latest'
         else:
-            PPYTHON_HOME = "/Users/ch21778/Documents/pPython/"+PPYTHON_VER
+            PPYTHON_HOME = '/Users/'+USER+'/Documents/pPython/'+PPYTHON_VER
     else:
         # For Linux OS environment
         if USE_LATEST_VERSION:
