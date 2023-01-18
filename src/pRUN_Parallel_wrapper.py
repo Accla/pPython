@@ -98,7 +98,7 @@ def pRUN_Parallel_wrapper(py_file):
                 print("pRUN_Parallel_Wrapper: grid_config['manycore_implicit'] = 0")
                 print('pRUN_Parallel_Wrapper: os.getenv(PPYTHON_MANYCORE) = %s'%(os.getenv('PPYTHON_MANYCORE')))
 
-        grid_config['PPYTHON_SRUN'] = ''
+        grid_config['srun'] = False
     else:
         if DEBUG:
             print("pRUN_Parallel_Wrapper: grid_config['PPYTHON_MANYCORE'] is NOT yes.")

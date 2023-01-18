@@ -43,7 +43,10 @@ def slurm_submit_job(grid_config,sched_job_file,py_file,dir_llsc):
     # Array job
     ntasks = grid_config['ntasks']
     if grid_config['EPPAC']:
-        cmdstr = cmdstr+' --exclusive -a 1-%d'%(ntasks)
+        if grid_config['srun']:
+            cmdstr = cmdstr+' --exclusive --nodes=%d'%(ntasks)
+        else:
+            cmdstr = cmdstr+' --exclusive -a 1-%d'%(ntasks)
     else:
         cmdstr = cmdstr+' -a 1-%d'%(ntasks)
         
@@ -77,16 +80,29 @@ def slurm_submit_job(grid_config,sched_job_file,py_file,dir_llsc):
     if DEBUG:
         print('remote_cc: %s'%(remote_cc))
     if remote_cc:
-        cmdstr = qq+cmd_chdir+";"+cmdstr+' '+dir_llsc+'/'+sched_job_file+qq
+        if grid_config['srun']:
+            # Note: change file permission before executing
+            ecmd.run(qq+cmd_chdir+";"+'chmod u+x '+sched_job_file+qq)
+            # Launch the job using srun as a single job
+            cmdstr = qq+cmd_chdir+";"+cmdstr+" --wrap='srun "+dir_llsc+'/'+sched_job_file+"'"+qq
+        else: 
+            # Launch the job as an array job
+            cmdstr = qq+cmd_chdir+";"+cmdstr+' '+dir_llsc+'/'+sched_job_file+qq
         if DEBUG:
             print(cmdstr)
         ecmd.run(cmdstr)
     else:
+        # Running on the grid
         # Not able to execute sbatch command as is.
         # Workaround to make it work on the grid environment
         save_cwd = os.getcwd()
         os.chdir(dir_llsc)
-        cmdstr = qq+cmdstr+' '+dir_llsc+'/'+sched_job_file+qq
+        if grid_config['srun']:
+            # Note: change file permission before executing
+            ecmd.run('chmod u+x '+sched_job_file)
+            cmdstr = qq+cmdstr+" --wrap='srun "+dir_llsc+'/'+sched_job_file+"'"+qq
+        else:
+            cmdstr = qq+cmdstr+' '+dir_llsc+'/'+sched_job_file+qq
         if DEBUG:
             print('chdir to %s'%(dir_llsc))
             print(cmdstr)

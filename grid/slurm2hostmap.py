@@ -43,7 +43,10 @@ def slurm2hostmap():
 
     if DEBUG:
         print('slurm2hostmap: Pid = %d' %(Pid))
-        # print("slurm2hostmap: grid.grid_config['PPYTHON_SRUN'] = %s"%(grid.grid_config['PPYTHON_SRUN']))
+        print('slurm2hostmap: grid.grid_config["srun"] = ',end="")
+        print(grid.grid_config['srun'])
+        print("")
+        # print("slurm2hostmap: grid.grid_config['srun'] = %s"%(grid.grid_config['srun']))
     
     maxIteration = 40
     pauseTime = 6
@@ -82,7 +85,7 @@ def slurm2hostmap():
         ecmd = ExecShellCmd(set_remote_cc())
 
         
-        if grid.grid_config['PPYTHON_SRUN'].lower() == 'yes':
+        if grid.grid_config['srun']:
             # pPython is launched with the Slurm srun command
             # This is for future implementation for the backgrounded triples mode jobs [ToDo]
             SLURM_JOB_ID = os.getenv('SLURM_JOB_ID')
@@ -93,7 +96,9 @@ def slurm2hostmap():
             cmdstr = 'scontrol show hostname '+slurm_nodelist
             ecmd.run(cmdstr)
             output = ecmd.get_output()
+            # print(output)
             # Start from 1 to match with the default Slurm task ID numbering
+            # Need to confirm if the nodelist is matching with node ID [ToDo]
             i = 1
             for host in output.split():
                 hostmap[i] = str(i)+' '+jobNumber+' '+host
@@ -142,7 +147,7 @@ def slurm2hostmap():
             # Wiat for pauseTime before checking again
             pyMPI_Sleep(pauseTime)
             
-            if grid.grid_config['PPYTHON_SRUN'].lower() == 'yes':
+            if grid.grid_config['srun']:
                 # pPython is launched with the Slurm srun command
                 # This is for future implementation for the backgrounded triples mode jobs [ToDo]
                 raise Exception('ERROR(slurm2hostmap): failed to get hostmap with Slurm srun.')
@@ -213,6 +218,7 @@ def slurm2hostmap():
     # To store the leader Pid on each node for every pPython process
     MPI_COMM_WORLD['leader'] = np.zeros(nProcs,dtype=int)
     MPI_COMM_WORLD['pidmax'] = np.zeros(nProcs,dtype=int)
+    # Slurm plugin set TMPDIR differently between array job and srun job
     tmpdir  = os.getenv('TMPDIR').split('.')
     
     if EPPAC:
@@ -233,12 +239,12 @@ def slurm2hostmap():
                 # ToDo: determine which one is better, machine_id or rank?
                 # MPI_COMM_WORLD['machine_db']['machine'][ipos] = tmp[2]
                 MPI_COMM_WORLD['machine_db']['machine'][i] = tmp[2]
-                if grid.grid_config['PPYTHON_SRUN'].lower() == 'yes':
+                if grid.grid_config['srun']:
                     # ToDo: determine which one is better, machine_id or rank?
                     # MPI_COMM_WORLD['tmpdir'][ipos] = '/state/partition1/slurm_tmp/'+tmp[1]+'.'+tmpdir[1]+'.'+my_node_rank
-                    MPI_COMM_WORLD['tmpdir'][i] = '/state/partition1/slurm_tmp/'+tmp[1]+'.'+tmpdir[1]+'.'+my_node_rank
+                    MPI_COMM_WORLD['tmpdir'][i] = '/state/partition1/slurm_tmp/'+tmp[1]+'.'+tmpdir[1]+'.'+str(my_node_rank)
                     if DEBUG:
-                        print("slurm2hostmap: MPI_COMM_WORLD['tmpdir'][%d] = %s"%(ipos,MPI_COMM_WORLD['tmpdir'][ipos]))
+                        print("slurm2hostmap: MPI_COMM_WORLD['tmpdir'][%d] = %s"%(ipos,MPI_COMM_WORLD['tmpdir'][i]))
                 else:
                     # ToDo: determine which one is better, machine_id or rank?
                     # MPI_COMM_WORLD['tmpdir'][ipos] = '/state/partition1/slurm_tmp/'+tmp[1]+'.'+tmpdir[1]+'.'+tmpdir[2]

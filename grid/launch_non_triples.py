@@ -152,10 +152,10 @@ def launch_non_triples(py_file, comm, grid_config):
     # This is done to fix Matlab's problem with very long commands sent to unix().
     # It may not present with python, though
     sched_job_file = 'PythonMPI/Unix_Commands.sh'
-    if grid.grid_config['scheduler'] == 'slurm':
-        slurm_write_job_script(sched_job_file,py_file,pwd_grid)
+    if grid_config['scheduler'] == 'slurm':
+        slurm_write_job_script(grid_config,sched_job_file,py_file,pwd_grid)
     else:
-        print('Error: unsupported scheduler, %s'%(grid.grid_config['scheduler']))
+        print('Error: unsupported scheduler, %s'%(grid_config['scheduler']))
         exit()
         
     # Execute launch script.
@@ -179,10 +179,10 @@ def launch_non_triples(py_file, comm, grid_config):
 
 
     # Submit the job
-    if grid.grid_config['scheduler'] == 'slurm':
-            slurm_submit_job(grid.grid_config,sched_job_file,py_file,pwd_grid)
+    if grid_config['scheduler'] == 'slurm':
+            slurm_submit_job(grid_config,sched_job_file,py_file,pwd_grid)
     else:
-        print('Error: unsupported scheduler, %s'%(grid.grid_config['scheduler']))
+        print('Error: unsupported scheduler, %s'%(grid_config['scheduler']))
         exit()
 
     # For somehow find out if this is an interactive job. then, execute the local processing:
