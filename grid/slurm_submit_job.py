@@ -44,7 +44,7 @@ def slurm_submit_job(grid_config,sched_job_file,py_file,dir_llsc):
     ntasks = grid_config['ntasks']
     if grid_config['EPPAC']:
         if grid_config['srun']:
-            cmdstr = cmdstr+' --exclusive --nodes=%d'%(ntasks)
+            cmdstr = cmdstr+' --exclusive --nodes=%d --ntasks=%d'%(ntasks,ntasks)
         else:
             cmdstr = cmdstr+' --exclusive -a 1-%d'%(ntasks)
     else:
