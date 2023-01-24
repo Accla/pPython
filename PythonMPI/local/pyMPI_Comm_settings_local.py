@@ -65,8 +65,8 @@ def pyMPI_Comm_settings_local(machine_db_settings):
             	exit()
         else:
             # Assuming running on LLSC
-         	machine_db_settings['python_module_path'] = '/etc/environment-modules/modules'
-         	machine_db_settings['python_module_name'] = 'anaconda/2022a'
+            machine_db_settings['python_module_path'] = '/etc/environment-modules/modules'
+            machine_db_settings['python_module_name'] = 'anaconda/2022a'
 
     machine_db_settings['python_command_llsc'] = python_location + ' -u '
 
@@ -74,4 +74,3 @@ def pyMPI_Comm_settings_local(machine_db_settings):
     machine_db_settings['local_dir_map'] = ['Z:', '/home/gridsan/'+USER, '/Volumes/'+USER, '/home/gridsan/'+USER, '/home/gridsan/groups', '/data2/groups', '/state/partition1/user/'+USER]
 
     return machine_db_settings
-

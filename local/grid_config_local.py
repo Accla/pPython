@@ -187,4 +187,3 @@ def grid_config_local(grid_config):
         print('--> Exiting grid_config_local')
 
     return grid_config
-

@@ -29,6 +29,7 @@ def launch_non_triples(py_file, comm, grid_config):
 
     # Set some strings for special characters.
     nl = '\n'
+    qq = '"'
 
     interactive = grid_config['interactive']
     
