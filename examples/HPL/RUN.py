@@ -14,7 +14,11 @@ import platform
 Customization for the user runtime environment
 """
 # User name on LLGrid
-USER = 'ch21778'
+system_name = platform.system()
+if system_name in ['Windows']:
+    USER = os.getenv('USERNAME')
+else:
+    USER = os.getenv('USER')
 
 # Uncomment to enable the debug mode to see some additional output
 # os.environ['PPYTHON_DEBUG'] = 'yes'
@@ -40,8 +44,6 @@ USE_LATEST_VERSION = True
 PPYTHON_VER = 'v0.9.4'
 
 # PPYTHON_HOME environment variable should be set in order to find the pPython installation
-system_name = platform.system()
-
 if GRID_PPYTHON:
     # Use pPython installed on the grid
     # ToDo: update the GRID_MOUNT_PATH accordingly
