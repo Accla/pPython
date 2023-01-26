@@ -41,8 +41,7 @@ def subsasgn_3D(a,s,b):
                 a.local[:,:,:] = b[a.global_ind['0'], a.global_ind['1'], a.global_ind['2']]
             else: 
                 # dimensions do not match
-                print('DMAT/subsasgn_2D:  Subscripted assignment dimension mismatch.')
-                exit()
+                raise Exception('DMAT/subsasgn_3D:  Subscripted assignment dimension mismatch.')
         else:
             # A(i:j, k:l, m:n) = B
             ind = get_ind_range(a,s)
@@ -73,8 +72,7 @@ def subsasgn_3D(a,s,b):
             # A(:,:,:) = B
             # check that dimensions match
             if a.shape != b.shape:
-                print('DMAT/subsasgn_3D: Subscripted assignment dimension mismatch.')
-                exit()
+                raise Exception('DMAT/subsasgn_3D: Subscripted assignment dimension mismatch.')
     
             # check if maps are the same
             if a.map==b.map:
@@ -235,20 +233,16 @@ def subsasgn_3D(a,s,b):
                                 a.local[local_ind[0], local_ind[1], local_ind[2]] = subsA2.local[:,:]
 
                     else:
-                        print('dmat/subsasgn3D: amap_slice and the map of the reference part of a should be the same.')
-                        exit()
+                        raise Exception('dmat/subsasgn3D: amap_slice and the map of the reference part of a should be the same.')
                 else:
-                    print('dmat/subsasgn3D: Only 2D slices can be assigned to 3D distributed arrays, i.e. b.dim MUST be 2.')
-                    exit()
+                    raise Exception('dmat/subsasgn3D: Only 2D slices can be assigned to 3D distributed arrays, i.e. b.dim MUST be 2.')
             else:
-                print('DMAT/SUBSASGN3D: If A and B are both distributed, assignment must be of the form A(:,:,:) = B or A(:,:,i) = B.')
-                exit()
+                raise Exception('DMAT/SUBSASGN3D: If A and B are both distributed, assignment must be of the form A(:,:,:) = B or A(:,:,i) = B.')
             # # # # # # # # # # # # # # # # # # # # # # # ADDED TO SUPPORT pMapper# # # # # # # # # # # # # # # # # # # # 
         # A(i:j, k:l, m:n) = B        
     else: 
         # RHS is not a DMAT or a DOUBLE
-        print('DMAT/subsasgn_3D: RHS must be a DOUBLE or DMAT.')
-        exit()
+        raise Exception('DMAT/subsasgn_3D: RHS must be a DOUBLE or DMAT.')
 
     if DEBUG:
         print('<-- Exiting subsasgn_3D')

@@ -8,8 +8,7 @@ def grid(d):
     Author: Nadya Travinin
     """
     if not isinstance(d,Dmat):
-        print('ERROR(grid): it is not a DMAT object.')
-        exit()
+        raise Exception('ERROR(grid): it is not a DMAT object.')
 
     print('Function grid(): called')
     return d.map.grid

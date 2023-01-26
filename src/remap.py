@@ -52,8 +52,7 @@ def remap(x, new_map):
         temp[:,:,:,:] = x
         x = temp
     else:
-        print('ERROR (remap): REMAP can only be applied to arrays with 4 dimensions or less.')
-        exit()
+        raise Exception('ERROR (remap): REMAP can only be applied to arrays with 4 dimensions or less.')
     
     if DEBUG:
         print('<-- Exiting remap')

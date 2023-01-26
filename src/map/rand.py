@@ -57,8 +57,7 @@ def rand(*array_sizes, **keywords):
         print(dims)
 
     if ndim>4:
-        print('ERROR(zeros): array dimension larger than 4-D is not supported')
-        exit()
+        raise Exception('ERROR(zeros): array dimension larger than 4-D is not supported')
 
     dmap = None
     if 'map' in keywords:
@@ -124,8 +123,7 @@ def rand(*array_sizes, **keywords):
                         else:
                             np.random.random(local_size)
     else:
-        print('@MAP/RAND: Only objects up to 4 dimensions are supported.')
-        exit()
+        raise Exception('@MAP/RAND: Only objects up to 4 dimensions are supported.')
 
     if DEBUG:
         print('type(d): %s'%(type(d)))

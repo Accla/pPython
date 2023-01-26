@@ -113,8 +113,7 @@ def fft(x, *argv):
                         #>>REMAPPING CODE
                         x.local = scipy.fftpack.fft(x.local, N, 0)
             else:
-                print('@dmat/fft: Distributed fft must be called with either 1 or 3 arguments.')
-                exit()
+                raise Exception('@dmat/fft: Distributed fft must be called with either 1 or 3 arguments.')
     
         elif x.dim == 3: # distributed array is 3-D
             g = proc_grid(x)
@@ -187,8 +186,7 @@ def fft(x, *argv):
                         # >>REMAPPING CODE
                         x.local = scipy.fftpack.fft(x.local, N, 0)
         else:
-            print('dmat/src/fft: FFT can only be applied to matrices or 3-D arrays.')
-            exit()
+            raise Exception('dmat/src/fft: FFT can only be applied to matrices or 3-D arrays.')
     
     if DEBUG:
         print('<-- Exiting fft')

@@ -48,8 +48,7 @@ def zeros(*array_sizes, **keywords):
     # Construct the array sizes:
     ndim = len(array_sizes)
     if ndim>4:
-        print('ERROR(zeros): array dimension larger than 4-D is not supported')
-        exit()
+        raise Exception('ERROR(zeros): array dimension larger than 4-D is not supported')
     # form dims vector
     if isinstance(array_sizes[0],list):
         ndim = len(array_sizes[0])

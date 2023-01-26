@@ -117,8 +117,7 @@ def submat(a, s):
             b.global_ind = a.global_ind
 
     else:
-        print('SUBMAT: Only up to 4 dimensions are supported.')
-        exit()
+        raise Exception('SUBMAT: Only up to 4 dimensions are supported.')
 
     if DEBUG:
         print('<-- Exiting submat')

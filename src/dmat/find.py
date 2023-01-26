@@ -48,8 +48,7 @@ def find(x):
                 print('<-- Exiting find')
             return [i,j]
         else:
-            print('Not implemented yet for DIM > 2.')
-            exit()
+            raise Exception('Not implemented yet for DIM > 2.')
     else:
         if DEBUG:
             print('... find for a distributed array')

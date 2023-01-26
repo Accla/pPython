@@ -91,8 +91,7 @@ def subsasgn_data(a, b, falls_index, fi):
                         a_local_ind[num_data] = get_local_ind(a.global_ind, g_ind)
                         num_data=num_data+1
     else:
-        print('DMAT/SUBSASGN_DATA: Only objects up to four (4) dimensions are supported.')
-        exit()
+        raise Exception('DMAT/SUBSASGN_DATA: Only objects up to four (4) dimensions are supported.')
 
     if DEBUG:
         print('<-- Exiting subsasgn_data')

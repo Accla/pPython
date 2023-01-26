@@ -103,8 +103,7 @@ def gen_pitfalls(np, dist_spec, dim_len, overlap=None):
             # ToDo: raise by 1 (ceil, pMatlab implementation) or not?
             b_size = math.ceil(dim_len/np)
         else:
-            print('ERROR(gen_pitfalls): Overlap is only supported for block distributions.')
-            exit()
+            raise Exception('ERROR(gen_pitfalls): Overlap is only supported for block distributions.')
 
         # cycle length
         cycle_len = b_size*np+overlap

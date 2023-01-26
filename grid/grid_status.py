@@ -67,8 +67,7 @@ def grid_status(cpu_type):
                 break
                 
     if not i_found_cpu_type:
-        print('Error (grid_status): cpu type, %s, is not found.'%(cpu_type))
-        exit()
+        raise Exception('Error (grid_status): cpu type, %s, is not found.'%(cpu_type))
         
     return total_procs,unclaimed_procs,unclaimed_nodes,\
     cluster_name,grid_scheduler,grid_scheduler_ver

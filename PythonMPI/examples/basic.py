@@ -74,8 +74,7 @@ if (my_rank == dest):
     print(data)
     # Check data.
     if np.count_nonzero(data - np.arange(10,dtype=DTYPE)):
-        print('ERROR: incorrect data sent.')
-        exit()
+        raise Exception('ERROR: incorrect data sent.')
 
 # Wait in order to check weather MPI message file is saved if uncommented line 42 above.
 pyMPI_Sleep(20)

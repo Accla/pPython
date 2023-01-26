@@ -67,8 +67,7 @@ def get_local_ind(global_ind, ind):
                 # dimension i is distributed
             local_ind[i] = loc_inds
     else:  # number of dimensions is greater than 4
-        print('localdims: Only objects up to 4-D are supported')
-        exit()
+        raise Exception('localdims: Only objects up to 4-D are supported')
         # number of dimensions is greater than 4    
 
     if DEBUG:

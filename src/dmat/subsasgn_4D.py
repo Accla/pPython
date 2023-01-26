@@ -40,8 +40,7 @@ def subsasgn_4D(a,s,b):
                 a.local[:,:,:,:] = b[a.global_ind['0'], a.global_ind['1'], a.global_ind['2'], a.global_ind['3']]
             else: 
                 # dimensions do not match
-                print('DMAT/SUBSASGN4D:  Subscripted assignment dimension mismatch.')
-                exit()
+                raise Exception('DMAT/SUBSASGN_4D:  Subscripted assignment dimension mismatch.')
         else: # A(i:j, k:l, m:n, p:q) = B
             ind = get_ind_range(a,s)
             local_ind = get_local_ind(a.global_ind, ind)
@@ -72,8 +71,7 @@ def subsasgn_4D(a,s,b):
             # A(:,:,:,:) = B
             # check that dimensions match
             if a.shape != b.shape:
-                print('DMAT/SUBSASGN4D: Subscripted assignment dimension mismatch.')
-                exit()
+                raise Exception('DMAT/SUBSASGN_4D: Subscripted assignment dimension mismatch.')
     
             # check if maps are the same
             if a.map==b.map: 
@@ -185,13 +183,11 @@ def subsasgn_4D(a,s,b):
             # maps not the same - redistribution
     
         else: # A(i:j, k:l, m:n, p:q) = B
-            print('DMAT/SUBSASGN4D: If A and B are both distributed, assignment must be of the form A(:,:,:,:) = B.')
-            exit()
+            raise Exception('DMAT/SUBSASGN_4D: If A and B are both distributed, assignment must be of the form A(:,:,:,:) = B.')
         # A(i:j, k:l, m:n, p:q) = B
     else: 
         # RHS is not a DMAT or a DOUBLE
-        print('DMAT/SUBSASGN4D: RHS must be a DOUBLE or DMAT.')
-        exit()
+        raise Exception('DMAT/SUBSASGN_4D: RHS must be a DOUBLE or DMAT.')
 
     if DEBUG:
         print('<-- Exiting subsasgn_4D')

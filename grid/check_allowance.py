@@ -93,8 +93,7 @@ def check_allowance(n_proc,cpu_type):
         elif isinstance(n_proc,int):
             n_proc_num = n_proc
         else:
-            print('ERROR(check_allowance): n_proc must be either interger or list')
-            exit()
+            raise Exception('ERROR(check_allowance): n_proc must be either interger or list')
 
         if cpu_q_avail > n_proc_num:
             # Resource limit can provide the requested resources

@@ -1,3 +1,5 @@
+import sys
+
 import pyMPI_COMM_WORLD as pyMCW
 
 from MPI_Comm_rank import *
@@ -19,5 +21,5 @@ def MPI_Finalize():
 
     # exit python process if this is not the host
     if my_rank != host:
-        exit()
+        sys.exit()
 

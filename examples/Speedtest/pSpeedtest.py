@@ -22,8 +22,7 @@ Nmessage = 20  # Number of message sizes.
 Ntrial = 4     # Trials per message size.
 
 if(Np < 2):
-    print('ERROR: too few processors (need at least 2)')
-    exit()
+    raise Exception('ERROR: too few processors (need at least 2)')
 
 # Setting up a ring communication
 source = (Pid - 1)%Np  # Set source.

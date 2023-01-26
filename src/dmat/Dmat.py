@@ -88,8 +88,7 @@ class Dmat:
             print(dims)
     
         if ndim>4:
-            print('ERROR(Dmat): array dimension larger than 4-D is not supported')
-            exit()
+            raise Exception('ERROR(Dmat): array dimension larger than 4-D is not supported')
     
         dmap = None
         if 'map' in keywords:
@@ -116,8 +115,7 @@ class Dmat:
         # Deprecated: self.size = dims
         self.shape = dims
         if isinstance(dmap,Dmap) and (dmap.dim != len(dims)):
-            print('ERROR(Dmat): Map and distributed object dimensions must match')
-            exit()
+            raise Exception('ERROR(Dmat): Map and distributed object dimensions must match')
             
         # create a PITFALLS for each dimension
         pitfalls = []
@@ -201,8 +199,7 @@ class Dmat:
         s = []
         ss = dict()
         if not isinstance(index,tuple): # 1-D distributed array
-            print('Dmat: 1-D assignment, not implemented yet.')
-            exit()
+            raise Exception('Dmat: 1-D assignment, not implemented yet.')
         else:
             if len(index)==2: # 2-D distributed array
                 if index[0]==slice(None, None, None) and index[1]==slice(None, None, None):
@@ -220,10 +217,9 @@ class Dmat:
                     ss['subs'][1] = slice(index[1],index[1]+1,None)
                     s.append(ss)
                 else:
-                    print('Dmat: 2-D assignment, not implemented this index type yet.')
                     print('type(index[0]')
                     print(type(index[0]))
-                    exit()
+                    raise Exception('Dmat: 2-D assignment, not implemented this index type yet.')
             elif len(index)==3: # 3-D distributed array
                 if index[0]==slice(None, None, None) and index[1]==slice(None, None, None) and index[2]==slice(None, None, None):
                     ss['type'] = '()'
@@ -242,10 +238,9 @@ class Dmat:
                     ss['subs'][2] = slice(index[2],index[2]+1,None)
                     s.append(ss)
                 else:
-                    print('Dmat: 3-D assignment, not implemented this index type yet.')
                     print('type(index[0]')
                     print(type(index[0]))
-                    exit()
+                    raise Exception('Dmat: 3-D assignment, not implemented this index type yet.')
             elif len(index)==4: # 4-D distributed array
                 if index[0]==slice(None, None, None) and index[1]==slice(None, None, None) and index[2]==slice(None, None, None) and index[3]==slice(None, None, None):
                     ss['type'] = '()'
@@ -266,13 +261,11 @@ class Dmat:
                     ss['subs'][3] = slice(index[3],index[3]+1,None)
                     s.append(ss)
                 else:
-                    print('Dmat: 4-D assignment, not implemented this index type yet.')
                     print('type(index[0]')
                     print(type(index[0]))
-                    exit()
+                    raise Exception('Dmat: 4-D assignment, not implemented this index type yet.')
             else: # unsupported distributed array dimension
-                print('Dmat: supported distributed dimension.')
-                exit()
+                raise Exception('Dmat: un-supported distributed dimension.')
 
         # construct s for sub-assignment operations
         if DEBUG:
@@ -295,11 +288,9 @@ class Dmat:
                 (self.shape == other.shape):
                 d.local = self.local + other.local
             else:
-                print('Error (Dmat): both map and array dimension should match for the subtraction.')
-                exit()
+                raise Exception('Error (Dmat): both map and array dimension should match for the subtraction.')
         else:
-            print('The type, %s, is not supported for the add operator with Dmat class yet.'%(type(other)))
-            exit()
+            raise Exception('The type, %s, is not supported for the add operator with Dmat class yet.'%(type(other)))
         return d
 
     def __sub__(self, other):
@@ -317,11 +308,9 @@ class Dmat:
                 (self.shape == other.shape):
                 d.local = self.local - other.local
             else:
-                print('Error (Dmat): both map and array dimension should match for the subtraction.')
-                exit()
+                raise Exception('Error (Dmat): both map and array dimension should match for the subtraction.')
         else:
-            print('The type, %s, is not supported for the subtraction operator with Dmat class yet.'%(type(other)))
-            exit()
+            raise Exception('The type, %s, is not supported for the subtraction operator with Dmat class yet.'%(type(other)))
         return d
 
     def __mul__(self, other):
@@ -339,11 +328,9 @@ class Dmat:
                 # ToDo: Need to implement the multiplicaiton of distributed arrays.
                 self.local = self.local * other.local
             else:
-                print('Error (Dmat): both map and array dimension should match for the subtraction.')
-                exit()
+                raise Exception('Error (Dmat): both map and array dimension should match for the subtraction.')
         else:
-            print('The type, %s, is not supported for the subtraction operator with Dmat class yet.'%(type(other)))
-            exit()
+            raise Exception('The type, %s, is not supported for the subtraction operator with Dmat class yet.'%(type(other)))
         return self
 
     def __rmul__(self, other):
@@ -363,11 +350,9 @@ class Dmat:
                 d.local = other.local * self.local
                 return d
             else:
-                print('Error (Dmat): both map and array dimension should match for the subtraction.')
-                exit()
+                raise Exception('Error (Dmat): both map and array dimension should match for the subtraction.')
         else:
-            print('The type, %s, is not supported for the subtraction operator with Dmat class yet.'%(type(other)))
-            exit()
+            raise Exception('The type, %s, is not supported for the subtraction operator with Dmat class yet.'%(type(other)))
         return self
 
     def __eq__(self,other):

@@ -48,8 +48,7 @@ def subsasgn_2D(a,s,b):
                     a.local[:,:] = b
                 else: 
                     # dimensions do not match
-                    print('DMAT/subsasgn_2D:  Subscripted assignment dimension mismatch.')
-                    exit()
+                    raise Exception('DMAT/subsasgn_2D:  Subscripted assignment dimension mismatch.')
         else: 
             # A[i:j, k:l] = B
             if DEBUG:
@@ -86,8 +85,7 @@ def subsasgn_2D(a,s,b):
                     #wrong: a.local[ local_ind[0][0]:local_ind[0][-1]+1, local_ind[1][0]:local_ind[1][-1]+1 ] = b
                     a.local[s1, s2] = b
             else:
-                print('DMAT/subsasgn_2D:  Subscripted assignment dimension mismatch.')
-                exit()
+                raise Exception('DMAT/subsasgn_2D:  Subscripted assignment dimension mismatch.')
         # A(i:j, k:l) = B
         
     # The following caused undefined Dmat error because its circular reference.
@@ -102,8 +100,7 @@ def subsasgn_2D(a,s,b):
             # A(:,:) = B
             # check that dimensions match
             if a.shape != b.shape:
-                print('DMAT/subsasgn_2D: Subscripted assignment dimension mismatch.')
-                exit()
+                raise Exception('DMAT/subsasgn_2D: Subscripted assignment dimension mismatch.')
     
             # check if maps are the same
             if a.map==b.map:
@@ -211,8 +208,7 @@ def subsasgn_2D(a,s,b):
             if size(a.local[a_local_ind[:]])==size(b.local):
                 a.local[a_local_ind[:]] = b.local
             else:
-                print('DMAT/subsasgn_2D: Subscripted assignment dimensions mismatch.')
-                exit()
+                raise Exception('DMAT/subsasgn_2D: Subscripted assignment dimensions mismatch.')
     if DEBUG:
         print('<-- Exiting subsasgn_2D')
     

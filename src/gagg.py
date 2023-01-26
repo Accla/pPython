@@ -61,8 +61,7 @@ def gagg(m,dest=0,ops='+',plist=None):
         
         # Check if the destination is a member of pid_subset
         if dest not in pid_subset:
-            print('gagg: the destination rank, %d, is not a member of the Pid subset list.'%(dest))
-            exit()
+            raise Exception('gagg: the destination rank, %d, is not a member of the Pid subset list.'%(dest))
 
         # For mapping between pid_subset (list of real Pids) 
         # and imaginary virtual contiguous Pid list
@@ -80,8 +79,7 @@ def gagg(m,dest=0,ops='+',plist=None):
 
     str_type = type(m)
     if not isinstance(m, (type(Assoc('','','')),type(Matrix.sparse(float)),float,np.float64,np.ndarray)): 
-        print('Current gagg() does not support class, %s, object.'%(str_type))
-        exit()
+        raise Exception('Current gagg() does not support class, %s, object.'%(str_type))
 
     # Gathering based on binary tree shown below
     # 

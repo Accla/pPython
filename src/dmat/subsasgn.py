@@ -44,12 +44,10 @@ def subsasgn(a, ss, b):
                 elif len(s['subs'])==4: # 4-D subscripted assignment
                     a = subsasgn_4D(a,s,b)
                 else:
-                    print('DMAT/SUBSASGN: Only objects up to four (4) dimensions are supported.')
-                    exit()
+                    raise Exception('DMAT/SUBSASGN: Only objects up to four (4) dimensions are supported.')
                 # End of N-D subscripted assignment
             else:
-                error('DMAT/SUBSASGN: The number of index dimensions must match the number of dimensions of the distributed array.')
-                exit()
+                raise Exception('DMAT/SUBSASGN: The number of index dimensions must match the number of dimensions of the distributed array.')
         elif s['type'] == '.': # subscripting type - members of dmat structure
             if s['subs']=='local':
                 a.local=b
@@ -60,17 +58,14 @@ def subsasgn(a, ss, b):
                 #CB: need to figure out what should be set with s[1]['subs']
                 a.local[ss[1]['subs']] = b
             else:
-                print('DMAT/SUBSASGN: Incorrect subscripting.')
-                exit()
+                raise Exception('DMAT/SUBSASGN: Incorrect subscripting.')
 
         else: # subscripting type
-            print('DMAT/SUBSASGN: Incorrect subscripting type.')
-            exit()
+            raise Exception('DMAT/SUBSASGN: Incorrect subscripting type.')
         # End subscripting type
 
     else: # subscripting level > 2
-        print('DMAT/SUBSASGN: Incorrect subscripting level.')
-        exit()
+        raise Exception('DMAT/SUBSASGN: Incorrect subscripting level.')
     # End subscripting level
     
     if DEBUG:

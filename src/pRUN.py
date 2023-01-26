@@ -42,8 +42,7 @@ LOCAL_PYTHONMPI_CONFIG_PATH = os.getenv('HOME')+os.sep+'ppython_conf'
 if os.path.exists(LOCAL_PYTHONMPI_CONFIG_PATH):
     sys.path.append(LOCAL_PYTHONMPI_CONFIG_PATH)
 else:
-    print('ERROR(pRUN): LOCAL_PYTHONMPI_CONFIG_PATH path, %s, does not exist.'%(LOCAL_PYTHONMPI_CONFIG_PATH))
-    exit()
+    raise Exception('ERROR(pRUN): LOCAL_PYTHONMPI_CONFIG_PATH path, %s, does not exist.'%(LOCAL_PYTHONMPI_CONFIG_PATH))
 
 if os.path.exists(PYTHONMPI_PATH):
     sys.path.append(PPYTHON_PATH)
@@ -53,8 +52,7 @@ if os.path.exists(PYTHONMPI_PATH):
     from pyMPI_Sleep import *
     print('Minimum PythonMPI functions are loaded for pRUN().')
 else:
-    print('ERROR(pRUN): PythonMPI package path, %s, does not exist.'%(PYTHONMPI_PATH))
-    exit()
+    raise Exception('ERROR(pRUN): PythonMPI package path, %s, does not exist.'%(PYTHONMPI_PATH))
     
 if os.path.exists(GRIDPYTHON_PATH):
     import grid_config as grid
@@ -66,8 +64,7 @@ if os.path.exists(GRIDPYTHON_PATH):
     from check_runtime import *
     print('gridPython functions are loaded......')
 else:
-    print('ERROR(pRUN): gridPython package path, %s, does not exist.'%(GRIDPYTHON_PATH))
-    exit()
+    raise Exception('ERROR(pRUN): gridPython package path, %s, does not exist.'%(GRIDPYTHON_PATH))
 
 def pRUN(py_file,n_proc,machines,sched_options=None):
     """Launch a PythonMPI script on a grid environment with a scheduler.

@@ -47,12 +47,10 @@ def subsasgn_1D(a,s,b):
                     elif a.dim == 4: # 4-D
                         a.local[:,:,:,:] = b[a.global_ind['0'], a.global_ind['1'], a.global_ind['2'], a.global_ind['3']]
                     else: # dimension > 4
-                        print('DMAT/subsasgn_1D: Only up to 4 dimensional objects supported.')
-                        exit()
+                        raise Exception('DMAT/subsasgn_1D: Only up to 4 dimensional objects supported.')
                         # distributed object dimension
         else:
-            print('unsupported indexing')
-            exit()
+            raise Exception('unsupported indexing')
 
     elif isinstance(b, Dmat): # RHS is a DMAT
         if isinstance(s['subs'][0], str):  # subscript is a CHAR
@@ -71,23 +69,18 @@ def subsasgn_1D(a,s,b):
                     a = subsasgn_4D(a,s,b)
                 else:
                     # >4-D
-                    print('DMAT/subsasgn_1D: Only up to 4 dimensional objects supported.')
-                    exit()
-                    # >4-D
+                    raise Exception('DMAT/subsasgn_1D: Only up to 4 dimensional objects supported.')
             else:
                 # subscript is not ':'
-                print('unsupported indexing')
-                exit()
+                raise Exception('unsupported indexing')
                 # subscript is not ':'
         else:
             # subscript is NOT a CHAR
-            print('unsupported indexing')
-            exit()
+            raise Exception('unsupported indexing')
             # subscript is NOT a CHAR
     else: 
         # RHS is a not a DMAT or a DOUBLE
-        print('DMAT/subsasgn_1D: RHS must be a DOUBLE or DMAT.')
-        exit()
+        raise Exception('DMAT/subsasgn_1D: RHS must be a DOUBLE or DMAT.')
         # RHS is a not a DMAT or a DOUBLE
 
     if DEBUG:

@@ -61,8 +61,7 @@ def pyMPI_Comm_settings_local(machine_db_settings):
                 python_location = '/opt/anaconda3/bin/python'
                 machine_db_settings['python_command'] = python_location + ' -u '
             else:
-            	print('Error (pyMPI_Comm_settings_local): unsupported OS.')
-            	exit()
+                raise Exception('Error (pyMPI_Comm_settings_local): unsupported OS.')
         else:
             # Assuming running on LLSC
             machine_db_settings['python_module_path'] = '/etc/environment-modules/modules'

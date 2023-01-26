@@ -52,8 +52,7 @@ def subsref(a,s):
             elif s[0]['subs']=='overlap':
                 b = a.overlap
             else:
-                print('%s is not a field of Dmap.'%(s['subs']))
-                exit()
+                raise Exception('%s is not a field of Dmap.'%(s['subs']))
         if DEBUG:
             print(b)
         # recursive call
@@ -75,8 +74,7 @@ def subsref(a,s):
             elif s['subs']=='overlap':
                 b = a.overlap
             else:
-                print('%s is not a field of Dmap.'%(s['subs']))
-                exit()
+                raise Exception('%s is not a field of Dmap.'%(s['subs']))
     if DEBUG:
         print('<--> Exiting subsref for Dmap objects')
     return b
@@ -120,11 +118,9 @@ def subsref(a,s):
     if stype=='()': #subscripting type
         # TODO eventually support < cases
         if len(subs) > ndims(a):
-            print('@dmat/subsref: Too many dimensions')
-            exit()
+            raise Exception('@dmat/subsref: Too many dimensions')
         elif len(subs) < ndims(a):
-            print('@dmat/subsref: Too few dimensions')
-            exit()
+            raise Exception('@dmat/subsref: Too few dimensions')
 
         #set submat flag to 0
         submat_flag = 0
@@ -139,8 +135,7 @@ def subsref(a,s):
                     #adjust submat flag
                     submat_flag = 1
                 elif subs[i] > sizeA[i]: # && i <= ndims(a)
-                    print('@dmat/subsref: Index exceeds dmat dimensions')
-                    exit()
+                    raise Exception('@dmat/subsref: Index exceeds dmat dimensions')
     
         if not submat_flag: #if reference consist of combinations of : and single numbers, use this code
             # expand the dimensions if needed
@@ -181,8 +176,7 @@ def subsref(a,s):
                     if len(subs[i]) == 1:
                         if subs[i] != ':':
                             if subs[i] < 1 or subs[i] > sizeB[i]:
-                                print('@dmat/subsref: The %d-th subscript exceeds size of dmat'%(i))
-                                exit()
+                                raise Exception('@dmat/subsref: The %d-th subscript exceeds size of dmat'%(i))
     
                             # figure out distribution
                             if distA[i]['dist']=='b':
@@ -206,8 +200,7 @@ def subsref(a,s):
                                 idx = idx%size(gridA, i)
     
                             else:
-                                print('@dmat/subsref: Unsupported distribution type: %s'%(distA.type))
-                                exit()
+                                raise Exception('@dmat/subsref: Unsupported distribution type: %s'%(distA.type))
                             #
                             # Set up the subscripts.
                             #
@@ -218,8 +211,7 @@ def subsref(a,s):
                             s_map['subs'][i] = ':'
                             s_data['subs'][i] = ':'
                     else:
-                        print('@dmat/subsref: Unsupported subscript: %s'%(subs[i]))
-                        exit()
+                        raise Exception('@dmat/subsref: Unsupported subscript: %s'%(subs[i]))
                 #
                 # Find the map that would contain these processors and create a
                 # dmat using this map.
@@ -259,8 +251,7 @@ def subsref(a,s):
         elif subs == 'map':
             b = a.map
         else:
-            print('@dmat/subsref: %s cannot be accessed directly or is not a field of DMAT.'%(subs))
-            exit()
+            raise Exception('@dmat/subsref: %s cannot be accessed directly or is not a field of DMAT.'%(subs))
     #
     # Recursive call
     #

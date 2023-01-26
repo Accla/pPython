@@ -85,8 +85,7 @@ def get_local_proc(pitfalls, grid, ind):
                               and not np.array(find(global_ind[i,j,k,l][3]==ind[3])).size==0):
                             r = grid[i,j,k,l]
     else:
-        print('GET_LOCAL_PROC: does not support %d dimensions.'%(len(g_dims)))
-        exit()
+        raise Exception('GET_LOCAL_PROC: does not support %d dimensions.'%(len(g_dims)))
 
     if DEBUG:
         print('<-- Exiting get_local_proc')

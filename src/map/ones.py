@@ -59,8 +59,7 @@ def ones(*array_sizes, **keywords):
         print(dims)
 
     if ndim>4:
-        print('ERROR(ones): array dimension larger than 4-D is not supported')
-        exit()
+        raise Exception('ERROR(ones): array dimension larger than 4-D is not supported')
 
     dmap = None
     if 'map' in keywords:

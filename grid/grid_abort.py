@@ -71,8 +71,7 @@ def grid_abort(grid_config):
             if grid_config['scheduler'] == 'slurm':
                 unix_command = 'scancel '+pid
             else:
-                print('MPI_Abort (grid version) does not support the scheduler %s'%(grid_config['scheduler']))
-                exit()
+                raise Exception('MPI_Abort (grid version) does not support the scheduler %s'%(grid_config['scheduler']))
                 
             # Print the command and execute it
             print('... '+unix_command)

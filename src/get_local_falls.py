@@ -166,8 +166,7 @@ def get_local_falls(pitfalls, grid, rank):
             for i in range(dim):
                 local_falls.append(None)
     else:
-        print('ERROR(get_local_falls): Only objects up to 4-D are supported')
-        # exit()
+        raise Exception('ERROR(get_local_falls): Only objects up to 4-D are supported')
         
     if DEBUG:
         print('**** get_local_falls: aggragated falls ****')

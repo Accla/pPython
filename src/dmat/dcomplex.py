@@ -23,8 +23,7 @@ def dcomplex(x,y):
             d = zeros(size(x),map=x.map,dtype=complex)
             d.local = np.vectorize(complex)(x.local,y.local)
         else:
-            print('ERROR: Both DMAT objects have to be the same kind.')
-            exit()
+            raise Exception('ERROR: Both DMAT objects have to be the same kind.')
         if DEBUG:
             print('dmat/dcomplex: return distributed array with its local array shape of %s'%(str(d.local.shape)))
     else:

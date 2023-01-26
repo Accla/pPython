@@ -37,7 +37,6 @@ def local_dims(falls, dim):
         else: # no local data
             local_size = np.zeros(dim,dtype='int')
     else:
-        print('ERROR(local_dims): Only objects up to 4-D are supported')
-        # exit()
+        raise Exception('ERROR(local_dims): Only objects up to 4-D are supported')
     return local_size
 

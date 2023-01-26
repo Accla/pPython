@@ -23,8 +23,7 @@ def summation(sum, *argv):
             res[i] = argv[i]
     else:
         # no Dmat argument to sum
-        print('Error (summation): no Dmats supplied.')
-        exit()
+        raise Exception('Error (summation): no Dmats supplied.')
 
     # Addition pattern:
     #  1. res{1} += res{2}, ..., res{2i-1} += res{2i}, ...

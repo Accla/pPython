@@ -149,7 +149,6 @@ def pyMPI_Dir_map(machine_db,path):
             dir_grid = sgrp_3_base
 
         else:
-            print("ERROR(pyMPI_Dir_map): path, %s, does not match with any in machine_db['local_dir_map']"%(path))
-            exit()
+            raise Exception("ERROR(pyMPI_Dir_map): path, %s, does not match with any in machine_db['local_dir_map']"%(path))
 
     return dir_pc, dir_linux, dir_mac, dir_grid

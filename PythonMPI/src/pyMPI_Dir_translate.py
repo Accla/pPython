@@ -61,8 +61,7 @@ def pyMPI_Dir_translate(machine_db,path):
         sgrp_3_base = machine_db['local_dir_map'][6]
         sgrp_3_n    = len(sgrp_3_base);
     else:
-        print('Error (pyMPI_Dir_translate): local directory map not defined in machine_db (local_dir_map)')
-        exit()
+        raise Exception('Error (pyMPI_Dir_translate): local directory map not defined in machine_db (local_dir_map)')
 
     # Check which OS is compatiable with the given path
     if re.search(pc_base,path,re.IGNORECASE):
@@ -87,8 +86,7 @@ def pyMPI_Dir_translate(machine_db,path):
         n_base = sgrp_3_n
         is_sgrp_3_path = 1
     else:
-        print('Error (pyMPI_Dir_translate): given path, %s, is not compatible with local directory map.'%(path))
-        exit()
+        raise Exception('Error (pyMPI_Dir_translate): given path, %s, is not compatible with local directory map.'%(path))
 
     if DEBUG:
         print('n_base = %d'%(n_base))

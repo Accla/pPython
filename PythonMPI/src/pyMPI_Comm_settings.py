@@ -73,8 +73,7 @@ def pyMPI_Comm_settings():
         loc = os.path.abspath(inspect.getfile(pyMPI_Comm_settings_local))
         print('--> pyMPI_Comm_settings: updated machine_db_settings with a local configuration, %s.'%(loc))
     except:
-        print('pyMPI_Comm_settings: Failed to update the local machine_db_settings.')
-        # exit()
+        raise Exception('pyMPI_Comm_settings: Failed to update the local machine_db_settings.')
 
     if DEBUG:
         print('<-- Exiting pyMPI_Comm_settings')

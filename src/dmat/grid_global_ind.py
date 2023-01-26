@@ -41,8 +41,7 @@ def grid_global_ind(d):
                         local_falls = get_local_falls(d.pitfalls, grid, grid[i,j,k,m])
                         global_ind[i][j][k][m] = get_global_ind(local_falls, grid_dims)
     else:
-        print('GLOBAL_BLOCK_RANGES: Only objects up to 4-D are supported')
-        exit()
+        raise Exception('GLOBAL_BLOCK_RANGES: Only objects up to 4-D are supported')
         
     return global_ind
 

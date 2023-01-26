@@ -14,8 +14,7 @@ def double(d):
     if isinstance(d, Dmat):
         d.local = np.float64(d.local)
     else:
-        print('dmat/double: upsupported data type')
-        exit()
+        raise Exception('dmat/double: upsupported data type')
 
     return d
 

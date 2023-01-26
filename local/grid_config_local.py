@@ -83,8 +83,7 @@ def grid_config_local(grid_config):
         elif cluster_name == 'txe1':
             grid_config['remote_user'] = 'cbyun'
         else:
-            print('grid_config_local: Unsupported system. Exited.')
-            exit()
+            raise Exception('grid_config_local: Unsupported system. Exited.')
     else:
         # The following line will not work if local username is differen from the grid username
         grid_config['remote_user'] = USER
@@ -96,7 +95,6 @@ def grid_config_local(grid_config):
         grid_config['remote_host'] = 'txe1-login.mit.edu'
     else:
         # print('grid_config_local: Unsupported system. Exited.')
-        # exit()
         print('grid_config_local: This is not a LLSC system. ')
 
     grid_config['remote_launch'] = 'ssh'
@@ -147,8 +145,7 @@ def grid_config_local(grid_config):
         # Current working directory path
         CWD_PATH = os.getcwd()
     except Exception:
-        print('grid_config_local: Failed to setup environment variables')
-        exit()
+        raise Exception('grid_config_local: Failed to setup environment variables')
 
 
     # Additional paths for PGAS using the distributed map and array construction

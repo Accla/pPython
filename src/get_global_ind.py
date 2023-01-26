@@ -91,8 +91,7 @@ def get_global_ind(falls, grid_dims=None):
             ind[i] = temp
                 
     else:
-        print('ERROR(get_global_ind): Only objects up to 4-D are supported')
-        exit()
+        raise Exception('ERROR(get_global_ind): Only objects up to 4-D are supported')
 
     if DEBUG:
         # print(ind)

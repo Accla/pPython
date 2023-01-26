@@ -31,8 +31,7 @@ def get_ind_range(a,s):
         ind[3] = s['subs'][3]
 
     else:
-        print('GET_IND_RANGE: Only up to 4 dimensional objects are supported.')
-        exit()
+        raise Exception('GET_IND_RANGE: Only up to 4 dimensional objects are supported.')
         
     return ind
 

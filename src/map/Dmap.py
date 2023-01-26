@@ -75,8 +75,7 @@ class Dmap:
                     dist_spec[d]['dist'] ='b'
             elif isinstance(dist_spec,str):
                 if dist_spec == 'bc':
-                    print('ERROR (Dmap): block-cyclic distribution also needs block size.')
-                    exit()
+                    raise Exception('ERROR (Dmap): block-cyclic distribution also needs block size.')
                 # 'b' for block & 'c' for cyclic distribution
                 tmp_dist_spec = dist_spec
                 dist_spec = dict()
@@ -87,8 +86,7 @@ class Dmap:
                 # distribution spec is provided for all directions individually
                 # dist_spec = {'0': {'dist': 'bc', 'b_size': 3}, '1': {'dist': 'b'}}
                 if len(grid_spec) != len(dist_spec):
-                    print('ERROR (Dmap): dimension does not match between grid_spec and dist_spec.')
-                    exit()
+                    raise Exception('ERROR (Dmap): dimension does not match between grid_spec and dist_spec.')
             else:
                 # dist_spec is provided as a dictionary form
                 # dist_spec['dist'] = 'b' or 'c' or 'bc'
@@ -104,14 +102,12 @@ class Dmap:
                 if (dist_spec[i]['dist'] != 'b') \
                 and (dist_spec[i]['dist'] != 'c') \
                 and (dist_spec[i]['dist'] != 'bc'):
-                    print('ERROR (Dmap): %s is not a valid distribution'%(dist_spec[i]['dist']))
-                    exit()
+                    raise Exception('ERROR (Dmap): %s is not a valid distribution'%(dist_spec[i]['dist']))
                 else:
                     # check that block size is defined for block-cyclic distributions
                     if dist_spec[i]['dist'] == 'bc':
                         if (not 'b_size' in dist_spec[i]) or (dist_spec[i]['b_size'] < 1):
-                            print('ERROR (Dmap): Block size must be specified for block-cyclic distibution')
-                            exit()
+                            raise Exception('ERROR (Dmap): Block size must be specified for block-cyclic distibution')
             self.dist_spec = dist_spec
             
             # create the grid from the processor list
@@ -124,8 +120,7 @@ class Dmap:
             # the grid
             gsize = grid.size
             if (len(proc_list) != gsize):
-                print('ERROR (Dmap): Processor list does not match the size of the grid')
-                exit()
+                raise Exception('ERROR (Dmap): Processor list does not match the size of the grid')
             else:
                 grid.reshape(gsize)[:] = proc_list[:]
         
@@ -171,14 +166,12 @@ class Dmap:
                         dist_spec[d] = dict()
                         dist_spec[d]['dist'] = tmp_dist_spec
                 else:
-                    print('ERROR (Dmap): Overlap is only supported for block distributions.')
-                    exit()
+                    raise Exception('ERROR (Dmap): Overlap is only supported for block distributions.')
             elif any(map(lambda x: isinstance(x,dict),dist_spec.values())):
                 # distribution spec is provided for all directions individually
                 # dist_spec = {0: {'dist': 'bc', 'b_size': 3}, 1: {'dist': 'b'}}
                 if len(grid_spec) != len(dist_spec):
-                    print('ERROR (Dmap): dimension does not match between grid_spec and dist_spec.')
-                    exit()
+                    raise Exception('ERROR (Dmap): dimension does not match between grid_spec and dist_spec.')
                 #
                 # Can we use overlap only certain direction with this?
                 #
@@ -186,8 +179,7 @@ class Dmap:
                 # dist_spec is provided as a dictionary form
                 # dist_spec['dist'] = 'b'
                 if dist_spec['dist'] != 'b':
-                        print('ERROR (Dmap): Overlap is only supported for block distributions.')
-                        exit()
+                        raise Exception('ERROR (Dmap): Overlap is only supported for block distributions.')
                 tmp_dist_spec = dist_spec
                 dist_spec = dict()
                 for d in range(len(grid_spec)):
@@ -196,8 +188,7 @@ class Dmap:
             for i in range(dim):
                 # check that distributions defined are consistent with {'b', 'c', 'bc'}
                 if dist_spec[i]['dist'] != 'b':
-                    print('ERROR (Dmap): Overlap is only supported for block distributions.')
-                    exit()
+                    raise Exception('ERROR (Dmap): Overlap is only supported for block distributions.')
             self.dist_spec = dist_spec
             
             # create the grid from the processor list
@@ -207,15 +198,13 @@ class Dmap:
             # the grid
             gsize = grid.size
             if (len(proc_list) != gsize):
-                print('ERROR (Dmap): Processor list does not match the size of the grid')
-                exit()
+                raise Exception('ERROR (Dmap): Processor list does not match the size of the grid')
             else:
                 grid.reshape(gsize)[:] = proc_list[:]
             self.grid = grid
         
             if len(overlap) != self.dim:
-                print('RROR (Dmap): Overlap must be specified for all of the dimensions of the map.')
-                exit()
+                raise Exception('RROR (Dmap): Overlap must be specified for all of the dimensions of the map.')
 
             # if the maps are created within the scope of MPI_COMM_WORLD
             # then the processor list is checked against current
