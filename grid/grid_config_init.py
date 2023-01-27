@@ -19,7 +19,7 @@ def grid_config_init():
         grid_config = grid_config_local(grid_config)
         # local grid_config customization
         loc = os.path.abspath(inspect.getfile(grid_config_local))
-        print('--> grid_config_init: updated grid_config with a local configuration, %s.'%(loc)) 
+        # print('--> grid_config_init: updated grid_config with a local configuration, %s.'%(loc)) 
     except Exception:
         print('Failed to setup local grid_config settings')
 

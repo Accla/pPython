@@ -131,7 +131,7 @@ def grid_config_local(grid_config):
     # pPython installation path
     try:
         PPYTHON_HOME = os.getenv('PPYTHON_HOME')
-        print('grid_config_local: PPYTHON_HOME = %s'%(PPYTHON_HOME))
+        # print('grid_config_local: PPYTHON_HOME = %s'%(PPYTHON_HOME))
         PPYTHON_PATH = PPYTHON_HOME+os.sep+"src"
         # PythonMPI installation path
         PYTHONMPI_PATH = PPYTHON_HOME+os.sep+"PythonMPI"+os.sep+"src"
