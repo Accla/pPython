@@ -104,9 +104,9 @@ def gen_commands(py_file,python_mpi_path,rank,machine,comm,EPPAC=False):
 
 ########################################################
 # PythonMPI
-# Dr. Chansup Byun
+# Dr. Jeremy Kepner & Dr. Chansup Byun
 # MIT Lincoln Laboratory
-# kepner@ll.mit.edu
+# kepner@ll.mit.edu & cbyun@ll.mit.edu
 ########################################################
 # Copyright 2023 Massachusetts Institute of Technology
 #

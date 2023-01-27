@@ -20,9 +20,9 @@ def replace_token(old_str,new_str,old_path):
 
 ########################################################
 # PythonMPI
-# Dr. Chansup Byun
+# Dr. Jeremy Kepner & Dr. Chansup Byun
 # MIT Lincoln Laboratory
-# kepner@ll.mit.edu
+# kepner@ll.mit.edu & cbyun@ll.mit.edu
 ########################################################
 # Copyright 2023 Massachusetts Institute of Technology
 #

@@ -76,9 +76,9 @@ def pyMPI_Comm_settings_local(machine_db_settings):
 
 ########################################################
 # PythonMPI
-# Dr. Chansup Byun
+# Dr. Jeremy Kepner & Dr. Chansup Byun
 # MIT Lincoln Laboratory
-# kepner@ll.mit.edu
+# kepner@ll.mit.edu & cbyun@ll.mit.edu
 ########################################################
 # Copyright 2023 Massachusetts Institute of Technology
 #

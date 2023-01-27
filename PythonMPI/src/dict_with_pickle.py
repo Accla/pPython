@@ -21,9 +21,9 @@ def load_dict_from_pickle(buffer_file):
 
 ########################################################
 # PythonMPI
-# Dr. Chansup Byun
+# Dr. Jeremy Kepner & Dr. Chansup Byun
 # MIT Lincoln Laboratory
-# kepner@ll.mit.edu
+# kepner@ll.mit.edu & cbyun@ll.mit.edu
 ########################################################
 # Copyright 2023 Massachusetts Institute of Technology
 #
