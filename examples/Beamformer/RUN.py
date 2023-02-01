@@ -1,9 +1,11 @@
 """RUN.py
 
-Example to run a PythonMPI code with pPython
-To run, execute the following command.
+    Example to run a PythonMPI code with pPython
+    To run, execute the following command.
 
     python RUN.py
+
+    Author: Dr. Chansup Byun
 """
 
 import os
@@ -32,16 +34,13 @@ os.environ['PPYTHON_TRIPLES'] = 'yes'
 # Uncomment to disable process bining
 # os.environ['PPYTHON_PROC_BIND'] = 'no'
 
-# Uncomment to use the git repository source code
-# os.environ['QA_ON_GIT'] = 'yes'
-
 # Specify whether to run on the grid with the scheduler or run locally without the scheduler
 RUN_ON_GRID = True  # True (run with grid installation) or False(run locally without scheduler)
 # Specify whether using pPython installed on the grid or locally
 GRID_PPYTHON = True  # True (grid installation) or False(local installation)
 # Specify whether to use the latest pPython version (True) or a specific version (False)
 USE_LATEST_VERSION = True
-PPYTHON_VER = 'v0.9.4'
+PPYTHON_VER = 'v0.9.5'
 
 # PPYTHON_HOME environment variable should be set in order to find the pPython installation
 if GRID_PPYTHON:
@@ -124,3 +123,37 @@ else:
     print('Running locally ...')
     pRUN( py_file, n_proc, {} )
 
+########################################################
+# pPython: Parallel Python Programming Tool
+# Dr. Jeremy Kepner and Dr. Chansup Byun
+# (kepner@ll.mit.edu and cbyun@ll.mit.edu)
+# MIT Lincoln Laboratory
+########################################################
+# Copyright (c) 2023, Massachusetts Institute of Technology All rights
+# reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#      * Redistributions of source code must retain the above copyright
+#        notice, this list of conditions and the following disclaimer.
+#      * Redistributions in binary form must reproduce the above copyright
+#        notice, this list of conditions and the following disclaimer in
+#        the documentation and/or other materials provided with the
+#        distribution.
+#      * Neither the name of the Massachusetts Institute of Technology nor
+#        the names of its contributors may be used to endorse or promote
+#        products derived from this software without specific prior written
+#        permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+# IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+# THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+# PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+# PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+# LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
