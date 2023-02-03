@@ -5,11 +5,17 @@
 # Extract the global and local properties for pPython process
 # Print "My process ID (Pid or Rank)"
 # Print "How many pPython processes are running (Np), Size"
-
 # Define Map
 # - How to distribute work load?
+# Create a distributed array (using the map)
+# - How to find local portion of global indices?
+# - How to find local portion of a distributed array (matrix)?
 
-# File: param_sweep_v2.py
+# Do the computation independently
+# - How to walk through the local portion of the work load?
+# - How to save the result inot the distributed array (matrix)?
+
+# File: param_sweep_v4.py
 
 import pPython as GPC
 from Dmap import *

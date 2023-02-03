@@ -32,7 +32,7 @@ my_index = global_ind(Z, 1)
 # Loop over the local indices
 for index in range(len(my_index)):
     for j in range(Nx):
-        myZ[j,index] = myZ[j,index] + 0.
+        myZ[j,index] = myZ[j,index] + 100.
 
 # Store the local portion (myZ) of Z into the distributed matrix Z
 Z = put_local(Z, myZ)
