@@ -10,7 +10,7 @@ from Dmat import *
 
 from inmap import *
 from reconstruct import *
-
+from agg_by_topology import *
 
 def agg(d, leader=None):
     """Hierarchical agg() aggregates the parts of a distributed matrix on the leader processor
@@ -46,6 +46,23 @@ def agg(d, leader=None):
     if Np == 1:
         mat = d.local
         return mat
+
+    # Use topology-aware agg() if this is a triple mode job
+    PIDSTART = os.getenv('PIDSTART',default='')
+    print('PIDSTART = %s'%(PIDSTART))
+    if len(PIDSTART):
+        print(' ')
+        print(' ')
+        print('AGG: calling topology-aware agg()')
+        print(' ')
+        print(' ')
+        return agg_by_topology(d)
+    else:
+        print(' ')
+        print(' ')
+        print('AGG: calling hierachical agg()')
+        print(' ')
+        print(' ')
     
     # Set the leader for aggregation
     if hasattr(GPC, 'leader'):

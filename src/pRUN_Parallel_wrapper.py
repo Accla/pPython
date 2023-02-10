@@ -30,6 +30,7 @@ def pRUN_Parallel_wrapper(py_file):
         islocal = grid_config['islocal']
         grid_job = grid_config['grid_job']
         interactive = grid_config['interactive']
+        EPPAC = grid_config['EPPAC']
         # Passed from pRUN()
         LAUNCH_TIMING = grid_config['LAUNCH_TIMING']
     else:
@@ -53,7 +54,7 @@ def pRUN_Parallel_wrapper(py_file):
         print('pRUN_Parallel_Wrapper: local_fs = %d'%(local_fs))
         print(' ')
 
-    if local_fs and (grid_job==True):
+    if interactive == 0 and (grid_job==True) and EPPAC:
         # update MPI_COMM_WORLD
         tic = timer()
         slurm2hostmap()
