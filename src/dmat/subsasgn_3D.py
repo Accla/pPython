@@ -20,8 +20,8 @@ def subsasgn_3D(a,s,b):
     S is of the following form [i:j, k:l, m:n]. Distributed object's dimension
     is 3. B is either a DMAT or a DOUBLE.
     
-    Python version: Dr. Chansup Byun
     Author:   Nadya Travinin
+    Python version: Dr. Chansup Byun
     """
     
     DEBUG = 0
@@ -41,8 +41,7 @@ def subsasgn_3D(a,s,b):
                 a.local[:,:,:] = b[a.global_ind['0'], a.global_ind['1'], a.global_ind['2']]
             else: 
                 # dimensions do not match
-                print('DMAT/subsasgn_2D:  Subscripted assignment dimension mismatch.')
-                exit()
+                raise Exception('DMAT/subsasgn_3D:  Subscripted assignment dimension mismatch.')
         else:
             # A(i:j, k:l, m:n) = B
             ind = get_ind_range(a,s)
@@ -73,8 +72,7 @@ def subsasgn_3D(a,s,b):
             # A(:,:,:) = B
             # check that dimensions match
             if a.shape != b.shape:
-                print('DMAT/subsasgn_3D: Subscripted assignment dimension mismatch.')
-                exit()
+                raise Exception('DMAT/subsasgn_3D: Subscripted assignment dimension mismatch.')
     
             # check if maps are the same
             if a.map==b.map:
@@ -235,23 +233,54 @@ def subsasgn_3D(a,s,b):
                                 a.local[local_ind[0], local_ind[1], local_ind[2]] = subsA2.local[:,:]
 
                     else:
-                        print('dmat/subsasgn3D: amap_slice and the map of the reference part of a should be the same.')
-                        exit()
+                        raise Exception('dmat/subsasgn3D: amap_slice and the map of the reference part of a should be the same.')
                 else:
-                    print('dmat/subsasgn3D: Only 2D slices can be assigned to 3D distributed arrays, i.e. b.dim MUST be 2.')
-                    exit()
+                    raise Exception('dmat/subsasgn3D: Only 2D slices can be assigned to 3D distributed arrays, i.e. b.dim MUST be 2.')
             else:
-                print('DMAT/SUBSASGN3D: If A and B are both distributed, assignment must be of the form A(:,:,:) = B or A(:,:,i) = B.')
-                exit()
+                raise Exception('DMAT/SUBSASGN3D: If A and B are both distributed, assignment must be of the form A(:,:,:) = B or A(:,:,i) = B.')
             # # # # # # # # # # # # # # # # # # # # # # # ADDED TO SUPPORT pMapper# # # # # # # # # # # # # # # # # # # # 
         # A(i:j, k:l, m:n) = B        
     else: 
         # RHS is not a DMAT or a DOUBLE
-        print('DMAT/subsasgn_3D: RHS must be a DOUBLE or DMAT.')
-        exit()
+        raise Exception('DMAT/subsasgn_3D: RHS must be a DOUBLE or DMAT.')
 
     if DEBUG:
         print('<-- Exiting subsasgn_3D')
 
     return a
+
+########################################################
+# pMatlab: Parallel Matlab Toolbox
+# Software Engineer: Ms. Nadya Travinin (nt@ll.mit.edu)
+# Architect:      Dr. Jeremy Kepner (kepner@ll.mit.edu)
+# MIT Lincoln Laboratory
+########################################################
+# Copyright (c) 2005, Massachusetts Institute of Technology All rights
+# reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#      * Redistributions of source code must retain the above copyright
+#        notice, this list of conditions and the following disclaimer.
+#      * Redistributions in binary form must reproduce the above copyright
+#        notice, this list of conditions and the following disclaimer in
+#        the documentation and/or other materials provided with the
+#        distribution.
+#      * Neither the name of the Massachusetts Institute of Technology nor
+#        the names of its contributors may be used to endorse or promote
+#        products derived from this software without specific prior written
+#        permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+# IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+# THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+# PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+# PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+# LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 

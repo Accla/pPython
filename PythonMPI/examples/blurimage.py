@@ -76,8 +76,7 @@ n_trial = 2
 total_ops = 2*n_trial*n_filter_x*n_filter_y*n_image_x*n_image_y
 
 if (n_image_x%comm_size):
-    print('ERROR: processors need to evenly divide image')
-    exit()
+    raise Exception('ERROR: processors need to evenly divide image')
 
 # Set who is source and who is destination.
 left = my_rank - 1

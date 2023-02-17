@@ -13,4 +13,3 @@ def intersect_mtlb(a, b):
     c = aux[:-1][aux[1:] == aux[:-1]]
     return c, ia[np.isin(a1, c)], ib[np.isin(b1, c)]
 
-

@@ -32,8 +32,8 @@ class Dmap:
     p.grid: p.dim-dimensional array of processors corresponding to how the
             object should be distributed
  
-    Author:   Nadya Travinin (pMatlab)
-              Chansup Byun (pPython)
+    Author:   Nadya Travinin
+    Python version: Dr. Chansup Byun
     """
     name = 'grid_map_class'
     
@@ -75,8 +75,7 @@ class Dmap:
                     dist_spec[d]['dist'] ='b'
             elif isinstance(dist_spec,str):
                 if dist_spec == 'bc':
-                    print('ERROR (Dmap): block-cyclic distribution also needs block size.')
-                    exit()
+                    raise Exception('ERROR (Dmap): block-cyclic distribution also needs block size.')
                 # 'b' for block & 'c' for cyclic distribution
                 tmp_dist_spec = dist_spec
                 dist_spec = dict()
@@ -87,8 +86,7 @@ class Dmap:
                 # distribution spec is provided for all directions individually
                 # dist_spec = {'0': {'dist': 'bc', 'b_size': 3}, '1': {'dist': 'b'}}
                 if len(grid_spec) != len(dist_spec):
-                    print('ERROR (Dmap): dimension does not match between grid_spec and dist_spec.')
-                    exit()
+                    raise Exception('ERROR (Dmap): dimension does not match between grid_spec and dist_spec.')
             else:
                 # dist_spec is provided as a dictionary form
                 # dist_spec['dist'] = 'b' or 'c' or 'bc'
@@ -104,14 +102,12 @@ class Dmap:
                 if (dist_spec[i]['dist'] != 'b') \
                 and (dist_spec[i]['dist'] != 'c') \
                 and (dist_spec[i]['dist'] != 'bc'):
-                    print('ERROR (Dmap): %s is not a valid distribution'%(dist_spec[i]['dist']))
-                    exit()
+                    raise Exception('ERROR (Dmap): %s is not a valid distribution'%(dist_spec[i]['dist']))
                 else:
                     # check that block size is defined for block-cyclic distributions
                     if dist_spec[i]['dist'] == 'bc':
                         if (not 'b_size' in dist_spec[i]) or (dist_spec[i]['b_size'] < 1):
-                            print('ERROR (Dmap): Block size must be specified for block-cyclic distibution')
-                            exit()
+                            raise Exception('ERROR (Dmap): Block size must be specified for block-cyclic distibution')
             self.dist_spec = dist_spec
             
             # create the grid from the processor list
@@ -124,8 +120,7 @@ class Dmap:
             # the grid
             gsize = grid.size
             if (len(proc_list) != gsize):
-                print('ERROR (Dmap): Processor list does not match the size of the grid')
-                exit()
+                raise Exception('ERROR (Dmap): Processor list does not match the size of the grid')
             else:
                 grid.reshape(gsize)[:] = proc_list[:]
         
@@ -171,14 +166,12 @@ class Dmap:
                         dist_spec[d] = dict()
                         dist_spec[d]['dist'] = tmp_dist_spec
                 else:
-                    print('ERROR (Dmap): Overlap is only supported for block distributions.')
-                    exit()
+                    raise Exception('ERROR (Dmap): Overlap is only supported for block distributions.')
             elif any(map(lambda x: isinstance(x,dict),dist_spec.values())):
                 # distribution spec is provided for all directions individually
                 # dist_spec = {0: {'dist': 'bc', 'b_size': 3}, 1: {'dist': 'b'}}
                 if len(grid_spec) != len(dist_spec):
-                    print('ERROR (Dmap): dimension does not match between grid_spec and dist_spec.')
-                    exit()
+                    raise Exception('ERROR (Dmap): dimension does not match between grid_spec and dist_spec.')
                 #
                 # Can we use overlap only certain direction with this?
                 #
@@ -186,8 +179,7 @@ class Dmap:
                 # dist_spec is provided as a dictionary form
                 # dist_spec['dist'] = 'b'
                 if dist_spec['dist'] != 'b':
-                        print('ERROR (Dmap): Overlap is only supported for block distributions.')
-                        exit()
+                        raise Exception('ERROR (Dmap): Overlap is only supported for block distributions.')
                 tmp_dist_spec = dist_spec
                 dist_spec = dict()
                 for d in range(len(grid_spec)):
@@ -196,8 +188,7 @@ class Dmap:
             for i in range(dim):
                 # check that distributions defined are consistent with {'b', 'c', 'bc'}
                 if dist_spec[i]['dist'] != 'b':
-                    print('ERROR (Dmap): Overlap is only supported for block distributions.')
-                    exit()
+                    raise Exception('ERROR (Dmap): Overlap is only supported for block distributions.')
             self.dist_spec = dist_spec
             
             # create the grid from the processor list
@@ -207,15 +198,13 @@ class Dmap:
             # the grid
             gsize = grid.size
             if (len(proc_list) != gsize):
-                print('ERROR (Dmap): Processor list does not match the size of the grid')
-                exit()
+                raise Exception('ERROR (Dmap): Processor list does not match the size of the grid')
             else:
                 grid.reshape(gsize)[:] = proc_list[:]
             self.grid = grid
         
             if len(overlap) != self.dim:
-                print('RROR (Dmap): Overlap must be specified for all of the dimensions of the map.')
-                exit()
+                raise Exception('RROR (Dmap): Overlap must be specified for all of the dimensions of the map.')
 
             # if the maps are created within the scope of MPI_COMM_WORLD
             # then the processor list is checked against current
@@ -267,4 +256,39 @@ class Dmap:
         print('   Distribution type: %s'%(str(self.dist_spec)))
         print('   Process Pid list: %s'%(str(self.proc_list)))
         print('   Overlap mapping: %s'%(str(self.overlap)))
+        return
 
+########################################################
+# pMatlab: Parallel Matlab Toolbox
+# Software Engineer: Ms. Nadya Travinin (nt@ll.mit.edu)
+# Architect:      Dr. Jeremy Kepner (kepner@ll.mit.edu)
+# MIT Lincoln Laboratory
+########################################################
+# Copyright (c) 2005, Massachusetts Institute of Technology All rights
+# reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#      * Redistributions of source code must retain the above copyright
+#        notice, this list of conditions and the following disclaimer.
+#      * Redistributions in binary form must reproduce the above copyright
+#        notice, this list of conditions and the following disclaimer in
+#        the documentation and/or other materials provided with the
+#        distribution.
+#      * Neither the name of the Massachusetts Institute of Technology nor
+#        the names of its contributors may be used to endorse or promote
+#        products derived from this software without specific prior written
+#        permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+# IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+# THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+# PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+# PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+# LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

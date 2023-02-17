@@ -54,7 +54,7 @@ if (PARALLEL):
     #  dist['2']=dict(); dist['2']['dist']='c'
     #  Zmap = Dmap([1, 1, Np],dist,range(Np))
 
-Z = zeros(N,N,Ns,pmap=Zmap)           # Create distributed array.
+Z = zeros(N,N,Ns,map=Zmap)           # Create distributed array.
 
 S = np.linspace(Sstart,Send,Ns)  # Compute scale factors.
 print('Zooming frames...')

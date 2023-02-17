@@ -61,12 +61,11 @@ def pyMPI_Comm_settings_local(machine_db_settings):
                 python_location = '/opt/anaconda3/bin/python'
                 machine_db_settings['python_command'] = python_location + ' -u '
             else:
-            	print('Error (pyMPI_Comm_settings_local): unsupported OS.')
-            	exit()
+                raise Exception('Error (pyMPI_Comm_settings_local): unsupported OS.')
         else:
             # Assuming running on LLSC
-         	machine_db_settings['python_module_path'] = '/etc/environment-modules/modules'
-         	machine_db_settings['python_module_name'] = 'anaconda/2022a'
+            machine_db_settings['python_module_path'] = '/etc/environment-modules/modules'
+            machine_db_settings['python_module_name'] = 'anaconda/2022a'
 
     machine_db_settings['python_command_llsc'] = python_location + ' -u '
 
@@ -75,3 +74,28 @@ def pyMPI_Comm_settings_local(machine_db_settings):
 
     return machine_db_settings
 
+########################################################
+# PythonMPI
+# Dr. Jeremy Kepner & Dr. Chansup Byun
+# MIT Lincoln Laboratory
+# kepner@ll.mit.edu & cbyun@ll.mit.edu
+########################################################
+# Copyright 2023 Massachusetts Institute of Technology
+#
+# Permission is herby granted, without payment, to copy, modify, display
+# and distribute this software and its documentation, if any, for any
+# purpose, provided that the above copyright notices and the following
+# three paragraphs appear in all copies of this software.  Use of this
+# software constitutes acceptance of these terms and conditions.
+#
+# IN NO EVENT SHALL MIT BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+# SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OF
+# THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF MIT HAS BEEN ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
+# MIT SPECIFICALLY DISCLAIMS ANY EXPRESS OR IMPLIED WARRANTIES INCLUDING,
+# BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+# FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+#
+# THIS SOFTWARE IS PROVIDED "AS IS," MIT HAS NO OBLIGATION TO PROVIDE
+# MAINTENANCE, SUPPORT, UPDATE, ENHANCEMENTS, OR MODIFICATIONS.

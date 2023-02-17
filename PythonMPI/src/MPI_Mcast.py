@@ -25,7 +25,7 @@ def MPI_Mcast(source, dest, tag, comm, *argv):
     Sender blocks until all the messages are received,
     unless pyMPI_Save_messages(1) has been called.
     
-    Python author: Dr. Chansup Byun
+    Python version: Dr. Chansup Byun
     2022-12-06: Update to support the message kernel using local filesystem
     """
     
@@ -318,13 +318,28 @@ def MPI_Mcast(source, dest, tag, comm, *argv):
         print('<-- Exiting MPI_Mcast.')
     return argv
 
-    """
-    Python version: 
-    Dr. Chansup Byun
-    cbyun@ll.mit.edu
-    
-    MatlabMPI: 
-    Dr. Jeremy Kepner
-    MIT Lincoln Laboratory
-    kepner@ll.mit.edu
-    """
+########################################################
+# MatlabMPI
+# Dr. Jeremy Kepner
+# MIT Lincoln Laboratory
+# kepner@ll.mit.edu
+########################################################
+# Copyright 2002 Massachusetts Institute of Technology
+#
+# Permission is herby granted, without payment, to copy, modify, display
+# and distribute this software and its documentation, if any, for any
+# purpose, provided that the above copyright notices and the following
+# three paragraphs appear in all copies of this software.  Use of this
+# software constitutes acceptance of these terms and conditions.
+#
+# IN NO EVENT SHALL MIT BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+# SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OF
+# THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF MIT HAS BEEN ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
+# MIT SPECIFICALLY DISCLAIMS ANY EXPRESS OR IMPLIED WARRANTIES INCLUDING,
+# BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+# FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+#
+# THIS SOFTWARE IS PROVIDED "AS IS," MIT HAS NO OBLIGATION TO PROVIDE
+# MAINTENANCE, SUPPORT, UPDATE, ENHANCEMENTS, OR MODIFICATIONS.

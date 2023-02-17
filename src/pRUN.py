@@ -42,8 +42,7 @@ LOCAL_PYTHONMPI_CONFIG_PATH = os.getenv('HOME')+os.sep+'ppython_conf'
 if os.path.exists(LOCAL_PYTHONMPI_CONFIG_PATH):
     sys.path.append(LOCAL_PYTHONMPI_CONFIG_PATH)
 else:
-    print('ERROR(pRUN): LOCAL_PYTHONMPI_CONFIG_PATH path, %s, does not exist.'%(LOCAL_PYTHONMPI_CONFIG_PATH))
-    exit()
+    raise Exception('ERROR(pRUN): LOCAL_PYTHONMPI_CONFIG_PATH path, %s, does not exist.'%(LOCAL_PYTHONMPI_CONFIG_PATH))
 
 if os.path.exists(PYTHONMPI_PATH):
     sys.path.append(PPYTHON_PATH)
@@ -51,10 +50,9 @@ if os.path.exists(PYTHONMPI_PATH):
     # from PythonMPI import *
     from pyMPI_Delete_all import *
     from pyMPI_Sleep import *
-    print('Minimum PythonMPI functions are loaded for pRUN().')
+    # print('Minimum PythonMPI functions are loaded for pRUN().')
 else:
-    print('ERROR(pRUN): PythonMPI package path, %s, does not exist.'%(PYTHONMPI_PATH))
-    exit()
+    raise Exception('ERROR(pRUN): PythonMPI package path, %s, does not exist.'%(PYTHONMPI_PATH))
     
 if os.path.exists(GRIDPYTHON_PATH):
     import grid_config as grid
@@ -64,10 +62,10 @@ if os.path.exists(GRIDPYTHON_PATH):
     from grid_config_init import *
     from grid_run import *
     from check_runtime import *
-    print('gridPython functions are loaded......')
+    # print('gridPython functions are loaded......')
 else:
-    print('ERROR(pRUN): gridPython package path, %s, does not exist.'%(GRIDPYTHON_PATH))
-    exit()
+    raise Exception('ERROR(pRUN): gridPython package path, %s, does not exist.'%(GRIDPYTHON_PATH))
+print(' ')
 
 def pRUN(py_file,n_proc,machines,sched_options=None):
     """Launch a PythonMPI script on a grid environment with a scheduler.
@@ -88,7 +86,8 @@ def pRUN(py_file,n_proc,machines,sched_options=None):
         []: running on the local machine
         ['machine_a','machine_b',...]: a list of machines to dispatch the job
     sched_options: additional scheduler options when using the scheduler [ToDo]
-    
+
+    Python version: Dr. Chansup Byun
     """
     
     # At this point, grid_config should be set.
@@ -184,3 +183,38 @@ def pRUN(py_file,n_proc,machines,sched_options=None):
 
     if DEBUG:
         print('<-- Exiting pRUN')
+
+########################################################
+# pMatlab: Parallel Matlab Toolbox
+# Software Engineer: Ms. Nadya Travinin (nt@ll.mit.edu)
+# Architect:      Dr. Jeremy Kepner (kepner@ll.mit.edu)
+# MIT Lincoln Laboratory
+########################################################
+# Copyright (c) 2005, Massachusetts Institute of Technology All rights 
+# reserved.
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are 
+# met:
+#      * Redistributions of source code must retain the above copyright 
+#        notice, this list of conditions and the following disclaimer.
+#      * Redistributions in binary form must reproduce the above copyright 
+#        notice, this list of conditions and the following disclaimer in
+#        the documentation and/or other materials provided with the
+#        distribution.
+#      * Neither the name of the Massachusetts Institute of Technology nor 
+#        the names of its contributors may be used to endorse or promote 
+#        products derived from this software without specific prior written 
+#        permission.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+# IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+# THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+# PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+# PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+# LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

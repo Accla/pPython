@@ -61,8 +61,7 @@ def pyMPI_Dir_translate(machine_db,path):
         sgrp_3_base = machine_db['local_dir_map'][6]
         sgrp_3_n    = len(sgrp_3_base);
     else:
-        print('Error (pyMPI_Dir_translate): local directory map not defined in machine_db (local_dir_map)')
-        exit()
+        raise Exception('Error (pyMPI_Dir_translate): local directory map not defined in machine_db (local_dir_map)')
 
     # Check which OS is compatiable with the given path
     if re.search(pc_base,path,re.IGNORECASE):
@@ -87,8 +86,7 @@ def pyMPI_Dir_translate(machine_db,path):
         n_base = sgrp_3_n
         is_sgrp_3_path = 1
     else:
-        print('Error (pyMPI_Dir_translate): given path, %s, is not compatible with local directory map.'%(path))
-        exit()
+        raise Exception('Error (pyMPI_Dir_translate): given path, %s, is not compatible with local directory map.'%(path))
 
     if DEBUG:
         print('n_base = %d'%(n_base))
@@ -129,3 +127,28 @@ def pyMPI_Dir_translate(machine_db,path):
         print('<-- Exiting pyMPI_Dir_translate')
     return local_path
 
+########################################################
+# PythonMPI
+# Dr. Jeremy Kepner & Dr. Chansup Byun
+# MIT Lincoln Laboratory
+# kepner@ll.mit.edu & cbyun@ll.mit.edu
+########################################################
+# Copyright 2023 Massachusetts Institute of Technology
+#
+# Permission is herby granted, without payment, to copy, modify, display
+# and distribute this software and its documentation, if any, for any
+# purpose, provided that the above copyright notices and the following
+# three paragraphs appear in all copies of this software.  Use of this
+# software constitutes acceptance of these terms and conditions.
+#
+# IN NO EVENT SHALL MIT BE LIABLE TO ANY PARTY FOR DIRECT, INDIRECT,
+# SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OF
+# THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF MIT HAS BEEN ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+#
+# MIT SPECIFICALLY DISCLAIMS ANY EXPRESS OR IMPLIED WARRANTIES INCLUDING,
+# BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+# FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+#
+# THIS SOFTWARE IS PROVIDED "AS IS," MIT HAS NO OBLIGATION TO PROVIDE
+# MAINTENANCE, SUPPORT, UPDATE, ENHANCEMENTS, OR MODIFICATIONS.

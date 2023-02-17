@@ -83,8 +83,7 @@ if(comm_size > 1):
         [t1, t2] = MPI_Bcast( source, tag, comm, data, data )
         # Check data.
         if(np.count_nonzero(t1 - data)>0):
-            print('ERROR: incorrect data sent.')
-            exit()
+            raise Exception('ERROR: incorrect data sent.')
 
 print('SUCCESS');
 # Finalize Matlab MPI.

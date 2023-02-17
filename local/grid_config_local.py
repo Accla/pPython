@@ -42,6 +42,7 @@ def grid_config_local(grid_config):
                          to True (automatically set when there is no resources available for immediate job 
                          launch for backgrounded triples mode job)
 
+    Author: Dr. Chansup Byun
     """
 
     # Define grid configuration parameters
@@ -83,8 +84,7 @@ def grid_config_local(grid_config):
         elif cluster_name == 'txe1':
             grid_config['remote_user'] = 'cbyun'
         else:
-            print('grid_config_local: Unsupported system. Exited.')
-            exit()
+            raise Exception('grid_config_local: Unsupported system. Exited.')
     else:
         # The following line will not work if local username is differen from the grid username
         grid_config['remote_user'] = USER
@@ -96,7 +96,6 @@ def grid_config_local(grid_config):
         grid_config['remote_host'] = 'txe1-login.mit.edu'
     else:
         # print('grid_config_local: Unsupported system. Exited.')
-        # exit()
         print('grid_config_local: This is not a LLSC system. ')
 
     grid_config['remote_launch'] = 'ssh'
@@ -133,7 +132,7 @@ def grid_config_local(grid_config):
     # pPython installation path
     try:
         PPYTHON_HOME = os.getenv('PPYTHON_HOME')
-        print('grid_config_local: PPYTHON_HOME = %s'%(PPYTHON_HOME))
+        # print('grid_config_local: PPYTHON_HOME = %s'%(PPYTHON_HOME))
         PPYTHON_PATH = PPYTHON_HOME+os.sep+"src"
         # PythonMPI installation path
         PYTHONMPI_PATH = PPYTHON_HOME+os.sep+"PythonMPI"+os.sep+"src"
@@ -147,8 +146,7 @@ def grid_config_local(grid_config):
         # Current working directory path
         CWD_PATH = os.getcwd()
     except Exception:
-        print('grid_config_local: Failed to setup environment variables')
-        exit()
+        raise Exception('grid_config_local: Failed to setup environment variables')
 
 
     # Additional paths for PGAS using the distributed map and array construction
@@ -188,3 +186,37 @@ def grid_config_local(grid_config):
 
     return grid_config
 
+########################################################
+# pPython: Parallel Python Programming Tool
+# Dr. Jeremy Kepner and Dr. Chansup Byun
+# (kepner@ll.mit.edu and cbyun@ll.mit.edu)
+# MIT Lincoln Laboratory
+########################################################
+# Copyright (c) 2023, Massachusetts Institute of Technology All rights
+# reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#      * Redistributions of source code must retain the above copyright
+#        notice, this list of conditions and the following disclaimer.
+#      * Redistributions in binary form must reproduce the above copyright
+#        notice, this list of conditions and the following disclaimer in
+#        the documentation and/or other materials provided with the
+#        distribution.
+#      * Neither the name of the Massachusetts Institute of Technology nor
+#        the names of its contributors may be used to endorse or promote
+#        products derived from this software without specific prior written
+#        permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+# IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+# THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+# PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+# PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+# LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

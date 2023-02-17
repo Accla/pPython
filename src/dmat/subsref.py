@@ -21,9 +21,9 @@ def subsref(a,s):
     control the user has of private members of the MAP object. SUBSREF
     might be replaced by getter functions.
     
-    Python version: Dr. Chansup Byun
     Author:  Nadya Travinin
     Edited:  Edmund L. Wong (elwong@ll.mit.edu)
+    Python version: Dr. Chansup Byun
     """
     DEBUG = 0
     if DEBUG:
@@ -52,8 +52,7 @@ def subsref(a,s):
             elif s[0]['subs']=='overlap':
                 b = a.overlap
             else:
-                print('%s is not a field of Dmap.'%(s['subs']))
-                exit()
+                raise Exception('%s is not a field of Dmap.'%(s['subs']))
         if DEBUG:
             print(b)
         # recursive call
@@ -75,8 +74,7 @@ def subsref(a,s):
             elif s['subs']=='overlap':
                 b = a.overlap
             else:
-                print('%s is not a field of Dmap.'%(s['subs']))
-                exit()
+                raise Exception('%s is not a field of Dmap.'%(s['subs']))
     if DEBUG:
         print('<--> Exiting subsref for Dmap objects')
     return b
@@ -120,11 +118,9 @@ def subsref(a,s):
     if stype=='()': #subscripting type
         # TODO eventually support < cases
         if len(subs) > ndims(a):
-            print('@dmat/subsref: Too many dimensions')
-            exit()
+            raise Exception('@dmat/subsref: Too many dimensions')
         elif len(subs) < ndims(a):
-            print('@dmat/subsref: Too few dimensions')
-            exit()
+            raise Exception('@dmat/subsref: Too few dimensions')
 
         #set submat flag to 0
         submat_flag = 0
@@ -139,8 +135,7 @@ def subsref(a,s):
                     #adjust submat flag
                     submat_flag = 1
                 elif subs[i] > sizeA[i]: # && i <= ndims(a)
-                    print('@dmat/subsref: Index exceeds dmat dimensions')
-                    exit()
+                    raise Exception('@dmat/subsref: Index exceeds dmat dimensions')
     
         if not submat_flag: #if reference consist of combinations of : and single numbers, use this code
             # expand the dimensions if needed
@@ -181,8 +176,7 @@ def subsref(a,s):
                     if len(subs[i]) == 1:
                         if subs[i] != ':':
                             if subs[i] < 1 or subs[i] > sizeB[i]:
-                                print('@dmat/subsref: The %d-th subscript exceeds size of dmat'%(i))
-                                exit()
+                                raise Exception('@dmat/subsref: The %d-th subscript exceeds size of dmat'%(i))
     
                             # figure out distribution
                             if distA[i]['dist']=='b':
@@ -206,8 +200,7 @@ def subsref(a,s):
                                 idx = idx%size(gridA, i)
     
                             else:
-                                print('@dmat/subsref: Unsupported distribution type: %s'%(distA.type))
-                                exit()
+                                raise Exception('@dmat/subsref: Unsupported distribution type: %s'%(distA.type))
                             #
                             # Set up the subscripts.
                             #
@@ -218,8 +211,7 @@ def subsref(a,s):
                             s_map['subs'][i] = ':'
                             s_data['subs'][i] = ':'
                     else:
-                        print('@dmat/subsref: Unsupported subscript: %s'%(subs[i]))
-                        exit()
+                        raise Exception('@dmat/subsref: Unsupported subscript: %s'%(subs[i]))
                 #
                 # Find the map that would contain these processors and create a
                 # dmat using this map.
@@ -259,8 +251,7 @@ def subsref(a,s):
         elif subs == 'map':
             b = a.map
         else:
-            print('@dmat/subsref: %s cannot be accessed directly or is not a field of DMAT.'%(subs))
-            exit()
+            raise Exception('@dmat/subsref: %s cannot be accessed directly or is not a field of DMAT.'%(subs))
     #
     # Recursive call
     #
@@ -273,3 +264,38 @@ def subsref(a,s):
         print('<--> Exiting subsref for distributed objects')
     return b
     
+########################################################
+# pMatlab: Parallel Matlab Toolbox
+# Software Engineer: Ms. Nadya Travinin (nt@ll.mit.edu)
+# Architect:      Dr. Jeremy Kepner (kepner@ll.mit.edu)
+# MIT Lincoln Laboratory
+########################################################
+# Copyright (c) 2005, Massachusetts Institute of Technology All rights
+# reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#      * Redistributions of source code must retain the above copyright
+#        notice, this list of conditions and the following disclaimer.
+#      * Redistributions in binary form must reproduce the above copyright
+#        notice, this list of conditions and the following disclaimer in
+#        the documentation and/or other materials provided with the
+#        distribution.
+#      * Neither the name of the Massachusetts Institute of Technology nor
+#        the names of its contributors may be used to endorse or promote
+#        products derived from this software without specific prior written
+#        permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+# IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+# THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+# PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
+# CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+# EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+# PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+# PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+# LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+

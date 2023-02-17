@@ -73,8 +73,7 @@ delay = 30
 synch_start(comm,starter_rank,delay)
 
 if(comm_size < 2):
-    print('ERROR: too few processors (need at least 2)')
-    exit()
+    raise Exception('ERROR: too few processors (need at least 2)')
 
 # Set who is source and who is destination.
 source = my_rank - 1
@@ -128,8 +127,7 @@ for i_message in range(n_message):
 
         # Check data.
         if np.count_nonzero(recv_data - source):
-            print('ERROR: incorrect data sent.')
-            exit()
+            raise Exception('ERROR: incorrect data sent.')
 
         # Increment message tag.
         tag = tag + 1

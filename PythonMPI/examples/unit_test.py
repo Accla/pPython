@@ -66,8 +66,7 @@ def unit_test( py_file, n_proc, machines, time_limit, time_check ):
         pyMPI_Sleep(1.0)
         file_list = glob(myfileStr)
         if (loop>10):
-            print('Failed to find the output, %s'%(myfileStr))
-            exit()
+            raise Exception('Failed to find the output, %s'%(myfileStr))
         loop += 1
     # print(file_list)
     i_check = 1
