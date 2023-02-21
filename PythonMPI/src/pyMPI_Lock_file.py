@@ -25,6 +25,7 @@ def pyMPI_Lock_file(source, dest, tag, comm, **argv):
     
     Python version: Dr. Chansup Byun
     2022-12-05: Updated to support message kernel using local filesystem (Dr. Chansup Byun)
+    2023-02-17: Updated to support mixed message kernels using central and local filesystem (Dr. Chansup Byun)
     """
     DEBUG = 0
     if DEBUG:
@@ -52,33 +53,46 @@ def pyMPI_Lock_file(source, dest, tag, comm, **argv):
         print('destination:',end="")
         print(dest)
         print("")
+    machine_id_source = comm['machine_id'][source]
     machine_id_dest = comm['machine_id'][dest]
 
     # grid_job
     grid_job = False
     if 'grid_config' in comm:
         grid_job = comm['grid_config']['grid_job']
+        mixed_fs = comm['grid_config']['mixed_fs']
 
     if local_fs:
-        # if using local filesystem
-        if (msg_type == 'send'):
-            # Send process
-            if innode:
-                # if in-node message, temporary directory is the same for the destination process
-                # this allows for source process to exit before the message is received by the receiver
-                dir = comm['tmpdir'][machine_id_dest]
+        # if mixed_fs = 1 and either sender or receiver is Pid = 0 (machine id = 0), use the central filesystem
+        if mixed_fs and (machine_id_source == 0 or machine_id_dest == 0):
+            # Using a central filesystem
+            if source == '*':
+                dir = '*'
             else:
-                # if out-of-node message, temporary directory is for the source process before scp
-                if source == '*':
-                    dir = '*'
+                machine_id_source = comm['machine_id'][source]
+                dir = comm['machine_db']['dir'][machine_id_source]
+            if DEBUG:
+                print('pyMPI_Lock_file.py: Using a central filesystem.')
+        else: 
+            # if using local filesystem
+            if (msg_type == 'send'):
+                # Send process
+                if innode:
+                    # if in-node message, temporary directory is the same for the destination process
+                    # this allows for source process to exit before the message is received by the receiver
+                    dir = comm['tmpdir'][machine_id_dest]
                 else:
-                    machine_id_source = comm['machine_id'][source]
-                    dir = comm['tmpdir'][machine_id_source]
-        else:
-            # Receive process
-            # Regardless of in-node or out-of-node messages, 
-            # temporary directory is the same for the destination process
-            dir = comm['tmpdir'][machine_id_dest]
+                    # if out-of-node message, temporary directory is for the source process before scp
+                    if source == '*':
+                        dir = '*'
+                    else:
+                        machine_id_source = comm['machine_id'][source]
+                        dir = comm['tmpdir'][machine_id_source]
+            else:
+                # Receive process
+                # Regardless of in-node or out-of-node messages, 
+                # temporary directory is the same for the destination process
+                dir = comm['tmpdir'][machine_id_dest]
     else:
         # Using a central filesystem
         if source == '*':
@@ -88,7 +102,7 @@ def pyMPI_Lock_file(source, dest, tag, comm, **argv):
             dir = comm['machine_db']['dir'][machine_id_source]
 
     # Translate dir if needed
-    if grid_job and (not local_fs):
+    if grid_job and ((not local_fs) or (mixed_fs and (machine_id_source == 0 or machine_id_dest == 0))):
         if dir != '*':
             dir = pyMPI_Dir_translate(comm['machine_db'],dir)
 

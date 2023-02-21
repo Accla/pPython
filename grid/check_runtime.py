@@ -196,9 +196,18 @@ def check_runtime( n_proc, machines, grid_config ):
         local_fs = 0
     grid_config['local_fs'] = local_fs
     # Check compatibality between interactive job versus messaging kernel using local filesystem
+    grid_config['mixed_fs'] = 0
     if local_fs and (grid_job==True):
         if interactive:
-            raise Exception('ERROR(pRUN_Parallel_wrapper): Interactive grid job does not support message using local filesystem. Use backgrounded mode.')
+            if grid_config['EPPAC'] :
+                # triples mode jobs
+                # Turn on mixed messaging kernel to support communication between the head process (Pid = 0) and the rest
+                # with a shared filesystem based messaging kernel while all other communication is accomplished by using
+                # a local filesystem based messaging kernel
+                grid_config['mixed_fs'] = 1
+            else:
+                # non triples mode jobs
+                raise Exception('ERROR(pRUN_Parallel_wrapper): Interactive non-triples mode grid job does not support the default messaging kernel using local filesystem. \nUse either the messaging kernel using the central filesystem or run as a backgrounded job.')
 
     if DEBUG:
         print('OS.islocal = %d'%(OS.islocal))

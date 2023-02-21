@@ -73,13 +73,22 @@ def slurm2hostmap():
     if DEBUG:
         print('slurm2hostmap: nTasks = %d' %(nTasks))
     
+    ## Mixed messaging kernel enhancement
+    #
+    mixed_fs = grid.grid_config['mixed_fs']
+    if mixed_fs:
+        leader = 1
+    else:
+        leader = 0
+
     ## Prelimenary implementation
     #
     # Rank 0 process obtains the host-to-rank map information from the scheduler
     # TaskID (#K), JobID (#A), NodeName (#N) from the squeue command
     iter = 0
     hostmap = dict()
-    if Pid == 0:
+
+    if Pid == leader:
         # Extract the host-to-rank map information and save to other processes to read it from
         # Create the remote execution command object
         ecmd = ExecShellCmd(set_remote_cc())
@@ -128,10 +137,11 @@ def slurm2hostmap():
                     if len(tmp)<3:
                         continue
                     else:
-                        jobArrayIndex = tmp[0]
+                        # if mixed messaging kernel, the first host is local machine
+                        jobArrayIndex = int(tmp[0]) + mixed_fs
                         jobNumber = tmp[1]
                         slurm_node = tmp[2]
-                    hostmap[int(jobArrayIndex)] = jobArrayIndex+' '+jobNumber+' '+slurm_node
+                    hostmap[jobArrayIndex] = str(jobArrayIndex)+' '+jobNumber+' '+slurm_node
             else:
                 # Not a batch job
                 for j in range(nProcs):
@@ -169,7 +179,7 @@ def slurm2hostmap():
                         jobArrayIndex = tmp[0]
                         jobNumber = tmp[1]
                         slurm_node = tmp[2]
-                    hostmap[int(jobArrayIndex)] = jobArrayIndex+' '+jobNumber+' '+slurm_node            
+                    hostmap[jobArrayIndex] = str(jobArrayIndex)+' '+jobNumber+' '+slurm_node
             
             if iter > maxIteration:
                 raise Exception('ERROR(slurm2hostmap): failed to get hostmap within the maximum iteration.')
@@ -219,39 +229,53 @@ def slurm2hostmap():
     MPI_COMM_WORLD['leader'] = np.zeros(nProcs,dtype=int)
     MPI_COMM_WORLD['pidmax'] = np.zeros(nProcs,dtype=int)
     # Slurm plugin set TMPDIR differently between array job and srun job
-    tmpdir  = os.getenv('TMPDIR').split('.')
+    if not (mixed_fs and Pid == 0):
+        # With interactive triples mode/job, the Pid = 0 process is running on a local machine
+        # So no TMPDIR defined in general.
+        tmpdir  = os.getenv('TMPDIR').split('.')
     
     if EPPAC:
         # For the triples mode jobs
-        # nTasks is equivalent to number of compute nodes
+        # nTasks is equivalent to number of compute nodes on the grid
         for i in range(nTasks):
             # hostmap key is a positive integer 
-            tmp = hostmap[i+1].split()
+            # Adjust for mixed messaging kernel
+            tmp = hostmap[i+1+mixed_fs].split()
             if DEBUG:
-                print('Slurm TaskID: %s, JobID: %s, Hostname: %s'%(tmp[0],tmp[1],tmp[2]))
+                # print('Slurm TaskID: %s, JobID: %s, Hostname: %s'%(tmp[0],tmp[1],tmp[2]))
+                print('pPython Machine ID: %s, JobID: %s, Hostname: %s'%(tmp[0],tmp[1],tmp[2]))
             my_node_rank = int(tmp[0])-1
+            # tmp[2] is compute node name
             MPI_COMM_WORLD['local_pids'][tmp[2]]=[]
+            # Adjust for mixed messaging kernel
+            if DEBUG:
+                print('store %s at %d in machine_db:machine'%(tmp[2],i+mixed_fs))
+            MPI_COMM_WORLD['machine_db']['machine'][i+mixed_fs] = tmp[2]
+            #
+            if not (mixed_fs and Pid == 0):
+                # Skip if Pid = 0 with mixed_fs = 1
+                # Otherwise, set MPI_COMM_WORLD['tmpdir'][i+mixed_fs]
+                if grid.grid_config['srun']:
+                    MPI_COMM_WORLD['tmpdir'][i+mixed_fs] = '/state/partition1/slurm_tmp/'+tmp[1]+'.'+tmpdir[1]+'.'+str(my_node_rank)
+                else:
+                   MPI_COMM_WORLD['tmpdir'][i+mixed_fs] = '/state/partition1/slurm_tmp/'+tmp[1]+'.'+tmpdir[1]+'.'+tmpdir[2]
+                if DEBUG:
+                   print("slurm2hostmap: MPI_COMM_WORLD['tmpdir'][%d] = %s"%(i+mixed_fs,MPI_COMM_WORLD['tmpdir'][i+mixed_fs]))
             for j in range(nppn):
-                ipos = my_node_rank*nppn+j
+                ipos = (my_node_rank - mixed_fs)*nppn+j 
+                if i == 0 and j == 0 and mixed_fs:
+                    # when mixed_fs, the Pid = 0 is local process.
+                    # skip
+                    continue
                 if (ipos > nProcs-1):
                     # skip
                     continue
-                # ToDo: determine which one is better, machine_id or rank?
-                # MPI_COMM_WORLD['machine_db']['machine'][ipos] = tmp[2]
-                MPI_COMM_WORLD['machine_db']['machine'][i] = tmp[2]
-                if grid.grid_config['srun']:
-                    # ToDo: determine which one is better, machine_id or rank?
-                    # MPI_COMM_WORLD['tmpdir'][ipos] = '/state/partition1/slurm_tmp/'+tmp[1]+'.'+tmpdir[1]+'.'+my_node_rank
-                    MPI_COMM_WORLD['tmpdir'][i] = '/state/partition1/slurm_tmp/'+tmp[1]+'.'+tmpdir[1]+'.'+str(my_node_rank)
-                    if DEBUG:
-                        print("slurm2hostmap: MPI_COMM_WORLD['tmpdir'][%d] = %s"%(ipos,MPI_COMM_WORLD['tmpdir'][i]))
-                else:
-                    # ToDo: determine which one is better, machine_id or rank?
-                    # MPI_COMM_WORLD['tmpdir'][ipos] = '/state/partition1/slurm_tmp/'+tmp[1]+'.'+tmpdir[1]+'.'+tmpdir[2]
-                    MPI_COMM_WORLD['tmpdir'][i] = '/state/partition1/slurm_tmp/'+tmp[1]+'.'+tmpdir[1]+'.'+tmpdir[2]
                 # Introduce pid list for those on the same compute ndoe 
                 MPI_COMM_WORLD['local_pids'][tmp[2]].append(ipos)
         machines = MPI_COMM_WORLD['machine_db']['machine']
+        if mixed_fs:
+            # machines[0]]  is the local machine and always executes Pid = 0 process
+            MPI_COMM_WORLD['local_pids'][machines[0]] = [0]
     else:
         # As a Slurm array job (not a triples mode job, though)
         for i in range(nProcs):
@@ -274,6 +298,8 @@ def slurm2hostmap():
         print('pidlist:')
         print(pidlist)
         # print(grid.grid_config)
+
+    # for hostname in sorted( set( machines.values() ) ):
     for hostname in sorted( set( machines.values() ) ):
         local_pid_list = MPI_COMM_WORLD['local_pids'][hostname]
         # Assuming that the key is equivalent the Pid of pPython process
@@ -285,16 +311,19 @@ def slurm2hostmap():
             MPI_COMM_WORLD['pidmax'][i] = pidmax
 
     if DEBUG:
+        print("MPI_COMM_WORLD['machine_id']")
+        print(MPI_COMM_WORLD['machine_id'])
         print("MPI_COMM_WORLD['machine_db']['machine']")
         print(MPI_COMM_WORLD['machine_db']['machine'])
-        print("MPI_COMM_WORLD['tmpdir']")
-        print(MPI_COMM_WORLD['tmpdir'])
         print("MPI_COMM_WORLD['leader']")
         print(MPI_COMM_WORLD['leader'])
         print("MPI_COMM_WORLD['pidmax']")
         print(MPI_COMM_WORLD['pidmax'])
         print("MPI_COMM_WORLD['local_pids']")
         print(MPI_COMM_WORLD['local_pids'])
+        if not (mixed_fs and Pid == 0):
+            print("MPI_COMM_WORLD['tmpdir']")
+            print(MPI_COMM_WORLD['tmpdir'])
         print('<-- Exiting slurm2hostmap')
     return
 

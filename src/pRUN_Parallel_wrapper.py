@@ -54,9 +54,10 @@ def pRUN_Parallel_wrapper(py_file):
         print('pRUN_Parallel_Wrapper: local_fs = %d'%(local_fs))
         print(' ')
 
-    if interactive == 0 and (grid_job==True) and EPPAC:
-        # update MPI_COMM_WORLD
+    if (grid_job==True) and EPPAC:
         tic = timer()
+        # update MPI_COMM_WORLD
+        # add mixed messaging kernel support
         slurm2hostmap()
         h2mtime = timer()-tic
         GPC.comm = MPI_COMM_WORLD
