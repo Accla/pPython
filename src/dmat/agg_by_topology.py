@@ -168,7 +168,7 @@ def agg_by_topology(d):
         # Find the next power of two number
         k = 0
         POTN = 1
-        while ( Np > POTN):
+        while ( nproc > POTN):
             k = k + 1
             POTN = POTN * 2
         if DEBUG:
@@ -244,7 +244,7 @@ def agg_by_topology(d):
                     print('  myPidPos+1 = %d, fromRank = %d' %(myPidPos+1,pid_keep[myPidPos]))
                 #CB if ~isempty(find(leader_pid_list==fromRank))
                 # Only receive data if fromRank is in the leader processor list
-                if myPidPos <= nproc:
+                if myPidPos < nproc:
                     # Recover the real Pid
                     fromRank = leader_pid_list[myPidPos]
                     if DEBUG:

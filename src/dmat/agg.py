@@ -7,6 +7,7 @@ from MPI_Send import *
 
 import pPython as GPC
 from Dmat import *
+import grid_config as grid
 
 from inmap import *
 from reconstruct import *
@@ -46,9 +47,17 @@ def agg(d, leader=None):
     if Np == 1:
         mat = d.local
         return mat
+    mixed_fs = grid.grid_config['mixed_fs']
 
     # Use topology-aware agg() if this is a triple mode job
     PIDSTART = os.getenv('PIDSTART',default='')
+    if mixed_fs and Pid==0:
+        # For interactive triples mode jobs using mixed messaging kernels
+        # The local pPython process (Pid = 0)
+        PIDSTART = '0'
+        os.environ['PIDSTART'] = PIDSTART
+        os.environ['PIDEND'] = PIDSTART
+
     print('PIDSTART = %s'%(PIDSTART))
     if len(PIDSTART):
         print(' ')
