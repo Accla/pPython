@@ -40,6 +40,9 @@ def MPI_Bcast( source, tag, comm, *argv ):
 
     # Check whether to use local filesystem or not
     grid_config = comm['grid_config']
+    # Check if using mixed messaging kernels for interactive triples mode jobs
+    if DEBUG:
+        mixed_fs = grid_config['mixed_fs']
     if grid_config['local_fs'] == 1 :
         local_fs  = 1
         tmpdir = comm['tmpdir']
@@ -52,10 +55,6 @@ def MPI_Bcast( source, tag, comm, *argv ):
     if DEBUG:
         if local_fs:
             print('Use local filesystem:')
-            #
-            # With the triples mode, we need to use machine id, instead of rank.
-            #
-            print('--> MPI_Bcast: source rank = %d, host = %s, local path = %s' %(my_rank,machines[machine_id_rank],tmpdir[machine_id_rank]))
 
     # Set some strings for special characters.
     qq = '"'
@@ -105,7 +104,15 @@ def MPI_Bcast( source, tag, comm, *argv ):
         # source is the smallest Pid among the destination
         source = min(destINN)
         if DEBUG:
+            #
+            # With the triples mode, we need to use machine id, instead of rank.
+            #
+            if mixed_fs and my_rank == 0:
+                print('--> MPI_Bcast: source rank = %d, host = %s' %(my_rank,machines[machine_id_rank]))
+            else:
+                print('--> MPI_Bcast: source rank = %d, host = %s, local path = %s' %(my_rank,machines[machine_id_rank],tmpdir[machine_id_rank]))
             print('--> calling MPI_Mcast among the processes on the same compute node.')
+            print('')
             print('source: %d' %(source))
             print('destination:',end=" ")
             print(destINN)
