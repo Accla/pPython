@@ -29,7 +29,7 @@ else:
 os.environ['PPYTHON_LOCAL_FS'] = 'no'
 
 # Uncomment to enable the triples mode jobs
-os.environ['PPYTHON_TRIPLES'] = 'yes'
+# os.environ['PPYTHON_TRIPLES'] = 'yes'
 
 # Uncomment to disable process bining
 # os.environ['PPYTHON_PROC_BIND'] = 'no'
