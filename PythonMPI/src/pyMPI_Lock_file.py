@@ -30,6 +30,10 @@ def pyMPI_Lock_file(source, dest, tag, comm, **argv):
     DEBUG = 0
     if DEBUG:
         print('--> Entering pyMPI_Lock_file')
+        print("comm['machine_id']: ",end='')
+        print(comm['machine_id'])
+        print("comm['machine_id']",end='')
+        print(comm['machine_id'])
     
     # Expand the additional argument for advanced features
     # - Use local filesystem
@@ -53,8 +57,14 @@ def pyMPI_Lock_file(source, dest, tag, comm, **argv):
         print('destination:',end="")
         print(dest)
         print("")
-    machine_id_source = comm['machine_id'][source]
-    machine_id_dest = comm['machine_id'][dest]
+    if isinstance(source,str) and source == '*':
+        machine_id_source = '*'
+    else:
+        machine_id_source = comm['machine_id'][source]
+    if isinstance(dest,str) and dest == '*':
+        machine_id_dest = '*'
+    else:
+        machine_id_dest = comm['machine_id'][dest]
 
     # grid_job
     grid_job = False
