@@ -26,10 +26,10 @@ else:
 # os.environ['PPYTHON_DEBUG'] = 'yes'
 
 # Uncomment to disable the messaging kernel using the TMPDIR local filesystem (which is the default).
-os.environ['PPYTHON_LOCAL_FS'] = 'no'
+# os.environ['PPYTHON_LOCAL_FS'] = 'no'
 
 # Uncomment to enable the triples mode jobs
-os.environ['PPYTHON_TRIPLES'] = 'yes'
+# os.environ['PPYTHON_TRIPLES'] = 'yes'
 
 # Uncomment to disable process bining
 # os.environ['PPYTHON_PROC_BIND'] = 'no'
@@ -118,7 +118,7 @@ if GRID_PPYTHON and RUN_ON_GRID:
         if os.getenv('PPYTHON_TRIPLES',default='no').lower() == 'no':
             pRUN( py_file, n_proc, 'grid&' )
         else:
-            pRUN( py_file, n_proc_triples, 'grid&' )
+            pRUN( py_file, n_proc_triples, 'grid' )
 else:
     print('Running locally ...')
     pRUN( py_file, n_proc, {} )

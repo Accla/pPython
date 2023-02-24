@@ -38,10 +38,17 @@ def MPI_Mcast(source, dest, tag, comm, *argv):
 
     # Check whether to use local filesystem or not
     grid_config = comm['grid_config']
+    # Additional parameter when using mixed messaging kernels
+    mixed_fs = grid_config['mixed_fs']
     if grid_config['local_fs'] == 1 :
         local_fs  = 1
         tmpdir = comm['tmpdir']
         machines =  comm['machine_db']['machine']
+        if DEBUG:
+            print('tmpdir:')
+            print(tmpdir)
+            print('machines:')
+            print(machines)
         #
         # With the triples mode, we need to use machine id, instead of rank.
         #
@@ -52,16 +59,25 @@ def MPI_Mcast(source, dest, tag, comm, *argv):
     if DEBUG:
         if local_fs:
             print('Use local filesystem:')
-            print('--> MPI_Mcast: source rank = %d, host = %s, local path = %s' %(my_rank,machines[machine_id_rank],tmpdir[machine_id_rank]))
+            if (mixed_fs and my_rank == 0):
+                print('--> MPI_Mcast: source rank = %d, host = %s' %(my_rank,machines[machine_id_rank]))
+            else:
+                print('--> MPI_Mcast: source rank = %d, host = %s, local path = %s' %(my_rank,machines[machine_id_rank],tmpdir[machine_id_rank]))
             if isinstance(dest,(int,np.int32,np.int64)):
                 machine_id_dest = comm['machine_id'][dest]
-                print('--> MPI_Mcast: destination rank = %d, host = %s, local path = %s' %(dest,machines[machine_id_dest],tmpdir[machine_id_dest]))
+                if (mixed_fs and my_rank == 0):
+                    print('--> MPI_Mcast: destination rank = %d, host = %s' %(dest,machines[machine_id_dest]))
+                else:
+                    print('--> MPI_Mcast: destination rank = %d, host = %s, local path = %s' %(dest,machines[machine_id_dest],tmpdir[machine_id_dest]))
             else:
                 for ii in dest:
                     if ii == source:
                         continue
                     machine_id_ii = comm['machine_id'][ii]
-                    print('--> MPI_Mcast: destination rank = %d, host = %s, local path = %s' %(ii,machines[machine_id_ii],tmpdir[machine_id_ii]))
+                    if (mixed_fs and my_rank == 0):
+                        print('--> MPI_Mcast: destination rank = %d, host = %s' %(ii,machines[machine_id_ii]))
+                    else:
+                        print('--> MPI_Mcast: destination rank = %d, host = %s, local path = %s' %(ii,machines[machine_id_ii],tmpdir[machine_id_ii]))
 
     # If not the source, then receive the data.
     if (my_rank != source):
@@ -77,7 +93,7 @@ def MPI_Mcast(source, dest, tag, comm, *argv):
 
     # If the source, then send the data.
     if (my_rank == source):
-        # Create data buffer file.
+        # Create data buffer file to myself.
         innode = 1
         buffer_file = pyMPI_Buffer_file(my_rank,source,tag,comm,local_fs=local_fs,msg_type='send',innode=innode)
 
@@ -126,7 +142,7 @@ def MPI_Mcast(source, dest, tag, comm, *argv):
             machine_id_ii = comm['machine_id'][ii]
                 
             if DEBUG:
-                print('MPI_Mcast: Message to my_rank = %d',ii)
+                print('MPI_Mcast: Message to my_rank = %d'%(ii))
             # identify whether the message communication is in-node or out-of-node
             innode = 0
             if local_fs:
@@ -152,8 +168,9 @@ def MPI_Mcast(source, dest, tag, comm, *argv):
                 raise Execution('MPI_Mcast: none of ismac, islinux and ispc defined.')
 
             # out-of-node message, scp the buffer and lock files to the remote receiver
-            if local_fs and (not innode):
+            if local_fs and (not innode) and (not (mixed_fs and my_rank == 0)):
                 # when using local filesystem and the message needs to be sent out of node
+                # Except when Pid=0 broadcast message with interactive triples mode job 
                 status = 0
 
                 # scp may cause DDoS attack if too many instances opened to the same host
@@ -164,7 +181,10 @@ def MPI_Mcast(source, dest, tag, comm, *argv):
                 try_max = 10
                 scp_cmd = 'scp '
                 # Copy the message before the actual link gets created.
-                cmd1 = scp_cmd+buffer_file+' '+machines[machine_id_ii]+':'+tmpdir[machine_id_ii]+'/'+buffer_link_basename
+                if (mixed_fs and my_rank == 0):
+                    cmd1 = scp_cmd+buffer_file+' '+machines[machine_id_ii]+':'+tmpdir[machine_id_ii]+'/'+buffer_link_basename
+                else: 
+                    cmd1 = scp_cmd+buffer_file+' '+machines[machine_id_ii]+':'+tmpdir[machine_id_ii]+'/'+buffer_link_basename
                 # generate a shell command
                 shcmd = shcmd+cmd1+'&'+nl
     
@@ -222,7 +242,8 @@ def MPI_Mcast(source, dest, tag, comm, *argv):
         rmcmd = ''
         # Loop over everyone in dest and create lock file.
         # generate a shell command
-        if local_fs and (not innode):
+        if local_fs and (not innode) and (not (mixed_fs and my_rank == 0)):
+            # Except when Pid=0 broadcast message with interactive triples mode job `:
             shcmd = shcmd+'# wait for all backgrounded scp processes to send the buffer files'+nl 
             shcmd = shcmd+'wait'+nl 
             shcmd = shcmd+'# generate all backgrounded scp processes to send the lock files'+nl
@@ -246,7 +267,8 @@ def MPI_Mcast(source, dest, tag, comm, *argv):
 
             
             # if out-of-node message, scp the buffer and lock files to the remote receiver
-            if local_fs and (not innode):
+            if local_fs and (not innode) and (not (mixed_fs and my_rank == 0)):
+                # Except when Pid=0 broadcast message with interactive triples mode job `
                 done_scp = False
                 try_counter = 0;
                 cmd1 = scp_cmd+lock_file+' '+machines[machine_id_ii]+':'+tmpdir[machine_id_ii]
@@ -277,7 +299,8 @@ def MPI_Mcast(source, dest, tag, comm, *argv):
                     rmcmd = rmcmd+'rm -f '+buffer_link+nl
 
         # generate a shell command
-        if local_fs and (not innode):
+        if local_fs and (not innode) and (not (mixed_fs and my_rank == 0)):
+            # Except when Pid=0 broadcast message with interactive triples mode job 
             shcmd = shcmd+'# wait for all backgrounded scp processes to send the lock files'+nl
             shcmd = shcmd+'wait'+nl
             shcmd = shcmd+'#'+nl

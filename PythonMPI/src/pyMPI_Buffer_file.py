@@ -24,6 +24,7 @@ def pyMPI_Buffer_file(source, dest, tag, comm, **argv):
     
     Python version: Dr. Chansup Byun
     2022-12-05: Updated to support message kernel using local filesystem (Dr. Chansup Byun)
+    2023-02-17: Updated to support mixed message kernels using central and local filesystem (Dr. Chansup Byun)
     """
     DEBUG = 0
     if DEBUG:
@@ -45,6 +46,7 @@ def pyMPI_Buffer_file(source, dest, tag, comm, **argv):
     grid_job = False
     if 'grid_config' in comm:
         grid_job = comm['grid_config']['grid_job']
+        mixed_fs = comm['grid_config']['mixed_fs']
             
     #
     # With the triples mode, we need to use machine id, instead of rank.
@@ -53,25 +55,33 @@ def pyMPI_Buffer_file(source, dest, tag, comm, **argv):
     machine_id_dest = comm['machine_id'][dest]
 
     if local_fs:
-        # if using local filesystem
-        if (msg_type == 'send'):
-            # Send process
-            if innode:
-                # if in-node message, temporary directory is the same for the destination process
-                # this allows for source process to exit before the message is received by the receiver
-                dir = comm['tmpdir'][machine_id_dest]
+        # if mixed_fs = 1 and either sender or receiver is Pid = 0 (machine id = 0), use the central filesystem
+        if mixed_fs and (machine_id_source == 0 or machine_id_dest == 0):
+            # Using a central filesystem
+            if DEBUG:
+                print('pyMPI_Buffer_file.py: Using a central filesystem.')
+            machine_id_source = comm['machine_id'][source]
+            dir = comm['machine_db']['dir'][machine_id_source]
+        else: 
+            # if using local filesystem
+            if (msg_type == 'send'):
+                # Send process
+                if innode:
+                    # if in-node message, temporary directory is the same for the destination process
+                    # this allows for source process to exit before the message is received by the receiver
+                    dir = comm['tmpdir'][machine_id_dest]
+                else:
+                    # if out-of-node message, temporary directory is for the source process before scp
+                    dir = comm['tmpdir'][machine_id_source]
             else:
-                # if out-of-node message, temporary directory is for the source process before scp
-                dir = comm['tmpdir'][machine_id_source]
-        else:
-            # Receive process
-            if innode:
-                # if in-node message, temporary directory is the same for the source process
-                dir = comm['tmpdir'][machine_id_dest]
-                #CB dir = comm['tmpdir'][machine_id_source]
-            else:
-                # if out-of-node message, temporary directory is for the destination process
-                dir = comm['tmpdir'][machine_id_dest]
+                # Receive process
+                if innode:
+                    # if in-node message, temporary directory is the same for the source process
+                    dir = comm['tmpdir'][machine_id_dest]
+                    #CB dir = comm['tmpdir'][machine_id_source]
+                else:
+                    # if out-of-node message, temporary directory is for the destination process
+                    dir = comm['tmpdir'][machine_id_dest]
     else:
         # Using a central filesystem
         if DEBUG:
@@ -80,7 +90,7 @@ def pyMPI_Buffer_file(source, dest, tag, comm, **argv):
         dir = comm['machine_db']['dir'][machine_id_source]
 
     # Translate dir if needed
-    if grid_job and (not local_fs):
+    if grid_job and ((not local_fs) or (mixed_fs and (machine_id_source == 0 or machine_id_dest == 0))):
         dir = pyMPI_Dir_translate(comm['machine_db'],dir)
 
     if DEBUG:

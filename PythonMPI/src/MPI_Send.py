@@ -38,6 +38,7 @@ def MPI_Send(dest, tag, comm, *argv):
     # save locally and read by scp remotely if out-of-node or read locally if in-node msg.
     innode = 1
     grid_config = comm['grid_config']
+    mixed_fs = grid_config['mixed_fs']
     if grid_config['local_fs'] == 1 :
         local_fs  = 1;
         tmpdir = comm['tmpdir']
@@ -45,15 +46,15 @@ def MPI_Send(dest, tag, comm, *argv):
         #
         # With the triples mode, we need to use machine id, instead of rank.
         #
-        machine_id_rank = comm['machine_id'][my_rank]
+        machine_id_source = comm['machine_id'][my_rank]
         machine_id_dest = comm['machine_id'][dest]
         if DEBUG:
             print('With using local filesystem:')
             print(machines)
             print(tmpdir)
             print('source = %d, destition rank = %d'%(my_rank,dest))
-            print('machine_id_source = %d, machine_id_destination = %d'%(machine_id_rank,machine_id_dest))
-        if machines[machine_id_rank] != machines[machine_id_dest] :
+            print('machine_id_source = %d, machine_id_destination = %d'%(machine_id_source,machine_id_dest))
+        if machines[machine_id_source] != machines[machine_id_dest] :
             innode = 0
     else:
         local_fs  = 0
@@ -64,9 +65,11 @@ def MPI_Send(dest, tag, comm, *argv):
         else:
             print('MPI_Send: in-node message from source rank=%d to destination rank=%d'%(my_rank,dest))
         if local_fs:
-            print('Use local filesystem:')
-            print('--> MPI_Send: source rank = %d, host = %s, local path = %s'   %(my_rank,machines[machine_id_rank],tmpdir[machine_id_rank]))
-            print('--> MPI_Send: destination rank = %d, host = %s, local path = %s' %(dest,machines[machine_id_dest],tmpdir[machine_id_dest]))
+            if not (mixed_fs and (machine_id_source == 0 or machine_id_dest == 0)):
+                # only when message is exchanged between the compute nodes on the grid
+                print('Use local filesystem:')
+                print('--> MPI_Send: source rank = %d, host = %s, local path = %s'   %(my_rank,machines[machine_id_source],tmpdir[machine_id_source]))
+                print('--> MPI_Send: destination rank = %d, host = %s, local path = %s' %(dest,machines[machine_id_dest],tmpdir[machine_id_dest]))
 
     # Create buffer and lock files [updated to support message kernel using local filesystem]
     buffer_file = pyMPI_Buffer_file(my_rank,dest,tag,comm,local_fs=local_fs,msg_type='send',innode=innode)
@@ -114,58 +117,60 @@ def MPI_Send(dest, tag, comm, *argv):
 
     if local_fs and (not innode):
         # when using local filesystem and the message needs to be sent out of node
-        status1 = 0
-        status2 = 0
-        if (OS.ispc):
-            myhostname = os.getenv('computername')
-        else:
-            myhostname = os.uname()[1]
-
-        # scp may cause DDoS attack if too many instances opened to the same host
-        # 3 sec delay may not able to fix the issue with 48 scp calls at the same time.
-        pauseTime = 4
-        done_scp = False
-        try_counter = 0
-        try_max = 10
-        scp_cmd = 'scp '
-        cmd1 = scp_cmd+buffer_file+' '+machines[machine_id_dest]+':'+tmpdir[machine_id_dest]
-        cmd2 = scp_cmd+lock_file+' '+machines[machine_id_dest]+':'+tmpdir[machine_id_dest]
-        # Create the remote execution command object
-        ecmd = ExecShellCmd(set_remote_cc())
-
-        while not done_scp:
-            try_counter = try_counter + 1;
-            # transfer the message to the remote host, return status with 0 when successful
-            status1 = True
-            try:
-                ecmd.run(cmd1)
-                status1 = ecmd.get_stderr()
-                if status1:
-                    print('scp failed on Rank = %d on %s with command, %s' %(my_rank,myhostname,cmd1))
-                    print('Status: %s'%(status1)) 
-            except:
-                    print('Try Error [MPI_Send]: failed to scp the buffer file to the remote host.')
-            status2 = True
-            try:
-                ecmd.run(cmd2)
-                status2 = ecmd.get_stderr()
-                if status2:
-                    print('scp failed by Rank = %d on %s with a command, %s' %(my_rank,myhostname,cmd2))
-                    print('status: %s'%(status2)) 
-            except:
-                    print('Try Error [MPI_Send]: failed to scp the lock file to the remote host.')
-            if (not status1) and (not status2):
-                done_scp = True
+        if not (mixed_fs and (machine_id_source == 0 or machine_id_dest == 0)):
+            # only when message is exchanged between the compute nodes on the grid
+            status1 = 0
+            status2 = 0
+            if (OS.ispc):
+                myhostname = os.getenv('computername')
             else:
-                if try_counter > try_max:
-                    raise Exception('Error [MPI_Send]: attempts to scp buffer or lock file exceeds 3 tries.')
-                else:
-                    if DEBUG:
-                        print('. . . scp failed. continue for next scp . . . ')
-                    pyMPI_Sleep(pauseTime)
+                myhostname = os.uname()[1]
 
-        os.remove(buffer_file)
-        os.remove(lock_file)
+            # scp may cause DDoS attack if too many instances opened to the same host
+            # 3 sec delay may not able to fix the issue with 48 scp calls at the same time.
+            pauseTime = 4
+            done_scp = False
+            try_counter = 0
+            try_max = 10
+            scp_cmd = 'scp '
+            cmd1 = scp_cmd+buffer_file+' '+machines[machine_id_dest]+':'+tmpdir[machine_id_dest]
+            cmd2 = scp_cmd+lock_file+' '+machines[machine_id_dest]+':'+tmpdir[machine_id_dest]
+            # Create the remote execution command object
+            ecmd = ExecShellCmd(set_remote_cc())
+
+            while not done_scp:
+                try_counter = try_counter + 1;
+                # transfer the message to the remote host, return status with 0 when successful
+                status1 = True
+                try:
+                    ecmd.run(cmd1)
+                    status1 = ecmd.get_stderr()
+                    if status1:
+                        print('scp failed on Rank = %d on %s with command, %s' %(my_rank,myhostname,cmd1))
+                        print('Status: %s'%(status1)) 
+                except:
+                    print('Try Error [MPI_Send]: failed to scp the buffer file to the remote host.')
+                status2 = True
+                try:
+                    ecmd.run(cmd2)
+                    status2 = ecmd.get_stderr()
+                    if status2:
+                        print('scp failed by Rank = %d on %s with a command, %s' %(my_rank,myhostname,cmd2))
+                        print('status: %s'%(status2)) 
+                except:
+                    print('Try Error [MPI_Send]: failed to scp the lock file to the remote host.')
+                if (not status1) and (not status2):
+                    done_scp = True
+                else:
+                    if try_counter > try_max:
+                        raise Exception('Error [MPI_Send]: attempts to scp buffer or lock file exceeds 3 tries.')
+                    else:
+                        if DEBUG:
+                            print('. . . scp failed. continue for next scp . . . ')
+                        pyMPI_Sleep(pauseTime)
+
+            os.remove(buffer_file)
+            os.remove(lock_file)
 
     if DEBUG:
         print('<-- Exiting MPI_Send')

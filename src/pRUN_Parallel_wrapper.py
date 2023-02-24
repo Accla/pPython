@@ -34,7 +34,7 @@ def pRUN_Parallel_wrapper(py_file):
         # Passed from pRUN()
         LAUNCH_TIMING = grid_config['LAUNCH_TIMING']
     else:
-        raise Exception('ERROR(pRUN_Parallel_wrapper): local_fs is not defined in grid_config with MPI_COMM_WORLD')
+        raise Exception('ERROR(pRUN_Parallel_wrapper): grid_config is not defined in MPI_COMM_WORLD')
     
     if LAUNCH_TIMING:
         # Current time
@@ -48,15 +48,18 @@ def pRUN_Parallel_wrapper(py_file):
     pPython_init()
     
     #
-    local_fs = grid_config['local_fs']
     if DEBUG:
         print(' ')
+        local_fs = grid_config['local_fs']
         print('pRUN_Parallel_Wrapper: local_fs = %d'%(local_fs))
+        mixed_fs = grid_config['mixed_fs']
+        print('pRUN_Parallel_Wrapper: mixed_fs = %d'%(mixed_fs))
         print(' ')
 
-    if interactive == 0 and (grid_job==True) and EPPAC:
-        # update MPI_COMM_WORLD
+    if local_fs and grid_job:
         tic = timer()
+        # update MPI_COMM_WORLD
+        # add mixed messaging kernel support
         slurm2hostmap()
         h2mtime = timer()-tic
         GPC.comm = MPI_COMM_WORLD
