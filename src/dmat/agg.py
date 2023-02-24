@@ -7,7 +7,6 @@ from MPI_Send import *
 
 import pPython as GPC
 from Dmat import *
-import grid_config as grid
 
 from inmap import *
 from reconstruct import *
@@ -34,7 +33,7 @@ def agg(d, leader=None):
     2010-05-03: Binary-tree based aggregation algoritm implemented in pMatlab
     """
     
-    DEBUG = 0
+    DEBUG = 1
     if DEBUG:
         print('--> Entering agg')
 
@@ -47,7 +46,10 @@ def agg(d, leader=None):
     if Np == 1:
         mat = d.local
         return mat
-    mixed_fs = grid.grid_config['mixed_fs']
+    comm = GPC.comm
+    mixed_fs = comm['grid_config']['mixed_fs']
+    if DEBUG:
+        print('mixed_fs = %d'%(mixed_fs))
 
     # Use topology-aware agg() if this is a triple mode job
     PIDSTART = os.getenv('PIDSTART',default='')
