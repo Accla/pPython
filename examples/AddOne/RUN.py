@@ -26,7 +26,7 @@ else:
 # os.environ['PPYTHON_DEBUG'] = 'yes'
 
 # Uncomment to disable the messaging kernel using the TMPDIR local filesystem (which is the default).
-os.environ['PPYTHON_LOCAL_FS'] = 'no'
+# os.environ['PPYTHON_LOCAL_FS'] = 'no'
 
 # Uncomment to enable the triples mode jobs
 # os.environ['PPYTHON_TRIPLES'] = 'yes'
