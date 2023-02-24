@@ -118,7 +118,7 @@ if GRID_PPYTHON and RUN_ON_GRID:
         if os.getenv('PPYTHON_TRIPLES',default='no').lower() == 'no':
             pRUN( py_file, n_proc, 'grid&' )
         else:
-            pRUN( py_file, n_proc_triples, 'grid&' )
+            pRUN( py_file, n_proc_triples, 'grid' )
 else:
     print('Running locally ...')
     pRUN( py_file, n_proc, {} )
