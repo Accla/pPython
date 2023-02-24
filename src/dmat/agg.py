@@ -33,7 +33,7 @@ def agg(d, leader=None):
     2010-05-03: Binary-tree based aggregation algoritm implemented in pMatlab
     """
     
-    DEBUG = 1
+    DEBUG = 0
     if DEBUG:
         print('--> Entering agg')
 

@@ -125,7 +125,7 @@ def check_runtime( n_proc, machines, grid_config ):
 
     # check and process the triples mode job request if needed
     n_proc_req, grid_config = check_triples(cluster_name,cpu_type,n_proc,grid_config)
-
+    EPPAC = grid_config['EPPAC'] 
     #
     # number of cores to be allocated from the grid
     # At this point, n_proc_req is already translated into number of cores (int) if triples mode is used.
@@ -184,6 +184,7 @@ def check_runtime( n_proc, machines, grid_config ):
 
     #
     # Override if PPYTHON_LOCAL_FS is defined
+    local_fs = 1
     PPYTHON_LOCAL_FS = os.getenv('PPYTHON_LOCAL_FS',default='yes')
     if DEBUG:
         print('PPYTHON_LOCAL_FS: %s'%(PPYTHON_LOCAL_FS))
@@ -197,19 +198,23 @@ def check_runtime( n_proc, machines, grid_config ):
     grid_config['local_fs'] = local_fs
     # Check compatibality between interactive job versus messaging kernel using local filesystem
     grid_config['mixed_fs'] = 0
-    if local_fs and (grid_job==True):
-        if interactive:
-            if grid_config['EPPAC'] :
-                # triples mode jobs
-                # Turn on mixed messaging kernel to support communication between the head process (Pid = 0) and the rest
-                # with a shared filesystem based messaging kernel while all other communication is accomplished by using
-                # a local filesystem based messaging kernel
-                grid_config['mixed_fs'] = 1
-            else:
-                # non triples mode jobs
-                raise Exception('ERROR(pRUN_Parallel_wrapper): Interactive non-triples mode grid job does not support the default messaging kernel using local filesystem. \nUse either the messaging kernel using the central filesystem or run as a backgrounded job.')
 
+    if local_fs: 
+        if interactive and EPPAC:
+            # Special case: interactive triples-mode jobs
+            # Turn on mixed messaging kernel to support communication between the head process (Pid = 0) and the rest
+            # with a shared filesystem based messaging kernel while all other communication is accomplished by using
+            # a local filesystem based messaging kernel
+            grid_config['mixed_fs'] = 1
+        elif (not grid_job) or interactive :
+            # Messaging kernel using local filesystem is only supported when
+            # 1. grid_job, 2. backgrounded job (interactive = 0)
+            # Both non-triples or triples mode jobs are supported as long as they are backgrounded grid jobs.
+            raise Exception('ERROR(pRUN_Parallel_wrapper): the default messaging kernel using local filesystem is only supported when \n1. grid_job, 2. backgrounded job (interactive = 0)\nUse either the messaging kernel using the central filesystem or run as a backgrounded job.')
+        
     if DEBUG:
+        print("grid_config['mixed_fs'] = %d"%(grid_config['mixed_fs']))
+        print("grid_config['local_fs'] = %d"%(grid_config['local_fs']))
         print('OS.islocal = %d'%(OS.islocal))
         print('<-- Exiting check_runtime')
         
