@@ -9,6 +9,13 @@ try: comm
 except NameError: comm = None
 if comm is None:
         comm = pyMCW.MPI_COMM_WORLD
+        if not isinstance(comm,dict):
+            comm = dict()
+            comm['rank'] = 0
+try: Np
+except NameError: Np = 1
+try: Pid
+except NameError: Pid = 0
 
 ########################################################
 # pMatlab: Parallel Matlab Toolbox

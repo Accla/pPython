@@ -43,6 +43,8 @@ class Dmap:
         DEBUG = 0
         if DEBUG:
             print('--> Entering Dmap.__init__()')
+            print('grid_spec')
+            print(grid_spec)
             print('proc_list')
             print(proc_list)
 
@@ -127,6 +129,7 @@ class Dmap:
             if DEBUG:
                 print('After grid.reshape(gsize)[:] = proc_list[:]')
                 print(grid)
+                print(proc_list)
 
             # if the maps are created within the scope of MPI_COMM_WORLD
             # then the processor list is checked against current
