@@ -88,13 +88,18 @@ def pyMPI_Comm_init(n_proc,machines,**argv):
         # For the triples mode jobs, take care of the node where the interactive process runs
         # The first node on the grid will have one less processes running due to the interactive process
         if interactive:
-            for i_machine in range(nnode+1):
-                if i_machine == 0:
-                    machine_db['n_proc'][i_machine] = 1
-                elif i_machine == 1:
-                    machine_db['n_proc'][i_machine] = nppn - 1
-                else:
+            if nppn==1:
+                # Take care when nppn=1
+                for i_machine in range(nnode):
                     machine_db['n_proc'][i_machine] = nppn
+            else:
+                for i_machine in range(nnode+1):
+                    if i_machine == 0:
+                        machine_db['n_proc'][i_machine] = 1
+                    elif i_machine == 1:
+                        machine_db['n_proc'][i_machine] = nppn - 1
+                    else:
+                        machine_db['n_proc'][i_machine] = nppn
         else:
             for i_machine in range(nnode):
                 machine_db['n_proc'][i_machine] = nppn

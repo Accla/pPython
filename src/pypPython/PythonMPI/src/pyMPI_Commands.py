@@ -2,7 +2,6 @@ import os
 
 from MPI_Comm_size import *
 
-import pyMPI_COMM_WORLD as pyMCW
 import checkOS as OS
 from pyMPI_Host_rank import *
 from pyMPI_Dir_map import *
@@ -13,11 +12,11 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD,**argv):
 
     Usage:
     ------
-    defscommands, unix_command = pyMPI_Commands(py_file,rank,pyMCW.MPI_COMM_WORLD)
+    defscommands, unix_command = pyMPI_Commands(py_file,rank,MPI_COMM_WORLD)
     
     py_file: a python script name (dtype: string)
     rank: a MPI process rank (dtype: int)
-    pyMCW.MPI_COMM_WORLD: MPI communicator (dtype: dictionary)
+    MPI_COMM_WORLD: MPI communicator (dtype: dictionary)
     defscommands: Python commands to be executed by remotely launched Python processes
                   to start coressponding Python MPI processes under the hood.
     unix_command: Command to start PythonMPI script.
@@ -29,6 +28,10 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD,**argv):
     if DEBUG:
         print('--> Entering pyMPI_Commands:')
         print('rank = %d'%(rank))
+        print('MPI_COMM_WORLD-machine_id')
+        print(MPI_COMM_WORLD['machine_id'])
+        print('MPI_COMM_WORLD-machine_db-machine')
+        print(MPI_COMM_WORLD['machine_db']['machine'])
 
     DONE = False
     grid_job = False
@@ -62,12 +65,14 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD,**argv):
     q = '\''
 
     # Get info on the target machine.
-    machine_id = pyMCW.MPI_COMM_WORLD['machine_id'][rank]
-    machine = pyMCW.MPI_COMM_WORLD['machine_db']['machine'][machine_id]
-    remote_launch = pyMCW.MPI_COMM_WORLD['machine_db']['remote_launch'][machine_id]
-    remote_flags = pyMCW.MPI_COMM_WORLD['machine_db']['remote_flags'][machine_id]
-    python_base  = pyMCW.MPI_COMM_WORLD['machine_db']['python_command'][machine_id]
-    type = pyMCW.MPI_COMM_WORLD['machine_db']['type'][machine_id]
+    machine_id = MPI_COMM_WORLD['machine_id'][rank]
+    if (grid_config['interactive']) and (grid_config['nppn'] == 1) and rank > 0:
+        machine_id = machine_id-1
+    machine = MPI_COMM_WORLD['machine_db']['machine'][machine_id]
+    remote_launch = MPI_COMM_WORLD['machine_db']['remote_launch'][machine_id]
+    remote_flags = MPI_COMM_WORLD['machine_db']['remote_flags'][machine_id]
+    python_base  = MPI_COMM_WORLD['machine_db']['python_command'][machine_id]
+    type = MPI_COMM_WORLD['machine_db']['type'][machine_id]
 
     # Create filename each Python job will run at startup.
     if EPPAC:
@@ -93,14 +98,16 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD,**argv):
     # Generate a series of commands to be executed to setup pPython runtime 
     # for each Python MPI process
     # the commands are stored in a dictionary
-    commands = gen_commands(py_file,python_mpi_path,rank,machine,pyMCW.MPI_COMM_WORLD,EPPAC)
+    commands = gen_commands(py_file,python_mpi_path,rank,machine,MPI_COMM_WORLD,EPPAC)
 
     defscommands = '';
 
     # Print name of the target machine we are launching on.
     # CB: Reduce the output when Np > 16
     if EPPAC:
-       nnode = grid_config['nnode']
+       # nnode = grid_config['nnode']
+       # Use the following to deal with an interactive triples mode job with nppn=1
+       nnode = grid_config['ntasks']
        if (nnode>=8):
            if ((machine_id > (nnode-3)) or (nnode < 2)) and (rank == i_rank_stop):
                print('Launching MPI rank: %d to %d on %s.' %(i_rank_stop,i_rank_start,machine))
@@ -126,7 +133,7 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD,**argv):
         print('Launch from %s to machine, %s'%(host,machine))
     if machine == host: # Target is host.
         # Check if running with host& set.
-        if ((rank == 0) and (pyMPI_Host_rank(pyMCW.MPI_COMM_WORLD) == 0)):
+        if ((rank == 0) and (pyMPI_Host_rank(MPI_COMM_WORLD) == 0)):
             # Run defsfile scipt interactively.
             defscommands = commands[0]+commands[1]+commands[2]+commands[3]+commands[5]
             unix_command = '';

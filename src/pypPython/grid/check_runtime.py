@@ -143,10 +143,13 @@ def check_runtime( n_proc, machines, grid_config ):
             machines.append(host)
         if grid_config['nnode'] > 0: 
             # Triples modes, pPython MPI processes on the same node are aggregated into a single scheduler task
-            grid_config['ntasks'] = grid_config['nnode']
+            if interactive and (grid_config['nppn']==1):
+                grid_config['ntasks'] = grid_config['nnode']-1
+            else:
+                grid_config['ntasks'] = grid_config['nnode']
             # Figure out how many digits are needed to represent the number of requested nodes
             n_digits = int(math.log10(grid_config['nnode'])+1)
-            for i in range(grid_config['nnode']):
+            for i in range(grid_config['ntasks']):
                 node_strid = str(i+1).zfill(n_digits)
                 machines.append('grid_slurm_'+node_strid)
         else:

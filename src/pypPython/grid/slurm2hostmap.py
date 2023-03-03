@@ -62,10 +62,11 @@ def slurm2hostmap():
     EPPAC    = grid.grid_config['EPPAC']  
     
     if EPPAC:
+        nnode   = grid.grid_config['nnode']
         nppn   = grid.grid_config['nppn']
         # Only 1 slurm task script per each compute node with PPYTHON_MANYCORE mode
-        # nTasks = grid.grid_config['nnodes']?
-        nProcs    = nppn * nTasks
+        # Do not use nTasks (slurm) for total number of process because of interactive jobs
+        nProcs    = nnode * nppn 
     else:
         # Traditional jobs (number of Slurm tasks == Np of pPython)
         nProcs    = grid.grid_config['ntasks']  
@@ -263,15 +264,19 @@ def slurm2hostmap():
                    print("slurm2hostmap: MPI_COMM_WORLD['tmpdir'][%d] = %s"%(i+mixed_fs,MPI_COMM_WORLD['tmpdir'][i+mixed_fs]))
             for j in range(nppn):
                 ipos = (my_node_rank - mixed_fs)*nppn+j 
-                if i == 0 and j == 0 and mixed_fs:
+                if i == 0 and j == 0 and mixed_fs and nppn > 1:
                     # when mixed_fs, the Pid = 0 is local process.
                     # skip
                     continue
+                if grid.grid_config['interactive'] and nppn == 1:
+                    ipos = ipos + 1
                 if (ipos > nProcs-1):
                     # skip
                     continue
                 # Introduce pid list for those on the same compute ndoe 
                 MPI_COMM_WORLD['local_pids'][tmp[2]].append(ipos)
+            if DEBUG:
+                print(MPI_COMM_WORLD['local_pids'][tmp[2]])
         machines = MPI_COMM_WORLD['machine_db']['machine']
         if mixed_fs:
             # machines[0]]  is the local machine and always executes Pid = 0 process
