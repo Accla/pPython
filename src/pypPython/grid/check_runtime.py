@@ -133,9 +133,12 @@ def check_runtime( n_proc, machines, grid_config ):
     # At this point, n_proc_req is already translated into number of cores (int) if triples mode is used.
     #
     # ToDo: Need to skip when submitting to the grid with Slurm srun
-    #
-    requested,unclaimed_procs,unclaimed_nodes = grid_resource_policy(grid_config, n_proc_req, interactive)
-    n_proc_req = requested + interactive
+    if re.search('reservation',grid_config['sched_options']):
+        # no policy check for reserved resources
+        requested = n_proc_req - interactive
+    else:#
+        requested,unclaimed_procs,unclaimed_nodes = grid_resource_policy(grid_config, n_proc_req, interactive)
+        n_proc_req = requested + interactive
     
     # Create a fictious machine list when 'grid[&]' is used
     if grid_config['grid_job']:
