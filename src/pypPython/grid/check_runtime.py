@@ -74,6 +74,8 @@ def check_runtime( n_proc, machines, grid_config ):
                 grid_job = True
             else:
                 grid_job = False
+    grid_config['interactive'] = interactive
+    grid_config['grid_job'] = grid_job
     
     # Determine if a specific CPU type is requested
     # Old partition also requires partition name 
@@ -136,7 +138,7 @@ def check_runtime( n_proc, machines, grid_config ):
     n_proc_req = requested + interactive
     
     # Create a fictious machine list when 'grid[&]' is used
-    if grid_job:
+    if grid_config['grid_job']:
         machines = []
         # set the Pid=0 machine for an interactive job
         if interactive:
@@ -172,6 +174,9 @@ def check_runtime( n_proc, machines, grid_config ):
                 machines.append('grid_slurm_'+node_strid)
     
     # Convert machines into a dictionary variable if needed
+    if isinstance(machines,str):
+        # Special case: interactive triples mode job with Npo=1
+        machines = {}
     machines,islocal = convert_to_dict(machines,host)
     #
     # Override islocal based on interactive
@@ -182,8 +187,6 @@ def check_runtime( n_proc, machines, grid_config ):
     OS.islocal = islocal
     # save to grid_config['islocal'] which will be saved in MPI_COMM_WORLD
     grid_config['islocal'] = islocal
-    grid_config['grid_job'] = grid_job
-    grid_config['interactive'] = interactive
 
     #
     # Override if PPYTHON_LOCAL_FS is defined
@@ -196,7 +199,7 @@ def check_runtime( n_proc, machines, grid_config ):
     else:
         local_fs = 1
     # Set local_fs = 0 for non grid jobs
-    if not grid_job:
+    if not grid_config['grid_job']:
         local_fs = 0
     grid_config['local_fs'] = local_fs
     # Check compatibality between interactive job versus messaging kernel using local filesystem

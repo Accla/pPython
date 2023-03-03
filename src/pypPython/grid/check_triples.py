@@ -51,6 +51,13 @@ def check_triples(cluster_name,cpu_type,n_proc,grid_config):
         else:
             n_proc_req = nnode * nppn
         
+        # Special case: interactive triples mode job with [1,1,NTPP], in order words, n_proc_req = 1
+        if grid_config['interactive'] and n_proc_req == 1:
+            print('interactive triples mode job with NNODE*NPPN=1')
+            grid_config['EPPAC'] = False
+            grid_config['grid_job'] = False
+            return n_proc_req, grid_config
+
         # update grid_config for triples mode job
         grid_config['nnode'] = nnode
         grid_config['ntasks'] = nnode

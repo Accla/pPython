@@ -66,7 +66,7 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD,**argv):
 
     # Get info on the target machine.
     machine_id = MPI_COMM_WORLD['machine_id'][rank]
-    if (grid_config['interactive']) and (grid_config['nppn'] == 1) and rank > 0:
+    if EPPAC and (grid_config['interactive']) and (grid_config['nppn'] == 1) and rank > 0:
         machine_id = machine_id-1
     machine = MPI_COMM_WORLD['machine_db']['machine'][machine_id]
     remote_launch = MPI_COMM_WORLD['machine_db']['remote_launch'][machine_id]
