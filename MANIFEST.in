@@ -1,0 +1,4 @@
+graft examples
+graft scripts
+graft tutorials
+global-exclude *.py[cod]
