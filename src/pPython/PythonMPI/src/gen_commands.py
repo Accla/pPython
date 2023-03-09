@@ -43,34 +43,7 @@ def gen_commands(py_file,python_mpi_path,rank,machine,comm,EPPAC=False):
     comm_pkl_file = 'PythonMPI/MPI_COMM_WORLD.pkl'
 
     commands = dict()
-
-    add_path_str = ''
-    for path in tmp:
-        # path needs to be translated in to the LLSC path if the machine is not the host
-        dir_pc, dir_linux, dir_mac, dir_grid = pyMPI_Dir_map(comm['machine_db'],path)
-        if machine == host:
-            if os.path.exists('/etc/llgrid.id'):
-                path = dir_grid
-            else:
-                if OS.ispc:
-                    path = dir_pc
-                elif OS.ismac:
-                    path = dir_mac
-                else:
-                    path = dir_linux
-        else:
-            # Use dir_grid (assuming all remote hosts are on the grid)
-            path = dir_grid
-        if DEBUG:
-            print('Translated path: %s'%(path))
-        if OS.ispc:
-           # Add prefix r to fix the error, unicodeescape codec annnot decode bytes in position 2-3: trauncate \UXXXXX escape
-           add_path_str = add_path_str + 'sys.path.append(r'+q+path+q+')'+nl
-        else:
-           add_path_str = add_path_str + 'sys.path.append('+q+path+q+')'+nl
-
     commands[0] = 'import os'+nl
-    commands[0] = commands[0]+'import sys'+nl+add_path_str
     commands[0] = commands[0]+'os.environ["HDF5_USE_FILE_LOCKING"]="FALSE"' + nl
     if EPPAC:
         # For the triples mode, a single script launches many pPython MPI processes.
@@ -80,6 +53,7 @@ def gen_commands(py_file,python_mpi_path,rank,machine,comm,EPPAC=False):
     else:
         commands[0] = commands[0]+'os.environ["OMP_NUM_THREADS"]="' + OMP_NUM_THREADS + '"' + nl
     # commands[0] = commands[0]+'from PythonMPI import *' + nl
+    commands[0] = commands[0]+'import pPython' + nl
     commands[0] = commands[0]+'import pyMPI_COMM_WORLD as pyMCW' + nl
     commands[0] = commands[0]+'from dict_with_pickle import load_dict_from_pickle' + nl
     commands[1] = 'from pRUN_Parallel_wrapper import *' + nl
