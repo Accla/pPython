@@ -1,4 +1,5 @@
 import sys
+import re
 
 import checkOS as OS
 from exec_shell_cmd import *
@@ -32,7 +33,9 @@ def slurm_submit_job(grid_config,sched_job_file,py_file,dir_llsc):
         cmdstr = cmdstr+' '+grid_config['sched_options']
     
     # Partition
-    cmdstr = cmdstr+' -p '+grid_config['q_name']
+    # Can be overrided by the --partition=PARTITION_NAME in the 4th argument in pRUN()
+    if not re.search('--partition',grid_config['sched_options']):
+        cmdstr = cmdstr+' -p '+grid_config['q_name']
     
     # CPU type (if needed)
     if (grid_config['cpu_type'] == 'xeon-e5') or \
