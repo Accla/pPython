@@ -56,7 +56,7 @@ def pRUN_Parallel_wrapper(py_file):
         print('pRUN_Parallel_Wrapper: mixed_fs = %d'%(mixed_fs))
         print(' ')
 
-    if local_fs and grid_job:
+    if (local_fs or (not interactive and EPPAC))and grid_job:
         tic = timer()
         # update MPI_COMM_WORLD
         # add mixed messaging kernel support
