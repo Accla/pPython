@@ -107,9 +107,9 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD,**argv):
        # Use the following to deal with an interactive triples mode job with nppn=1
        nnode = grid_config['ntasks']
        if (nnode>=8):
-           if ((machine_id > (nnode-3)) or (machine_id < (nnode < 2))) and (rank == i_rank_stop):
+           if ((machine_id > (nnode-3)) or (machine_id < 2)) and (rank == i_rank_stop):
                print('Launching MPI rank: %d to %d on %s.' %(i_rank_stop,i_rank_start,machine))
-           elif (machine_id==(nnode-3)):
+           elif (machine_id==(nnode-3)) and (rank == i_rank_stop):
                print('Continuing to launch MPI processes ......')
        else:
            if (rank == i_rank_stop):
