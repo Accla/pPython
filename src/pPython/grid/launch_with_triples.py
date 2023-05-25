@@ -9,7 +9,7 @@ from pyMPI_Dir_map import *
 from pyMPI_Sleep import *
 
 from get_cpu_info import *
-from gen_cpu_list import *
+from map_procs_to_cores import *
 
 from slurm_submit_job import *
 from slurm_write_job_script import *
@@ -70,7 +70,15 @@ def launch_with_triples(py_file, comm, grid_config):
     nptpc = floor(max_threads / max_cores) # number of physical threads per core
     # grid_config['nppn']: number of processes per node
     # grid_config['ntpp']: number of threads per process, i.e., OMP_NUM_THREADS
-    cpu_list = gen_cpu_list(max_cores,nptpc,grid_config['nppn'],grid_config['ntpp'])
+    # xeon-p8 node numbers processor IDs differently than all other nodes we have
+    if re.search('xeon-p8',grid_config['q_name'],flags=re.IGNORECASE):
+        dist_type = 2
+    else:
+        dist_type = 1
+    cpu_list = map_procs_to_cores(grid_config['nppn'],max_cores,nptpc,dist_type)
+    if DEBUG:
+        print('nppn = %d, cores = %d, ntpc = %d, dist_type = %d'%(grid_config['nppn'],max_cores,nptpc,dist_type))
+        print(cpu_list)
 
     # Get number of machines.
     n_m = comm['machine_db']['n_machine']

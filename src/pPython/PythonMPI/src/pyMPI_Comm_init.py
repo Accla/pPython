@@ -30,6 +30,7 @@ def pyMPI_Comm_init(n_proc,machines,**argv):
         print('--> Entering pyMPI_Comm_init')
         print('machines:')
         print(machines)
+        print('n_proc = %d'%(n_proc))
         print('----------')
 
     # Set default machine.
@@ -47,8 +48,6 @@ def pyMPI_Comm_init(n_proc,machines,**argv):
     MPI_COMM_WORLD['rank'] = -1
     MPI_COMM_WORLD['size'] = int(n_proc)
     MPI_COMM_WORLD['save_message_flag'] = 0
-    MPI_COMM_WORLD['group'] = np.arange(0,n_proc,dtype=int)
-    MPI_COMM_WORLD['machine_id'] = np.zeros((n_proc,),dtype=int)
     MPI_COMM_WORLD['host_rank'] = 0
     MPI_COMM_WORLD['host_name'] = host
     MPI_COMM_WORLD['machine_db'] = dict()
@@ -66,6 +65,12 @@ def pyMPI_Comm_init(n_proc,machines,**argv):
             nnode = MPI_COMM_WORLD['grid_config']['nnode']
             if EPPAC:
                nppn = MPI_COMM_WORLD['grid_config']['nppn']
+    if EPPAC:
+        MPI_COMM_WORLD['group'] = np.arange(0,nnode*nppn,dtype=int)
+        MPI_COMM_WORLD['machine_id'] = np.zeros((nnode*nppn,),dtype=int)
+    else:
+        MPI_COMM_WORLD['group'] = np.arange(0,n_proc,dtype=int)
+        MPI_COMM_WORLD['machine_id'] = np.zeros((n_proc,),dtype=int)
     
     # Initialize machine database.
     machine_db = dict()
@@ -93,7 +98,9 @@ def pyMPI_Comm_init(n_proc,machines,**argv):
                 for i_machine in range(nnode):
                     machine_db['n_proc'][i_machine] = nppn
             else:
-                for i_machine in range(nnode+1):
+                for i_machine in range(nnode):
+                    if DEBUG:
+                        print('  -> i_machine: %d'%(i_machine))
                     if i_machine == 0:
                         machine_db['n_proc'][i_machine] = 1
                     elif i_machine == 1:
