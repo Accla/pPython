@@ -60,7 +60,8 @@ def agg(d, leader=None):
         os.environ['PIDSTART'] = PIDSTART
         os.environ['PIDEND'] = PIDSTART
 
-    print('PIDSTART = %s'%(PIDSTART))
+    if DEBUG:
+        print('PIDSTART = %s'%(PIDSTART))
     if len(PIDSTART):
         print(' ')
         print(' ')

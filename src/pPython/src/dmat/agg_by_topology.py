@@ -30,7 +30,8 @@ def agg_by_topology(d):
     comm = GPC.comm
     
     DEBUG = 0
-    if DEBUG:
+    DEBUG_TIMING = 0
+    if DEBUG or DEBUG_TIMING:
         print('--> Entering agg_by_topology')
         # print(comm)
     
@@ -44,7 +45,7 @@ def agg_by_topology(d):
     # How to extract the Pid list of the leader process on each node?
     #
     leader_pid_list = list(sorted(set(comm['leader'])))
-    if DEBUG:
+    if DEBUG or DEBUG_TIMING:
         print(' ')
         print('Part 1: Aggregation within a node')
     #
@@ -65,6 +66,9 @@ def agg_by_topology(d):
     
     ## Part 2: Aggregation among the leader processes
     
+    if DEBUG or DEBUG_TIMING:
+        time_part_2_start = timer()
+
     ## Aggregation based on binary tree shown below for the 2nd part of 
     #  topology-aware agg() among the leader processes across all the nodes
     #
@@ -82,7 +86,7 @@ def agg_by_topology(d):
     # Obtain local Pid information (min and max Pid on each node):
     PIDMIN = min(leader_pid_list)
     PIDMAX = max(leader_pid_list)
-    if DEBUG:
+    if DEBUG or DEBUG_TIMING:
         print('Part 2: Aggregation among the leader processes')
         print('PIDMIN = %d, PIDMAX = %d'%(PIDMIN,PIDMAX))
         print('leader_pid_list: ',end='')
@@ -150,6 +154,9 @@ def agg_by_topology(d):
     if nproc == 1:
         # No reduction across nodes is needed.
         # Update the distributed array, d, and return.
+        if DEBUG_TIMING:
+            time_part_2 = timer() - time_part_2_start
+            print('Time for agg part 2: %f (sec)'%(time_part_2))
         return reconstruct(d.pitfalls, d.map.grid, temp_mat, d.shape)
     
     # Fix the tag for the final aggregation among the node leaders
@@ -194,7 +201,7 @@ def agg_by_topology(d):
             print(' ')
             print('Reduction at level %d'%(bt))
         # Compute msg units transferred at this level
-        msgUnit = 2^(bt-1)
+        msgUnit = 2**(bt-1)
         # Find my Pid position in pid_list
         # (Search is limited to the active Pid list)
         # (There are ficticious virtual Pid numbers >= len(leader_pid_list) when len(leader_pid_list) != POTN)
@@ -219,7 +226,9 @@ def agg_by_topology(d):
                 vPidPos = tmp2[0]
             else:
                 print('No more message to send. Exitinting.')
-                if DEBUG:
+                if DEBUG or DEBUG_TIMING:
+                    time_part_2 = timer() - time_part_2_start
+                    print('Time for agg part 2: %f (sec)'%(time_part_2))
                     print('<-- Exiting agg_by_topology')
                 return d.local
 
@@ -344,7 +353,9 @@ def agg_by_topology(d):
     else:
         mat = d.local
     
-    if DEBUG:
+    if DEBUG or DEBUG_TIMING:
+        time_part_2 = timer() - time_part_2_start
+        print('Time for agg part 2: %f (sec)'%(time_part_2))
         print('<-- Exiting agg_by_topology')
 
     return mat

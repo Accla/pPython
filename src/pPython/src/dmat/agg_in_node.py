@@ -24,7 +24,9 @@ def agg_in_node(d):
     """
 
     DEBUG = 0
-    if DEBUG:
+    DEBUG_TIMING = 0
+    if DEBUG or DEBUG_TIMING:
+        time_start = timer()
         print('--> Entering agg_in_node')
 
     Np = GPC.Np
@@ -70,7 +72,9 @@ def agg_in_node(d):
     if nproc == 1:
         # No in-node aggregation needed.
         # just return the local array packaged in a dictionary variable.
-        if DEBUG:
+        if DEBUG or DEBUG_TIMING:
+            time_end = timer() - time_start
+            print('agg_in_node time: %f (sec)'%(time_end))
             print('local Pid list has only one Pid. Just return the local d.local array')
             print('<-- Exiting agg_in_node')
                 # Non-leader prepares to send its local data
@@ -113,7 +117,7 @@ def agg_in_node(d):
     # Walk up the binary tree.
     while (bt <= btMax):
         # Compute msg units transferred at this level
-        msgUnit = 2^(bt-1)
+        msgUnit = 2**(bt-1)
         # Find my Pid position in pid_list
         # (Search is limited to the active Pid list)
         # (There are ficticious virtual Pid numbers >= len(local_pid_list) when len(local_pid_list) != POTN)
@@ -167,7 +171,9 @@ def agg_in_node(d):
     else:
         mat = d.local
     
-    if DEBUG:
+    if DEBUG or DEBUG_TIMING:
+        time_end = timer() - time_start
+        print('agg_in_node time: %f (sec)'%(time_end))
         print('<-- Exiting agg_in_node')
     
     return mat
