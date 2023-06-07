@@ -9,7 +9,7 @@ from pyMPI_Wait import *
 from MPI_Comm_rank import *
 from MPI_Comm_size import *
 from MPI_Recv import *
-from MPI_Mcast import *
+from MPI_Tcast import *
 
 def MPI_Bcast( source, tag, comm, *argv ):
     """MPI_Bcast - broadcast variables to everyone.
@@ -56,6 +56,9 @@ def MPI_Bcast( source, tag, comm, *argv ):
         if local_fs:
             print('Use local filesystem:')
 
+    if comm_size == 1:
+        return argv
+
     # Set some strings for special characters.
     qq = '"'
     sp = ' '
@@ -73,7 +76,7 @@ def MPI_Bcast( source, tag, comm, *argv ):
         leader = comm['leader']
         destOON = set(leader)
         if DEBUG:
-            print('--> Calling MPI_Mcast among the leaders of each compute node.')
+            print('--> Calling MPI_Tcast among the leaders of each compute node.')
             print('--> leader:',end=" ")
             print(leader)
             print(" ")
@@ -85,15 +88,17 @@ def MPI_Bcast( source, tag, comm, *argv ):
         #
         if (my_rank == source) or (my_rank in destOON):
             # Communicaiton among source and the leader processes on each node
-            [argv] = MPI_Mcast(source, destOON, tag, comm, argv)
+            [argv] = MPI_Tcast(source, destOON, tag, comm, argv)
 
         if DEBUG:
-            print('<-- finished MPI_Mcast among node leaders.')
+            print('argv:')
+            print(argv)
+            print('<-- finished MPI_Tcast among node leaders.')
 
         ##
         # Stage 2:
         # The leader on each node broadcast the message to other processses on the same node
-        # Now all processes are calling MPI_Mcast() with different source and destination
+        # Now all processes are calling MPI_Tcast() with different source and destination
         #
         # Figure out the list of processes on the same nodes
         # my compute node
@@ -111,7 +116,7 @@ def MPI_Bcast( source, tag, comm, *argv ):
                 print('--> MPI_Bcast: source rank = %d, host = %s' %(my_rank,machines[machine_id_rank]))
             else:
                 print('--> MPI_Bcast: source rank = %d, host = %s, local path = %s' %(my_rank,machines[machine_id_rank],tmpdir[machine_id_rank]))
-            print('--> calling MPI_Mcast among the processes on the same compute node.')
+            print('--> calling MPI_Tcast among the processes on the same compute node.')
             print('')
             print('source: %d' %(source))
             print('destination:',end=" ")
@@ -120,11 +125,15 @@ def MPI_Bcast( source, tag, comm, *argv ):
         #
         # Communicaiton within a node
         # The leader on each node broadcast the message to the oters on the same node
-        [argv] = MPI_Mcast(source, destINN, tag, comm, argv)
+        [argv] = MPI_Tcast(source, destINN, tag, comm, argv)
         if DEBUG:
-            print('<-- finished MPI_Mcast among processes on the same compute node.')
+            print('argv:')
+            print(argv)
+            print('<-- finished MPI_Tcast among processes on the same compute node.')
 
     else:
+        if DEBUG:
+            print('Original broadcasting algorithm (no optimization)')
         # Original broadcasting algorithm (no optimization)
         # ToDo: 
         # Broadcasting in a reverse binary tree (oposite to what is implemented in agg)
@@ -225,6 +234,8 @@ def MPI_Bcast( source, tag, comm, *argv ):
             os.remove(buffer_file)
        
     if DEBUG:
+        print('argv: ')
+        print(argv)
         print('<-- Exiting MPI_Bcast.')
     return argv
 

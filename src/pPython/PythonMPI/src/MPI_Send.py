@@ -105,10 +105,10 @@ def MPI_Send(dest, tag, comm, *argv):
     loop = 0;
     while os.path.exists(lock_file) == False :
         # Sleep statement allows cleaner profiling, but adds latency.
-        pyMPI_Sleep(0.1);
+        pyMPI_Sleep(0.01);
         fid = open(lock_file,'w+')
         fid.close()
-        if loop > 100:
+        if loop > 1000:
             raise Execution('MPI_Send: fail to create the lock file, %s'%(lock_file))
         loop = loop + 1
 
@@ -128,7 +128,7 @@ def MPI_Send(dest, tag, comm, *argv):
 
             # scp may cause DDoS attack if too many instances opened to the same host
             # 3 sec delay may not able to fix the issue with 48 scp calls at the same time.
-            pauseTime = 4
+            pauseTime = 1
             done_scp = False
             try_counter = 0
             try_max = 10

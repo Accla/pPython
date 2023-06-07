@@ -175,7 +175,7 @@ def MPI_Mcast(source, dest, tag, comm, *argv):
 
                 # scp may cause DDoS attack if too many instances opened to the same host
                 # 3 sec delay may not able to fix the issue with 48 scp calls at the same time.
-                pauseTime = 4
+                pauseTime = 1
                 done_scp = False
                 try_counter = 0
                 try_max = 10
@@ -236,7 +236,7 @@ def MPI_Mcast(source, dest, tag, comm, *argv):
             os.system('/bin/bash '+link_script)
         #
         # Wait a little bit
-        pyMPI_Sleep(0.5)
+        # pyMPI_Sleep(0.5)
         os.remove(link_script)
 
         rmcmd = ''
