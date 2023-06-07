@@ -17,6 +17,7 @@ def map_procs_to_cores(nppn, max_cores, ntpc, dist_type):
     #                        ToDo: cyclic_inc can be an input if there are more than two sockets per node
     cyclic_inc = 2;
 
+    DEBUG = 0
     #    
     # Output:
     # cores_per_proc_list: a dictionary variable to hold physical core & thread ids for nppn processes
@@ -87,8 +88,14 @@ def map_procs_to_cores(nppn, max_cores, ntpc, dist_type):
             ipos = i%max_cores
             # Process by pairs of processor lists with j1 being 1st element of the 1st  list
             # and j2 being the last element + 1 of the 2nd list
+            if DEBUG:
+                print('Process ID: %d, Position: %d, Leaders: '%(i,ipos),end='')
+                print(leaders)
             j1 = int(leaders[ipos])
-            j2 = int(leaders[ipos+cyclic_inc])
+            if ipos+cyclic_inc >= len(leaders):
+                j2 = int(leaders[ipos+cyclic_inc-1])
+            else:
+                j2 = int(leaders[ipos+cyclic_inc])
             # print('start=%d end=%d\n'%(j1,j2))
             inum1 = []
             inum2 = []
@@ -127,8 +134,13 @@ def map_procs_to_cores(nppn, max_cores, ntpc, dist_type):
             # Physical thread ID list assigned to the given process
             cores_per_proc_list[i]=inum1
             if i < nppn-1:
-                # Take care when nppn is an odd number
+                # get here always when nppn is even number
                 cores_per_proc_list[i+1]=inum2
+            else:
+                # get here only when nppn is odd number
+                if nppn <= max_cores:
+                   # add the 2nd part to the 1st part so that the last process can get the rest of remaining cores
+                   cores_per_proc_list[i] += inum2
 
     return cores_per_proc_list
 
