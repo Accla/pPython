@@ -1,24 +1,45 @@
 # pPython
+pPython is a new LLSC capability that provides a parallel computing capability with good speed-up without sacrificing 
+the ease of programming in Python. It will run on any combination of heterogeneous systems that support Python, 
+including Windows, Linux, and MacOS operating systems.
 
-PythonMPI support with a grid environment so that jobs can be launched much easier
+In addition to running transparently on a single-node (e.g., a laptop), pPython provides a scheduler interface 
+so that pPython can be executed in a massively parallel computing environment.
+
 <br>
-There are a couple of requireemnts to use the pPython package
+There are a few of requireemnts to use the pPython package
 <br>
 <li>
-It assumes that PythonMPI is distributed with pPython at its root directory. <br>
+PythonMPI, which provides the minimal set of MPI functionalities in Python, is distributed with pPython at its installation directory. <br>
 </li>
 <li>
-It is also assumes that a local configuration is available from $HOME/ppython_conf directory.
+A local configuration files are required to customize the specific pPython runtime enivironment and they are installed at $HOME/ppython_conf directory.
+</li>
+<li>
+For the grid environment, currently Slurm is the only scheduler supported by pPython for job dispatching and management and, depending on the cluster configuration, the local configuration files should be customized accordingly.
 </li>
 <br>
 <br>
-An example run script is available in the example directory. 
-The following environment variables in the example run script need to be modified according to the user runtime environment.
-This enables to run a pPython job either locally on a user desktop machine or on a grid environment.
-GRID_PPYTHON: True (grid installation) or False(local installation) <br>
-USE_LATEST_VERSION: True (use the latest version pointed by the latest symbolic link) or False (use the specific version defined by PPYTHON_VER) <br>
-PPYTHON_VER: Define a specific version (such as v0.9.2) <br>
+An example run script, RUN.py, is available in the example directory. 
 <br>
-This will determine the PPYTHON_HOME environment variable.
+<strong>Installation</strong>
+The pPython package can be installed with the "pip install --user <pPYthon_package_name>" command.
+In order to set up an interactive runtime environment on a local machine and launch pPython jobs to a grid environment,
+the pPython package should be installed on both the local machine and the grid account in addition to mapping/mounting 
+the home directory for the grid account on the local machine.
+
+<strong>Running an example</strong>
+The pPython examples distribued with the pPython source tarball file can be found in the dist directory from the git repository.
+Once the pPython package is installed, an example can be executed by using the RUN.py script by typing
+<li>
+python RUN.py
+</li>
+from an example directory or it can be executed interactive by typing at the Python command prompt
+<pre>
+import pPyton
+from pRUN import pRUN
+pRUN('pMandelbrot.py',4,{})
+</pre>
+This will execute the parallel Mandelbrot example using 4 pPython processes locally.
 <br>
 
