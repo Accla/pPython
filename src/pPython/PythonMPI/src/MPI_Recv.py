@@ -1,4 +1,6 @@
 import os
+import sys
+from timeit import default_timer as timer
 
 from dict_with_pickle import load_dict_from_pickle
 from pyMPI_Buffer_file import *
@@ -26,7 +28,9 @@ def MPI_Recv( source, tag, comm ):
     """
 
     DEBUG = 0
-    if DEBUG:
+    DEBUG_TIMING = 0
+    if DEBUG or DEBUG_TIMING:
+        t_start = timer()
         print('--> Entering MPI_Recv')
    
     # Get processor rank.
@@ -72,9 +76,9 @@ def MPI_Recv( source, tag, comm ):
     # Create buffer and lock files [updated to support message kernel using local filesystem]
     buffer_file = pyMPI_Buffer_file(source,my_rank,tag,comm,local_fs=local_fs,msg_type='recv',innode=innode)
     lock_file   = pyMPI_Lock_file(source,my_rank,tag,comm,local_fs=local_fs,msg_type='recv',innode=innode)
-    if DEBUG:
-        print('Buffer file: %s'%(buffer_file))
-        print('Lock file: %s'%(lock_file))
+    if DEBUG or DEBUG_TIMING:
+        print('  Buffer file: %s'%(buffer_file))
+        print('  Lock file: %s'%(lock_file))
 
     # Spin on lock file until it is created.
     pyMPI_Wait('MPI_Recv', lock_file, False)
@@ -82,6 +86,9 @@ def MPI_Recv( source, tag, comm ):
     # Spin on buffer file until it is created.
     pyMPI_Wait('MPI_Recv', buffer_file, False)
             
+    if DEBUG_TIMING:
+        t_st_2 = timer()
+        print('  MPI_Recv: time to create message and lock files (sec): %f'%(t_st_2 - t_start))
     # Read all data out of buffer_file.
     buf = load_dict_from_pickle(buffer_file)
     
@@ -94,8 +101,12 @@ def MPI_Recv( source, tag, comm ):
         # when it's removed.
         os.remove(lock_file);
 
-    if DEBUG:
-        print(buf.values())
+    if DEBUG or DEBUG_TIMING:
+        if DEBUG_TIMING:
+            t_st_3 = timer()
+            print('  MPI_Recv: time to receive message file (sec): %f'%(t_st_3 - t_st_2))
+        elif DEBUG:
+            print(buf.values())
         print('<-- Exiting MPI_Recv')
     # Get variable out of buf.
     return list(buf.values())

@@ -153,8 +153,7 @@ def MPI_Tcast(source, dest, tag, comm, *argv):
                     MPI_Send(toRank, tag, comm, argv)
                     if DEBUG_TIMING:
                         time_05 = timer()
-                        print('    Time for MPI_Send call: %f (sec)'%(time_05-time_04))
-
+                        print('    Time for MPI_Send call (sec): %f'%(time_05-time_04))
             else:
                 # Even position from the left. In Python, first even position is one.
                 # Receive message from my left neighbor in the virtual Pid list
@@ -162,14 +161,20 @@ def MPI_Tcast(source, dest, tag, comm, *argv):
                 if vPidPos < nproc: # Receive data only if processor is in the local processor list
                     fromRank = local_pid_list[vPidPos]
                     if DEBUG: print('  MPI_Tcast() received: Pid = %d, fromRank %d'%(Pid,fromRank))
+                    if DEBUG_TIMING: time_06 = timer()
                     [argv] = MPI_Recv(fromRank, tag, comm)  
+                    if DEBUG_TIMING:
+                        time_07 = timer()
+                        print('    Time for MPI_Recv call (sec): %f'%(time_07-time_06))
                 # Note: the received msg may be sent to my neighbor at the next communicaiton level
     
     if DEBUG or DEBUG_TIMING:
         time_end = timer() - time_start
-        print('MPI_Tcast time: %f (sec)'%(time_end))
-        print('argv: ')
-        print(argv)
+        if DEBUG:
+            print('argv: ')
+            print(argv)
+        else:
+            print('MPI_Tcast time (sec): %f'%(time_end))
         print('<-- Exiting MPI_Tcast')
     
     return argv

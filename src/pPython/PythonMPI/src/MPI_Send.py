@@ -1,4 +1,6 @@
-#
+import sys
+from timeit import default_timer as timer
+
 import checkOS as OS
 from set_remote_cc import *
 from exec_shell_cmd import *
@@ -28,7 +30,9 @@ def MPI_Send(dest, tag, comm, *argv):
     """
 
     DEBUG = 0
-    if DEBUG:
+    DEBUG_TIMING = 0
+    if DEBUG or DEBUG_TIMING:
+        t_start = timer()
         print('--> Entering MPI_Send')
         # print(comm)
 
@@ -74,9 +78,8 @@ def MPI_Send(dest, tag, comm, *argv):
     # Create buffer and lock files [updated to support message kernel using local filesystem]
     buffer_file = pyMPI_Buffer_file(my_rank,dest,tag,comm,local_fs=local_fs,msg_type='send',innode=innode)
     lock_file   = pyMPI_Lock_file(my_rank,dest,tag,comm,local_fs=local_fs,msg_type='send',innode=innode)
-    if DEBUG:
+    if DEBUG or DEBUG_TIMING:
         print(buffer_file)
-        print(lock_file)
 
     # Save buf to file after packing the message into a dictionary
     msg = dict()
@@ -90,12 +93,13 @@ def MPI_Send(dest, tag, comm, *argv):
         msg[ii] = arg
         ii = ii + 1
     # Write the message into a file.
-    # if DEBUG:
-    #     print(msg.values())
     try:
         save_dict_to_pickle(msg,buffer_file)
     except:
         raise Exception('MPI_Send: fail to create a message file, %s'%(buffer_file))
+    if DEBUG_TIMING:
+        t_st_1 = timer()
+        print('  MPI_Send: time to save the message (sec): %f'%(t_st_1 - t_start))
     
     # Create lock file.
     fid = open(lock_file,'w+')
@@ -112,8 +116,10 @@ def MPI_Send(dest, tag, comm, *argv):
             raise Execution('MPI_Send: fail to create the lock file, %s'%(lock_file))
         loop = loop + 1
 
-    if DEBUG:
-        print('--> MPI_Send: created lock file, %s'%(lock_file))
+    if DEBUG_TIMING:
+        t_st_2 = timer()
+        print('  MPI_Send: time to create the lock file (sec): %f'%(t_st_2 - t_st_1))
+        print('  --> MPI_Send: created lock file, %s'%(lock_file))
 
     if local_fs and (not innode):
         # when using local filesystem and the message needs to be sent out of node
@@ -171,8 +177,11 @@ def MPI_Send(dest, tag, comm, *argv):
 
             os.remove(buffer_file)
             os.remove(lock_file)
+            if DEBUG_TIMING:
+                t_st_3 = timer()
+                print('  MPI_Send: time to scp the message and lock file (sec): %f'%(t_st_3 - t_st_2))
 
-    if DEBUG:
+    if DEBUG or DEBUG_TIMING:
         print('<-- Exiting MPI_Send')
     return
 

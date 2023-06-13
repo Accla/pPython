@@ -1,4 +1,5 @@
 import numpy as np
+import sys
 
 from MPI_Bcast import *
 
@@ -12,7 +13,8 @@ def BcastMsg(source, tag, *argv):
     """
 
     DEBUG = 0
-    if DEBUG:
+    DEBUG_TIMING = 0
+    if DEBUG or DEBUG_TIMING:
         print('--> Entering BcastMsg')
 
     comm = GPC.comm
@@ -25,18 +27,21 @@ def BcastMsg(source, tag, *argv):
     if Pid == source:
         # Send after packing the message into a dictionary
         ii = 0
-        if DEBUG:
-            print('Length of argv: %d'%(len(argv)))
+        if DEBUG_TIMING:
+            print('    Length of argv: %d'%(len(argv)))
         for arg in argv:
-            if DEBUG:
-                print(arg)
+            if DEBUG: print(arg)
+            if DEBUG_TIMING: print('    size of message: %d'%(sys.getsizeof(arg)))
             msg[ii] = arg
             ii = ii + 1
    
     [out] = MPI_Bcast(source,tag,comm,msg)
 
-    if DEBUG:
-        print('source: %d, tag: %d'%(source,tag))
+    if DEBUG or DEBUG_TIMING:
+        if DEBUG: print('source: %d, tag: %d'%(source,tag))
+        if DEBUG_TIMING: 
+            for arg in out.values():
+                print('    size of message: %d'%(sys.getsizeof(arg)))
         print('<-- Exiting BcastMsg')
         
     return list(out.values())

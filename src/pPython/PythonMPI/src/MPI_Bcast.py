@@ -1,4 +1,6 @@
 import os
+from timeit import default_timer as timer
+import sys
 
 import checkOS as OS
 from dict_with_pickle import save_dict_to_pickle
@@ -31,7 +33,9 @@ def MPI_Bcast( source, tag, comm, *argv ):
     Python version: Dr. Chansup Byun
     """
     DEBUG = 0
-    if DEBUG:
+    DEBUG_TIMING = 0
+    if DEBUG or DEBUG_TIMING:
+        t_start = timer()
         print('--> Entering MPI_Bcast.')
     
     # Get processor rank.
@@ -90,10 +94,18 @@ def MPI_Bcast( source, tag, comm, *argv ):
             # Communicaiton among source and the leader processes on each node
             [argv] = MPI_Tcast(source, destOON, tag, comm, argv)
 
-        if DEBUG:
-            print('argv:')
-            print(argv)
-            print('<-- finished MPI_Tcast among node leaders.')
+        if DEBUG or DEBUG_TIMING:
+            t_end_s1 = timer()
+            if DEBUG:
+                print('argv:')
+                print(argv)
+            elif DEBUG_TIMING:
+                id = 0
+                for arg in argv:
+                    print('  MsgID: %d, size: %d'%(id,sys.getsizeof(arg)))
+                    id += 1
+                print('  MPI_Bcast: Time for broadcasting the message among the leader processes (sec): %f'%(t_end_s1-t_start))
+            print('<-- Stage 1 finished MPI_Tcast among node leaders.')
 
         ##
         # Stage 2:
@@ -126,10 +138,18 @@ def MPI_Bcast( source, tag, comm, *argv ):
         # Communicaiton within a node
         # The leader on each node broadcast the message to the oters on the same node
         [argv] = MPI_Tcast(source, destINN, tag, comm, argv)
-        if DEBUG:
-            print('argv:')
-            print(argv)
-            print('<-- finished MPI_Tcast among processes on the same compute node.')
+        if DEBUG or DEBUG_TIMING:
+            t_end_s2 = timer()
+            if DEBUG:
+                print('argv:')
+                print(argv)
+            elif DEBUG_TIMING:
+                id = 0
+                for arg in argv:
+                    print('  MsgID: %d, size: %d'%(id,sys.getsizeof(arg)))
+                    id += 1
+                print('  MPI_Bcast: Time for broadcasting the message among the processes within a ndoe (sec): %f'%(t_end_s2-t_end_s1))
+            print('<-- Stage 2 finished MPI_Tcast among processes on the same compute node.')
 
     else:
         if DEBUG:
@@ -215,8 +235,6 @@ def MPI_Bcast( source, tag, comm, *argv ):
                 fid.close()
     
         # Loop over lock files.
-        # Wait until all lock files are gone, which means that all receiving processes
-        # have received the broadcasted message
         # Loop over everyone in comm and create lock file.
         for ii in range(0,comm_size):
             # Don't do source.
@@ -225,6 +243,8 @@ def MPI_Bcast( source, tag, comm, *argv ):
                 lock_file = pyMPI_Lock_file(my_rank,ii,tag,comm)
                 # Spin on lock file until it is deleted.
                 # Spin on lock file until it is created.
+                # Wait until all lock files are gone, which means that all receiving processes
+                # have received the broadcasted message
                 pyMPI_Wait('MPI_Bcast', lock_file, True)
     
         # Now all processes have received the broadcasted message.
