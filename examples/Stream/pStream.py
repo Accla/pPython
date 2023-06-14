@@ -2,7 +2,6 @@ import numpy as np
 import os
 from timeit import default_timer as timer
 
-# from pPython_all import *
 import pPython as GPC
 from Dmap import *
 from local import *
