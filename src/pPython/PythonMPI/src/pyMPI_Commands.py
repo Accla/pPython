@@ -204,7 +204,7 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD,**argv):
             if DEBUG:
                 print('-> Remote machine is NOT a pc')
             if grid_job and rank>0:
-                python_command = 'python '+defsfile+' &> '+outfile
+                python_command = python_base+' '+defsfile+' &> '+outfile
             # Forward standard error output to the log and err file on Unix environment
             if EPPAC:
                 FORWARD_ERR = ' 2> >(awk '+q+'BEGIN{FS="\\n"}{print "Pid=" ENVIRON["MPI_COMM_WORLD_RANK"] ": " $1}'+q+' |tee -a '+errfile+' >&2)'
