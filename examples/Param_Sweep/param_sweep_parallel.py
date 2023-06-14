@@ -25,7 +25,6 @@ from local import *
 from put_local import *
 from agg import *
 
-
 from sample_function import *
 
 # Initialize MPI
