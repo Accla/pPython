@@ -34,7 +34,7 @@ def slurm_submit_job(grid_config,sched_job_file,py_file,dir_llsc):
     
     # Partition
     # Can be overrided by the --partition=PARTITION_NAME in the 4th argument in pRUN()
-    if not re.search('--partition',grid_config['sched_options']):
+    if 'sched_options' not in grid_config or (not re.search('--partition',grid_config['sched_options'])):
         cmdstr = cmdstr+' -p '+grid_config['q_name']
     
     # CPU type (if needed)
