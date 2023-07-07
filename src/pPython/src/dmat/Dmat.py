@@ -103,7 +103,7 @@ class Dmat:
     
         if not isinstance(dmap,Dmap):
             # Not a distributed array 
-            self.local = np.array(dims)
+            self.local = np.zeros(dims,dtype)
             return
         
         if len(dims) == 1: # DMAT(M, P)
@@ -166,11 +166,14 @@ class Dmat:
         # figure out local dimensions (d.local_dim added with pPython)
         local_dim = local_dims(self.falls, self.dim);
         self.local_dim = local_dim
+        if DEBUG:
+            print('local dimension: ', end='')
+            print(local_dim)
         
         # Allocating memory is the responsibility of map functions
         # (e.g. ones, zeros, rand and sparse)
         # pPython: allocate memory for sparse method
-        self.local = np.array(self.local_dim, dtype)
+        self.local = np.zeros(self.local_dim, dtype)
         
         # get the local indices for the current processor
         grid_dims = dmap.grid_spec
