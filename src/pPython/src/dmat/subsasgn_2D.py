@@ -103,6 +103,11 @@ def subsasgn_2D(a,s,b):
                 raise Exception('DMAT/subsasgn_2D: Subscripted assignment dimension mismatch.')
     
             # check if maps are the same
+            if DEBUG:
+                print('A & B map properties:')
+                a.map.print()
+                b.map.print()
+
             if a.map==b.map:
                 # maps are the same - no communication needed
                 a.local[:,:] = b.local[:,:]

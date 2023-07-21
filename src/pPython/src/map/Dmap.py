@@ -229,15 +229,25 @@ class Dmap:
             print('<-- Exiting Dmap.__init__()')
 
     def __eq__(self, other):
-
+        # Check if both Dmap objects match with all their propreties
         if isinstance(other, Dmap):
-            if ((self.grid == other.grid).all()) and \
-                (self.dim == other.dim) and \
-                (self.dist_spec == other.dist_spec) and \
-                (self.grid_spec == other.grid_spec) and \
-                (self.proc_list == other.proc_list) and \
-                (self.overlap == other.overlap):
-                return True
+            if (self.dim == other.dim) and (self.overlap == other.overlap) and (self.grid_spec == other.grid_spec) :
+                if (self.grid == other.grid).all():
+                    if (self.dist_spec == other.dist_spec):
+                        if isinstance(self.proc_list,(list)):
+                            if (self.proc_list == other.proc_list):
+                                return False
+                            else:
+                                return False
+                        else:
+                            if (self.proc_list == other.proc_list).all() :
+                                return True
+                            else:
+                                return False
+                    else:
+                        return False
+                else:
+                    return False
             else:
                 return False
         return False
@@ -254,11 +264,11 @@ class Dmap:
     def print(self):
         """Print the map."""
         print('Map Properties:')
-        print('   Process grid: %s'%(str(self.grid)))
-        print('   Map distribution specificaiton: %s'%(str(self.grid_spec)))
-        print('   Distribution type: %s'%(str(self.dist_spec)))
-        print('   Process Pid list: %s'%(str(self.proc_list)))
-        print('   Overlap mapping: %s'%(str(self.overlap)))
+        print('   Process grid (grid): %s'%(str(self.grid)))
+        print('   Map distribution specificaiton (grid_spec): %s'%(str(self.grid_spec)))
+        print('   Distribution type (dist_spec): %s'%(str(self.dist_spec)))
+        print('   Process Pid list (proc_list): %s'%(str(self.proc_list)))
+        print('   Overlap mapping (overlap): %s'%(str(self.overlap)))
         return
 
 ########################################################

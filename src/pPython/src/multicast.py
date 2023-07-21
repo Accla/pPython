@@ -23,22 +23,24 @@ def multicast(src=None, dst=None, data=None):
     DEBUG = 0
     if DEBUG:
         print('--> Entering multicast')
+        print('Source type: %s'%(type(src)))
+        print('Destination type: %s'%(type(dst)))
         
     # Tag management.
     GPC.tag_num += 1
     GPC.tag = 'tag-'+str(GPC.tag_num)
     
     # Quick check
-    if (not src) or (not dst):
-        # Either src nor dst is not defined or empty
-        # no op
-        if DEBUG:
-            print('<-- Exiting multicast')
-        return data
-    elif (src == dst):
+    if isinstance(src,type(None)) or isinstance(dst,type(None)):
+        # Either src nor dst is not defined
+        raise Exception('Error (multicast): either source or destination is not defined.')
+    elif (len(src)==0) or (len(dst)==0):
+        # Either src nor dst is empty
+        raise Exception('Error (multicast): either source or destination is empty.')
+    elif (src == dst.all()):
         # if src is equal to dst, no op
         if DEBUG:
-            print('<-- Exiting multicast')
+            print('<-- Exiting multicast (no op due to src == dst)')
         return data
     
     # Initialize needed variables.
