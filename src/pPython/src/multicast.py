@@ -25,6 +25,7 @@ def multicast(src=None, dst=None, data=None):
         print('--> Entering multicast')
         print('Source type: %s'%(type(src)))
         print('Destination type: %s'%(type(dst)))
+        print('maxGap = size(dst) / 2, %d'%(np.size(dst)/2))
         
     # Tag management.
     GPC.tag_num += 1
@@ -45,7 +46,7 @@ def multicast(src=None, dst=None, data=None):
     
     # Initialize needed variables.
     gap = 1
-    maxGap = len(dst)/2.
+    maxGap = np.size(dst)/2.
     # Assuming src and dst are list types, construct the whole list including src at the first location.
     dst = np.concatenate((np.array(src), np.array(dst)), axis=None)
     # Extract the index number since find() returns a list
@@ -70,28 +71,30 @@ def multicast(src=None, dst=None, data=None):
         # send from dst(i) to dst(i+gap)
         if myIndex < gap:
             if DEBUG:
-                print('Sending data to destination: %d'%(dst[myIndex+gap][0]))
+                print('Case gap <= maxGap: Sending data to destination: %d'%(dst[myIndex+gap][0]))
                 print(data)
             # Need to add [0] to extract the value from dst
             MPI_Send(dst[myIndex+gap][0], GPC.tag, GPC.comm, data)
         elif myIndex < 2*gap:
+            if DEBUG:
+                print('Case gap <= maxGap: Received data from source: %d'%(dst[myIndex-gap][0]))
             # Need to add [0] to extract the value from dst
             [data] = MPI_Recv(dst[myIndex-gap][0], GPC.tag, GPC.comm)
             if DEBUG:
-                print('Received data from source: %d'%(dst[myIndex-gap][0]))
                 print(data)
         gap = gap*2
     
     # Finish off any remaining destinations.
-    if myIndex < len(dst)-gap:
+    if myIndex < np.size(dst)-gap:
         if DEBUG:
-            print('Sending data to destination: %d'%(dst[myIndex+gap][0]))
+            print('Finish: Sending data to destination: %d'%(dst[myIndex+gap][0]))
             print(data)
         MPI_Send(dst[myIndex + gap][0], GPC.tag, GPC.comm, data)
     elif myIndex >= gap:
+        if DEBUG:
+            print('Finish: Received data from source: %d'%(dst[myIndex-gap][0]))
         [data] = MPI_Recv(dst[myIndex-gap][0], GPC.tag, GPC.comm)
         if DEBUG:
-            print('Received data from source: %d'%(dst[myIndex-gap][0]))
             print(data)
 
     if DEBUG:
