@@ -39,7 +39,7 @@ def mtimes(a,b):
         c = a * b
         return c
         if DEBUG:
-            print('<-- Exiting mtimes')
+            print('<-- Exiting mtimes with a scalar')
     
     # Check that both arguments are 2D
     if (len(a.shape) != 2) or (len(b.shape) != 2):
@@ -52,10 +52,12 @@ def mtimes(a,b):
         # np.ndarray * np.ndarray
         c = np.matmul(a,b)
         if DEBUG:
-            print('<-- Exiting mtimes')
+            print('<-- Exiting mtimes, both are not a dmat matrix')
         return c
 
     elif isinstance(a, np.ndarray) and isinstance(b, Dmat):
+        if DEBUG:
+            print('--> Entering mtimes, a: ndarray, b: dmat matrix')
         # np.ndarray * dmat
         mapB = b.map
     
@@ -88,20 +90,37 @@ def mtimes(a,b):
             new_mapA = Dmap(new_gridspec, new_distspec, new_proclist, mapB.overlap)
         else:
             new_mapA = Dmap(new_gridspec, new_distspec, new_proclist)
+        if DEBUG:
+            print('When A is a ndarray, new_mapA is ',end='')
+            new_mapA.print()
+
+        if DEBUG:
+            print('mtimes: calling remap . . . ')
         a = remap(a, new_mapA)
+        if DEBUG:
+            print('mtimes: after remap, type of a is %s . . . '%(type(a)))
                   
         # find row/column in grid
         [myRow, myCol] = find(mapB.grid == GPC.Pid)
+        if DEBUG:
+            print('mtimes: after find, [myRow,myCol] = ')
+            print(myRow)
+            print(myCol)
+            print('mapB.grid[myRow, 0] = %d'%(mapB.grid[myRow, 0]))
+            print('mapB.grid[myRow, 1:] = ',end='')
+            print(mapB.grid[myRow, 1:])
                   
         # send/receive data and do the multiplication
         res[my_idx].local = np.matmul(multicast(mapB.grid[myRow, 0], mapB.grid[myRow, 1:], a.local), b.local)
 
         # add back together sub-results to form resulting matrix (c)
-        c = summation(zeros(size(a, 0)[0], size(b, 1)[0], mapB), res)
+        c = summation(zeros(size(a, 0)[0], size(b, 1)[0], map=mapB), res)
+        if DEBUG:
+            print('<-- Exiting mtimes, np.ndarry * dmat')
                   
     else:
                   
-        # dmat * dmat OR dmat * double
+        # dmat * dmat OR dmat * double (is this a np.ndarray?)
         mapA = a.map
     
         # create sub-result matrices, each with a map equivalent to
@@ -186,6 +205,8 @@ def mtimes(a,b):
     
         # add back together sub-results to form resulting matrix (c)
         c = summation(zeros(size(a, 0)[0], size(b, 1)[0], map=mapA), res)
+        if DEBUG:
+            print('<-- Exiting mtimes, dmat * dmat OR dmat * np.ndarray')
 
     if DEBUG:
         print('After summation: c.local')
