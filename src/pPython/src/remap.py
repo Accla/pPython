@@ -37,7 +37,10 @@ def remap(x, new_map):
             if DEBUG:
                 if isinstance(temp,Dmat):
                     print('local array shape of temp: %s'%(str(temp.local.shape)))
-                    print('local array shape of x: %s'%(str(x.local.shape)))
+                    if isinstance(x,Dmat):
+                        print('local array shape of x: %s'%(str(x.local.shape)))
+                    else:
+                        print('local array shape of x: %s'%(str(x.shape)))
                 else:
                     print('local array shape of temp: %s'%(str(temp.shape)))
                     print('local array shape of x: %s'%(str(x.shape)))
@@ -55,6 +58,7 @@ def remap(x, new_map):
         raise Exception('ERROR (remap): REMAP can only be applied to arrays with 4 dimensions or less.')
     
     if DEBUG:
+        print(x.local)
         print('<-- Exiting remap')
     return x
 

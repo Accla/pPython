@@ -64,17 +64,11 @@ def agg(d, leader=None):
         print('PIDSTART = %s'%(PIDSTART))
     if len(PIDSTART):
         print(' ')
-        print(' ')
         print('AGG: calling topology-aware agg()')
-        print(' ')
-        print(' ')
         return agg_by_topology(d)
     else:
         print(' ')
-        print(' ')
         print('AGG: calling hierachical agg()')
-        print(' ')
-        print(' ')
     
     # Set the leader for aggregation
     if hasattr(GPC, 'leader'):

@@ -15,7 +15,7 @@ def get_global_ind(falls, grid_dims=None):
         len(IND) is equal to the number of dimensions of the distributed
         object. IND(i) is of the form [ind1 ind2 ind3 ...] where ind_i is a
         global index of the distributed object that is local to the current
-        processor.
+        processor. Eachi ind_i is a tuple of range objects (could be one or more)
         
         This is a dictionary variable
         Each value is a tuple of ranges of indices instead of list of indices (save memory usage)

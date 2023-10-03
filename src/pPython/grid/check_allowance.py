@@ -111,7 +111,7 @@ def check_allowance(n_proc,cpu_type):
                 print(' ')
                 strfmt = '''Note: Currently available cores for your job is %d cores.
 But your job requested %d cores.
-Therefor, you job has been submitted as a batch job and it will be executed when the resources become available.'''%( q_avail,n_proc)
+Therefor, you job has been submitted as a batch job and it will be executed when the resources become available.'''%( cpu_q_avail,n_proc)
                 print(strfmt)
             else:
                 status = -1
@@ -119,7 +119,7 @@ Therefor, you job has been submitted as a batch job and it will be executed when
                 print(' ')
                 strfmt = '''Error: Currently available cores for your job is %d cores.
 But your job requested %d cores.
-Please reduce your job size ...'''%(q_avail,n_proc)
+Please reduce your job size ...'''%(cpu_q_avail,n_proc)
                 print(strfmt)
             
         # Debug run for the srun job launch
