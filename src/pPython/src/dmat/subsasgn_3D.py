@@ -269,9 +269,11 @@ def subsasgn_3D(a,s,b):
                 raise Exception('DMAT/SUBSASGN3D: If A and B are both distributed, assignment must be of the form A(:,:,:) = B or A(:,:,i) = B.')
             # # # # # # # # # # # # # # # # # # # # # # # ADDED TO SUPPORT pMapper# # # # # # # # # # # # # # # # # # # # 
         # A(i:j, k:l, m:n) = B        
-    else: 
-        # RHS is not a DMAT or a DOUBLE
-        raise Exception('DMAT/subsasgn_3D: RHS must be a DOUBLE or DMAT.')
+    # How to raise exception when RHS is not a DMAT nor a DOUBLE?
+    # else: 
+    # How to raise exception when RHS is not a DMAT nor a DOUBLE?
+    # # RHS is not a DMAT or a DOUBLE
+    #    raise Exception('DMAT/subsasgn_3D: RHS must be a DOUBLE or DMAT.')
 
     if DEBUG:
         print('<-- Exiting subsasgn_3D')

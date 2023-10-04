@@ -218,9 +218,10 @@ def subsasgn_4D(a,s,b):
         else: # A(i:j, k:l, m:n, p:q) = B
             raise Exception('DMAT/SUBSASGN_4D: If A and B are both distributed, assignment must be of the form A(:,:,:,:) = B.')
         # A(i:j, k:l, m:n, p:q) = B
-    else: 
-        # RHS is not a DMAT or a DOUBLE
-        raise Exception('DMAT/SUBSASGN_4D: RHS must be a DOUBLE or DMAT.')
+    # How to raise exception when RHS is not a DMAT nor a DOUBLE?
+    # else: 
+    #    # RHS is not a DMAT or a DOUBLE
+    #    raise Exception('DMAT/SUBSASGN_4D: RHS must be a DOUBLE or DMAT.')
 
     if DEBUG:
         print('<-- Exiting subsasgn_4D')
