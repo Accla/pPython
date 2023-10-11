@@ -234,16 +234,10 @@ class Dmap:
             if (self.dim == other.dim) and (self.overlap == other.overlap) and (self.grid_spec == other.grid_spec) :
                 if (self.grid == other.grid).all():
                     if (self.dist_spec == other.dist_spec):
-                        if isinstance(self.proc_list,(list)):
-                            if (self.proc_list == other.proc_list):
-                                return False
-                            else:
-                                return False
+                        if (self.proc_list == other.proc_list):
+                            return True
                         else:
-                            if (self.proc_list == other.proc_list).all() :
-                                return True
-                            else:
-                                return False
+                            return False
                     else:
                         return False
                 else:
