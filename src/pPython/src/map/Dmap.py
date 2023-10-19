@@ -22,7 +22,7 @@ class Dmap:
             Additionally, if DIST == 'bc', the block size 'B_SIZE' must
             also be defined.
     PROC_LIST - array of processor ranks specifying on which ranks the
-            object should be distributed. 
+            object should be distributed. (np.array type internally)
     
     Dmap object p contains:
     p.dim: number of dimensions of the the distributed object
@@ -63,7 +63,7 @@ class Dmap:
         dim = len(grid_spec); # dimension of the distributed object
         self.dim = dim
         self.grid_spec = grid_spec
-        self.proc_list = proc_list
+        self.proc_list = np.array(proc_list)
  
         if isinstance(overlap,type(None)):
             # MAP(GRID_SPEC, DIST_SPEC, PROC_LIST)
@@ -122,7 +122,7 @@ class Dmap:
             # the grid
             gsize = grid.size
             if (len(proc_list) != gsize):
-                raise Exception('ERROR (Dmap): Processor list does not match the size of the grid')
+                raise Exception('ERROR (Dmap): Processor list (size: %d) does not match the size (%d) of the grid'%(len(proc_list),gsize))
             else:
                 grid.reshape(gsize)[:] = proc_list[:]
         
@@ -229,12 +229,20 @@ class Dmap:
             print('<-- Exiting Dmap.__init__()')
 
     def __eq__(self, other):
+
+        DEBUG = 0
+        
         # Check if both Dmap objects match with all their propreties
         if isinstance(other, Dmap):
             if (self.dim == other.dim) and (self.overlap == other.overlap) and (self.grid_spec == other.grid_spec) :
                 if (self.grid == other.grid).all():
                     if (self.dist_spec == other.dist_spec):
-                        if (self.proc_list == other.proc_list):
+                        if DEBUG:
+                            print(self.proc_list)
+                            print(type(self.proc_list))
+                            print(other.proc_list)
+                            print(type(other.proc_list))
+                        if (self.proc_list == other.proc_list).all() :
                             return True
                         else:
                             return False
