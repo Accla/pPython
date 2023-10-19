@@ -38,11 +38,12 @@ def multicast(src=None, dst=None, data=None):
     elif (len(src)==0) or (len(dst)==0):
         # Either src nor dst is empty
         raise Exception('Error (multicast): either source or destination is empty.')
-    elif (src == dst.all()):
-        # if src is equal to dst, no op
-        if DEBUG:
-            print('<-- Exiting multicast (no op due to src == dst)')
-        return data
+    elif isinstance(dst,list):
+        if src == np.array(dst).all():
+            # if src is equal to dst, no op
+            if DEBUG:
+                print('<-- Exiting multicast (no op due to src == dst)')
+            return data
     
     # Initialize needed variables.
     gap = 1
