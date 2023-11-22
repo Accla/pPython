@@ -1,16 +1,12 @@
-import numpy as np
+# pPython book example
+from numpy import exp,absolute,meshgrid,array,reshape,vectorize
 from timeit import default_timer as timer
 import matplotlib.pyplot as plt
 
 # Import PythonMPI methods.
 import pPython as GPC
-from Dmap import *
-from zeros import *
-from local import *
-from put_local import *
-from find import *
-from agg import *
-from global_ind import *
+from pPython.map import Dmap,zeros
+from pPython.dmat import local,put_local,agg,find,global_ind
 
 """
 Computes the Mandelbrot set in parallel.
@@ -55,10 +51,10 @@ Wloc = local(W)                # Get local part.
 myI = global_ind(W,0)          # Get local i indices.
 myJ = global_ind(W,1)          # Get local j indices.
 
-[ReC,ImC] = np.meshgrid(np.array(myJ)/(N/2) -1.6, np.array(myI)/(N/2) -1,indexing='xy')
-Cloc = np.vectorize(complex)(ReC,ImC)        # Initialize C.
-Zloc = np.vectorize(complex)(ReC,ImC)        # Initialize Z.
-ieps = np.array(range(Wloc.size),dtype=int)  # Initialize indices.
+[ReC,ImC] = meshgrid(array(myJ)/(N/2) -1.6, array(myI)/(N/2) -1,indexing='xy')
+Cloc = vectorize(complex)(ReC,ImC)        # Initialize C.
+Zloc = vectorize(complex)(ReC,ImC)        # Initialize Z.
+ieps = array(range(Wloc.size),dtype=int)  # Initialize indices.
 tic = timer()                  # Start clock.
 # Flatten arrays for the iteration
 Cloc = Cloc.flatten('F')
@@ -67,12 +63,12 @@ save_shape = Wloc.shape
 Wloc = Wloc.flatten('F')
 for i in range(Niter):         #  Compute Mandelbrot set.
     Zloc[ieps] = Zloc[ieps] * Zloc[ieps]  + Cloc[ieps]  # Numpy always use elementwise multiplication.
-    Wloc[ieps] = np.exp(-np.absolute(Zloc[ieps]))
+    Wloc[ieps] = exp(-absolute(Zloc[ieps]))
     # ieps = ieps[ find(Wloc[ieps] > epsilon) ]
     ieps = ieps[ tuple(find(Wloc[ieps] > epsilon)) ]
 
 # Recover Wloc in the original shape before aggregation
-Wloc = np.reshape(Wloc,save_shape,order='F')
+Wloc = reshape(Wloc,save_shape,order='F')
 W = put_local(W,Wloc)         # Put back into W
 
 Tcompute = timer() - tic      # Stop clock.

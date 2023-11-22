@@ -27,7 +27,7 @@ if run_locally:
 else:
     # Running on a grid environment if configured properly
     # Use the triples mode job
-    GRID_TARGET = 'grid-xeon-e5&'
+    GRID_TARGET = 'grid-xeon64c'
     pRUN( py_file, n_proc_triples, GRID_TARGET )
 
 ########################################################
