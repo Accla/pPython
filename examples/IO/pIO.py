@@ -1,15 +1,15 @@
+# import Python module
 import numpy as np
 import os
 from timeit import default_timer as timer
 
+# import pPython modules
 import pPython as GPC
-from Dmap import *
-from rand import *
-from zeros import *
-from local import *
+from pPython.map import Dmap,rand,zeros
+from pPython.dmat import local
 
-from write_parallel_matrix import *
-from read_parallel_matrix import *
+# import local modules
+from matrix_util import write_matrix,read_matrix
 
 """
 This script creates a distributed matrix. Writes it
@@ -28,7 +28,6 @@ at the PYthon prompt type
 """
 
 #  MPI information
-comm = GPC.comm
 Np = GPC.Np
 Pid = GPC.Pid
 
@@ -37,34 +36,31 @@ print('size: %d'%(Np))
 print('my_rank: %d'%(Pid))
 
 # Set the problem dimensions and filename.
-N = 2^16   
-M = 128   
+N = 2**22; M = 128   
+N = 2^14 # Debug.
 
 if not os.path.exists(os.path.join(os.getcwd(), 'dat')):
     os.mkdir('dat')
-FILE = './dat/pIOvector_'+str(Pid)+'.npz'
+FILE = './dat/pIOvector'
 
-N = 2^14      # Debug.
 PARALLEL = 1  # Set control flag.
-Xmap = 1  
-Ymap = 1      # Create serial maps.
-if (PARALLEL):
-    Xmap = Dmap([1,Np],{},range(Np))  
-    Ymap = Xmap           # Create parallel maps.
+Xmap = 1; Ymap = 1  # Create serial maps.
+if (PARALLEL): # Create parallel maps.
+    Xmap = Dmap([1,Np],{},range(Np)); Ymap = Xmap
 
+print('Global matrix size: %d x %d'%(N,M))
 Xrand = rand(N,M,map=Xmap)    # Create distributed array.
 Yrand = zeros(N,M,map=Ymap)   # Create distributed array.
 tic = timer()             # Start clock.
-write_parallel_matrix(Xrand,FILE)   # Save files.
+write_matrix(Xrand,FILE)   # Save files.
 Twrite = timer() - tic    # Stop clock.
-print('Write Time (sec)                   = %f'%(Twrite))
+print('Write Time (sec)                   = %10.4f'%(Twrite))
 tic = timer()             # Start clock.
-Yrand = read_parallel_matrix(Yrand,FILE)  # Read files.
+Yrand = read_matrix(Yrand,FILE)  # Read files.
 Tread = timer() - tic     # Stop clock.
-print('ead Time (sec)                     = %f'%(Tread))
+print('Read Time (sec)                     = %10.4f'%(Tread))
 
 # Compare results.
-# max_difference = np.amax(np.amax(abs( local(Xrand) - local(Yrand) )))
 max_difference = np.amax(abs( local(Xrand) - local(Yrand) ))
 
 if (max_difference > 0):
@@ -72,9 +68,7 @@ if (max_difference > 0):
     print(max_difference)
 else:
     print('')
-    print('')
     print('SUCCESS')
-    print('')
     print('')
 
 
