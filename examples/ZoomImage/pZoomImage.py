@@ -2,7 +2,6 @@
 import numpy as np
 from timeit import default_timer as timer
 import matplotlib.pyplot as plt
-from matplotlib import interactive
 
 import pPython as GPC
 from pPython.map import Dmap,zeros
@@ -70,7 +69,8 @@ GigaFlops = 1.e-9*totalOps/Tcompute
 print('Performance (Gigaflops)            = %f'%(GigaFlops))
 
 # Display on leader.
-if (Pid == 0):
+PLOT_IMAGE = 0
+if (Pid == 0) and (PLOT_IMAGE == 1):
     f = dict()
     for frameIndex in range(Ns):
         print('Frame index: %d'%(frameIndex))
