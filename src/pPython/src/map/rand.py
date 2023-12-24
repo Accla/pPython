@@ -76,7 +76,7 @@ def rand(*array_sizes, **keywords):
         d = np.random.random(dims)
         return d
     
-    d = Dmat(dims, map=dmap)
+    d = Dmat(None, dtype, dims, map=dmap)
     local_size = d.local_dim
 
     if DEBUG:

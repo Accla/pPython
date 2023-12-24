@@ -78,7 +78,10 @@ def zeros(*array_sizes, **keywords):
         return d
 
     if len(dims) < 5:
-        d = Dmat(dims, map=dmap)
+        d = Dmat(None, dtype, dims, map=dmap)
+        if DEBUG:
+            print('Initialize Dmat with dtype = %s'%(dtype))
+            print(dir(d))
     else:
         print('ERROR(map/zeros): Incorrect number of inputs')
 

@@ -94,7 +94,7 @@ def global_block_range(d, dims):
 # For distributed array type (Dmat) variables
 #
 
-@dispatch(type(Dmat()))
+@dispatch(type(Dmat(None,np.float64)))
 def global_block_range(d):
     """Returns the ranges of global indices local to the current processor.
     
@@ -121,7 +121,7 @@ def global_block_range(d):
     return global_block_range(d, dims)
 
 
-@dispatch(type(Dmat()),int)
+@dispatch(type(Dmat(None,np.float64)),int)
 def global_block_range(d, dim):
     """Returns the ranges of global indices local to the current processor.
     
@@ -148,7 +148,7 @@ def global_block_range(d, dim):
     return global_block_range(d, dims)
 
 
-@dispatch(type(Dmat()),list)
+@dispatch(type(Dmat(None,np.float64)),list)
 def global_block_range(d, dims):
     """Returns the ranges of global indices local to the current processor.
     

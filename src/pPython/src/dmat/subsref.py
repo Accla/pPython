@@ -223,7 +223,7 @@ def subsref(a,s):
                 sizeB = sizeB[0:maxGenDim]
                 gridB = subsref(gridA, s_map)
                 mapB = Dmap(size(gridB), m.dist_spec[0:maxGenDim], reshape(gridB, 1, np.prod(size(gridB))))
-                b = Dmat(sizeB, map=mapB)
+                b = Dmat(a.nbytes,a.dtype,sizeB, map=mapB)
     
                 #
                 # If local processor has data that needs to be sent, send it.

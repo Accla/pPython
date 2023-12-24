@@ -4,7 +4,7 @@ import numpy as np
 from Dmat import *
 from grid_global_ind import *
 
-dmat_type = type(Dmat())
+dmat_type = type(Dmat(None,np.float64))
 
 #
 # For np.ndarray type variables

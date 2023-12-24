@@ -33,7 +33,7 @@ def submat(a, s):
         s_type = s['type']
         s_subs = s['subs']
 
-    b = Dmat()
+    b = Dmat(a.nbytes,a.dtype)
     
     if a.dim==2:  # 2-D
         if isinstance(s_subs[0], str) and isinstance(s_subs[1], str):

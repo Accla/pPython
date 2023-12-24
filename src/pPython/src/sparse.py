@@ -121,7 +121,7 @@ def sparse(*argv,**kwargs):
               'distributed matrices is not supported, yet.')
     
     # Create the 2D distributed object
-    d = Dmat(m, n, map=p)
+    d = Dmat(None, np.float64, m, n, map=p)
     if DEBUG:
         print('2D distributed matrix:')
         print(d.local)
