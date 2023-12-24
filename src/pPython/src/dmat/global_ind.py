@@ -1,3 +1,5 @@
+import numpy as np
+
 from Dmat import *
 from size import *
 
@@ -12,8 +14,7 @@ def global_ind(d, dim=None):
     D: distributed array
     dim: dimension of the distributed array D. 
         A scalar or list containing the desired dimension axis.
-    local_ind: a list (in order to support a string ':' element 
-        representting the full indices of the given dimension)
+    local_ind: a NumPy array to make sub-array operation easier
  
     Author:   Nadya Travinin
     Python version: Dr. Chansup Byun
@@ -76,7 +77,7 @@ def global_ind(d, dim=None):
 
     if DEBUG:
         print('<-- Exiting global_ind')
-    return local_ind
+    return np.array(local_ind)
 
 ########################################################
 # pMatlab: Parallel Matlab Toolbox
