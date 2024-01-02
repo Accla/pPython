@@ -151,8 +151,9 @@ print('SUCCESS')
 print('')
 print('')
 
-# from utils import whosPy
-# var_list = [X0, X1, X2, X3, X0loc, X1loc, X2loc, x3, myI_f, myV]
-# name_list = ['X0', 'X1', 'X2', 'X3', 'X0loc', 'X1loc', 'X2loc', 'x3', 'myI_f', 'myV']
-# whosPy(var_list,name_list)
+"""
+v1=[X0,X0loc,X1,X1loc,X2,X2loc,X3,x3,myI_f,myV]
+v2=['X0','X0loc','X1','X1loc','X2','X2loc','X3','x3','myI_f','myV']
+whosPy(v1,v2)
+"""
 
