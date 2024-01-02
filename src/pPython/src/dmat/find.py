@@ -62,10 +62,10 @@ def find(x):
             if isinstance(x.global_ind[0], str):
                 if x.global_ind[0] == ':':
                     # Send range() instead of list to save memory
-                    x.global_ind[0] = range(x.shape[1]+1)
+                    x.global_ind[0] = range(x.shape[0]+1)
             if isinstance(x.global_ind[1], str):
                 if x.global_ind[1] == ':':
-                    x.global_ind[1] = range(x.shape[2]+1)
+                    x.global_ind[1] = range(x.shape[1]+1)
         
             # When a processor is allocated a single row (column), x.global_ind[0]
             # (x.global_ind[1]) contain a 1x1 matrix.  Since local_i and local_j
