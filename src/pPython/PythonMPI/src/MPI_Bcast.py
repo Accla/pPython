@@ -42,6 +42,9 @@ def MPI_Bcast( source, tag, comm, *argv ):
     my_rank = MPI_Comm_rank(comm)
     comm_size = MPI_Comm_size(comm)
 
+    if comm_size == 1:
+        return argv
+
     # Check whether to use local filesystem or not
     grid_config = comm['grid_config']
     # Check if using mixed messaging kernels for interactive triples mode jobs
@@ -59,9 +62,6 @@ def MPI_Bcast( source, tag, comm, *argv ):
     if DEBUG:
         if local_fs:
             print('Use local filesystem:')
-
-    if comm_size == 1:
-        return argv
 
     # Set some strings for special characters.
     qq = '"'

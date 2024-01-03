@@ -2,7 +2,13 @@ import inspect
 import os
 
 import checkOS as OS
-from pyMPI_Comm_settings_local import *
+
+# Check if $HOME/ppython_conf exists
+PYTHON_CONF_LOCAL=os.getenv('HOME')+os.sep+'ppython_conf'
+if os.path.exists(PYTHON_CONF_LOCAL):
+    import sys
+    sys.path.append(PYTHON_CONF_LOCAL)
+    from pyMPI_Comm_settings_local import *
 
 def pyMPI_Comm_settings():
     """pyMPI_Comm_settings  -  Function for setting values in the MPI Communicator.
