@@ -1,4 +1,4 @@
-import sys
+from sys import getsizeof
 import numpy as np
 
 import pyMPI_COMM_WORLD as pyMCW
@@ -36,6 +36,7 @@ class Dmap:
     Python version: Dr. Chansup Byun
     """
     name = 'grid_map_class'
+    dtype = 'Dmap'
     
     def __init__(self,grid_spec=None,dist_spec=None,proc_list=None,overlap=None,**kwargs):
         """Init constructor."""
@@ -48,6 +49,7 @@ class Dmap:
             print('proc_list')
             print(proc_list)
 
+        self.nbytes = 0
         if not bool(grid_spec):
             return
         #
@@ -63,6 +65,8 @@ class Dmap:
         dim = len(grid_spec); # dimension of the distributed object
         self.dim = dim
         self.grid_spec = grid_spec
+        # to be used with whosPy
+        self.shape = grid_spec
         self.proc_list = np.array(proc_list)
  
         if isinstance(overlap,type(None)):
@@ -224,6 +228,12 @@ class Dmap:
                 else:
                     n_procs = None
             self.overlap = overlap
+
+        # Calculate the actual memory usage
+        self.nbytes = getsizeof(self.dim)+getsizeof(self.grid_spec)+getsizeof(self.shape)+\
+                getsizeof(self.proc_list)+getsizeof(self.dist_spec)+getsizeof(self.grid)+\
+                getsizeof(self.overlap)+\
+                64
 
         if DEBUG:
             print('<-- Exiting Dmap.__init__()')
