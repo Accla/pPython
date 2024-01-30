@@ -47,7 +47,7 @@ def get_local_ind(global_ind, ind):
                     loc_inds = ':'
                 else:
                     if isinstance(ind[i],slice):
-                        # Convert to a list of index
+                        # Convert to a list of index from a slice object
                         ind_list = list(range(ind[i].stop)[ind[i]])
                     else:
                         # assuming it is a list already
@@ -55,7 +55,7 @@ def get_local_ind(global_ind, ind):
                     # PRESERVES THE ORDERING OF INDICES
                     loc_inds = []
                     #  vvvvv new code vvvvv
-                    [vals, i_global, i_ind] = np.intersect1d(np.array(global_ind[i]), np.array(ind_list), return_indices=True)
+                    [vals, i_global, i_ind] = np.intersect1d(global_ind[i], ind_list, return_indices=True)
                     i_ind_sorted = np.argsort(i_ind)
                     ind_sorted = i_ind[i_ind_sorted]
                     loc_inds = i_global[i_ind_sorted]
