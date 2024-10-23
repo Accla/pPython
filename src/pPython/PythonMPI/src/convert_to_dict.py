@@ -20,6 +20,8 @@ def convert_to_dict(input,host):
     if len(input) == 0:    # empty machines list, running locally
         output = {0:host}
         islocal = 1
+        if DEBUG:
+            print('<-- Exiting convert_to_dict')
         return output,islocal
     
     if type(input) == type(set()) or type(input) == type(list()):
@@ -36,6 +38,9 @@ def convert_to_dict(input,host):
         return output,islocal
     else:
         raise Exception('Error in convert_to_dict(). Input is neither list nor set variable.')
+
+    if DEBUG:
+        print('<-- Exiting convert_to_dict')
 
     return
 

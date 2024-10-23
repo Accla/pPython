@@ -22,6 +22,8 @@ def pyMPI_Comm_settings_local(machine_db_settings):
                    for PC, Linux, and Mac OS environment
 
     """
+    DEBUG = 0
+
     # Grid user (ToDo: need a better way to set the grid username)
     # pick up the local username
     if OS.ispc:
@@ -50,7 +52,8 @@ def pyMPI_Comm_settings_local(machine_db_settings):
         # machines.  If wrong, then this needs to be hard coded (see below).
         if OS.islocal:
             if OS.ispc:
-                python_location = 'C:\ProgramData\Anaconda3\python.exe'
+                sep = os.sep
+                python_location = 'C:'+sep+'ProgramData'+sep+'Anaconda3'+sep+'python.exe'
                 machine_db_settings['python_command'] = python_location + ' -u '
             elif OS.islinux:
                 python_location = 'python'
@@ -72,6 +75,8 @@ def pyMPI_Comm_settings_local(machine_db_settings):
     # local directory mapping. (pc, linux, mac, grid, sgrp_1, sgrp_2, sgrp_3)
     machine_db_settings['local_dir_map'] = ['Z:', '/home/gridsan/'+USER, '/Volumes/'+USER, '/home/gridsan/'+USER, '/home/gridsan/groups', '/data2/groups', '/state/partition1/user/'+USER]
 
+    if DEBUG:
+        print(machine_db_settings)
     return machine_db_settings
 
 ########################################################

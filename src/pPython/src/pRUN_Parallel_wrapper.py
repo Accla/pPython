@@ -27,9 +27,12 @@ def pRUN_Parallel_wrapper(py_file):
         # The default mode is defined in the grid_config_local
         grid_config = MPI_COMM_WORLD['grid_config']
         local_fs = grid_config['local_fs']
-        islocal = grid_config['islocal']
         grid_job = grid_config['grid_job']
         interactive = grid_config['interactive']
+        if 'islocal' in grid_config:
+            islocal = grid_config['islocal']
+        else:
+            islocal = True
         EPPAC = grid_config['EPPAC']
         # Passed from pRUN()
         LAUNCH_TIMING = grid_config['LAUNCH_TIMING']

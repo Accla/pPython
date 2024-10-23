@@ -70,13 +70,14 @@ def MPI_Run( py_file, n_proc, machines, **argv ):
     elif (OS.ispc):
         host = os.getenv('computername')
 
-    # Convert machines into a dictionary variable if needed
-    if not isinstance(machines,(dict)):
+    # Convert machines into a dictionary variable if needed (added locally running case)
+    if not isinstance(machines,(dict)) or (len(machines)==0):
         machines,islocal = convert_to_dict(machines,host)
         # pass islocal to pyMPI_Comm_init.py
         OS.islocal = islocal
     if DEBUG:
         print('MPI_Run: OS.islocal = %d'%(OS.islocal))
+        print(machines)
 
     # Check if the directory 'PythonMPI' exists
     checkPath = '.'+os.sep+'PythonMPI'
@@ -99,7 +100,7 @@ def MPI_Run( py_file, n_proc, machines, **argv ):
 
     # Set paths.
     if DEBUG:
-        # print(pyMCW.MPI_COMM_WORLD['machine_db'])
+        print(pyMCW.MPI_COMM_WORLD['machine_db'])
         print(os.getcwd())
     pwd_pc,pwd_linux,pwd_mac,pwd_grid = pyMPI_Dir_map(pyMCW.MPI_COMM_WORLD['machine_db'],os.getcwd())
 
@@ -136,7 +137,7 @@ def MPI_Run( py_file, n_proc, machines, **argv ):
     # dos2unix convert command
     if OS.ispc:
         convert_command = 'dos2unix PythonMPI/*py PythonMPI/*sh'
-        convert_file = 'PythonMPI\dos2unix_conversion.bat'
+        convert_file = 'PythonMPI'+dir_sep+'dos2unix_conversion.bat'
     
     # Loop backwards over each machine target machine
     # so that we hit the host machine last (if it is a target).
@@ -248,7 +249,7 @@ def MPI_Run( py_file, n_proc, machines, **argv ):
     # This is done to fix Matlab's problem with very long commands sent to unix().
     # It may not present with python, though
     if (OS.ispc):
-        launch_file = 'PythonMPI\Dos_Commands.bat'
+        launch_file = 'PythonMPI'+dir_sep+'Dos_Commands.bat'
     else:
         launch_file = 'PythonMPI/Unix_Commands.sh'
             

@@ -10,6 +10,8 @@ from pyMPI_Commands import *
 from pyMPI_Dir_map import *
 from pyMPI_Sleep import *
 
+from convert_to_dict  import *
+
 import grid_config as grid
 from exec_shell_cmd import *
 from grid_resource_policy  import *
@@ -72,10 +74,13 @@ def grid_run( py_file, n_proc, machines ):
         print('machines: %s'%(machines))
 
     # Recover variables processed in check_runtime()
-    islocal = grid.grid_config['islocal']
-    cpu_type = grid.grid_config['cpu_type']
     grid_job = grid.grid_config['grid_job']
-    interactive = grid.grid_config['interactive']
+    if grid_job:
+        islocal = grid.grid_config['islocal']
+        cpu_type = grid.grid_config['cpu_type']
+        interactive = grid.grid_config['interactive']
+    else:
+        islocal = True
 
     OS.islocal = islocal
     if DEBUG:
@@ -94,6 +99,16 @@ def grid_run( py_file, n_proc, machines ):
     # because pyMPI_Comm_init() saves MPI_COMM_WORLD.
     # When each pPython process starts, it read MPI_COMM_WORLD.
     #
+
+    # Convert machines into a dictionary variable if needed (added locally running case)
+    if not isinstance(machines,(dict)) or (len(machines)==0):
+        # Unix vs. Windows host name.
+        if (OS.isunix):
+            host = os.uname()[1]
+        elif (OS.ispc):
+            host = os.getenv('computername')
+        machines,islocal = convert_to_dict(machines,host)
+
     pyMCW.MPI_COMM_WORLD = pyMPI_Comm_init(n_proc,machines,grid_config=grid.grid_config);
 
     if not grid_job:
@@ -112,12 +127,8 @@ def grid_run( py_file, n_proc, machines ):
         # print(pyMCW.MPI_COMM_WORLD['machine_db'])
         print(pyMCW.MPI_COMM_WORLD['grid_config'])
         print(os.getcwd())
-
-    
     
     ## Work in Progress
-    
-    
     
     if (grid.grid_config['EPPAC'] == True):
         #

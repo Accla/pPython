@@ -30,6 +30,7 @@ def pyMPI_Comm_init(n_proc,machines,**argv):
         print('--> Entering pyMPI_Comm_init')
         print('machines:')
         print(machines)
+        print(type(machines))
         print('n_proc = %d'%(n_proc))
         print('----------')
 
@@ -60,11 +61,19 @@ def pyMPI_Comm_init(n_proc,machines,**argv):
         if key == 'grid_config':
             MPI_COMM_WORLD['grid_config'] = argv[key]
             # Check if EPPAC (triples mode jobs) is used.
-            EPPAC = MPI_COMM_WORLD['grid_config']['EPPAC']
+            if 'EPPAC' in MPI_COMM_WORLD['grid_config']:
+                EPPAC = MPI_COMM_WORLD['grid_config']['EPPAC']
+            else:
+                MPI_COMM_WORLD['grid_config']['EPPAC'] = EPPAC
             interactive = MPI_COMM_WORLD['grid_config']['interactive']
             nnode = MPI_COMM_WORLD['grid_config']['nnode']
             if EPPAC:
                nppn = MPI_COMM_WORLD['grid_config']['nppn']
+    # Default setup: 
+    # execution is done locally
+    MPI_COMM_WORLD['grid_config']['islocal'] = True
+    # No mixed file systsem
+    MPI_COMM_WORLD['grid_config']['mixed_fs'] = False
     if EPPAC:
         MPI_COMM_WORLD['group'] = np.arange(0,nnode*nppn,dtype=int)
         MPI_COMM_WORLD['machine_id'] = np.zeros((nnode*nppn,),dtype=int)
@@ -195,17 +204,17 @@ def pyMPI_Comm_init(n_proc,machines,**argv):
                     machine_db['dir'][ii] = pwd_grid+'/PythonMPI'
                 else:
                     if OS.ispc:
-                        machine_db['dir'][ii] = pwd_pc+'\PythonMPI'
+                        machine_db['dir'][ii] = pwd_pc+sep+'PythonMPI'
                     elif OS.islinux:
-                        machine_db['dir'][ii] = pwd_linux+'/PythonMPI'
+                        machine_db['dir'][ii] = pwd_linux+sep+'PythonMPI'
                     else:
-                        machine_db['dir'][ii] = pwd_mac+'/PythonMPI'
+                        machine_db['dir'][ii] = pwd_mac+sep+'PythonMPI'
             else:
                 # Use user specified default (probably 'unix').
                 machine_db['type'][ii] = machine_db_settings['type']
                 # Assuming the remote hosts are LLSC system for now
                 machine_db['python_command'][ii] = machine_db_settings['python_command_llsc']
-                machine_db['dir'][ii] = pwd_grid+'/PythonMPI'
+                machine_db['dir'][ii] = pwd_grid+sep+'PythonMPI'
 
             if DEBUG:
                 print('python command updated: %s'%(machine_db['python_command'][ii]))

@@ -115,25 +115,26 @@ def pRUN(py_file,n_proc,machines,sched_options=None):
     if DEBUG:
         print('After check_runtime: n_proc_req = %d'%(n_proc_req))
 
-    # Check allowance 
-    cpu_type = grid.grid_config['cpu_type'] 
+    if grid.grid_config['grid_job']:
+        # Check allowance 
+        cpu_type = grid.grid_config['cpu_type'] 
 
-    # If a backgrounded triples mode job is launched with the environment variable PPYTHON_SRUN=yes,
-    # do not check allowance for the job and the job will be submitted as a batch job using srun.
-    chk_allowance = True
-    if (os.getenv('PPYTHON_SRUN',default='no').lower() == 'yes'):
-        grid.grid_config['srun'] = True
-    else:
-        grid.grid_config['srun'] = False
-    if grid.grid_config['srun'] and grid.grid_config['EPPAC'] and (grid.grid_config['interactive']==0):
-        chk_allowance = False
+        # If a backgrounded triples mode job is launched with the environment variable PPYTHON_SRUN=yes,
+        # do not check allowance for the job and the job will be submitted as a batch job using srun.
+        chk_allowance = True
+        if (os.getenv('PPYTHON_SRUN',default='no').lower() == 'yes'):
+            grid.grid_config['srun'] = True
+        else:
+            grid.grid_config['srun'] = False
+        if grid.grid_config['srun'] and grid.grid_config['EPPAC'] and (grid.grid_config['interactive']==0):
+            chk_allowance = False
 
-    status = 0
-    if chk_allowance:
-        status = check_allowance(n_proc_req,cpu_type)
-    if DEBUG:
-        print('pRUN: n_proc_req,cpu_type = %d, %s'%(n_proc_req,cpu_type))
-        print('check_allowance status: %d'%(status))
+        status = 0
+        if chk_allowance:
+            status = check_allowance(n_proc_req,cpu_type)
+        if DEBUG:
+            print('pRUN: n_proc_req,cpu_type = %d, %s'%(n_proc_req,cpu_type))
+            print('check_allowance status: %d'%(status))
     
     # For PC, use ;, For Mac & Linux, use :
     if OS.ispc:

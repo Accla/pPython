@@ -77,6 +77,9 @@ def check_runtime( n_proc, machines, grid_config ):
     grid_config['interactive'] = interactive
     grid_config['grid_job'] = grid_job
     
+    if not grid_job:
+        return n_proc, machines, grid_config
+
     # Determine if a specific CPU type is requested
     # Old partition also requires partition name 
     # But new partition, starting xeon-p8, does not need partition name 
