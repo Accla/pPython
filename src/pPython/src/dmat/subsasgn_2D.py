@@ -37,12 +37,24 @@ def subsasgn_2D(a,s,b):
         # RHS is a scalar (double) or an array
         if DEBUG:
             print('RHS is a scalar (double) or an array')
-        if isinstance(s['subs'][0],str) and isinsttance(s['subs'][1],str):
+        if isinstance(s['subs'][0],str) and isinstance(s['subs'][1],str):
             if (s['subs'][0] == ':') and (s['subs'][1] == ':'):
                 # A[:,:] = B
                 if (size(b) == a.shape): 
                     # dimensions are the same in global
-                    a.local[:,:] = b[a.global_ind[0]][:,a.global_ind[1]]
+                    if DEBUG:
+                        print('a.global_ind[0] = %s'%(str(a.global_ind[0])))
+                        print('a.global_ind[1] = %s'%(str(a.global_ind[1])))
+                        print(b[a.global_ind[0],a.global_ind[1]])
+                    # Assuming global_ind is a tuple object of a range object or more
+                    # Only works if there is no missing indices when multiple range objects are in the tuple
+                    robj1 = []
+                    for i in range(len(a.global_ind[0])):
+                        robj1 += list(a.global_ind[0][i])
+                    robj2 = []
+                    for i in range(len(a.global_ind[1])):
+                        robj2 += list(a.global_ind[1][i])
+                    a.local[:,:] = b[robj1[0]:robj1[-1]+1,robj2[0]:robj2[-1]+1]
                 elif (size(b)==[1,1]):   
                     # b is a scalar
                     a.local[:,:] = b
@@ -103,6 +115,11 @@ def subsasgn_2D(a,s,b):
                 raise Exception('DMAT/subsasgn_2D: Subscripted assignment dimension mismatch.')
     
             # check if maps are the same
+            if DEBUG:
+                print('A & B map properties:')
+                a.map.print()
+                b.map.print()
+
             if a.map==b.map:
                 # maps are the same - no communication needed
                 a.local[:,:] = b.local[:,:]

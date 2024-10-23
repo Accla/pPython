@@ -11,6 +11,7 @@ except NameError: MPI_COMM_WORLD = None
 if MPI_COMM_WORLD is None:
     MPI_COMM_WORLD = dict()
     MPI_COMM_WORLD['rank'] = 0
+    MPI_COMM_WORLD['size'] = 1
 
 ########################################################
 # PythonMPI

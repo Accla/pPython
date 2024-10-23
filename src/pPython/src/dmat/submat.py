@@ -1,7 +1,7 @@
-import GridPython as GPC
+import pPython as GPC
 
-from GridMap import *
-from GridDmat import *
+from Dmap import *
+from Dmat import *
 from get_ind_range import *
 from get_local_ind import *
 from get_local_proc import *
@@ -33,7 +33,7 @@ def submat(a, s):
         s_type = s['type']
         s_subs = s['subs']
 
-    b = GridDmat()
+    b = Dmat(a.nbytes,a.dtype)
     
     if a.dim==2:  # 2-D
         if isinstance(s_subs[0], str) and isinstance(s_subs[1], str):
@@ -49,8 +49,8 @@ def submat(a, s):
             # need to figure out on all procs where the index is local
             r = get_local_proc(a.pitfalls, a.map.grid, [ind[0],ind[1]])
             # define new map
-            new_map = GridMap([1,1], {}, [r])
-            # create a new GridDmat object
+            new_map = Dmap([1,1], {}, [r])
+            # create a new Dmat object
             """
             Properties need to be set:
             d.map = self.map

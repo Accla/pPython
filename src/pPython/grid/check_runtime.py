@@ -222,7 +222,8 @@ def check_runtime( n_proc, machines, grid_config ):
             # Messaging kernel using local filesystem is only supported when
             # 1. grid_job, 2. backgrounded job (interactive = 0)
             # Both non-triples or triples mode jobs are supported as long as they are backgrounded grid jobs.
-            raise Exception('ERROR(pRUN_Parallel_wrapper): the default messaging kernel using local filesystem is only supported when \n1. grid_job, 2. backgrounded job (interactive = 0)\nUse either the messaging kernel using the central filesystem or run as a backgrounded job.')
+            err_str = 'ERROR(check_runtime): the default messaging kernel using local filesystem is only supported when '+'\n'+'1. grid_job, 2. backgrounded job (interactive = 0)'+'\n'+'Use either the messaging kernel using the central filesystem or run as a backgrounded job.'
+            raise Exception(err_str)
         
     if DEBUG:
         print("grid_config['mixed_fs'] = %d"%(grid_config['mixed_fs']))

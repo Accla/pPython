@@ -32,42 +32,74 @@ def subsasgn_4D(a,s,b):
     # allocated for a in the caller's workspace
     # Not needed with Python: assignin('caller', inputname(1), [])
     
-    if isinstance(b, (float, np.float64, np.ndarray)): 
-        # RHS is a double
+    if isinstance(b, (int,float,np.float64,np.float32,np.ndarray)): 
+        # RHS is a scalar (double) or an array
         if (s['subs'][0] == ':') and (s['subs'][1] == ':') and (s['subs'][2] == ':') and (s['subs'][3] == ':'):
             # A[:,:,:,:] = B
             if (size(b) == a.shape): # dimensions are the same
-                a.local[:,:,:,:] = b[a.global_ind['0'], a.global_ind['1'], a.global_ind['2'], a.global_ind['3']]
+                # Assuming global_ind is a tuple object of a range object or more
+                # Only works if there is no missing indices when multiple range objects are in the tuple
+                robj1 = []
+                for i in range(len(a.global_ind[0])):
+                    robj1 += list(a.global_ind[0][i])
+                robj2 = []
+                for i in range(len(a.global_ind[1])):
+                    robj2 += list(a.global_ind[1][i])
+                robj3 = []
+                for i in range(len(a.global_ind[2])):
+                    robj3 += list(a.global_ind[2][i])
+                robj4 = []
+                for i in range(len(a.global_ind[3])):
+                    robj4 += list(a.global_ind[3][i])
+                a.local[:,:,:,:] = b[robj1[0]:robj1[-1]+1,robj2[0]:robj2[-1]+1,robj3[0]:robj3[-1]+1,robj4[0]:robj4[-1]+1]
             else: 
                 # dimensions do not match
                 raise Exception('DMAT/SUBSASGN_4D:  Subscripted assignment dimension mismatch.')
         else: # A(i:j, k:l, m:n, p:q) = B
             ind = get_ind_range(a,s)
             local_ind = get_local_ind(a.global_ind, ind)
-            
-            if len(size(b)) == len(size(a.local[local_ind['0'], local_ind['1'], local_ind['2'], local_ind['3']])):
-                if size(b) == size(a.local[local_ind['0'], local_ind['1'], local_ind['2'], local_ind['3']]):
-                    a.local[local_ind['0'], local_ind['1'], local_ind['2'], local_ind['3']] = b
-            elif (len(size(b))==2) and (len(size(a.local[local_ind['0'], local_ind['1'], local_ind['2'], local_ind['3']]))==4):
-                [s1,s2] = size(b)
-                s3 = 1
-                s4 = 1
-                nds = [s1,s2,s3,s4]
-                if nds == size(a.local[local_ind['0'], local_ind['1'], local_ind['2'], local_ind['3']]):
-                    a.local[local_ind['0'], local_ind['1'], local_ind['2'], local_ind['3']] = b
+            # Key for local_ind is numberic key
+            # subslicing array is done differently between MATLAB and Python.
+            s0 = None; s1 = None; s2 = None; s3 = None
+            if len(local_ind[0]):
+                s0 = slice(local_ind[0][0],local_ind[0][-1]+1,None)
+            if len(local_ind[1]):
+                s1 = slice(local_ind[1][0],local_ind[1][-1]+1,None)
+            if len(local_ind[2]):
+                s2 = slice(local_ind[2][0],local_ind[2][-1]+1,None)
+            if len(local_ind[3]):
+                s3 = slice(local_ind[3][0],local_ind[3][-1]+1,None)
 
-            elif (len(size(b))==4) and (len(size(a.local[local_ind['0'], local_ind['1'], local_ind['2'], local_ind['3']]))==4):
-                [ds1,ds2] = size(a.local[local_ind['0'], local_ind['1'], local_ind['2'], local_ind['3']])
+            if len(size(b)) == len(size(a.local[local_ind[0]][:, local_ind[1]][:, local_ind[2]][:, local_ind[3]])):
+                if size(b) == size(a.local[local_ind[0]][:, local_ind[1]][:, local_ind[2]][:, local_ind[3]]):
+                    a.local[s0, s1, s2, s3] = b
+            elif (len(size(b))==2) and (len(size(b)) == len(size(a.local[local_ind[0]][:, local_ind[1]][:, local_ind[2]][:, local_ind[3]]))==4):
+                [t1,t2] = size(b)
+                t3 = 1
+                t4 = 1
+                nds = [t1,t2,t3,t4]
+                if nds == size(a.local[local_ind[0]][:, local_ind[1]][:, local_ind[2]][:, local_ind[3]]):
+                    a.local[s0, s1, s2, s3] = b
+
+            elif (len(size(b))==4) and (len(size(b)) == len(size(a.local[local_ind[0]][:, local_ind[1]][:, local_ind[2]][:, local_ind[3]]))==4):
+                [ds1,ds2] = size(a.local[local_ind[0]][:, local_ind[1]][:, local_ind[2]][:, local_ind[3]])
                 ds3 = 1
                 ds4 = 1
                 ds = [ds1,ds2,ds3,ds4]
                 if size(b)==ds:
-                    a.local[local_ind['0'], local_ind['1'], local_ind['2'], local_ind['3']] = b
+                    a.local[s0, s1, s2, s3] = b
         # A(i:j, k:l, m:n, p:q) = B
-    elif isinstance(b, Dmat):
-        # assignment from a distributed matrix
+
+    # The following caused undefined Dmat error because its circular reference.
+    # elif isinstance(b, Dmat):
+    # elif hasattr(b, 'Dmat'):
+    # elif hasattr(b, 'Dmap'):
+    # elif isinstance(b, Dmat.Dmat):
+    else:
+        # RHS is a DMAT, aassignment from a distributed matrix
         # communication might be necessary
-        if (s['subs'][0]==':') and (s['subs'][1]==':') and (s['subs'][2]==':') and (s['subs'][3]==':'):
+        # if (s['subs'][0]==':') and (s['subs'][1]==':') and (s['subs'][2]==':') and (s['subs'][3]==':'):
+        if isinstance(s['subs'][0],str) and isinstance(s['subs'][1],str) and isinstance(s['subs'][2],str) and isinstance(s['subs'][3],str):
             # A(:,:,:,:) = B
             # check that dimensions match
             if a.shape != b.shape:
@@ -174,7 +206,8 @@ def subsasgn_4D(a,s,b):
                                         # **************************************
                                         for r in range(len(data)):
                                             ind = a_local_ind[r]
-                                            a.local[ind[0], ind[1], ind[2], ind[3]] = data[r]
+                                            # Different behavior compared to Matlab: a.local[ind[0], ind[1]] = data[r]
+                                            a.local[slice(ind[0][0],ind[0][-1]+1),slice(ind[1][0],ind[1][-1]+1),slice(ind[2][0],ind[2][-1]+1),slice(ind[3][0],ind[3][-1]+1)] = data[r]
                                         # both intersections not empty
                             # no comm
                         # the local processor is either in a's or b's map, otherwise should just fall through
@@ -185,9 +218,10 @@ def subsasgn_4D(a,s,b):
         else: # A(i:j, k:l, m:n, p:q) = B
             raise Exception('DMAT/SUBSASGN_4D: If A and B are both distributed, assignment must be of the form A(:,:,:,:) = B.')
         # A(i:j, k:l, m:n, p:q) = B
-    else: 
-        # RHS is not a DMAT or a DOUBLE
-        raise Exception('DMAT/SUBSASGN_4D: RHS must be a DOUBLE or DMAT.')
+    # How to raise exception when RHS is not a DMAT nor a DOUBLE?
+    # else: 
+    #    # RHS is not a DMAT or a DOUBLE
+    #    raise Exception('DMAT/SUBSASGN_4D: RHS must be a DOUBLE or DMAT.')
 
     if DEBUG:
         print('<-- Exiting subsasgn_4D')

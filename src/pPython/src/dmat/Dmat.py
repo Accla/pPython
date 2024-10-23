@@ -1,4 +1,5 @@
 import numpy as np
+from sys import getsizeof
 
 import pyMPI_COMM_WORLD as pyMCW
 from MPI_Comm_rank import *
@@ -17,7 +18,7 @@ from print_falls import *
 class Dmat:
     """Define Dmat class.
     """
-    def __init__(self, *array_sizes, **keywords):
+    def __init__(self, nbytes, dtype, *array_sizes, **keywords):
         """Distributed matrix constructor.
         Creates the necessary data structures for the distributed matrix.
 
@@ -70,6 +71,12 @@ class Dmat:
         if DEBUG:
             print('--> Entering Dmat.init')
         #
+        # Initialize properties
+        self._nbytes = nbytes
+        self._dtype = dtype
+        if DEBUG:
+            print('Dmat: define dtype = %s'%(self._dtype))
+
         # form dims vector
         if array_sizes == None or len(array_sizes)==0:
             self.local = None
@@ -97,13 +104,9 @@ class Dmat:
             elif isinstance(keywords['map'], int):
                 dmap = 1
     
-        dtype = np.float64
-        if 'dtype' in keywords:
-            dtype = keywords['dtype']
-    
         if not isinstance(dmap,Dmap):
             # Not a distributed array 
-            self.local = np.array(dims)
+            self.local = np.zeros(dims,dtype)
             return
         
         if len(dims) == 1: # DMAT(M, P)
@@ -166,11 +169,14 @@ class Dmat:
         # figure out local dimensions (d.local_dim added with pPython)
         local_dim = local_dims(self.falls, self.dim);
         self.local_dim = local_dim
+        if DEBUG:
+            print('local dimension: ', end='')
+            print(local_dim)
         
         # Allocating memory is the responsibility of map functions
         # (e.g. ones, zeros, rand and sparse)
         # pPython: allocate memory for sparse method
-        self.local = np.array(self.local_dim, dtype)
+        self.local = np.zeros(self.local_dim, dtype)
         
         # get the local indices for the current processor
         grid_dims = dmap.grid_spec
@@ -179,8 +185,35 @@ class Dmat:
                 grid_dims.append(0)
         
         self.global_ind = get_global_ind(self.falls, grid_dims)
+
+        # Calculate the actual memory usage
+        nbytes = getsizeof(self.shape)+getsizeof(self.map)+getsizeof(self.local)+\
+                getsizeof(self.falls)+getsizeof(self.dim)+getsizeof(self.pitfalls)+\
+                getsizeof(self.local_dim)+getsizeof(self.global_ind)+getsizeof(self._dtype)+\
+                64
+                # getsizeof(self.copy)
+        self._nbytes = nbytes
+
         if DEBUG:
             print('<-- Exiting Dmat.init')
+
+    @property
+    def nbytes(self):
+        # print("Getting nbytes value...")
+        return self._nbytes
+    @nbytes.setter
+    def nbytes(self, value):
+        # print("Setting nbytes value...")
+        self._nbytes = value
+
+    @property
+    def dtype(self):
+        # print("Getting dtype value...")
+        return self._dtype
+    @dtype.setter
+    def dtype(self, value):
+        # print("Setting dtype value...")
+        self._dtype = value
 
     def __setitem__(self, index, d):
         """Implement __setitem__ with Dmat()
@@ -383,11 +416,11 @@ class Dmat:
                 if (self.dim == other.dim): #compare dimensions
                     if (self.shape == other.shape): #compare shape (a.k.a. size)
                         if self.dim == 2:
-                            c = Dmat(self.shape[0],self.shape[1], map=self.map)
+                            c = Dmat(self._nbytes, self._dtype, self.shape[0],self.shape[1], map=self.map)
                         elif self.dim == 3:
-                            c = Dmat(self.shape[0], self.shape[1], self.shape[2], map=self.map)
+                            c = Dmat(self._nbytes, self._dtype, self.shape[0], self.shape[1], self.shape[2], map=self.map)
                         elif self.dim == 4:
-                            c = Dmat(self.shape[0], self.shape[1], self.shape[2], self.shape[3], map=self.map)
+                            c = Dmat(self._nbytes, self._dtype, self.shape[0], self.shape[1], self.shape[2], self.shape[3], map=self.map)
                         else:
                             print('Dmat/eq: Only distributed arrays of up to 4D are supported')
                             exit(-1)
@@ -411,7 +444,7 @@ class Dmat:
 
     def copy(self):
         """Copy the given dmat."""
-        d = Dmat()
+        d = Dmat(self._nbytes, self._dtype)
         d.map = self.map
         d.dim = self.dim
         d.shape = self.shape

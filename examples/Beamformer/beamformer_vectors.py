@@ -1,12 +1,5 @@
 import numpy as np
-from numpy import cos,sin,pi,ones
-
-# import pPython functions
-from zeros import *
-from size import *
-from ones import *
-from sin import *
-from cos import *
+from numpy import cos,sin,pi
 
 class Params:
     """
@@ -49,9 +42,9 @@ def beamformer_vectors(Nsensors,Nbeams,myFreqs):
     params.arrayGeom.x = np.linspace(-1000,1000,Nsensors)
     if DEBUG:
         print(params.arrayGeom.x.shape)
-        print(size(params.arrayGeom.x))
-    params.arrayGeom.y = zeros(size(params.arrayGeom.x))
-    params.arrayGeom.z = zeros(size(params.arrayGeom.x))
+        print(np.size(params.arrayGeom.x))
+    params.arrayGeom.y = np.zeros(np.size(params.arrayGeom.x))
+    params.arrayGeom.z = np.zeros(np.size(params.arrayGeom.x))
     params.numEls = len(params.arrayGeom.x)
     
     params.soundSpeed=1500
@@ -65,10 +58,10 @@ def beamformer_vectors(Nsensors,Nbeams,myFreqs):
     
     # set so all azimuths have the same focus range
     if(hasattr(params, 'focus_range')):
-        focus_range = params.focus_range*ones(1,numAz)
+        focus_range = params.focus_range*np.ones((1,numAz))
     else:
         # default to far-field
-        focus_range = 1e10*ones(1,numAz)
+        focus_range = 1e10*np.ones((1,numAz))
 
     # shoehorn rr structure into P_array.
     P_array = np.concatenate((params.arrayGeom.x,params.arrayGeom.y,params.arrayGeom.z)).reshape((-1, 3), order='F')
@@ -87,7 +80,7 @@ def beamformer_vectors(Nsensors,Nbeams,myFreqs):
             print(P_array_matrix[:,:,i])
 
     #CB: v is an array of complex numbers. So allocate memory accordingly
-    v = zeros(params.numEls,numAz,numElev,numFreqs)
+    v = np.zeros((params.numEls,numAz,numElev,numFreqs))
     v = np.vectorize(complex)(v,v)
     if DEBUG:
         print('v.shape')
@@ -97,9 +90,10 @@ def beamformer_vectors(Nsensors,Nbeams,myFreqs):
     for ielev in range(numElev):
         # Define the vector that points at this azimuth and elevation
         # from the array phase center
-        pointing_vectors[0,:] = cos(params.az*pi/180)*cos(params.el[ielev]*pi/180)
-        pointing_vectors[1,:] = sin(params.az*pi/180)*cos(params.el[ielev]*pi/180)
-        pointing_vectors[2,:] = ones(1,numAz)*sin(params.el[ielev]*pi/180)
+        # Use np.around to overcome the exact zero issue
+        pointing_vectors[0,:] = np.around(cos(params.az*pi/180),decimals=8)*cos(params.el[ielev]*pi/180)
+        pointing_vectors[1,:] = np.around(sin(params.az*pi/180),decimals=8)*cos(params.el[ielev]*pi/180)
+        pointing_vectors[2,:] = np.ones((1,numAz))*sin(params.el[ielev]*pi/180)
     
         # Compute the actual focus point (meters)
         focus_points = np.dot(pointing_vectors,np.diag(focus_range[0]))
@@ -114,11 +108,11 @@ def beamformer_vectors(Nsensors,Nbeams,myFreqs):
     
         # Compute the difference in range to each element in the array with
         # respect to the array phase center
-        focus_points_matrix = np.reshape(np.kron(focus_points,ones(params.numEls,1)),(params.numEls,3,numAz),'F')
+        focus_points_matrix = np.reshape(np.kron(focus_points,np.ones((params.numEls,1))),(params.numEls,3,numAz),'F')
         """
         if DEBUG:
-            print('np.kron(focus_points,ones(params.numEls,1))')
-            print(np.kron(focus_points,ones(params.numEls,1)))
+            print('np.kron(focus_points,np.ones(params.numEls,1))')
+            print(np.kron(focus_points,np.ones(params.numEls,1)))
             
             print('focus_points_matrix.shape')
             print(focus_points_matrix.shape)
@@ -128,7 +122,7 @@ def beamformer_vectors(Nsensors,Nbeams,myFreqs):
                 print(focus_points_matrix[:,:,i])
         """
     
-        delta_range = np.sqrt(np.squeeze(np.sum((P_array_matrix - focus_points_matrix)**2,1))) - ones(params.numEls,1)*focus_range
+        delta_range = np.sqrt(np.squeeze(np.sum((P_array_matrix - focus_points_matrix)**2,1))) - np.ones((params.numEls,1))*focus_range
 
         if DEBUG:
             print('delta_range')

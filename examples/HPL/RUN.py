@@ -20,12 +20,15 @@ n_proc_triples = [4,2,24]
 # Launch pPython
 # print('Running: %s via pRUN().'%(py_file))
 
-# Running locally
-pRUN( py_file, n_proc, {})
-
-# Running on a grid environment if configured properly
-# Use the triples mode job
-# pRUN( py_file, n_proc_triples, 'grid' )
+run_locally = 0
+if run_locally:
+    # Running locally
+    pRUN( py_file, n_proc, {})
+else:
+    # Running on a grid environment if configured properly
+    # Use the triples mode job
+    GRID_TARGET = 'grid-xeon-e5&'
+    pRUN( py_file, n_proc_triples, GRID_TARGET )
 
 ########################################################
 # pPython: Parallel Python Programming Tool

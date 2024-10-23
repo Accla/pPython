@@ -1,21 +1,14 @@
+# Import NumPy and timer modules.
 import numpy as np
 from timeit import default_timer as timer
-from math import ceil
 import matplotlib.pyplot as plt
-from matplotlib import interactive
 
 import pPython as GPC
-from Dmap import *
-from zeros import *
-from put_local import *
-from agg import *
-from global_ind import *
+from pPython.map import Dmap,zeros
+from pPython.dmat import put_local,agg,find,global_ind
 
 from reference_frame import *
 from zoom_frames import *
-
-# for debugging
-from size import *
 
 """
 ZoomImage: zoom in on an image.
@@ -29,16 +22,15 @@ To run in serial with distributed arrays, set
 At the Python prompt type
     pZoomImage
 To run in parallel with distributed arrays at the Python prompt type
-    eval(pRUN('pZoomImage',2,{}))
+    pRUN('pZoomImage',2,{})
 """
 
 #  MPI information
-comm = GPC.comm
 Np = GPC.Np
 Pid = GPC.Pid
 
 # Set image size, number frames, start and stop scale.
-N = 512;  Ns  = 16; Sstart = 32; Send = 1
+N = 512;  Ns  = 16; Sstart = 24; Send = 1
 N = 256   # Debug.
 
 sigma  = 0.5     # Width of blur kernel.
@@ -77,14 +69,18 @@ GigaFlops = 1.e-9*totalOps/Tcompute
 print('Performance (Gigaflops)            = %f'%(GigaFlops))
 
 # Display on leader.
-if (Pid == 0):
+PLOT_IMAGE = 0
+if (Pid == 0) and (PLOT_IMAGE == 1):
     f = dict()
     for frameIndex in range(Ns):
         print('Frame index: %d'%(frameIndex))
         pimg = np.squeeze(Zagg[:,:,frameIndex])
-        f[frameIndex] = plt.figure(frameIndex)
-        plt.imshow(pimg, origin = 'lower')
-        # filename = 'zoom_frame_'+pstr+'_'+npstr+'-'+str(frameIndex)
+        f[frameIndex] = plt.figure(frameIndex,figsize=(1,1))
+        ax = plt.Axes(f[frameIndex], [0., 0., 1., 1.])
+        ax.set_axis_off()
+        f[frameIndex].add_axes(ax)
+        img = ax.imshow(pimg, origin = 'upper')
+        img.set_cmap('bwr')
         filename = 'zoom_frame_'+str(frameIndex)
         plt.savefig(filename+'.png')
     # The following will keep the leader process running until all the figures are closed.

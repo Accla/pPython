@@ -15,48 +15,54 @@ To run in parallel with distributed arrays at the Python prompt type
     
 Python version: Dr. Chansup Byun
 """
-import numpy as np
+# import numpy as np
+from numpy import abs,array,dot,newaxis,save,sqrt,squeeze,sum,transpose
 from timeit import default_timer as timer
 import matplotlib.pyplot as plt
 
 # Import PythonMPI methods.
 import pPython as GPC
-from Dmap import *
-from dcomplex import *
-from local import *
-from size import *
-from rand import *
-from global_ind import *
-from agg import *
-from put_local import *
+from pPython.map import Dmap,rand,zeros
+from pPython.dmat import dcomplex,local,global_ind,agg,put_local
 
+# Import auxiliary module
 from beamformer_vectors import *
 
 #  MPI information
-comm = GPC.comm
 Np = GPC.Np
 Pid = GPC.Pid
 
 # Set number of time snapshots, sensors, beams and frequencies.
-Nt = 600 
-Ns = 90  
-Nb = 40 
-Nf = 100
+Nt = 50   # number of different time snapshots
+Ns = 90   # number of sensor elements
+Nb = 40   # number of beams 
+Nf = 100  # number of frequencies
 
-Nt = 100 # Debug.
+# Nt = 600 # Performance
+Nt = 100 # Performance
+Nb = 80  # Plot 
 
-PARALLEL = 0    # Set control flag.
+# For BOOK plots
+# Nf = 256
+# For BOOK timing
+# Nf = 512
+
+# For BOOK texts
+Nt = 50
+Nb = 40
+
+PARALLEL = 1    # Set control flag.
 Xmap = 1        # Create serial map.
 if (PARALLEL):
     Xmap = Dmap([1,1,Np],{},range(Np))  # Create parallel map.
 
 # ALLOCATE PARALLEL DATA STRUCTURES ---------------------
 X0 = zeros(Nt,Nb,Nf,map=Xmap)   # Source array.
-X1 = np.sqrt(Ns)*dcomplex(rand(Nt,Ns,Nf,map=Xmap),rand(Nt,Ns,Nf,map=Xmap))  # Sensor input.
+X1 = sqrt(Ns)*dcomplex(rand(Nt,Ns,Nf,map=Xmap),rand(Nt,Ns,Nf,map=Xmap))  # Sensor input.
 X2 = zeros(Nt,Nb,Nf,map=Xmap)   # Beamformed output.
 X3 = zeros(Nt,Nb,Np,map=Xmap)   # Intermediate sum.
-#CB global_ind() returns a list, Should make it return a numpy array?
-myI_f = np.array(global_ind(X1,2))   # Get local indices.
+
+myI_f = global_ind(X1,2)   # Get local indices.
 # Get local parts of arrays.
 X0loc = local(X0)  
 X1loc = local(X1)  
@@ -66,13 +72,13 @@ X2loc = local(X2)
 
 # Pick an arbitrary set of frequencies.
 freq0 = 10  
-frequencies = freq0 + np.array(range(Nf))
+frequencies = freq0 + array(range(Nf))
 # Create local steering vector by passing local frequencies.
-myV = np.squeeze(beamformer_vectors(Ns,Nb,frequencies[myI_f]))
+myV = squeeze(beamformer_vectors(Ns,Nb,frequencies[myI_f]))
 
 # STEP 0: Insert targets ---------------------
 
-# Insert two targets at different angles.
+# Insert two targets at different angles in X0.
 # Subtract one to match with the same index location used by Matlab
 X0loc[:,round(0.25*Nb)-1,:] = 1  
 X0loc[:,round(0.5*Nb)-1,:] = 1
@@ -80,59 +86,74 @@ X0loc[:,round(0.5*Nb)-1,:] = 1
 # STEP 1: CREATE SYNTHETIC DATA. ---------------------
 tic = timer()               # Start timer.
 for i_t in range(Nt):       # Loop over time snapshots.
-    for i_f in range(np.prod(size(myI_f))):  # Loop over local frequencies.
+    for i_f in range(myI_f.size):  # Loop over local frequencies.
         # Convert from beams to sensors.
-        X1loc[i_t,:,i_f] = X1loc[i_t,:,i_f] + np.dot(np.squeeze(myV[:,:,i_f]),np.transpose(np.squeeze(X0loc[i_t,:,i_f])))
+        # X1loc[i_t,:,i_f] = X1loc[i_t,:,i_f] + dot(squeeze(myV[:,:,i_f]),transpose(squeeze(X0loc[i_t,:,i_f])))
+        X1loc[i_t,:,i_f] += dot(squeeze(myV[:,:,i_f]),transpose(squeeze(X0loc[i_t,:,i_f])))
 
 # STEP 2: BEAMFORM AND SAVE DATA. ---------------------
 
 for i_t in range(Nt):      # Loop over time snapshots.
-    for i_f in range(np.prod(size(myI_f))):  # Loop over local frequencies.
+    for i_f in range(myI_f.size):  # Loop over local frequencies.
         # Convert from sensors back to beams.
         # Matlab automatically transpose vector as 1xN but not with Python, whcih needs explicit transpose()
-        X2loc[i_t,:,i_f] = np.abs(np.dot(np.squeeze(X1loc[i_t,:,i_f]).T, np.squeeze(myV[:,:,i_f])))**2
+        X2loc[i_t,:,i_f] = abs(dot(squeeze(X1loc[i_t,:,i_f]).T, squeeze(myV[:,:,i_f])))**2
 
-for i_f in range(np.prod(size(myI_f))):  # Loop over frequencies.
-    X_i_f = np.squeeze(X2loc[:,:,i_f])   # Get a matrix of data.
+for i_f in range(myI_f.size):  # Loop over frequencies.
+    X_i_f = squeeze(X2loc[:,:,i_f])   # Get a matrix of data.
     filename = 'dat/pBeamformer_freq.'+str(myI_f[i_f])+'.npy'
-    np.save(filename, X_i_f)             # .npy extension is added if not given
+    save(filename, X_i_f)             # .npy extension is added if not given
 
 Tcompute = timer()-tic
 print('Compute Time (sec)                 = %f'%(Tcompute))
 
 # STEP 3: SUM ACROSS FREQUNCY. ---------------------
 
-# Add the missing axis for the broadcast ops in put_local() when np.sum() reduces X2loc dimension
-X3 = put_local(X3,np.sum(X2loc,2)[:,:,np.newaxis])   # Sum local part and put into X3.
+# Add the missing axis for the broadcast ops in put_local() when sum() reduces X2loc dimension
+X3 = put_local(X3,sum(X2loc,2)[:,:,newaxis])   # Sum local part and put into X3.
 tic = timer()                        # Start timer.
-x3 = np.squeeze(np.sum(agg(X3),2))   # Aggregate X3 on leader and complte sum.
+x3 = squeeze(sum(agg(X3),2))   # Aggregate X3 on leader and complte sum.
 
 Tcomm = timer() - tic
 print('Launch+Comm Time (sec)             = %f'%(Tcomm))
 
 # STEP 4: Finalize and display. ---------------------
 # Display on leader.
-if (Pid == 0):
+DISPLAY_PLOT=0
+if (Pid == 0) and (DISPLAY_PLOT==1):
     pstr = str(PARALLEL)
     npstr = str(Np)
-    plt.imshow(np.abs(np.squeeze(X0loc[:,:,0])), origin = 'lower')
-    filename = 'beamformer_x0_'+pstr+'_'+npstr
-    plt.savefig(filename+'.png')
+    
+    img0 = plt.imshow(abs(squeeze(X0loc[:,:,0])), origin = 'upper')
+    # img0.set_cmap('bwr')
+    filename = 'beamformer_x0_'+pstr+'_'+npstr+'.png'
+    plt.savefig(filename)
 
-    plt.imshow(np.abs(np.squeeze(X1loc[:,:,0])), origin = 'lower')
-    filename = 'beamformer_x1_'+pstr+'_'+npstr
-    plt.savefig(filename+'.png')
+    img1 = plt.imshow(abs(squeeze(X1loc[:,:,0])), origin = 'upper')
+    # img1.set_cmap('bwr')
+    filename = 'beamformer_x1_'+pstr+'_'+npstr+'.png'
+    plt.savefig(filename)
 
-    plt.imshow(np.abs(np.squeeze(X2loc[:,:,0])), origin = 'lower')
-    filename = 'beamformer_x2_'+pstr+'_'+npstr
-    plt.savefig(filename+'.png')
+    img2 = plt.imshow(abs(squeeze(X2loc[:,:,0])), origin = 'upper')
+    # img2.set_cmap('bwr')
+    filename = 'beamformer_x2_'+pstr+'_'+npstr+'.png'
+    plt.savefig(filename)
 
-    plt.imshow(x3, origin = 'lower')
-    filename = 'beamformer_x3_'+pstr+'_'+npstr
-    plt.savefig(filename+'.png')
+    img3 = plt.imshow(x3, origin = 'upper')
+    img3.set_cmap('bwr')
+    filename = 'beamformer_x3_'+pstr+'_'+npstr+'.png'
+    plt.savefig(filename)
+
+    plt.show()
 
 print('')
 print('SUCCESS')
 print('')
 print('')
+
+"""
+v1=[X0,X0loc,X1,X1loc,X2,X2loc,X3,x3,myI_f,myV]
+v2=['X0','X0loc','X1','X1loc','X2','X2loc','X3','x3','myI_f','myV']
+whosPy(v1,v2)
+"""
 

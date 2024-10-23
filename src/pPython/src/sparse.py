@@ -111,6 +111,9 @@ def sparse(*argv,**kwargs):
         n     = argv[4]
         nzmax = argv[5]
 
+    if DEBUG:
+        print('m  = %d, n = %d'%(m,n))
+        print('nzmax: %d'%(nzmax))
     # For now, sparse only works when ii, jj, and s are [].  Specifying
     # values for ii, jj and s will be implemented in the future.
     if (len(ii) != 0 or len(jj) !=  0 or len(s) != 0):
@@ -118,7 +121,11 @@ def sparse(*argv,**kwargs):
               'distributed matrices is not supported, yet.')
     
     # Create the 2D distributed object
-    d = Dmat(m, n, map=p)
+    d = Dmat(None, np.float64, m, n, map=p)
+    if DEBUG:
+        print('2D distributed matrix:')
+        print(d.local)
+        print(' ')
     
     # Figure out local dimensions of dmat
     
@@ -149,12 +156,22 @@ def sparse(*argv,**kwargs):
         jj = jj + [ floor(k/local_size[0]) ]
     if DEBUG:
         print('nzmax_local: %d'%(nzmax_local))
-        print('Length of row: %d'%(len(ii)))
-        print('Length of col: %d'%(len(jj)))
-        print('Length of data: %d'%(len(s)))
+        print('Length of data: %d'%(len(s)),end='')
+        print(s)
+        print('Length of row: %d'%(len(ii)),end='')
+        print(ii)
+        print('Length of col: %d'%(len(jj)),end='')
+        print(jj)
         print('Sparse matrix shape: (%d, %d)'%(local_size[0],local_size[1]))
 
-    d.local = csr_matrix((s, (ii, jj)), shape=(local_size[0], local_size[1]), dtype=np.float64)
+    #
+    # The following fails when local_size[0] * local_size[1] < nzmax_local since dense matrix is
+    # not big enough to hold all sparse elements
+    #
+    if local_size[0] * local_size[1] < nzmax_local:
+        raise Exception('The local dense matrix is not big enough to store all the sparse elements. Increase local matrix dimension')
+    else:
+        d.local = csr_matrix((s, (ii, jj)), shape=(local_size[0], local_size[1]), dtype=np.float64)
 
     if DEBUG:
         print('<-- Exiting sparse')

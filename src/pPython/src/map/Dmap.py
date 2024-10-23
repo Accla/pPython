@@ -1,4 +1,4 @@
-import sys
+from sys import getsizeof
 import numpy as np
 
 import pyMPI_COMM_WORLD as pyMCW
@@ -22,7 +22,7 @@ class Dmap:
             Additionally, if DIST == 'bc', the block size 'B_SIZE' must
             also be defined.
     PROC_LIST - array of processor ranks specifying on which ranks the
-            object should be distributed. 
+            object should be distributed. (np.array type internally)
     
     Dmap object p contains:
     p.dim: number of dimensions of the the distributed object
@@ -36,6 +36,7 @@ class Dmap:
     Python version: Dr. Chansup Byun
     """
     name = 'grid_map_class'
+    dtype = 'Dmap'
     
     def __init__(self,grid_spec=None,dist_spec=None,proc_list=None,overlap=None,**kwargs):
         """Init constructor."""
@@ -48,6 +49,7 @@ class Dmap:
             print('proc_list')
             print(proc_list)
 
+        self.nbytes = 0
         if not bool(grid_spec):
             return
         #
@@ -63,7 +65,9 @@ class Dmap:
         dim = len(grid_spec); # dimension of the distributed object
         self.dim = dim
         self.grid_spec = grid_spec
-        self.proc_list = proc_list
+        # to be used with whosPy
+        self.shape = grid_spec
+        self.proc_list = np.array(proc_list)
  
         if isinstance(overlap,type(None)):
             # MAP(GRID_SPEC, DIST_SPEC, PROC_LIST)
@@ -122,7 +126,7 @@ class Dmap:
             # the grid
             gsize = grid.size
             if (len(proc_list) != gsize):
-                raise Exception('ERROR (Dmap): Processor list does not match the size of the grid')
+                raise Exception('ERROR (Dmap): Processor list (size: %d) does not match the size (%d) of the grid'%(len(proc_list),gsize))
             else:
                 grid.reshape(gsize)[:] = proc_list[:]
         
@@ -225,19 +229,37 @@ class Dmap:
                     n_procs = None
             self.overlap = overlap
 
+        # Calculate the actual memory usage
+        self.nbytes = getsizeof(self.dim)+getsizeof(self.grid_spec)+getsizeof(self.shape)+\
+                getsizeof(self.proc_list)+getsizeof(self.dist_spec)+getsizeof(self.grid)+\
+                getsizeof(self.overlap)+\
+                64
+
         if DEBUG:
             print('<-- Exiting Dmap.__init__()')
 
     def __eq__(self, other):
 
+        DEBUG = 0
+        
+        # Check if both Dmap objects match with all their propreties
         if isinstance(other, Dmap):
-            if ((self.grid == other.grid).all()) and \
-                (self.dim == other.dim) and \
-                (self.dist_spec == other.dist_spec) and \
-                (self.grid_spec == other.grid_spec) and \
-                (self.proc_list == other.proc_list) and \
-                (self.overlap == other.overlap):
-                return True
+            if (self.dim == other.dim) and (self.overlap == other.overlap) and (self.grid_spec == other.grid_spec) :
+                if (self.grid == other.grid).all():
+                    if (self.dist_spec == other.dist_spec):
+                        if DEBUG:
+                            print(self.proc_list)
+                            print(type(self.proc_list))
+                            print(other.proc_list)
+                            print(type(other.proc_list))
+                        if (self.proc_list == other.proc_list).all() :
+                            return True
+                        else:
+                            return False
+                    else:
+                        return False
+                else:
+                    return False
             else:
                 return False
         return False
@@ -254,11 +276,11 @@ class Dmap:
     def print(self):
         """Print the map."""
         print('Map Properties:')
-        print('   Process grid: %s'%(str(self.grid)))
-        print('   Map distribution specificaiton: %s'%(str(self.grid_spec)))
-        print('   Distribution type: %s'%(str(self.dist_spec)))
-        print('   Process Pid list: %s'%(str(self.proc_list)))
-        print('   Overlap mapping: %s'%(str(self.overlap)))
+        print('   Process grid (grid): %s'%(str(self.grid)))
+        print('   Map distribution specificaiton (grid_spec): %s'%(str(self.grid_spec)))
+        print('   Distribution type (dist_spec): %s'%(str(self.dist_spec)))
+        print('   Process Pid list (proc_list): %s'%(str(self.proc_list)))
+        print('   Overlap mapping (overlap): %s'%(str(self.overlap)))
         return
 
 ########################################################

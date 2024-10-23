@@ -20,28 +20,22 @@ import scipy.signal
 import scipy.sparse
 import matplotlib.pyplot as plt
 
+# import pPython modules
 import pPython as GPC
-from Dmap import *
-from zeros import *
-from ones import *
-from synch import *
-from find import *
-from global_ind import *
-from local import *
-from put_local import *
-from BcastMsg import *
+from pPython.map import Dmap,zeros,ones
+from pPython.dmat import size,synch,local,global_ind,agg,put_local
+from pPython.ppm import BcastMsg
 
 #  MPI information
-comm = GPC.comm
 Np = GPC.Np
 Pid = GPC.Pid
 
 # Set image size (scaled by numlabs), filter size and blur.
 Nx = 2**11*Np;  Ny = 1024; Nk = 2**5;  Nblur = 2
-# Nx = 2**9*Np;  # Debug 
+Nx = 2**9*Np;  # Debug 
 
 PARALLEL = 1   # Set control flag.
-CHECK = 1      # Check answer with serial calculation.
+CHECK = 0      # Check answer with serial calculation.
 
 Zmap = 1       # Create serial map.
 if (PARALLEL):
@@ -53,15 +47,9 @@ if (CHECK):
 
 Z = zeros(Nx,Ny,map=Zmap) + 1.e-4   # Create 2D distributed array.
 # Make sure the pertubation indices, ii and jj, are the same across all the MPI processes
-tag = 1004
-if Pid == 0:
-    [ii,jj] = find(scipy.sparse.random(Nx, Ny, density=1.e-4))  # Create non-zeros.
-    [ii,jj] = BcastMsg(0,tag,ii,jj)
-else:
-    ii = jj = None
-    [ii,jj] = BcastMsg(0,tag,ii,jj)
-ii = np.array(ii) # Convert as Numpy array for array indexing ops
-jj = np.array(jj) # Convert as Numpy array for array indexing ops
+tmp = scipy.sparse.random(Nx, Ny, density=1.e-4, random_state=0)  # Create non-zeros.
+[ii,jj] = tmp.nonzero()
+
 for i in range(np.prod(size(ii))):
     Z[ii[i],jj[i]]=1             # Insert non-zeros.
 
@@ -107,7 +95,8 @@ gigaflops = totalOps / Tcompute / 1.e9
 print('Performance (Gigaflops)            = %f'%(gigaflops))
 
 # Display on leader.
-if (Pid == 0):
+DISPLAY=1
+if (Pid == 0) and (DISPLAY!=0):
     pstr = str(PARALLEL)
     npstr = str(Np)
     fig, ax = plt.subplots()
@@ -120,6 +109,14 @@ if (Pid == 0):
     fig, ax = plt.subplots()
     plt.imshow(np.rot90(local(Z),1), origin = 'lower')
     plt.show()
+
+# Uncomment the following section to profile memory usage
+"""
+from utils import whosPy
+v1=[Nx, Ny, Nk, Z, Zloc, Zmap, kernel, myI, myJ, Nblur]
+v2=['Nx', 'Ny', 'Nk', 'Z', 'Zloc', 'Zmap', 'kernel', 'myI', 'myJ', 'Nblur']
+whosPy(v1,v2)
+"""
 
 print('')
 print('SUCCESS')

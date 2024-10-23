@@ -43,6 +43,10 @@ def synch(d):
     # obtain the process grid dimensions
     grid_dims = list(proc_grid.shape)
 
+    # Return if there is only 1 process in the grid.
+    if np.prod(grid_dims)==1:
+        return d
+
     if inmap(p, GPC.Pid):
         subs = []
         for i  in range(d.dim): # syncronize each dimension of distributed array

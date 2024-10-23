@@ -1,6 +1,7 @@
 import grid_config as grid
 from exec_shell_cmd import *
 from set_remote_cc import *
+from get_cpu_info import *
 
 def check_allowance(n_proc,cpu_type):
     """Check whether the requested number of cores exceeds the number of currently allowed cores for the user
@@ -60,7 +61,8 @@ def check_allowance(n_proc,cpu_type):
             print(line)
         tmp = line.split(',')
         sum += int(tmp[1])
-    # print('Quota in use: %d cores'%(sum))
+    if DEBUG:
+        print('Quota in use: %d cores'%(sum))
     
     # Check current resource limit
     # Slurm sacctmgr command to find out the current resource limit for a given user
@@ -84,6 +86,11 @@ def check_allowance(n_proc,cpu_type):
             tmp2 = arg.strip().split('=')
             if tmp2[0] == 'cpu':
                 cpu_q_limit = int(tmp2[1])
+            elif tmp2[0] == 'node':
+                node_q_limit = int(tmp2[1])
+                cluster_name = grid.grid_config['cluster_name']
+                [max_slots, default_slots, max_cores, max_threads] = get_cpu_info(cpu_type,cluster_name)
+                cpu_q_limit = node_q_limit * max_cores
             elif tmp2[0] == 'mem':
                 mem_q_limit = tmp2[1]
         cpu_q_avail = cpu_q_limit - sum
@@ -111,7 +118,7 @@ def check_allowance(n_proc,cpu_type):
                 print(' ')
                 strfmt = '''Note: Currently available cores for your job is %d cores.
 But your job requested %d cores.
-Therefor, you job has been submitted as a batch job and it will be executed when the resources become available.'''%( q_avail,n_proc)
+Therefor, you job has been submitted as a batch job and it will be executed when the resources become available.'''%( cpu_q_avail,n_proc)
                 print(strfmt)
             else:
                 status = -1
@@ -119,7 +126,7 @@ Therefor, you job has been submitted as a batch job and it will be executed when
                 print(' ')
                 strfmt = '''Error: Currently available cores for your job is %d cores.
 But your job requested %d cores.
-Please reduce your job size ...'''%(q_avail,n_proc)
+Please reduce your job size ...'''%(cpu_q_avail,n_proc)
                 print(strfmt)
             
         # Debug run for the srun job launch

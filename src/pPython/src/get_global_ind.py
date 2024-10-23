@@ -15,7 +15,7 @@ def get_global_ind(falls, grid_dims=None):
         len(IND) is equal to the number of dimensions of the distributed
         object. IND(i) is of the form [ind1 ind2 ind3 ...] where ind_i is a
         global index of the distributed object that is local to the current
-        processor.
+        processor. Eachi ind_i is a tuple of range objects (could be one or more)
         
         This is a dictionary variable
         Each value is a tuple of ranges of indices instead of list of indices (save memory usage)
@@ -76,7 +76,13 @@ def get_global_ind(falls, grid_dims=None):
                             print('falls_i.r = %d, falls_i.l = %d'%(falls_i.r,falls_i.l))
                         # incomplete n-th cycle, incomplete block  
                         block_size = falls_i.r-falls_i.l+1
-                        rem_block = falls_i.local_len%block_size
+                        if DEBUG:
+                            print('block_size = falls_i.r-falls_i.l+1: %d'%(block_size))
+                        if block_size > 0:
+                            rem_block = falls_i.local_len%block_size
+                        else:
+                            raise Exception('Problem dimension is smaller than Np. Reduce Np or Increase problem size.')
+
                         if falls_i.dist == 'b':
                             temp += (range(falls_i.l,falls_i.r+1),)
                         else:

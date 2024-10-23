@@ -4,7 +4,14 @@ from timeit import default_timer as timer
 import matplotlib.pyplot as plt
 
 # Import pPython methods.
-from pPython_all import *
+import pPython as GPC
+from Dmap import *
+from zeros import *
+from global_ind import *
+from local import *
+from put_local import *
+from synch import *
+from agg import *
 
 """ pBlurimage
 

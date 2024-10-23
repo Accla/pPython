@@ -43,7 +43,7 @@ def gen_commands(py_file,python_mpi_path,rank,machine,comm,EPPAC=False):
     comm_pkl_file = 'PythonMPI/MPI_COMM_WORLD.pkl'
 
     commands = dict()
-    commands[0] = 'import os'+nl
+    commands[0] = 'import os'+nl+'import sys'+nl+'sys.path.append(".")'+nl
     commands[0] = commands[0]+'os.environ["HDF5_USE_FILE_LOCKING"]="FALSE"' + nl
     if EPPAC:
         # For the triples mode, a single script launches many pPython MPI processes.

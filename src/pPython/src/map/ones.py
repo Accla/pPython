@@ -77,7 +77,7 @@ def ones(*array_sizes, **keywords):
         return d
     
     if len(dims) < 5:
-        d = Dmat(dims, map=dmap)
+        d = Dmat(None, dtype, dims, map=dmap)
     else:
         print('ERROR(map/ones): Incorrect number of inputs')
 

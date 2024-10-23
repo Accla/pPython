@@ -23,8 +23,14 @@ def dcomplex(x,y):
             print('DMAT object')
         # if only works if x and y are equally sized and distributed DMAT
         if x.map == y.map:
-            d = zeros(size(x),map=x.map,dtype=complex)
+            d = zeros(size(x),map=x.map,dtype=np.complex128)
             d.local = np.vectorize(complex)(x.local,y.local)
+            if DEBUG:
+                if not hasattr(d,'dtype'): 
+                    print('DMAT object has no dtype attribute. Set as dtype = Dmat')
+                else:
+                    print('DMAT object has dtype attribute. Set as dtype = %s'%(d.dtype))
+                    print('DMAT object has nbytes attribute. Set as nbytes = %d'%(d.nbytes))
         else:
             raise Exception('ERROR: Both DMAT objects have to be the same kind.')
         if DEBUG:

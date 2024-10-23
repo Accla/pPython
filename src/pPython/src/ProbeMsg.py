@@ -3,17 +3,14 @@ from MPI_Probe import *
 # pPython class
 import pPython as GPC
 
-def ProbeMsg(source, tag):
-    """
-    ProbeMsg abstracts away further details with MPI_Probe
-    Returns message_rank, numeric_tag, string_tag
+def ProbeMsg(source, tag, nargout=2):
+    """Wrap MPI_Probe() to hide MPI communicator 
 
     Python version: Dr. Chansup Byun
     """
-    
+
     comm = GPC.comm
-    nargout = 3
-    return MPI_Probe(source, tag, comm, nargout)
+    return MPI_Probe(source, tag, GPC.comm, nargout)
 
 ########################################################
 # pMatlab: Parallel Matlab Toolbox
