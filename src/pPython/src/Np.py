@@ -1,25 +1,14 @@
-import pathlib
+# pPython class
+import pPython as GPC
 
-def pPython_ver(default_display = None):
-    """pPython_ner - Return the current pPython version.
-    
-    Usage:
-    version = pPython_Ver()
-    
-    location: current location of the pPython library (dtype: string)
-    version:  pPython version (dtype: string)
+def Np():
+    """
+    Np( ) returns the number Python instance currently running.
     
     Python version: Dr. Chansup Byun
     """
-    
-    location = pathlib.Path().absolute()
-    version = '0.9.10'
-    
-    if default_display:
-        print('pPython version: %s'%(version))
-        print('          Location: %s'%(location))
-    
-    return version
+
+    return GPC.Np
 
 ########################################################
 # pMatlab: Parallel Matlab Toolbox
@@ -27,7 +16,7 @@ def pPython_ver(default_display = None):
 # Architect:      Dr. Jeremy Kepner (kepner@ll.mit.edu)
 # MIT Lincoln Laboratory
 ########################################################
-# Copyright (c) 2005, Massachusetts Institute of Technology All rights
+# Copyright (c) 2023, Massachusetts Institute of Technology All rights
 # reserved.
 #
 # Redistribution and use in source and binary forms, with or without
