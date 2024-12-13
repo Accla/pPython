@@ -24,7 +24,6 @@ import matplotlib.pyplot as plt
 import pPython as GPC
 from pPython.map import Dmap,zeros,ones
 from pPython.dmat import size,synch,local,global_ind,agg,put_local
-from pPython.ppm import BcastMsg
 
 #  MPI information
 Np = GPC.Np
@@ -32,7 +31,7 @@ Pid = GPC.Pid
 
 # Set image size (scaled by numlabs), filter size and blur.
 Nx = 2**11*Np;  Ny = 1024; Nk = 2**5;  Nblur = 2
-Nx = 2**9*Np;  # Debug 
+# Nx = 2**9*Np;  # Debug 
 
 PARALLEL = 1   # Set control flag.
 CHECK = 0      # Check answer with serial calculation.
