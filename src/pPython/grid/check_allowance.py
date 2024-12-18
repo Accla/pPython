@@ -41,12 +41,7 @@ def check_allowance(n_proc,cpu_type):
     llsc_user = grid.grid_config['remote_user']
     
     # Set the corresponding partition (queue) name 
-    if cpu_type == 'xeon-e5' or cpu_type == 'opteron':
-        q_name = 'normal'
-    elif cpu_type == 'xeon64c':
-        q_name = 'manycore'
-    elif cpu_type == 'xeon-p8':
-        q_name = cpu_type
+    q_name = grid.grid_config['q_name']
     
     # Check current resource usage
     # Slurm squeue command to find out the current resource usage for a given user
