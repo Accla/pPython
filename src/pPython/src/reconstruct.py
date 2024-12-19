@@ -67,11 +67,20 @@ def reconstruct(pitfalls, grid, temp_mat, mat_size):
 
         # get local indices for each processor in the grid
         my_global_ind = dict()
+        # i is processor grid id in the 1st dimension
         for i in range(grid_dims[0]):
             my_global_ind[i] = dict()
+            # j is processor grid id in the 2nd dimension
             for j in range(grid_dims[1]):
                 local_falls = get_local_falls(pitfalls, grid, grid[i][j])
                 my_global_ind[i][j] = get_global_ind(local_falls, grid_dims)
+
+        if DEBUG:
+            print('grid_dims:')
+            print(grid_dims)
+            for i in range(grid_dims[0]):
+                print('--> my_global_ind[i][0]:')
+                print(my_global_ind[i][0])
 
         # !!!FOR NOW - assume MAT is of type DOUBLE
         i = 0
@@ -80,16 +89,30 @@ def reconstruct(pitfalls, grid, temp_mat, mat_size):
             for jkey in jkeys:
                 if temp_mat[ikey][jkey].any() != 0.0:
                     # Change due to switch from list to tuple of ranges
-                    # Select the 1st range element in the tuple
-                    ii = my_global_ind[i][j][0][0]
-                    jj = my_global_ind[i][j][1][0]
+                    # Construct indices from all the range elements in the 1st dimension
+                    list_of_ranges = my_global_ind[i][j][0]
+                    ii = []
+                    for i2 in range(len(list_of_ranges)):
+                        ii += list(list_of_ranges[i2])
+                    # Construct indices from all the range elements in the 2nd dimension
+                    list_of_ranges = my_global_ind[i][j][1]
+                    jj = []
+                    for j2 in range(len(list_of_ranges)):
+                        jj += list(list_of_ranges[j2])
+
                     if DEBUG:
                         print('mat index: ii,jj = %d,%d'%(len(ii),len(jj)))
                         print('temp_mat keys: ikey,jkey = %s,%s'%(ikey,jkey))
                         print(ii)
                         print(jj)
                         print(temp_mat[ikey][jkey])
-                    mat[ii[0]:ii[-1]+1,jj[0]:jj[-1]+1] = temp_mat[ikey][jkey]
+
+                    # Update the global array from the update associated with the ikey,jkey process grid.
+                    # May need a better way to update
+                    il1 = 0
+                    for i2 in ii:
+                        mat[i2][jj] = temp_mat[ikey][jkey][il1,:]
+                        il1 += 1
                 j +=1
             i +=1
     elif dim==3:
@@ -120,10 +143,13 @@ def reconstruct(pitfalls, grid, temp_mat, mat_size):
 
         # get local indices for each processor in the grid
         my_global_ind = dict()
+        # i is processor grid id in the 1st dimension
         for i in range(grid_dims[0]):
             my_global_ind[i] = dict()
+            # j is processor grid id in the 2nd dimension
             for j in range(grid_dims[1]):
                 my_global_ind[i][j] = dict()
+                # k is processor grid id in the 3rd dimension
                 for k in range(grid_dims[2]):
                     local_falls = get_local_falls(pitfalls, grid, grid[i][j][k])
                     my_global_ind[i][j][k] = get_global_ind(local_falls, grid_dims)
@@ -137,10 +163,22 @@ def reconstruct(pitfalls, grid, temp_mat, mat_size):
                 for kkey in kkeys:
                     if temp_mat[ikey][jkey][kkey].any() != 0.0:
                         # Change due to switch from list to tuple of ranges
-                        # Select the 1st range element in the tuple
-                        ii = my_global_ind[i][j][k][0][0]
-                        jj = my_global_ind[i][j][k][1][0]
-                        kk = my_global_ind[i][j][k][2][0]
+                        # Construct indices from all the range elements in the 1st dimension
+                        list_of_ranges = my_global_ind[i][j][k][0]
+                        ii = []
+                        for i2 in range(len(list_of_ranges)):
+                            ii += list(list_of_ranges[i2])
+                        # Construct indices from all the range elements in the 2nd dimension
+                        list_of_ranges = my_global_ind[i][j][k][1]
+                        jj = []
+                        for j2 in range(len(list_of_ranges)):
+                            jj += list(list_of_ranges[j2])
+                        # Construct indices from all the range elements in the 3rd dimension
+                        list_of_ranges = my_global_ind[i][j][k][2]
+                        kk = []
+                        for k2 in range(len(list_of_ranges)):
+                            kk += list(list_of_ranges[k2])
+    
                         if DEBUG:
                             print('mat index: ii,jj,kk = %d,%d,%d'%(len(ii),len(jj),len(kk)))
                             print('temp_mat keys: ikey,jkeykkey = %s,%s,%s'%(ikey,jkey,kkey))
@@ -148,7 +186,16 @@ def reconstruct(pitfalls, grid, temp_mat, mat_size):
                             print(jj)
                             print(kk)
                             # print(temp_mat[ikey][jkey][kkey])
-                        mat[ii[0]:ii[-1]+1,jj[0]:jj[-1]+1,kk[0]:kk[-1]+1] = temp_mat[ikey][jkey][kkey]
+
+                        # Update the global array from the update associated with the ikey,jkey process grid.
+                        # May need a better way to update
+                        il1 = 0
+                        for i2 in ii:
+                            jl1 = 0
+                            for j2 in jj:
+                                mat[i2][j2][kk] = temp_mat[ikey][jkey][kkey][mkey][il1,jl1,:]
+                                jl1 += 1
+                            il1 += 1
                     k +=1
                 j +=1
             i +=1
@@ -186,12 +233,16 @@ def reconstruct(pitfalls, grid, temp_mat, mat_size):
 
         # get local indices for each processor in the grid
         my_global_ind = dict()
+        # i is processor grid id in the 1st dimension
         for i in range(grid_dims[0]):
             my_global_ind[i] = dict()
+            # j is processor grid id in the 2nd dimension
             for j in range(grid_dims[1]):
                 my_global_ind[i][j] = dict()
+                # k is processor grid id in the 3rd dimension
                 for k in range(grid_dims[2]):
                     my_global_ind[i][j][k] = dict()
+                    # m is processor grid id in the 4th dimension
                     for m in range(grid_dims[3]):
                         local_falls = get_local_falls(pitfalls, grid, grid[i][j][k][m])
                         my_global_ind[i][j][k][m] = get_global_ind(local_falls, grid_dims)
@@ -207,11 +258,26 @@ def reconstruct(pitfalls, grid, temp_mat, mat_size):
                     for mkey in mkeys:
                         if temp_mat[ikey][jkey][kkey][mkey].any() != 0.0:
                             # Change due to switch from list to tuple of ranges
-                            # Select the 1st range element in the tuple
-                            ii = my_global_ind[i][j][k][m][0][0]
-                            jj = my_global_ind[i][j][k][m][1][0]
-                            kk = my_global_ind[i][j][k][m][2][0]
-                            ll = my_global_ind[i][j][k][m][3][0]
+                            # Construct indices from all the range elements in the 1st dimension
+                            list_of_ranges = my_global_ind[i][j][k][m][0]
+                            ii = []
+                            for i2 in range(len(list_of_ranges)):
+                                ii += list(list_of_ranges[i2])
+                            # Construct indices from all the range elements in the 2nd dimension
+                            list_of_ranges = my_global_ind[i][j][k][m][1]
+                            jj = []
+                            for j2 in range(len(list_of_ranges)):
+                                jj += list(list_of_ranges[j2])
+                            # Construct indices from all the range elements in the 3rd dimension
+                            list_of_ranges = my_global_ind[i][j][k][m][2]
+                            kk = []
+                            for k2 in range(len(list_of_ranges)):
+                                kk += list(list_of_ranges[k2])
+                            # Construct indices from all the range elements in the 4th dimension
+                            list_of_ranges = my_global_ind[i][j][k][m][3]
+                            mm = []
+                            for m2 in range(len(list_of_ranges)):
+                                mm += list(list_of_ranges[m2])
                             if DEBUG:
                                 print('mat index: ii,jj,kk,mm = %d,%d,%d,%d'%(len(ii),len(jj),len(kk),len(mm)))
                                 print('temp_mat keys: ikey,jkeykkey,mkey = %s,%s,%s,%s'%(ikey,jkey,kkey,mkey))
@@ -220,7 +286,19 @@ def reconstruct(pitfalls, grid, temp_mat, mat_size):
                                 print(kk)
                                 print(mm)
                                 # print(temp_mat[ikey][jkey][kkey][mkey])
-                            mat[ii[0]:ii[-1]+1,jj[0]:jj[-1]+1,kk[0]:kk[-1]+1,mm[0]:mm[-1]+1] = temp_mat[ikey][jkey][kkey][mkey]
+
+                            # Update the global array from the update associated with the ikey,jkey process grid.
+                            # May need a better way to update
+                            il1 = 0
+                            for i2 in ii:
+                                jl1 = 0
+                                for j2 in jj:
+                                    kl1 = 0
+                                    for k2 in kk:
+                                        mat[i2][j2][k2][mm] = temp_mat[ikey][jkey][kkey][mkey][il1,jl1,kl1,:]
+                                        kl1 += 1
+                                    jl1 += 1
+                                il1 += 1
                         m +=1
                     k +=1
                 j +=1
