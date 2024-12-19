@@ -52,13 +52,25 @@ def global_ind(d, dim=None):
         if len(dims)==1:
             # Change due to switching from list to tuple of ranges
             # Select the 1st range element in the tuple
-            local_ind = list(my_inds[dims[0]][0])
+            # For cyclic distribution, there are multiple ranges to represent indices for a given Pid
+            list_of_ranges = list(my_inds[dims[0]])
+            local_ind = []
+            for i in range(len(list_of_ranges)):
+                local_ind += list(list_of_ranges[i])
         else:
             local_ind = []
-            for i in range(len(dims)):
+            for idim in range(len(dims)):
                 # Change due to switching from list to tuple of ranges
                 # Select the 1st range element in the tuple
-                local_ind.append(list(my_inds[dims[i]][0]))
+                # Reconstruct indices from a list of multiple ranges
+                list_of_ranges = list(my_inds[dims[idim]])
+                local_ind_idim = []
+                for i in range(len(list_of_ranges)):
+                    local_ind_idim += list(list_of_ranges[i])
+                local_ind.append(np.array(local_ind_idim))
+        if DEBUG:
+            print('local_ind:')
+            print(local_ind)
     else:
         #
         # non-distributed array
