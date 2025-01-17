@@ -8,7 +8,7 @@ from print_falls import *
 
 def get_local_falls(pitfalls, grid, rank):
     """Given the PITFALLS object, the grid and local processor rank, 
-    returns an array of local FALLS objects (one for each dimension of the
+    returns a list of local FALLS objects (one for each dimension of the
     distributed object).
     
     Usage:
@@ -23,7 +23,7 @@ def get_local_falls(pitfalls, grid, rank):
     RANK: processor rank
  
     LOCAL_FALLS:
-        Array of FALLS objects, one for each dimension of the distributed
+        A list of FALLS objects, one for each dimension of the distributed
         object. FALLS[i] is a 4-tuple (l,r,s,n). In addition FALLS[i]
         stores information regarding local length of data to take care of
         cases with non-evenly divisible dimensions without implementing

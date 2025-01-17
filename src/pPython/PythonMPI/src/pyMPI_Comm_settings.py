@@ -44,7 +44,8 @@ def pyMPI_Comm_settings():
     if OS.isunix:
         # python_location = '/usr/bin/python'
         if os.path.exists('/etc/llgrid.id'):
-           python_location = '/state/partition1/llgrid/pkg/anaconda/anaconda3-2022a/bin/python'
+           # Use Python from the newest LLSC provided Anaconda
+           python_location = '/state/partition1/llgrid/pkg/anaconda/python-ML-2024b/bin/python'
         else:
            python_location = 'python'
     elif OS.ispc:

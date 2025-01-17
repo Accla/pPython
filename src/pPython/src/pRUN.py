@@ -108,12 +108,10 @@ def pRUN(py_file,n_proc,machines,sched_options=None):
     if LAUNCH_TIMING:
         grid.grid_config['LAUNCH_TIMING'] = LAUNCH_TIMING
 
-    if DEBUG:
-        print(grid.grid_config)
-
     n_proc_req, machines, grid.grid_config = check_runtime( n_proc, machines, grid.grid_config )
     if DEBUG:
         print('After check_runtime: n_proc_req = %d'%(n_proc_req))
+        print(grid.grid_config)
 
     if grid.grid_config['grid_job']:
         # Check allowance 

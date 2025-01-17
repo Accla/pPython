@@ -6,7 +6,7 @@ def size(d, dims=None):
     matrix D or an array
  
     SIZE(D, DIMS) returns the length of those dimensions specified
-    in DIMS.
+    in DIMS as a list object.
  
     Author:  Nadya Travinin
     Edited:  Edmund L. Wong (elwong@ll.mit.edu)

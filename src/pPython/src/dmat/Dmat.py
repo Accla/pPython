@@ -224,7 +224,7 @@ class Dmat:
         DEBUG = 0
         if DEBUG:
             print('--> Entering Dmat.setitem() ')
-            print('Class Dmat: see if this is calleb by A[:,:] = B where A and B are Dmat()')
+            print('Class Dmat: see if this is called by A[:,:] = B where A and B are Dmat()')
             print('What is passed as index: ')
             print(index)
         # [:,:] -> (slice(None, None, None), slice(None, None, None))

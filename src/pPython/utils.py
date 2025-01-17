@@ -13,7 +13,6 @@ from get_ind_range import *
 from get_local_falls import *
 from get_local_ind import *
 from get_local_proc import *
-from intersect_mtlb import *
 from lcm import *
 from local_dims import *
 from ls_intersection import *

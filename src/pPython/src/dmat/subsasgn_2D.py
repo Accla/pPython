@@ -136,9 +136,12 @@ def subsasgn_2D(a,s,b):
                     if inmap(b.map, GPC.Pid): 
                         # belongs to b's map
                         for i in range(len(a.map.proc_list)):
+                            # a_falls is a list of FALLS objects, size is equal to array dimension
                             a_falls = get_local_falls(a.pitfalls, a.map.grid, a.map.proc_list[i])
                             # falls intersection on b's procs
+                            # For the 1st dimension
                             b_row_fi[i] = falls_intersection(b.falls[0], a_falls[0])
+                            # For the 2nd dimension
                             b_col_fi[i] = falls_intersection(b.falls[1], a_falls[1])
                         # belongs to b's map
     
