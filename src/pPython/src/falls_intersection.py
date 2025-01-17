@@ -29,6 +29,8 @@ def falls_intersection(f1, f2):
     Redistribution Routines for Distributed Memory Multicomputers. IEEE 1995.
 
     Python version: Dr. Chansup Byun
+    Note: Python version updated to make block distribution as evenly as possible where as pMatlab 
+    version may suffer no data distributed in certain array size and number of processes in a direction.
     """ 
     
     DEBUG = 0
@@ -36,21 +38,20 @@ def falls_intersection(f1, f2):
         print('--> Entering falls_intersection')
     
     #  check to see if either f1 or f2 are -1's
+    fi = []
     if not isinstance(f1,Falls) or not isinstance(f2,Falls):
-        fi = []
         return fi
 
     # compute intersection period (fp), m1 and m2
+    # calculate least common multiple between the two input
     fp = lcm(f1.s, f2.s)
     m1 = fp/f1.s
     m2 = fp/f2.s
     
-    fi = []
     I1 = int(max(0, ceil((f2.l-f1.r)/f1.s)))
     L1 = LineSgmt()
     L2 = LineSgmt()
     LS = LineSgmt()
-    temp = Falls()
     for i1 in range(I1,int(min(I1+m1-1, f1.n-1)+1)):
         #CB: This has to be modified for the recent update for FALLS fix 
         L1.l = f1.l+i1*f1.s
@@ -63,7 +64,8 @@ def falls_intersection(f1, f2):
             if DEBUG:
                 print('Line segments: L1:(%d,%d), L2:(%d,%d)'%(L1.l,L1.r,L2.l,L2.r))
                 print('Overlao segments: LS:(%d,%d)'%(LS.l,LS.r))
-    
+            # Create a new Falls object for each case
+            temp = Falls()
             # don't have to check that intersection is non-empty since we
             # are guaranteed intersection by iterating over the above
             # specified loop bounds
@@ -117,14 +119,17 @@ def falls_intersection(f1, f2):
                 elif diff_ind <= fi_block_size:
                     temp.complete_cycle = False
                     temp.complete_block = False
-            if DEBUG:
+            if DEBUG==2:
                 print('fi_block_size: %d, fi_last_ind: %d'%(fi_block_size,fi_last_ind))
                 print('f1_last_ind: %d, f2_last_ind: %d'%(f1_last_ind,f2_last_ind))
                 print('Falls: temp')
                 print_falls(temp)
             fi.append(temp)
     if DEBUG:
+        print('Length of fi: %d'%(len(fi)))
+        print(fi)
         print('<-- Exiting falls_intersection')
+
     return fi
 
 ########################################################
