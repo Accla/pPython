@@ -99,7 +99,7 @@ def subsref(a,s):
     Author:  Nadya Travinin
     Edited:  Edmund L. Wong (elwong@ll.mit.edu)
     """
-    DEBUG = 1
+    DEBUG = 0
     if DEBUG:
         print('--> Entering subsref for distributed objects')
     

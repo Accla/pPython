@@ -235,6 +235,8 @@ class Dmat:
             raise Exception('Dmat: 1-D assignment, not implemented yet.')
         else:
             if len(index)==2: # 2-D distributed array
+                if DEBUG:
+                    print('Dmat: 2-D assignment update')
                 if index[0]==slice(None, None, None) and index[1]==slice(None, None, None):
                     ss['type'] = '()'
                     ss['subs'] = dict()
@@ -254,6 +256,8 @@ class Dmat:
                     print(type(index[0]))
                     raise Exception('Dmat: 2-D assignment, not implemented this index type yet.')
             elif len(index)==3: # 3-D distributed array
+                if DEBUG:
+                    print('Dmat: 3-D assignment update')
                 if index[0]==slice(None, None, None) and index[1]==slice(None, None, None) and index[2]==slice(None, None, None):
                     ss['type'] = '()'
                     ss['subs'] = dict()
@@ -275,6 +279,8 @@ class Dmat:
                     print(type(index[0]))
                     raise Exception('Dmat: 3-D assignment, not implemented this index type yet.')
             elif len(index)==4: # 4-D distributed array
+                if DEBUG:
+                    print('Dmat: 4-D assignment update')
                 if index[0]==slice(None, None, None) and index[1]==slice(None, None, None) and index[2]==slice(None, None, None) and index[3]==slice(None, None, None):
                     ss['type'] = '()'
                     ss['subs'] = dict()

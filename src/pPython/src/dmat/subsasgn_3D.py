@@ -12,6 +12,7 @@ from get_local_ind import *
 from get_local_falls import *
 from falls_intersection import *
 from subsasgn_data import *
+from inmap import *
 
 def subsasgn_3D(a,s,b):
     """
@@ -107,6 +108,8 @@ def subsasgn_3D(a,s,b):
                 a.local[:,:,:] = b.local[:,:,:]
 
             else:
+                if DEBUG:
+                    print('  --> A(:,:,:) = B where A & B have different distribution maps')
                 # maps not the same - redistribution
                 # compute falls intersections
                 if (inmap(a.map, GPC.Pid)) or (inmap(b.map, GPC.Pid)):
@@ -116,6 +119,7 @@ def subsasgn_3D(a,s,b):
                     # a's local falls and compute intersections
                     b_row_fi = dict()
                     b_col_fi = dict()
+                    b_dim3_fi = dict()
                     if inmap(b.map, GPC.Pid): 
                         # belongs to b's map
                          for i in range(len(a.map.proc_list)):
@@ -131,6 +135,7 @@ def subsasgn_3D(a,s,b):
                     # intersections
                     a_row_fi = dict()
                     a_col_fi = dict()
+                    a_dim3_fi = dict()
                     if inmap(a.map, GPC.Pid):
                         for i in range(len(b.map.proc_list)):
                             b_falls = get_local_falls(b.pitfalls, b.map.grid, b.map.proc_list[i])
@@ -155,7 +160,7 @@ def subsasgn_3D(a,s,b):
                             if b.map.proc_list[p1] != a.map.proc_list[p2]: # comm is needed
                                 if GPC.Pid==b.map.proc_list[p1]: # my rank is current B rank
                                     # redistribute data
-                                    if b_row_fi[p2].size and a_col_fi[p2].size and b_dim3_fi[p2].size :
+                                    if len(b_row_fi[p2])>0 and len(b_col_fi[p2])>0 and len(b_dim3_fi[p2])>0 :
                                         # all intersections not empty
                                         # [data, scratch] = subsasgn_data(a, b, p2, b_row_fi, b_col_fi) 
                                         b_fi = dict()
@@ -168,7 +173,7 @@ def subsasgn_3D(a,s,b):
                                         MPI_Send(a.map.proc_list[p2], GPC.tag, GPC.comm, data)
                                         # both intersections not empty
                                 elif GPC.Pid==a.map.proc_list[p2]: # my_rank is current A rank
-                                    if a_row_fi[p1].size and a_col_fi[p1].size and a_dim3_fi[p1].size : 
+                                    if len(a_row_fi[p1])>0 and len(a_col_fi[p1])>0 and len(a_dim3_fi[p1])>0 :
                                         # all intersections not empty
                                         # [scratch, a_local_ind] = subsasgn_data(a, b, p1, a_row_fi, a_col_fi) 
                                         a_fi = dict()
@@ -181,12 +186,13 @@ def subsasgn_3D(a,s,b):
                                         [data] = MPI_Recv(b.map.proc_list[p1], GPC.tag, GPC.comm)
                                         for r in range(len(data)):
                                             ind = a_local_ind[r]
-                                            a.local[ind[0], ind[1], ind[2]] = data[r]
+                                            # Different behavior compared to Matlab: a.local[ind[0], ind[1]] = data[r]
+                                            a.local[slice(ind[0][0],ind[0][-1]+1),slice(ind[1][0],ind[1][-1]+1),slice(ind[2][0],ind[2][-1]+1)] = data[r]
                                             # both intersections not empty
                                         # my_rank is current A rank
                             elif b.map.proc_list[p1] == a.map.proc_list[p2]: # no comm
                                 if GPC.Pid==a.map.proc_list[p2]:
-                                    if b_row_fi[p2].size and b_col_fi[p2].size and b_dim3_fi[p2].size : 
+                                    if len(b_row_fi[p2])>0 and len(b_col_fi[p2])>0 and len(b_dim3_fi[p2])>0 :
                                         # all intersections not empty
                                         # [data, a_local_ind] = subsasgn_data(a, b, p2, b_row_fi, b_col_fi) 
                                         b_fi = dict()

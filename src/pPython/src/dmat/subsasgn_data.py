@@ -36,8 +36,8 @@ def subsasgn_data(a, b, falls_index, fi):
                 g_ind = get_global_ind(fi_temp)
                 b_local_ind = get_local_ind(b.global_ind, g_ind)
                 if DEBUG:
-                    # print('b.local')
-                    # print(b.local)
+                    print('b.local')
+                    print(b.local)
                     print('b_local_ind')
                     print(b_local_ind)
                 if len(b_local_ind[0])>0 and len(b_local_ind[1])>0:
@@ -62,7 +62,7 @@ def subsasgn_data(a, b, falls_index, fi):
                     b_local_ind = get_local_ind(b.global_ind, g_ind)
                     if len(b_local_ind[0])>0 and len(b_local_ind[1])>0 and len(b_local_ind[2])>0:
                         # Workaround for Matlab, which still works with empty index
-                        data[num_data] = b.local[b_local_ind[0], b_local_ind[1], b_local_ind[2]]
+                        data[num_data] = b.local[slice(b_local_ind[0][0],b_local_ind[0][-1]+1), slice(b_local_ind[1][0],b_local_ind[1][-1]+1), slice(b_local_ind[2][0],b_local_ind[2][-1]+1)]
                     else:
                         # Workaround for Matlab, which still works with empty index
                         data[num_data] = None
@@ -84,7 +84,7 @@ def subsasgn_data(a, b, falls_index, fi):
                         b_local_ind = get_local_ind(b.global_ind, g_ind)
                         if len(b_local_ind[0])>0 and len(b_local_ind[1])>0 and len(b_local_ind[2])>0 and len(b_local_ind[3])>0:
                             # Workaround for Matlab, which still works with empty index
-                            data[num_data] = b.local[b_local_ind[0], b_local_ind[1], b_local_ind[2], b_local_ind[3]]
+                            data[num_data] = b.local[slice(b_local_ind[0][0],b_local_ind[0][-1]+1), slice(b_local_ind[1][0],b_local_ind[1][-1]+1), slice(b_local_ind[2][0],b_local_ind[2][-1]+1), slice(b_local_ind[3][0],b_local_ind[3][-1]+1)]
                         else:
                             # Workaround for Matlab, which still works with empty index
                             data[num_data] = None

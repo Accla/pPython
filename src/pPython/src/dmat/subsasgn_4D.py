@@ -12,6 +12,7 @@ from get_local_ind import *
 from get_local_falls import *
 from falls_intersection import *
 from subsasgn_data import *
+from inmap import *
 
 def subsasgn_4D(a,s,b):
     """
@@ -119,6 +120,8 @@ def subsasgn_4D(a,s,b):
                     # a's local falls and compute intersections
                     b_row_fi = dict()
                     b_col_fi = dict()
+                    b_dim3_fi = dict()
+                    b_dim4_fi = dict()
                     if inmap(b.map, GPC.Pid): 
                         # belongs to b's map
                         for i in range(len(a.map.proc_list)):
@@ -135,6 +138,8 @@ def subsasgn_4D(a,s,b):
                     # intersections
                     a_row_fi = dict()
                     a_col_fi = dict()
+                    a_dim3_fi = dict()
+                    a_dim4_fi = dict()
                     if inmap(a.map, GPC.Pid):
                         for i in range(len(b.map.proc_list)):
                             b_falls = get_local_falls(b.pitfalls, b.map.grid, b.map.proc_list(i))
@@ -160,7 +165,7 @@ def subsasgn_4D(a,s,b):
                             if b.map.proc_list[p1] != a.map.proc_list[p2]: # comm is needed
                                 if GPC.Pid==b.map.proc_list[p1]: # my rank is current B rank
                                     # redistribute data
-                                    if b_row_fi[p2].size and a_col_fi[p2].size and b_dim3_fi[p2].size and b_dim4_fi[p2].size :
+                                    if len(b_row_fi[p2])>0 and len(b_col_fi[p2])>0 and len(b_dim3_fi[p2])>0 and len(b_dim4_fi[p2])>0 :
                                         # all intersections not empty
                                         # [data, scratch] = subsasgn_data(a, b, p2, b_row_fi, b_col_fi) 
                                         b_fi = dict()
@@ -174,7 +179,7 @@ def subsasgn_4D(a,s,b):
                                         MPI_Send(a.map.proc_list[p2], GPC.tag, GPC.comm, data)
                                     # both intersections not empty
                                 elif GPC.Pid==a.map.proc_list[p2]: # my_rank is current A rank
-                                    if a_row_fi[p1].size and a_col_fi[p1].size and a_dim3_fi[p1].size and a_dim4_fi[p1].size :
+                                    if len(a_row_fi[p1])>0 and len(a_col_fi[p1])>0 and len(a_dim3_fi[p1])>0 and len(a_dim4_fi[p1])>0 :
                                         # all intersections not empty
                                         # [scratch, a_local_ind] = subsasgn_data(a, b, p1, a_row_fi, a_col_fi) 
                                         a_fi = dict()
@@ -193,7 +198,7 @@ def subsasgn_4D(a,s,b):
                                 # my_rank is current A rank
                             elif b.map.proc_list[p1] == a.map.proc_list[p2]: # no comm needed
                                 if GPC.Pid==a.map.proc_list[p2]:
-                                    if b_row_fi[p2].size and b_col_fi[p2].size and b_dim3_fi[p2].size and b_dim4_fi[p2].size :
+                                    if len(b_row_fi[p2])>0 and len(b_col_fi[p2])>0 and len(b_dim3_fi[p2])>0 and len(b_dim4_fi[p2])>0 :
                                         # all intersections not empty
                                         # [data, a_local_ind] = subsasgn_data(a, b, p2, b_row_fi, b_col_fi) 
                                         b_fi = dict()

@@ -13,7 +13,7 @@ from inmap import *
 
 def mtimes(a,b):
     """Matrix multiply.
-    C = MTIMES(A, B) or C = A*B multiples two matrices together.
+    C = MTIMES(A, B) or C = A (dot) B multiples two matrices together.
     Mtimes is an inner product matrix multiply and assumes that A is row mapped and B is column mapped.
     If B is row mapped, it is remapped in order to perform the matrix multiplication.
  

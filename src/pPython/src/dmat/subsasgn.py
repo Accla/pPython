@@ -40,6 +40,8 @@ def subsasgn(a, ss, b):
                         print('Calling a = subsasgn_2D(a,s,b)')
                     a = subsasgn_2D(a,s,b)
                 elif len(s['subs'])==3: # 3-D subscripted assignment
+                    if DEBUG:
+                        print('Calling a = subsasgn_3D(a,s,b)')
                     a = subsasgn_3D(a,s,b)
                 elif len(s['subs'])==4: # 4-D subscripted assignment
                     a = subsasgn_4D(a,s,b)

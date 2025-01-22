@@ -6,6 +6,7 @@ from size import *
 from subsasgn_2D import *
 from subsasgn_3D import *
 from subsasgn_4D import *
+from inmap import *
 
 def subsasgn_1D(a,s,b):
     """

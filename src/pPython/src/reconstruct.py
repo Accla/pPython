@@ -193,7 +193,7 @@ def reconstruct(pitfalls, grid, temp_mat, mat_size):
                         for i2 in ii:
                             jl1 = 0
                             for j2 in jj:
-                                mat[i2][j2][kk] = temp_mat[ikey][jkey][kkey][mkey][il1,jl1,:]
+                                mat[i2][j2][kk] = temp_mat[ikey][jkey][kkey][il1,jl1,:]
                                 jl1 += 1
                             il1 += 1
                     k +=1
