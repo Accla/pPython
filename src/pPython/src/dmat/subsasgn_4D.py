@@ -142,7 +142,7 @@ def subsasgn_4D(a,s,b):
                     a_dim4_fi = dict()
                     if inmap(a.map, GPC.Pid):
                         for i in range(len(b.map.proc_list)):
-                            b_falls = get_local_falls(b.pitfalls, b.map.grid, b.map.proc_list(i))
+                            b_falls = get_local_falls(b.pitfalls, b.map.grid, b.map.proc_list[i])
                             # falls intersection on a's procs
                             a_row_fi[i] = falls_intersection(b_falls[0], a.falls[0])
                             a_col_fi[i] = falls_intersection(b_falls[1], a.falls[1])
@@ -193,7 +193,8 @@ def subsasgn_4D(a,s,b):
                                         [data] = MPI_Recv(b.map.proc_list[p1], GPC.tag, GPC.comm)
                                         for r in range(len(data)):
                                             ind = a_local_ind[r]
-                                            a.local[ind[0], ind[1], ind[2], ind[3]] = data[r]
+                                            # Different behavior compared to Matlab: a.local[ind[0], ind[1]] = data[r]
+                                            a.local[slice(ind[0][0],ind[0][-1]+1),slice(ind[1][0],ind[1][-1]+1),slice(ind[2][0],ind[2][-1]+1),slice(ind[3][0],ind[3][-1]+1)] = data[r]
                                     # both intersections not empty
                                 # my_rank is current A rank
                             elif b.map.proc_list[p1] == a.map.proc_list[p2]: # no comm needed
