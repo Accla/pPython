@@ -215,6 +215,16 @@ class Dmat:
         # print("Setting dtype value...")
         self._dtype = value
 
+    def __getitem__(self, item):
+        """
+        Make the Dmat object scriptable
+        """
+        DEBUG = 0
+        if DEBUG:
+            print('  --> Entering __getitem__ in Dmat')
+            print(item)
+        # return getattr(self, item)
+
     def __setitem__(self, index, d):
         """Implement __setitem__ with Dmat()
            d: RHS distributed array, Dmat 
@@ -256,14 +266,23 @@ class Dmat:
                     print(type(index[0]))
                     raise Exception('Dmat: 2-D assignment, not implemented this index type yet.')
             elif len(index)==3: # 3-D distributed array
-                if DEBUG:
-                    print('Dmat: 3-D assignment update')
                 if index[0]==slice(None, None, None) and index[1]==slice(None, None, None) and index[2]==slice(None, None, None):
+                    if DEBUG:
+                        print('Dmat: 3-D assignment update with case 1')
                     ss['type'] = '()'
                     ss['subs'] = dict()
                     ss['subs'][0] = ':'
                     ss['subs'][1] = ':'
                     ss['subs'][2] = ':'
+                    s.append(ss)
+                elif isinstance(index[0],slice) and isinstance(index[1],slice) and isinstance(index[2],(np.int32,int)):
+                    if DEBUG:
+                        print('Dmat: 3-D assignment update with case 2')
+                    ss['type'] = '()'
+                    ss['subs'] = dict()
+                    ss['subs'][0] = index[0]
+                    ss['subs'][1] = index[1]
+                    ss['subs'][2] = index[2]
                     s.append(ss)
                 elif isinstance(index[0],(np.int32,int)) and isinstance(index[1],(np.int32,int)) and isinstance(index[2],(np.int32,int)):
                     if DEBUG:
@@ -275,8 +294,8 @@ class Dmat:
                     ss['subs'][2] = slice(index[2],index[2]+1,None)
                     s.append(ss)
                 else:
-                    print('type(index[0]')
-                    print(type(index[0]))
+                    for ii in range(len(index)):
+                        print('type(index[%d])=%s'%(ii,type(index[ii])))
                     raise Exception('Dmat: 3-D assignment, not implemented this index type yet.')
             elif len(index)==4: # 4-D distributed array
                 if DEBUG:
@@ -308,6 +327,8 @@ class Dmat:
 
         # construct s for sub-assignment operations
         if DEBUG:
+            print('s for subscripted assignment:')
+            print(s)
             print('<-- Exiting Dmat.setitem() with calling subsasgn(d, s, self)')
         self = subsasgn(self, s, d)
 
