@@ -30,6 +30,8 @@ def subsasgn(a, ss, b):
         print('--> Entering subsasgn')
 
     if len(ss)==1: # subscripting level
+        if DEBUG:
+            print('   a single level subscripting level')
         s = ss[0]
         if s['type'] == '()': # subscripting type -> parenthesis
             if len(s['subs']) ==1:    # 1-D subscripted assignment

@@ -13,6 +13,7 @@ from get_local_falls import *
 from falls_intersection import *
 from subsasgn_data import *
 from inmap import *
+from get_local_proc import *
 
 def subsasgn_3D(a,s,b):
     """
@@ -216,7 +217,7 @@ def subsasgn_3D(a,s,b):
             # A(i:j, k:l, m:n) = B
             # # # # # # # # # # # # # # # # # # # # # # # ADDED TO SUPPORT pMapper# # # # # # # # # # # # # # # # # # # # 
             # if (s['subs'][0]==':') and (s['subs'][1]==':') and (len(s['subs'][2])==1):
-            if isinstance(s['subs'][0],str) and isinstance(s['subs'][1],str) and isinstance(s['subs'][2],str):
+            if isinstance(s['subs'][0],slice) and isinstance(s['subs'][1],slice) and isinstance(s['subs'][2],int):
                 # A(:,:,i) = B
                 print('Warning - dmat/subsasgn_3D: A(:,:,i) = B should be used with EXTREME caution.')
                 print('Warning - dmat/subsasgn_3D: Need to check that for assignment A(:,:,i) = B, the size of the referenced part of A and size of B are the same.')
@@ -228,7 +229,10 @@ def subsasgn_3D(a,s,b):
                     amap = a.map
                     bmap = b.map
                     # figure out the map slice local to the A(:,:,i)
-                    ind = [1,1,s['2']['subs']] # indices to search for local proc
+                    if DEBUG:
+                        print("s['subs']")
+                        print(s['subs'])
+                    ind = [0,0,s['subs'][2]] # indices to search for local proc
                     local_proc = get_local_proc(a.pitfalls, amap.grid, ind)
                     # find out the map grid indices for local_proc
                     grid_inds = n_dim_find(amap.grid, local_proc)
@@ -243,7 +247,7 @@ def subsasgn_3D(a,s,b):
                     a_dist = amap.dist_spec
                     a_proc_list = np.transpose(a_grid_slice)
                     # create a 2D map for the grid slice
-                    amap_slice = Dmap(size(a_grid_slice), a_dist[1:2], a_proc_list)
+                    amap_slice = Dmap(size(a_grid_slice), a_dist[0:2], a_proc_list)
                     # NOTE: Might not even have to deal with map slices
                     # Algorithms for A(:,:,i) = B subsasgn
                     #    1. Subsref the relevant slice of A
@@ -252,11 +256,13 @@ def subsasgn_3D(a,s,b):
                     #    3. Stuff the slice back into 3D A. At this point the
                     #     slice of A and the local part of 3D A should have the
                     #     same maps
+
                     subsA = subsref(a,s)
                     s2D = dict()
                     s2D['type'] = '()'
                     s2D['subs'] = {0:':',1:':'}                                   
                     subsA2 = subsasgn_2D(subsA, s2D, b)
+
                     if amap_slice == subsA2.map:
                         if inmap(amap_slice, GPC.Pid):
                             # get local indices
