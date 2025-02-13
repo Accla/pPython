@@ -125,6 +125,11 @@ def check_runtime( n_proc, machines, grid_config ):
             elif (cpu_type == 'xeon-e5'):
                 # Only on TX-Green
                 grid_config['q_name'] = 'normal'
+        elif cluster_name == 'txe1':
+            if (cpu_type == 'xeon-p8'):
+                grid_config['q_name'] = 'xeon-p8'
+            elif (cpu_type == 'xeon-g6'):
+                grid_config['q_name'] = 'xeon-g6-volta'
         else:
             raise Exception('ERROR(check_runtime): %s is not a supported cluster.'%(grid_config['cluster_name']))
 
