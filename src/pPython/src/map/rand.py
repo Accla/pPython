@@ -94,14 +94,14 @@ def rand(*array_sizes, **keywords):
     #CB falls = get_local_falls(dpitfalls(d), p.grid, pMATLAB.my_rank);
     #CB local_size = localdims(falls, p.dim);
     
-    dim = dmap.dim
-    g = (dmap.grid).shape
+    dim = dmap['dim']
+    g = (dmap['grid']).shape
     if dim==2:
         for j in range(g[1]):     # i 1
             for i in range(g[0]): # j 2
                 if DEBUG:
-                    print('my rank: %d, Process grid rank: %d'%(GPC.Pid,dmap.grid[i][j]))
-                if (GPC.Pid==dmap.grid[i][j]):
+                    print('my rank: %d, Process grid rank: %d'%(GPC.Pid,dmap['grid'][i][j]))
+                if (GPC.Pid==dmap['grid'][i][j]):
                     d.local = np.random.random(local_size)
                 else:
                     np.random.random(local_size)
@@ -109,7 +109,7 @@ def rand(*array_sizes, **keywords):
         for k in range(g[2]):
             for j in range(g[1]):
                 for i in range(g[0]):
-                    if (GPC.Pid==dmap.grid[i][j][k]):
+                    if (GPC.Pid==dmap['grid'][i][j][k]):
                         d.local = np.random.random(local_size)
                     else:
                         np.random.random(local_size)
@@ -118,7 +118,7 @@ def rand(*array_sizes, **keywords):
             for k in range(g[2]):
                 for j in range(g[1]):
                     for i in range(g[0]):
-                        if (GPC.Pid==dmap.grid[i][j][k][l]):
+                        if (GPC.Pid==dmap['grid'][i][j][k][l]):
                             d.local = np.random.random(local_size)
                         else:
                             np.random.random(local_size)

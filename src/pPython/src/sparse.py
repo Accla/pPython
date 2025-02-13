@@ -131,8 +131,8 @@ def sparse(*argv,**kwargs):
     
     # NOTE: This is recomputing information already computed within
     # @dmat/dmat. Is there a cleaner way of getting this information?
-    falls = get_local_falls(d.pitfalls, p.grid, GPC.Pid)
-    local_size = local_dims(falls, p.dim)
+    falls = get_local_falls(d.pitfalls, p['grid'], GPC.Pid)
+    local_size = local_dims(falls, p['dim'])
     
     # What if the user specifies values for ii, jj and s AND a value
     # for nzmax, such that on a processor's local portion of the sparse

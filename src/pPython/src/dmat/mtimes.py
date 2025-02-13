@@ -63,15 +63,15 @@ def mtimes(a,b):
     
         # create sub-result matrices, each with a map equivalent to
         # one of map B's rows
-        res_gridspec = [1, mapB.grid.shape[1]]
+        res_gridspec = [1, mapB['grid'].shape[1]]
         res_distspec[0] = dict()
         res_distspec[0]['dist'] = 'b'
-        res_distspec[1] = mapB.dist_spec[1]
+        res_distspec[1] = mapB['dist_spec'][1]
                   
         my_idx = 0  
         res = dict() # store intermediate Dmat results     
-        for i in range(mapB.grid.shape[0]):
-            res_map = Dmap(res_gridspec, res_distspec, mapB.grid[i, :])
+        for i in range(mapB['grid'].shape[0]):
+            res_map = Dmap(res_gridspec, res_distspec, mapB['grid'][i, :])
             res[i] = zeros(a.shape[0], size(b, 1)[0], map=res_map)
     
             # store which result matrix this processor will use
@@ -79,20 +79,20 @@ def mtimes(a,b):
                 my_idx = i
     
         # map A's i-th column to the leftmost node in B's i-th row
-        new_gridspec = [1, size(mapB.grid, 0)[0]]
+        new_gridspec = [1, size(mapB['grid'], 0)[0]]
         new_distspec[0] = dict()
         new_distspec[0]['dist'] = 'b'
-        new_distspec[1] = mapB.dist_spec[0]
-        new_proclist = np.transpose(mapB.grid[:, 0])
+        new_distspec[1] = mapB['dist_spec'][0]
+        new_proclist = np.transpose(mapB['grid'][:, 0])
 
-        if mapB.overlap:
+        if mapB['overlap']:
             print('WARNING (@dmat/mtimes): TODO dmats with overlap may not work')
-            new_mapA = Dmap(new_gridspec, new_distspec, new_proclist, mapB.overlap)
+            new_mapA = Dmap(new_gridspec, new_distspec, new_proclist, mapB['overlap'])
         else:
             new_mapA = Dmap(new_gridspec, new_distspec, new_proclist)
         if DEBUG:
             print('When A is a ndarray, new_mapA is ',end='')
-            new_mapA.print()
+            new_mapA.show()
 
         if DEBUG:
             print('mtimes: calling remap . . . ')
@@ -101,17 +101,17 @@ def mtimes(a,b):
             print('mtimes: after remap, type of a is %s . . . '%(type(a)))
                   
         # find row/column in grid
-        [myRow, myCol] = find(mapB.grid == GPC.Pid)
+        [myRow, myCol] = np.where(mapB['grid'] == GPC.Pid)
         if DEBUG:
             print('mtimes: after find, [myRow,myCol] = ')
             print(myRow)
             print(myCol)
-            print('mapB.grid[myRow, 0] = %d'%(mapB.grid[myRow, 0]))
-            print('mapB.grid[myRow, 1:] = ',end='')
-            print(mapB.grid[myRow, 1:])
+            print("mapB['grid[myRow'], 0] = %d"%(mapB['grid'][myRow, 0]))
+            print("mapB['grid[myRow, 1:] = ",end='')
+            print(mapB['grid'][myRow, 1:])
                   
         # send/receive data and do the multiplication
-        res[my_idx].local = np.matmul(multicast(mapB.grid[myRow, 0], mapB.grid[myRow, 1:], a.local), b.local)
+        res[my_idx].local = np.matmul(multicast(mapB['grid'][myRow, 0], mapB['grid'][myRow, 1:], a.local), b.local)
 
         # add back together sub-results to form resulting matrix (c)
         c = summation(zeros(size(a, 0)[0], size(b, 1)[0], map=mapB), res)
@@ -140,7 +140,7 @@ def mtimes(a,b):
             res_map = Dmap(res_gridspec, res_distspec, mapA.grid[:,i])
             if DEBUG:
                 print('res_map: ')
-                res_map.print()
+                res_map.show()
 
             res[i] = zeros(size(a, 0)[0], size(b, 1)[0], map=res_map)
             # store which result matrix this processor will use
@@ -163,7 +163,7 @@ def mtimes(a,b):
         
         if DEBUG:
             print('new_mapB properties:')
-            new_mapB.print()
+            new_mapB.show()
             print('   Before b.loal = ')
             print(b.local)
             print('   n_dim_find error happened when calling remap: ')
@@ -178,7 +178,7 @@ def mtimes(a,b):
         # find row/column in grid
         if DEBUG:
             print('mapA properties:')
-            mapA.print()
+            mapA.show()
 
         [myRow, myCol] = find(mapA.grid == GPC.Pid)
         if DEBUG:

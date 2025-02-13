@@ -48,7 +48,11 @@ def get_local_ind(global_ind, ind):
                 else:
                     if isinstance(ind[i],slice):
                         # Convert to a list of index from a slice object
-                        ind_list = list(range(ind[i].stop)[ind[i]])
+                        if ind[i].stop == None:
+                            # dimension i is not distributed
+                            ind_list = list(global_ind[i])[ind[i]]
+                        else:
+                            ind_list = list(range(ind[i].stop)[ind[i]])
                     else:
                         # assuming it is a list already
                         ind_list = ind[i]

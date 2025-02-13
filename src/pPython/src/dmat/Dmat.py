@@ -14,6 +14,11 @@ from local_dims import *
 from get_global_ind import *
 from print_pitfalls import *
 from print_falls import *
+from submat import *
+from ndims import *
+from tup2ary import *
+from exec_subsref import *
+from size import *
 
 class Dmat:
     """Define Dmat class.
@@ -92,6 +97,7 @@ class Dmat:
         if DEBUG:
             print('Dimension of distributed dmat array: %d'%(len(dims)))
             print(array_sizes)
+            print('dims = ',end='')
             print(dims)
     
         if ndim>4:
@@ -117,32 +123,32 @@ class Dmat:
         # Use 'shape' instead of 'size' in order to be compatible with a NumPy array
         # Deprecated: self.size = dims
         self.shape = dims
-        if isinstance(dmap,Dmap) and (dmap.dim != len(dims)):
+        if isinstance(dmap,Dmap) and (dmap['dim'] != len(dims)):
             raise Exception('ERROR(Dmat): Map and distributed object dimensions must match')
             
         # create a PITFALLS for each dimension
         pitfalls = []
-        for i in range(dmap.dim):
+        for i in range(dmap['dim']):
             if DEBUG:
                 print('Dmat: axis, i = %d'%(i))
-                print(dmap.grid.shape[i])
-                print(dmap.dist_spec[i])
+                print(dmap['grid'].shape[i])
+                print(dmap['dist_spec'][i])
                 print(dims[i])
-            if not (dmap.overlap):
-                # dmap.grid.shape: tuple of the dim length
-                # dmap.dist_spec: a dictionary of dictoary with key in str(dim)
+            if not (dmap['overlap']):
+                # dmap['grid'].shape: tuple of the dim length
+                # dmap['dist_spec']: a dictionary of dictoary with key in str(dim)
                 # print('no overlap')
-                pitfalls.append(gen_pitfalls(dmap.grid.shape[i], dmap.dist_spec[i], dims[i]))
-            elif dmap.overlap[i]==0:
-                # Same as not defined dmap.overlap
+                pitfalls.append(gen_pitfalls(dmap['grid'].shape[i], dmap['dist_spec'][i], dims[i]))
+            elif dmap['overlap'][i]==0:
+                # Same as not defined dmap['overlap']
                 # print('zero overlap')
-                pitfalls.append(gen_pitfalls(dmap.grid.shape[i], dmap.dist_spec[i], dims[i]))
+                pitfalls.append(gen_pitfalls(dmap['grid'].shape[i], dmap['dist_spec'][i], dims[i]))
             else:
-                # non-zero dmap.overlap is defined.
+                # non-zero dmap['overlap'] is defined.
                 if DEBUG:
                     print('non-zero overlap')
-                    print('dmap.overlap: %d in axis, i = %d'%(dmap.overlap[i],i))
-                pitfalls.append(gen_pitfalls(dmap.grid.shape[i], dmap.dist_spec[i], dims[i], dmap.overlap[i]))
+                    print("dmap['overlap']: %d in axis, i = %d"%(dmap['overlap'][i],i))
+                pitfalls.append(gen_pitfalls(dmap['grid'].shape[i], dmap['dist_spec'][i], dims[i], dmap['overlap'][i]))
         
         self.pitfalls = pitfalls
         if DEBUG:
@@ -157,9 +163,9 @@ class Dmat:
         my_rank = MPI_Comm_rank(comm)
         
         # get the local falls
-        self.falls = get_local_falls(self.pitfalls, dmap.grid, my_rank)
+        self.falls = get_local_falls(self.pitfalls, dmap['grid'], my_rank)
         if DEBUG:
-            print(dmap.grid)
+            print(dmap['grid'])
             print(my_rank)
             for i in range(len(self.falls)):
                 f = self.falls[i]
@@ -170,6 +176,8 @@ class Dmat:
         local_dim = local_dims(self.falls, self.dim);
         self.local_dim = local_dim
         if DEBUG:
+            print('global Dmat shape: ', end='')
+            print(self.shape)
             print('local dimension: ', end='')
             print(local_dim)
         
@@ -177,11 +185,14 @@ class Dmat:
         # (e.g. ones, zeros, rand and sparse)
         # pPython: allocate memory for sparse method
         self.local = np.zeros(self.local_dim, dtype)
+        if DEBUG:
+            print('Dmat local array: ')
+            print(self.local)
         
         # get the local indices for the current processor
-        grid_dims = dmap.grid_spec
-        if len(grid_dims)<dmap.dim:
-            for i in range(len(grid_dims),dmap.dim+1):
+        grid_dims = dmap['grid_spec']
+        if len(grid_dims)<dmap['dim']:
+            for i in range(len(grid_dims),dmap['dim']+1):
                 grid_dims.append(0)
         
         self.global_ind = get_global_ind(self.falls, grid_dims)
@@ -330,8 +341,8 @@ class Dmat:
             print('s for subscripted assignment:')
             print(s)
             print('<-- Exiting Dmat.setitem() with calling subsasgn(d, s, self)')
-        self = subsasgn(self, s, d)
-
+        #
+        return subsasgn(self, s, d)
 
     def __add__(self, other):
         """Implement addition with Dmat()
@@ -469,6 +480,226 @@ class Dmat:
             c = False
         return c
 
+    def subsref(self,s):
+        """
+        SUBSREF Subscripted reference. Called for syntax A(S).
+        Should not be called directly.
+        SUBSREF(A, S) Subscripted reference on a distributed array A.
+        S is a structure array with the fields:
+        type -- string containing '()', '{}', or '.' specifying the subscript type.
+        subs -- Cell array or string containing the actual subscripts.
+    
+        Note: Matlab is flexible to deal with whether s is a single structure or an array.
+        In order to deal with that behavior in Python, coding becomes a little bit lengthy.
+        s can be a single dictionary variable or a list of dictionary variables.
+
+        !!!WARNING: Does not produce a stand-alone distributed array.
+    
+        Python version: Dr. Chansup Byun
+        Author:  Nadya Travinin
+        Edited:  Edmund L. Wong (elwong@ll.mit.edu)
+        """
+        DEBUG = 0
+        if DEBUG:
+            print('--> Entering subsref for Dmat objects')
+    
+        sizeA = size(self)
+        if isinstance(s,list):
+            subs = s[0]['subs']
+            stype = s[0]['type']
+        else:  
+            # assuming a single dictionary variable
+            subs = s['subs']
+            stype = s['type']
+
+        #
+        # Array access.
+        #
+        if stype=='()': #subscripting type
+            # TODO eventually support < cases
+            if len(subs) > ndims(self):
+                raise Exception('@dmat/subsref: Too many dimensions')
+            elif len(subs) < ndims(self):
+                raise Exception('@dmat/subsref: Too few dimensions')
+
+            #set submat flag to 0
+            submat_flag = 0
+    
+            # check to make sure that the indices before the last are
+            # within bounds
+            f_all = 1
+            for i in range(ndims(self)):
+                # In Python, slice(None) is equivalent to using the colon : operator in array slicing.
+                # if not isinstance(subs[i],slice) and subs[i].start != None :
+                if not isinstance(subs[i],slice) :
+                    f_all = 0
+                    # if len(subs[i]) != 1:
+                    if not isinstance(subs[i],int):
+                        #adjust submat flag
+                        if DEBUG:
+                            print('Dmat.subsref: adjust submat flag = 1')
+                        submat_flag = 1
+                    elif subs[i] > sizeA[i]: # && i <= ndims(self)
+                        raise Exception('@dmat/subsref: Index exceeds dmat dimensions')
+    
+            if not submat_flag: #if reference consist of combinations of : and single numbers, use this code
+                # expand the dimensions if needed
+                # TODO doesn't follow Matlab semantics if last specified
+                # dimension is : and it needs to be expanded, so it has been
+                # disabled for the time being
+                #
+                #excess = subs{len(subs)}
+                #for i=len(subs):ndims(self)
+                #  subs[i] = mod(excess-1, sizeA) + 1
+                #  excess = floor((excess-1) / sizeA(len(subs))) + 1
+                #end
+    
+                #
+                # If all subscripts are :, return the entire matrix otherwise
+                # call submatrix.
+                #
+                if f_all:
+                    b = self.copy()
+                else:
+                    #
+                    # Commonly used variables.
+                    #
+                    m = self.map
+                    gridA = m['grid']
+                    distA = m['dist_spec']
+                    sizeB = sizeA # initialize size of B to be size of A
+    
+                    #
+                    # TODO should use FALLS structure if handling subscript ranges, but
+                    # currently that is not supported.  Thus using simpler approach.
+                    #
+                    s_map = dict()
+                    s_map['subs'] = dict()
+                    s_data = dict()
+                    s_data['subs'] = dict()
+                    for i in range(len(subs)):
+                        # if len(subs[i]) == 1:
+                        # Not sure what it means if len(subs[i]) != 1 ?
+                        #     if subs[i] != ':':
+                        # Onlf access if a direction has a specified index to address ...
+                        if not isinstance(subs[i],slice) and isinstance(subs[i],int):
+                                if subs[i] < 0 or subs[i] > sizeB[i]-1:
+                                    raise Exception('@dmat/subsref: The %d-th subscript exceeds size of dmat'%(i))
+    
+                                # figure out distribution
+                                if distA[i]['dist']=='b':
+                                    # block - take the subscript and divide by the block size =
+                                    # size(a, i) / size(gridA, i)
+
+                                    if DEBUG:
+                                        print(size(self,i))
+                                        print(size(gridA,i))
+                                    # size() returns a list
+                                    b_size = ceil(size(self, i)[0] / size(gridA, i)[0])
+                                    idx = floor((subs[i]) / b_size) 
+                                    off = subs[i]%b_size
+    
+                                elif distA[i]['dist']=='c':
+                                    # cyclic - find the remainder of the subscript divided by
+                                    # the number of processors in that dimension
+                                    idx = subs[i]%size(gridA, i)[0]
+                                    off = floor(subs[i] / size(gridA, i)[0])
+    
+                                elif distA[i]['dist']=='bc':
+                                    # block cyclic - find out which block this would lie on (block),
+                                    # and then find out which processor owns this block (cyclic)
+                                    idx = floor(subs[i] / distA[i]['b_size'])
+                                    off = distA[i]['b_size'] * floor(idx / size(gridA, i)[0]) + subs[i]%distA[i]['b_size']
+                                    idx = idx%size(gridA, i)[0]
+    
+                                else:
+                                    raise Exception('@dmat/subsref: Unsupported distribution type: %s'%(distA.type))
+                                #
+                                # Set up the subscripts.
+                                #
+                                s_map['subs'][i] = idx
+                                s_data['subs'][i] = off
+                                sizeB[i] = 1
+                        #    else:
+                        elif isinstance(subs[i],slice):
+                                s_map['subs'][i] = subs[i]
+                                s_data['subs'][i] = subs[i]
+                        else:
+                            raise Exception('@dmat/subsref: Unsupported subscript: %s'%(subs[i]))
+                    #
+                    # Find the map that would contain these processors and create a
+                    # dmat using this map.
+                    #
+                    s_map['type'] = '()'
+                    s_data['type'] = '()'
+                    # find() returns a list
+                    # np.where( sizeB != 1)[0] returns a list of indices where its elements is not 1
+                    maxGenDim = np.max((np.max(np.where( sizeB != 1)[0]),2))
+                    sizeB = sizeB[0:maxGenDim]
+                    gridA = gridA.flatten()
+                    gridB = exec_subsref(gridA,s_map)
+
+                    # Downsize the distribution specification for the first 2 dimensions
+                    m_dist_spec = {key: m['dist_spec'][key] for key in [0,1] if key in m['dist_spec']}
+                    # proc_list = np.reshape(gridB, (1, np.prod(size(gridB))))[0]
+                    proc_list = np.reshape(gridB, (np.prod(size(gridB)),))
+                    if DEBUG:
+                       print('Dmat.subsref: check some variables')
+                       print('size(gridB) = ',end='')
+                       print(size(gridB))
+                       print(m_dist_spec)
+                       print(proc_list)
+                    mapB = Dmap(size(gridB), m_dist_spec, proc_list)
+                    b = Dmat(self.nbytes,self.dtype,sizeB, map=mapB)
+    
+                    #
+                    # If local processor has data that needs to be sent, send it.
+                    #
+                    if DEBUG:
+                        print('Dmat.subsref: before exec_subsref(self.local,s_data) call . . . ')
+                        print('. . . Check Dmat b with ndims(): ')
+                        b.show()
+                        print(ndims(b))
+
+                    if np.prod(size(self.local)) > 0 and inmap(mapB, GPC.Pid):
+                        # print('. . . calling b.local = exec_subsref(self.local,s_data) ')
+                        b.local = exec_subsref(self.local,s_data)
+                    if DEBUG:
+                        print('... after exec_subsref(self.local,s_data) call . . . ')
+                        print('b.local = ',end='') 
+                        print(b.local)
+                        b.show()
+            else: #make a call to submat with a warning
+                print(
+                    '''Warning:
+                    dmat/subsref: Fully functional sibscripted reference
+                    is only supported for indices that consist of combinatioons
+                    of : and single number. Otherwise, please restrict operation
+                    to the local part of the referenced structure. Stand alone
+                    distirbuted array will not be returned.
+                    ''')
+                b = submat(self,s)
+
+            #
+            # Structure reference.
+            #
+        elif stype=='.': #subscripting type
+            if subs == 'local':
+                b = self.local
+            elif subs == 'map':
+                b = self.map
+            else:
+                raise Exception('@dmat/subsref: %s cannot be accessed directly or is not a field of DMAT.'%(subs))
+        #
+        # Recursive call
+        #
+        if isinstance(s,list) and len(s) > 1:
+            b = exec_subsref(self, s[2:])
+
+        if DEBUG:
+            print('<-- Exiting subsref for Dmat objects')
+        return b
+
     def copy(self):
         """Copy the given dmat."""
         d = Dmat(self._nbytes, self._dtype)
@@ -486,6 +717,21 @@ class Dmat:
             d.local = np.zeros(self.local.shape)
         d.local[:] = self.local
         return d
+
+    def show(self):
+        """
+        Show the Dmat properties
+        '"""
+        print('*** Dmat object')
+        self.map.show()
+        print('   global Dmat shape: ',end='')
+        print(self.shape)
+        print('   local array shape: ',end='')
+        print(self.local.shape)
+        print('   global index: ',end='')
+        print(self.global_ind)
+        print('   local dimension: ',end='')
+        print(self.local_dim)
 
 ########################################################
 # pMatlab: Parallel Matlab Toolbox

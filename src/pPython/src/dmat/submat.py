@@ -53,27 +53,27 @@ def submat(a, s):
             # create a new Dmat object
             """
             Properties need to be set:
-            d.map = self.map
-            d.dim = self.dim
-            d.shape = self.shape (size in pMatlab)
-            d.pitfalls = self.pitfalls
-            d.falls = self.falls
-            d.local_dim = self.local_dim # added with gridPython
-            d.global_ind = self.global_ind
-            # create an array same as d.local
-            d.local = np.zeros(self.local.shape)
-            d.local[:] = self.local
+               d.map = self.map
+               d.dim = self.dim
+               d.shape = self.shape (size in pMatlab)
+               d.pitfalls = self.pitfalls
+               d.falls = self.falls
+               d.local_dim = self.local_dim # added with gridPython
+               d.global_ind = self.global_ind
+               # create an array same as d.local
+               d.local = np.zeros(self.local.shape)
+               d.local[:] = self.local
             """
             b.map = new_map
             b.dim = a.dim
             b.shape = [len(ind[0]),len(ind[1])]
             # create a PITFALLS for each dimension
-            for i in range(new_map.dim):
-                b.pitfalls[i] = gen_pitfalls(size(new_map.grid,i), new_map.dist_spec[i], 1)
-            b.falls = get_local_falls(b.pitfalls, new_map.grid, GPC.Pid)
+            for i in range(new_map['dim']):
+                b.pitfalls[i] = gen_pitfalls(size(new_map['grid'],i), new_map['dist_spec'][i], 1)
+            b.falls = get_local_falls(b.pitfalls, new_map['grid'], GPC.Pid)
             b.local = a.local[local_ind[0], local_ind[1]]
             b.local_dim = size(b.local)  # added with gridPython
-            grid_dims = size(new_map.grid)
+            grid_dims = size(new_map['grid'])
             b.global_ind = get_global_ind(b.falls, grid_dims)
             # ----CASE 1 on SUBSREF development plan----
         else:

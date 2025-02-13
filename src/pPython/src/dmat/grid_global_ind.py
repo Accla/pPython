@@ -15,7 +15,7 @@ def grid_global_ind(d):
     dim = len(d.pitfalls)
 
     # processor grid on which the object is distributed
-    grid = d.map.grid
+    grid = d.map['grid']
 
     grid_dims = list(grid.shape)
     # Fill up if missing dimension

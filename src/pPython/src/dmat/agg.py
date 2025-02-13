@@ -128,7 +128,7 @@ def agg(d, leader=None):
     if d.dim > 4:
         raise Exception('DMAT/AGG: Only up to 4-D objects currently supported')
         
-    dim = d.map.grid.shape
+    dim = d.map['grid'].shape
     # dim(1) - number of processor grid rows, dim(2) - number of grid col
     totalProcs = 1
     for i in range(len(dim)):
@@ -145,7 +145,7 @@ def agg(d, leader=None):
 
     # Generate relation between process rank and grid map
     # gridIndex = mapGridRank(d);
-    # No need to create this array, use np.where with d.map.grid processor grid array
+    # No need to create this array, use np.where with d.map['grid'] processor grid array
     # For example, 2-D array
     # [i,j] = np.where(dmat_proc_grid == 3)
 
@@ -157,7 +157,7 @@ def agg(d, leader=None):
         if d.dim==2:
             # Two dimensional array
             # Find the position in the processor grid for the given Pid
-            [i,j] = np.where(d.map.grid == Pid)
+            [i,j] = np.where(d.map['grid'] == Pid)
             # i & j are np.array
             i = int(i); j = int(j)
             # if DEBUG: 
@@ -171,7 +171,7 @@ def agg(d, leader=None):
         elif d.dim==3:
             # Three dimensional array
             # Find the position in the processor grid for the given Pid
-            [i,j,k] = np.where(d.map.grid == Pid)
+            [i,j,k] = np.where(d.map['grid'] == Pid)
             i = int(i); j = int(j); k = int(k)
             # if DEBUG: print('Process position [i,j,k] = [%d,%d,%d]'%(i,j,k))
             if i not in temp_mat:
@@ -184,7 +184,7 @@ def agg(d, leader=None):
         elif d.dim==4:
             # Four dimensional array
             # Find the position in the processor grid for the given Pid
-            [i,j,k,m] = np.where(d.map.grid == Pid)
+            [i,j,k,m] = np.where(d.map['grid'] == Pid)
             i = int(i); j = int(j); k = int(k); m = int(m)
             # if DEBUG: print('Process position [i,j,k,m] = [%d,%d,%d,%d]'%(i,j,k,m))
             if i not in temp_mat:
@@ -252,7 +252,7 @@ def agg(d, leader=None):
                                     # Two dimensional array
                                     # if DEBUG: print('imsg=%s, Msg from Pid = %d' %(imsg,pidKeep[recvPidPos+imsg]))
                                     # Find the position in the processor grid for the given Pid
-                                    [i,j] = np.where(d.map.grid == pidKeep[recvPidPos+imsg])
+                                    [i,j] = np.where(d.map['grid'] == pidKeep[recvPidPos+imsg])
                                     i = int(i); j = int(j)
                                     if DEBUG:
                                         print('i,j,imsg=%d,%d,%d'%(i,j,imsg))
@@ -262,7 +262,7 @@ def agg(d, leader=None):
                                     temp_mat[i][j] = recvBuf[imsg]
                                 elif d.dim==3:
                                     # Three dimensional array
-                                    [i,j,k] = np.where(d.map.grid == pidKeep[recvPidPos+imsg])
+                                    [i,j,k] = np.where(d.map['grid'] == pidKeep[recvPidPos+imsg])
                                     i = int(i); j = int(j); k = int(k)
                                     if i not in temp_mat:
                                         temp_mat[i] = dict()
@@ -271,7 +271,7 @@ def agg(d, leader=None):
                                     temp_mat[i][j][k] = recvBuf[imsg]
                                 elif d.dim==4:
                                     # Four dimensional array
-                                    [i,j,k,m] = np.where(d.map.grid == pidKeep[recvPidPos+imsg])
+                                    [i,j,k,m] = np.where(d.map['grid'] == pidKeep[recvPidPos+imsg])
                                     i = int(i); j = int(j); k = int(k); m = int(m)
                                     if i not in temp_mat:
                                         temp_mat[i] = dict()
@@ -307,7 +307,7 @@ def agg(d, leader=None):
     if (Pid == map_leader):   # agg() leader
         # Reconstruct the matrix from the local pieces
         # This is a NO-OP for block distributions
-        mat = reconstruct(d.pitfalls,  d.map.grid, temp_mat, d.shape)
+        mat = reconstruct(d.pitfalls,  d.map['grid'], temp_mat, d.shape)
 
     if DEBUG:
         time_02 = timer()

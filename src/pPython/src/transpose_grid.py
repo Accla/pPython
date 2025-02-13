@@ -59,11 +59,11 @@ def transpose_grid(B):
         # Get B's size, map, grid, dist, overlap and cpus list.
         B_size      = size(B)
         B_map       = B.map
-        B_grid      = B_map.grid
-        B_grid_spec = B_map.grid_spec
-        B_dist_spec = B_map.dist_spec
-        B_proc_list = B_map.proc_list
-        B_overlap   = B_map.overlap
+        B_grid      = B_map['grid']
+        B_grid_spec = B_map['grid_spec']
+        B_dist_spec = B_map['dist_spec']
+        B_proc_list = B_map['proc_list']
+        B_overlap   = B_map['overlap']
  
     # Create map for A that is the same as B's but with a transposed grid.
     A_grid_spec = [B_grid_spec[1], B_grid_spec[0]]

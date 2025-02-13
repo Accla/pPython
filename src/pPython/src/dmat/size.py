@@ -21,6 +21,8 @@ def size(d, dims=None):
     if dims == None:
         # take care of non Dmat array
         if isinstance(d,np.ndarray):
+            if len(d.shape) == 1:
+                d = d.reshape(1,d.shape[0])
             dims = list(range(len(d.shape)))
         elif isinstance(d,(int, float)):
             # special treatment for a scalar
