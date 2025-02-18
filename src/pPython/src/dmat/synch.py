@@ -38,7 +38,7 @@ def synch(d):
 
     p = d.map
     # find current processor index in the grid
-    proc_grid = p.grid
+    proc_grid = p['grid']
     my_grid_ind = n_dim_find(proc_grid, GPC.Pid)
     # obtain the process grid dimensions
     grid_dims = list(proc_grid.shape)
@@ -50,8 +50,8 @@ def synch(d):
     if inmap(p, GPC.Pid):
         subs = []
         for i  in range(d.dim): # syncronize each dimension of distributed array
-            if bool(p.overlap): # overlap description defined
-                if p.overlap[i]>0: # overlap is greater than 0
+            if bool(p['overlap']): # overlap description defined
+                if p['overlap'][i]>0: # overlap is greater than 0
                 
                     ind_adjuster = np.zeros(d.dim,dtype=int)
                     ind_adjuster[i] = -1
@@ -69,9 +69,9 @@ def synch(d):
                     # if the rank is not at the starting edge in the i-th direction (dimension)
                     if my_grid_ind[i] > 0:
                         str_sub_data = 'd.local['
-                        for s in range(len(p.overlap)):
-                            if p.overlap[s] > 0:
-                                str_sub_data += '0:'+str(p.overlap[s])+','
+                        for s in range(len(p['overlap'])):
+                            if p['overlap'][s] > 0:
+                                str_sub_data += '0:'+str(p['overlap'][s])+','
                             else:
                                 str_sub_data += ':,'
                         # Take care of the last character
@@ -111,9 +111,9 @@ def synch(d):
                         
                         
                         str_sub_data = 'd.local['
-                        for s in range(len(p.overlap)):
-                            if p.overlap[s] > 0:
-                                str_sub_data += str(local_dims[s]-p.overlap[s])+':'+str(local_dims[s])+','
+                        for s in range(len(p['overlap'])):
+                            if p['overlap'][s] > 0:
+                                str_sub_data += str(local_dims[s]-p['overlap'][s])+':'+str(local_dims[s])+','
                             else:
                                 str_sub_data += ':,'
                         # Take care of the last character
