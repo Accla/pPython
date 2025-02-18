@@ -31,7 +31,7 @@ def find(x):
     GPC.tag_num = GPC.tag_num+1
     GPC.tag = 'tag-'+str(GPC.tag_num)
     
-    if inmap(x.map, GPC.Pid):
+    if hasattr(x,'map') and inmap(x.map, GPC.Pid):
         local_ij = np.argwhere(x.local)
         # Note: local_ij[:,0] -> local_i, local_ij[:,1] -> local_j
         if isinstance(x.global_ind[0], str):

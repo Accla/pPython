@@ -132,6 +132,13 @@ def slurm_submit_job(grid_config,sched_job_file,py_file,dir_llsc):
         else:
             ecmd.run(cmdstr)
             os.chdir(save_cwd)
+    # Export job id
+    if isinstance(job_id,int):
+        os.environ['SLURM_JOB_ID'] = str(job_id)
+        os.environ['SLURM_ARRAY_JOB_ID'] = str(job_id)
+    else:
+        os.environ['SLURM_JOB_ID'] = job_id
+        os.environ['SLURM_ARRAY_JOB_ID'] = job_id
 
     return job_id
 
