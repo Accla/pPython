@@ -71,9 +71,7 @@ def pyMPI_Comm_init(n_proc,machines,**argv):
                nppn = MPI_COMM_WORLD['grid_config']['nppn']
     # Default setup: 
     # execution is done locally
-    MPI_COMM_WORLD['grid_config']['islocal'] = True
-    # No mixed file systsem
-    MPI_COMM_WORLD['grid_config']['mixed_fs'] = False
+    MPI_COMM_WORLD['grid_config']['islocal'] = 0
     if EPPAC:
         MPI_COMM_WORLD['group'] = np.arange(0,nnode*nppn,dtype=int)
         MPI_COMM_WORLD['machine_id'] = np.zeros((nnode*nppn,),dtype=int)
