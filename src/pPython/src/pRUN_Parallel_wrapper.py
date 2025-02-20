@@ -32,7 +32,7 @@ def pRUN_Parallel_wrapper(py_file):
         if 'islocal' in grid_config:
             islocal = grid_config['islocal']
         else:
-            islocal = True
+            islocal = 1
         EPPAC = grid_config['EPPAC']
         # Passed from pRUN()
         LAUNCH_TIMING = grid_config['LAUNCH_TIMING']
@@ -57,6 +57,10 @@ def pRUN_Parallel_wrapper(py_file):
         print('pRUN_Parallel_Wrapper: local_fs = %d'%(local_fs))
         mixed_fs = grid_config['mixed_fs']
         print('pRUN_Parallel_Wrapper: mixed_fs = %d'%(mixed_fs))
+        SLURM_JOB_ID = os.getenv('SLURM_JOB_ID',default='')
+        SLURM_ARRAY_JOB_ID = os.getenv('SLURM_ARRAY_JOB_ID',default='')
+        print('pRUN_Parallel_Wrapper: SLURM_JOB_ID = %s'%(SLURM_JOB_ID))
+        print('pRUN_Parallel_Wrapper: SLURM_ARRAY_JOB_ID = %s'%(SLURM_ARRAY_JOB_ID))
         print(' ')
 
     if (local_fs or (not interactive and EPPAC))and grid_job:

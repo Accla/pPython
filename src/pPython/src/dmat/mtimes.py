@@ -125,19 +125,19 @@ def mtimes(a,b):
     
         # create sub-result matrices, each with a map equivalent to
         # one of map A's columns
-        res_gridspec = [size(mapA.grid, 0)[0], 1]
-        res_distspec[0] = mapA.dist_spec[0]
+        res_gridspec = [size(mapA['grid'], 0)[0], 1]
+        res_distspec[0] = mapA['dist_spec'][0]
         res_distspec[1] = dict()
         res_distspec[1]['dist'] = 'b'
 
         if DEBUG:
-            print('size(mapA.grid) = ',end='')
-            print(size(mapA.grid))
+            print("size(mapA['grid']) = ",end='')
+            print(size(mapA['grid']))
 
         my_idx = 0
         res = dict() # store intermediate Dmat results     
-        for i in range(size(mapA.grid, 1)[0]):
-            res_map = Dmap(res_gridspec, res_distspec, mapA.grid[:,i])
+        for i in range(size(mapA['grid'], 1)[0]):
+            res_map = Dmap(res_gridspec, res_distspec, mapA['grid'][:,i])
             if DEBUG:
                 print('res_map: ')
                 res_map.show()
@@ -149,15 +149,15 @@ def mtimes(a,b):
                 if DEBUG:
                     print('Pid = %d found in res_map  my_idx = %d'%(GPC.Pid,i))
         # map B's ith row to the top node in A's ith column
-        new_gridspec = [size(mapA.grid, 1)[0], 1]
-        new_distspec[0] = mapA.dist_spec[1]
+        new_gridspec = [size(mapA['grid'], 1)[0], 1]
+        new_distspec[0] = mapA['dist_spec'][1]
         new_distspec[1] = dict()
         new_distspec[1]['dist'] = 'b'
-        #CB new_proclist = np.transpose(mapA.grid[0, :])
-        new_proclist = mapA.grid[0, :]
-        if mapA.overlap:
+        #CB new_proclist = np.transpose(mapA['grid'][0, :])
+        new_proclist = mapA['grid'][0, :]
+        if mapA['overlap']:
             print('Warning[@dmat/mtimes]: TODO dmats with overlap may not work')
-            new_mapB = Dmap(new_gridspec, new_distspec, new_proclist, mapA.overlap)
+            new_mapB = Dmap(new_gridspec, new_distspec, new_proclist, mapA['overlap'])
         else:
             new_mapB = Dmap(new_gridspec, new_distspec, new_proclist)
         
@@ -180,7 +180,7 @@ def mtimes(a,b):
             print('mapA properties:')
             mapA.show()
 
-        [myRow, myCol] = find(mapA.grid == GPC.Pid)
+        [myRow, myCol] = find(mapA['grid'] == GPC.Pid)
         if DEBUG:
             print('myRow & myCol that matches with GPC.Pid = %d'%(GPC.Pid))
             print('myRow:')
@@ -194,11 +194,11 @@ def mtimes(a,b):
         # send/receive data and do the multiplication
         if DEBUG:
             print('   multicast source: ',end='')
-            print(mapA.grid[0, myCol])
+            print(mapA['grid'][0, myCol])
             print('   multicast destinations: ',end='')
-            print(mapA.grid[1:, myCol])
+            print(mapA['grid'][1:, myCol])
 
-        res[my_idx].local = np.matmul(a.local, multicast(mapA.grid[0, myCol], mapA.grid[1:, myCol], b.local))
+        res[my_idx].local = np.matmul(a.local, multicast(mapA['grid'][0, myCol], mapA['grid'][1:, myCol], b.local))
         if DEBUG:
             print('After summation: res[my_idx].local')
             print(res[my_idx].local)
