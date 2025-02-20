@@ -2,7 +2,7 @@
 # Main test script to drive the entire test cases
 
 # Load anaconda module
-soruce /etc/profile
+source /etc/profile
 module purge
 module load anaconda/Python-ML-2025a
 

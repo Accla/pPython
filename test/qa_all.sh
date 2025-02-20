@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # List of directories by test cases
-# MYDIRLIST="examples dmat dmap ppython pythonmpi"
-MYDIRLIST="examples "
+MYDIRLIST="examples dmat dmap ppython pythonmpi grid mixed_kernel"
 
 for mydir in $MYDIRLIST; 
 do 
