@@ -33,7 +33,7 @@ def beamformer_vectors(Nsensors,Nbeams,myFreqs):
     Output:     
     v = steering vector (Nelements x M x L x F)
     """
-    DEBUG = 1
+    DEBUG = 0
     if DEBUG:
         print('--> Entering beamformer_vectors')
       

@@ -10,6 +10,7 @@ from global_ind import *
 from global_block_range import *
 from global_block_ranges import *
 from uint64 import *
+from exec_shell_cmd import *
 
 from RandomAccessStarts import *
 
@@ -97,7 +98,7 @@ if PARALLEL:
 
 tic = timer()
 X = zeros(1,N,map=Xmap)  # Allocate main table.
-Xloc = uint64(global_ind(X,1)) # Initialize local part indices.
+Xloc = uint64(global_ind(X,1)[0]) # Initialize local part indices.
 Talloc = timer() - tic
 print('Allocation Time (sec)              = %f'%(Talloc))
 
@@ -114,7 +115,7 @@ print('Number of updates blocks           = %d'%(Nblocks))
 # BEGIN BENCHMARK
 
 # Distribute update block indices across processors.
-myBLOCK = global_ind(zeros(1,Nblocks,map=Xmap),1)
+myBLOCK = global_ind(zeros(1,Nblocks,map=Xmap),1)[0]
 
 # Create a block of starting locations in the random sequence.
 ranStarts = RandomAccessStarts( (myBLOCK[0])*Nb + np.arange(Nb)*len(myBLOCK) )
@@ -133,8 +134,9 @@ VALIDATE = 0
 tic = timer()
 
 # Execute pRandomAccessSpray script
-# does it enherit all variables from the parent process?
-exec(open("pRandomAccessTree.py").read())
+ecmd = ExecShellCmd()
+cmdstr = 'python3 pRandomAccessTree.py'
+ecmd.run(cmdstr)
 
 Trun = timer() - tic
 print('Run time (sec)                     = %f'%(Trun))
@@ -155,9 +157,10 @@ if VALIDATE:
     tic = timer()
 
     # Run core of parallel RandomAccess benchmark, with validation
-    exec(open("pRandomAccessSpray.py").read())
+    cmdstr = 'python3 pRandomAccessSpray.py'
+    ecmd.run(cmdstr)
 
-    Xloc0 = uint64(global_ind(X,1));  # Compute errors.
+    Xloc0 = uint64(global_ind(X,1)[0])  # Compute errors.
     Nerrors = np.count_nonzero(np.not_equal(Xloc,Xloc0))
 
     Tvalidate = timer() - tic;

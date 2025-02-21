@@ -1,10 +1,14 @@
 from math import ceil,pi
 from scipy.signal import convolve
 import warnings
+import sys
 
+import numpy as np
+# Replace interp2d with RegularGridInterpolator
+from scipy.interpolate import interp2d, RegularGridInterpolator
+
+from size import *
 from zeros import *
-
-from imdown import *
 
 def zoom_frames(refFrame,scaleFactor,blurSigma):
     """
@@ -23,7 +27,7 @@ def zoom_frames(refFrame,scaleFactor,blurSigma):
     # Supress overflow warning in np.exp()
     warnings.filterwarnings('ignore')
 
-    DEBUG = 1
+    DEBUG = 0
     if DEBUG:
         print('--> Entering zoom_frames')
     
@@ -40,10 +44,12 @@ def zoom_frames(refFrame,scaleFactor,blurSigma):
         print(zoomedFrames.shape)
     
     # Estimate frames at selected ranges.
+
     for i in range(len(scaleFactor)):
     
         # Generate point spread function.
         # Pre-selected to be 5-sigma.
+        factor = int(scaleFactor[i])
         nelem = ceil(scaleFactor[i]*(5*blurSigma))
         if nelem%2 == 0:
             # Make odd.
@@ -79,11 +85,46 @@ def zoom_frames(refFrame,scaleFactor,blurSigma):
             print(blurFrame)
     
         # Simulate sampled image at requested range.
-
+        if DEBUG:
+            print('sys.path = ',end=''); print(sys.path)
         zoomedFrames[:,:,i] = imdown(blurFrame,windowSize,scaleFactor[i])
     
     if DEBUG:
         print('<-- Exiting zoom_frames')
     
     return zoomedFrames
+
+
+def imdown(I,res,alpha):
+    """
+    # IMDOWN Resamples a grayscale image.
+    #    DOWNIMG = IMDOWN(I,R,A) Resamples the input
+    #    image I using bilinear interpolation using a sampling
+    #    lattice with R point samples at A times the original
+    #    sample spacing.  Extrapolated values are set to zero.
+    """
+
+    #MATLAB: Vq = interp2(V,Xq,Yq) assumes X=1:N and Y=1:M where [M,N]=SIZE(V).
+    #Python:
+    [npix,npiy] = size(I)
+    X = np.array(range(1,npix+1))
+    Y = np.array(range(1,npiy+1))
+    # deprecated
+    # f  = interp2d(X, Y, I.astype(float), kind='linear')
+    interp = RegularGridInterpolator((X, Y), I.astype(float), bounds_error=False, fill_value=None)
+   
+    # Create the down-sampling lattice.
+    x = alpha*(np.array(range(1,res+1))-((res+1)/2))+((res+1)/2)+(npix-res)/2
+    y = alpha*(np.array(range(1,res+1))-((res+1)/2))+((res+1)/2)+(npix-res)/2
+    [XI,YI] = np.meshgrid(x,y,indexing='xy')
+
+    # Down-sample the input grayscale image.
+    # downimg = interp2(im2double(I),XI,YI,'bilinear')
+    # downimg = interp2(double(I),XI,YI,'bilinear')
+    # downimg = interp2(double(I),XI,YI,'linear')
+    # Interpret at the mesh points
+    downimg = interp((XI, YI))
+    downimg[np.argwhere(np.isnan(downimg))] = 0
+ 
+    return downimg
 

@@ -80,14 +80,14 @@ tic = timer()                    # Start clock.
 Z0 = reference_frame(N,0.1,0.8)  # Create reference frame.
 # Compute local frames.
 if DEBUG:
-    print('global_ind(Z,2)')
-    print(global_ind(Z,2))
-    indx = S[np.array(global_ind(Z,2))]
-    print('S[np.array(global_ind(Z,2))]')
+    print('global_ind(Z,2)[0]')
+    print(global_ind(Z,2)[0])
+    indx = S[np.array(global_ind(Z,2)[0])]
+    print('S[np.array(global_ind(Z,2][0])]')
     print(indx.shape)
     print(indx)
 
-Zloc = zoom_frames(Z0,S[np.array(global_ind(Z,2))],sigma)
+Zloc = zoom_frames(Z0,S[np.array(global_ind(Z,2)[0])],sigma)
 if DEBUG:
     print('Zloc[:,:,0]')
     print(Zloc[:,:,0])

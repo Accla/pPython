@@ -49,7 +49,8 @@ else:
 # PARALLEL = 1  # Set control flag.
 CHECK = 1     # Check answer with serial calculation.
 
-DEBUG = 1
+DEBUG = 0
+PLOT = 0
 
 # Set image size (scaled by numlabs), filter size and blur.
 Nx = 2**11*Np;  Ny = 1024; Nk = 2**5;  Nblur = 2
@@ -188,7 +189,7 @@ npstr = str(Np)
 Zagg = agg(Z)
 
 # Display on leader.
-if (Pid == 0):
+if (Pid == 0) and PLOT:
     fig, ax = plt.subplots()
     ax.plot(ii, jj, 'o')
     ax.set_xlim(0, Nx)

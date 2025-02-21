@@ -94,7 +94,7 @@ gigaflops = totalOps / Tcompute / 1.e9
 print('Performance (Gigaflops)            = %f'%(gigaflops))
 
 # Display on leader.
-DISPLAY=1
+DISPLAY=0
 if (Pid == 0) and (DISPLAY!=0):
     pstr = str(PARALLEL)
     npstr = str(Np)

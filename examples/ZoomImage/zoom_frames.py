@@ -4,6 +4,7 @@ import warnings
 import sys
 
 import numpy as np
+# Replace interp2d with RegularGridInterpolator
 from scipy.interpolate import interp2d, RegularGridInterpolator
 
 from size import *

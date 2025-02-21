@@ -62,7 +62,7 @@ X1 = sqrt(Ns)*dcomplex(rand(Nt,Ns,Nf,map=Xmap),rand(Nt,Ns,Nf,map=Xmap))  # Senso
 X2 = zeros(Nt,Nb,Nf,map=Xmap)   # Beamformed output.
 X3 = zeros(Nt,Nb,Np,map=Xmap)   # Intermediate sum.
 
-myI_f = global_ind(X1,2)   # Get local indices.
+myI_f = global_ind(X1,2)[0]   # Get local indices.
 # Get local parts of arrays.
 X0loc = local(X0)  
 X1loc = local(X1)  

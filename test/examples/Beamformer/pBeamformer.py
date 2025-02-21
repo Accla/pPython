@@ -48,7 +48,7 @@ if QA_PARALLEL == '1':
 else:
     PARALLEL = 0
 
-DEBUG = 1
+DEBUG = 0
 
 # Set number of time snapshots, sensors, beams and frequencies.
 Nt = 600 

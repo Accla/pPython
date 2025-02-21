@@ -11,7 +11,7 @@ def reference_frame(n,a,b):
     refFrame: A reference frame of size, nxn
     """
     
-    DEBUG = 1
+    DEBUG = 0
     if DEBUG: 
         print('--> Entering reference_frame')
         

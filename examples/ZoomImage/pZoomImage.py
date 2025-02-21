@@ -53,7 +53,7 @@ print('Zooming frames...')
 tic = timer()                    # Start clock.
 Z0 = reference_frame(N,0.1,0.8)  # Create reference frame.
 # Compute local frames.
-Zloc = zoom_frames(Z0,S[np.array(global_ind(Z,2))],sigma)
+Zloc = zoom_frames(Z0,S[np.array(global_ind(Z,2)[0])],sigma)
 Tcompute = timer()-tic           # Stop Clock.
 print('Compute Time (sec)                 = %f'%(Tcompute))
 Z  = put_local(Z,Zloc)           # Insert into distributed  array.
