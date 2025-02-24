@@ -95,8 +95,6 @@ if DEBUG:
     # print('local(Z)')
     # print(local(Z))
 
-#old: myI = np.array(global_ind(Z,0))  # Get local i indices.
-#old: myJ = np.array(global_ind(Z,1))  # Get local j indices.
 myI = global_ind(Z,0)[0]  # Get local i indices.
 myJ = global_ind(Z,1)[0]  # Get local j indices.
 if DEBUG:

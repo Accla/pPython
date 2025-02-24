@@ -62,8 +62,8 @@ if (PARALLEL):
 
 W = zeros(N,N,map=Wmap)            # Create distributed array
 Wloc = local(W)                # Get local part.
-myI = global_ind(W,0)          # Get local i indices.
-myJ = global_ind(W,1)          # Get local j indices.
+myI = global_ind(W,0)[0]          # Get local i indices.
+myJ = global_ind(W,1)[0]          # Get local j indices.
 
 [ReC,ImC] = np.meshgrid(np.array(myJ)/(N/2) -1.6, np.array(myI)/(N/2) -1,indexing='xy')
 Cloc = np.vectorize(complex)(ReC,ImC)        # Initialize C.

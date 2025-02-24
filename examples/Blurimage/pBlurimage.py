@@ -52,8 +52,8 @@ tmp = scipy.sparse.random(Nx, Ny, density=1.e-4, random_state=0)  # Create non-z
 for i in range(np.prod(size(ii))):
     Z[ii[i],jj[i]]=1             # Insert non-zeros.
 
-myI = np.array(global_ind(Z,0))  # Get local i indices.
-myJ = np.array(global_ind(Z,1))  # Get local j indices.
+myI = global_ind(Z,0)[0]  # Get local i indices.
+myJ = global_ind(Z,1)[0]  # Get local j indices.
 
 Z0 = Z         # They are stored in two different memory locations
 

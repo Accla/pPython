@@ -79,7 +79,7 @@ if VALIDATE:
     phases = np.floor([3, np.log2(N), np.sqrt(N)]) # Create wave phases.
     for i in range(len(phases)):
         # Add one to index values to match with Matlab version
-        omega = (2*np.pi*phases[i]/N) * (np.array(global_ind(X,1))+1) # Compute angle.
+        omega = (2*np.pi*phases[i]/N) * (np.array(global_ind(X,1)[0])+1) # Compute angle.
         Xloc = Xloc + dcomplex(cos(omega),sin(omega))             # Add wave to Xloc.
     X = put_local(X,Xloc)           # Insert back into X.
 

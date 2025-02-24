@@ -118,8 +118,7 @@ sync = agg(zeros(1,1,Np, map=Xmap))
 
 X2 = zeros(Nt,Nb,Nf,map=Xmap)  # Beamformed output.
 X3 = zeros(Nt,Nb,Np,map=Xmap)  # Intermediate sum.
-#CB global_ind() returns a list, Should make it return a numpy array?
-# old: myI_f = np.array(global_ind(X1,2))   # Get local indices.
+# global_ind() returns a list
 myI_f = global_ind(X1,2)[0]   # Get local indices.
 # Get local parts of arrays.
 X0loc = local(X0)  
