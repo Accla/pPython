@@ -1,4 +1,44 @@
-Installation
+
+Install pPython at the user space:
+= = =
+$ cd ~/devtools/git/pPython/dist
+$ module load anaconda/Python-ML-2024b (LLSC system)
+$ pip install --user --force-reinstall pPython-0.9.11-py3-none-any.whl
+
+Installed locations:
+$HOME/.local/lib/python3.10/site-packages/pPython [LLSC system]
+
+Setup pPython configuration:
+= = =
+•	Create ~/ppython_conf directory
+mkdir ~/ppython_conf
+
+•	Copy the following local configuration files to ~/ppython_conf
+PPYTHON_HOME=$HOME/.local/lib/python3.10/site-packages/pPython
+cp $PPYTHON_HOME/ppython_conf/grid_config_local.py ~/ppython_conf
+cp $PPYTHON_HOME/PythonMPI/local/pyMPI_Comm_settings_local.py ~/ppython_conf
+
+•	Edit the local configuration files for your LLGrid account.
+grid_config_local.py
+pyMPI_Comm_settings_local.py
+
+Packaging pPython Project
+= = =
+•	Update pPython version in the source code
+Edit the following files:
+cd ~/devtools/git/pPython
+vi setup.py
+	version = 0.9.11. (Line #30)
+vi src/pPython/src/pPython_ver.py
+	version = '0.9.11’ (Line $16)
+
+•	Update pPython source and build from the build machine
+% cd ~/devtools/git/pPython
+% git pull
+% python -m build |& tee ppython-build.log-v0.9.11
+
+
+Installation (outdated)
 ------------
 
 1. Unpack the pPython tarball source at your desired location on your LLGrid account 
