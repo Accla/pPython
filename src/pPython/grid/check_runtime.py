@@ -207,8 +207,10 @@ def check_runtime( n_proc, machines, grid_config ):
         print('PPYTHON_LOCAL_FS: %s'%(PPYTHON_LOCAL_FS))
     if (PPYTHON_LOCAL_FS.lower() == 'no'):
         local_fs = 0
-    else:
-        local_fs = 1
+        if interactive and EPPAC:
+            # incorretly set PPYTHON_LOCAL_FS=no for interactive triples mode jobs
+            # ignore PPYTHON_LOCAL_FS=no
+            local_fs = 1
     # Set local_fs = 0 for non grid jobs
     if not grid_config['grid_job']:
         local_fs = 0

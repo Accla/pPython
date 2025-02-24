@@ -40,9 +40,9 @@ def MPI_Recv( source, tag, comm ):
     # or saved by a local process on the same node.
     innode = 1
     grid_config = comm['grid_config']
-    mixed_fs = grid_config['mixed_fs']
     if grid_config['local_fs'] == 1 :
-        local_fs  = 1;
+        local_fs = 1
+        mixed_fs = grid_config['mixed_fs']
         tmpdir = comm['tmpdir']
         machines =  comm['machine_db']['machine']
         #
@@ -59,7 +59,8 @@ def MPI_Recv( source, tag, comm ):
         if machines[machine_id_source] != machines[machine_id_dest] :
             innode = 0
     else:
-        local_fs  = 0
+        local_fs = 0
+        mixed_fs = 0
 
     if DEBUG:
         if innode == 0 :
