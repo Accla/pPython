@@ -43,6 +43,8 @@ def slurm2hostmap():
 
     if DEBUG:
         print('slurm2hostmap: Pid = %d' %(Pid))
+        print('slurm2hostmap: grid.grid_config["mixed_fs"] = ',end="")
+        print(grid.grid_config['mixed_fs'])
         print('slurm2hostmap: grid.grid_config["srun"] = ',end="")
         print(grid.grid_config['srun'])
         print("")
@@ -75,13 +77,20 @@ def slurm2hostmap():
         print('slurm2hostmap: nTasks = %d' %(nTasks))
     
     ## Mixed messaging kernel enhancement
-    #
     mixed_fs = grid.grid_config['mixed_fs']
     if mixed_fs:
+        # central shared filesystem for rank 0
+        # local filesystem for the rest of MPI ranks 
+        # So the leader MPI rank be 1 when using mixed kernel 
         leader = 1
     else:
+        # The leader MPI rank be 0
         leader = 0
 
+    if DEBUG:
+        
+        print('slurm2hostmap: mixed_fs = %d' %(leader))
+    
     ## Prelimenary implementation
     #
     # Rank 0 process obtains the host-to-rank map information from the scheduler

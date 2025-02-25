@@ -112,7 +112,7 @@ def agg_by_topology(d):
                 if DEBUG:
                     print('Msg from Pid = %d' %(vPid))
                 # Find the position in the processor grid for the given Pid
-                [i,j] = np.where(d.map.grid == vPid)
+                [i,j] = np.where(d.map['grid'] == vPid)
                 i = int(i); j = int(j)
                 if DEBUG:
                     print('i,j,imsg=%d,%d,%d'%(i,j,imsg))
@@ -124,7 +124,7 @@ def agg_by_topology(d):
             elif d.dim==3:
                 # Three dimensional array
                 # Find the position in the processor grid for the given Pid
-                [i,j,k] = np.where(d.map.grid == vPid)
+                [i,j,k] = np.where(d.map['grid'] == vPid)
                 i = int(i); j = int(j); k = int(k)
                 if DEBUG:
                     print('i,j,k,imsg=%d,%d,%d'%(i,j,k,imsg))
@@ -138,7 +138,7 @@ def agg_by_topology(d):
             elif d.dim==4:
                 # Four dimensional array
                 # Find the position in the processor grid for the given Pid
-                [i,j,k,m] = np.where(d.map.grid == vPid)
+                [i,j,k,m] = np.where(d.map['grid'] == vPid)
                 i = int(i); j = int(j); k = int(k); m = int(m)
                 if DEBUG:
                     print('i,j,k,m,imsg=%d,%d,%d'%(i,j,k,m,imsg))
@@ -157,7 +157,7 @@ def agg_by_topology(d):
         if DEBUG_TIMING:
             time_part_2 = timer() - time_part_2_start
             print('Time for agg part 2: %f (sec)'%(time_part_2))
-        return reconstruct(d.pitfalls, d.map.grid, temp_mat, d.shape)
+        return reconstruct(d.pitfalls, d.map['grid'], temp_mat, d.shape)
     
     # Fix the tag for the final aggregation among the node leaders
     # Since only part of the pPython processes are involved, it should not be chnaged.
@@ -274,7 +274,7 @@ def agg_by_topology(d):
                                 # Two dimensional array
                                 # print('Msg from Pid = %d' %(pid_keep[recvPidPos+imsg]))
                                 # Find the position in the processor grid for the given vPid
-                                [i,j] = np.where(d.map.grid == vPid)
+                                [i,j] = np.where(d.map['grid'] == vPid)
                                 if DEBUG:
                                     print('i,j,imsg=%d,%d,%d'%(i,j,imsg),end='')
                                     print('len(recv_buf) = %d'%(len(recv_buf)))
@@ -286,7 +286,7 @@ def agg_by_topology(d):
                             elif d.dim==3:
                                 # Three dimensional array
                                 # Find the position in the processor grid for the given vPid
-                                [i,j,k] = np.where(d.map.grid == vPid)
+                                [i,j,k] = np.where(d.map['grid'] == vPid)
                                 i = int(i); j = int(j); k = int(k)
                                 if i not in temp_mat:
                                     temp_mat[i] = dict()
@@ -296,7 +296,7 @@ def agg_by_topology(d):
                             elif d.dim==4:
                                 # Four dimensional array
                                 # Find the position in the processor grid for the given vPid
-                                [i,j,k,m] = np.where(d.map.grid == vPid)
+                                [i,j,k,m] = np.where(d.map['grid'] == vPid)
                                 i = int(i); j = int(j); k = int(k); m = int(m)
                                 if i not in temp_mat:
                                     temp_mat[i] = dict()
@@ -349,7 +349,7 @@ def agg_by_topology(d):
     if (Pid == PIDMIN): # agg() leader
         # Reconstruct the matrix from the local pieces
         # This is a NO-OP for block distributions
-        mat = reconstruct(d.pitfalls, d.map.grid, temp_mat, d.shape)
+        mat = reconstruct(d.pitfalls, d.map['grid'], temp_mat, d.shape)
     else:
         mat = d.local
     

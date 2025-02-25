@@ -4,7 +4,6 @@ from MPI_Send import *
 from MPI_Recv import *
 
 import pPython as GPC
-from Dmat import *
 from inmap import *
 from size import *
 
@@ -24,7 +23,7 @@ def find(x):
     if DEBUG:
         print('--> Entering find')
 
-    if not isinstance(x,Dmat):
+    if not hasattr(x,'map'):
         if DEBUG:
             print('... find for a non-distributed array')
         local_ij = np.argwhere(x)
@@ -90,13 +89,13 @@ def find(x):
             data.append(global_j)
             temp = dict()
         
-            grid_size = size(x.map.grid)
+            grid_size = size(x.map['grid'])
             #grid_size(1) - number of grid rows, grid_size(2) - number of grid cols
             #send local finds to everyone
             for d1 in range(grid_size[0]):
                 for d2 in range(grid_size[1]):
-                    if (GPC.Pid != x.map.grid[d1,d2]):
-                        MPI_Send(x.map.grid[d1,d2], GPC.tag, GPC.comm, data)
+                    if (GPC.Pid != x.map['grid'][d1,d2]):
+                        MPI_Send(x.map['grid'][d1,d2], GPC.tag, GPC.comm, data)
 
             #receive finds from everyone
             for d1 in range(grid_size[0]):
@@ -104,17 +103,17 @@ def find(x):
                     temp[d1] = dict()
                 for d2 in range(grid_size[1]):
                     if DEBUG:
-                        print('x.map.grid[d1, d2]')
-                        print(x.map.grid[d1,d2])
-                    if (GPC.Pid != x.map.grid[d1,d2]):
-                        [temp[d1][d2]] = MPI_Recv(x.map.grid[d1,d2], GPC.tag, GPC.comm)
+                        print("x.map['grid'][d1, d2]")
+                        print(x.map['grid'][d1,d2])
+                    if (GPC.Pid != x.map['grid'][d1,d2]):
+                        [temp[d1][d2]] = MPI_Recv(x.map['grid'][d1,d2], GPC.tag, GPC.comm)
                     else:
                         temp[d1][d2] = data
             i = []
             j = []
             for d2 in range(grid_size[1]): #grid cols
                 for d1 in range(grid_size[0]): #grid rows
-                    if (GPC.Pid != x.map.grid[d1,d2]):
+                    if (GPC.Pid != x.map['grid'][d1,d2]):
                         if len(temp[d1][d2][0])>0:
                             i = i+list(temp[d1][d2][0])
                             j = j+list(temp[d1][d2][1])

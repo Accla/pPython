@@ -27,7 +27,12 @@ def subsasgn_2D(a,s,b):
     DEBUG = 0
     if DEBUG:
         print('--> Entering subsasgn_2D')
-        print(b)
+        print('Dmat a:')
+        a.show()
+        print('a.local.shape = ',end='')
+        print(a.local.shape)
+        print('Dmat b:')
+        b.show()
 
     # Instead of creating a copy of a, write directly to the memory
     # allocated for a in the caller's workspace
@@ -37,30 +42,30 @@ def subsasgn_2D(a,s,b):
         # RHS is a scalar (double) or an array
         if DEBUG:
             print('RHS is a scalar (double) or an array')
-        if isinstance(s['subs'][0],str) and isinstance(s['subs'][1],str):
-            if (s['subs'][0] == ':') and (s['subs'][1] == ':'):
-                # A[:,:] = B
-                if (size(b) == a.shape): 
-                    # dimensions are the same in global
-                    if DEBUG:
-                        print('a.global_ind[0] = %s'%(str(a.global_ind[0])))
-                        print('a.global_ind[1] = %s'%(str(a.global_ind[1])))
-                        print(b[a.global_ind[0],a.global_ind[1]])
-                    # Assuming global_ind is a tuple object of a range object or more
-                    # Only works if there is no missing indices when multiple range objects are in the tuple
-                    robj1 = []
-                    for i in range(len(a.global_ind[0])):
-                        robj1 += list(a.global_ind[0][i])
-                    robj2 = []
-                    for i in range(len(a.global_ind[1])):
-                        robj2 += list(a.global_ind[1][i])
-                    a.local[:,:] = b[robj1[0]:robj1[-1]+1,robj2[0]:robj2[-1]+1]
-                elif (size(b)==[1,1]):   
-                    # b is a scalar
-                    a.local[:,:] = b
-                else: 
-                    # dimensions do not match
-                    raise Exception('DMAT/subsasgn_2D:  Subscripted assignment dimension mismatch.')
+        if (s['subs'][0] == ':') and (s['subs'][1] == ':'):
+            # RHS is a scalar (double) or an array
+            # A[:,:] = B
+            if (size(b) == a.shape): 
+                # dimensions are the same in global
+                if DEBUG:
+                    print('a.global_ind[0] = %s'%(str(a.global_ind[0])))
+                    print('a.global_ind[1] = %s'%(str(a.global_ind[1])))
+                    print(b[a.global_ind[0],a.global_ind[1]])
+                # Assuming global_ind is a tuple object of a range object or more
+                # Only works if there is no missing indices when multiple range objects are in the tuple
+                robj1 = []
+                for i in range(len(a.global_ind[0])):
+                    robj1 += list(a.global_ind[0][i])
+                robj2 = []
+                for i in range(len(a.global_ind[1])):
+                    robj2 += list(a.global_ind[1][i])
+                a.local[:,:] = b[robj1[0]:robj1[-1]+1,robj2[0]:robj2[-1]+1]
+            elif (size(b)==[1,1]):   
+                # b is a scalar
+                a.local[:,:] = b
+            else: 
+                # dimensions do not match
+                raise Exception('DMAT/subsasgn_2D:  Subscripted assignment dimension mismatch.')
         else: 
             # A[i:j, k:l] = B
             if DEBUG:
@@ -93,19 +98,16 @@ def subsasgn_2D(a,s,b):
                     print('a.local[local_ind[0]][:,local_ind[1]]')
                     print(a.local[local_ind[0]][:,local_ind[1]])
             elif size(b) == size(a.local[local_ind[0]][:, local_ind[1]]):
-                if s1  and s1:
+                if s0 and s1:
                     #wrong: a.local[ local_ind[0][0]:local_ind[0][-1]+1, local_ind[1][0]:local_ind[1][-1]+1 ] = b
-                    a.local[s1, s2] = b
+                    a.local[s0, s1] = b
             else:
                 raise Exception('DMAT/subsasgn_2D:  Subscripted assignment dimension mismatch.')
         # A(i:j, k:l) = B
         
-    # The following caused undefined Dmat error because its circular reference.
-    # elif isinstance(b, Dmat):
-    # elif hasattr(b, 'Dmat'):
-    # elif hasattr(b, 'Dmap'):
-    # elif isinstance(b, Dmat.Dmat):
-    else:
+    elif hasattr(b,'map'):
+        if DEBUG:
+            print('RHS is a Dmat object')
         # RHS is a DMAT, assignment from a distributed matrix
         # communication might be necessary
         if isinstance(s['subs'][0],str) and isinstance(s['subs'][1],str): 
@@ -113,16 +115,10 @@ def subsasgn_2D(a,s,b):
             # check that dimensions match
             if a.shape != b.shape:
                 raise Exception('DMAT/subsasgn_2D: Subscripted assignment dimension mismatch.')
-    
-            # check if maps are the same
-            if DEBUG:
-                print('A & B map properties:')
-                a.map.print()
-                b.map.print()
-
             if a.map==b.map:
                 # maps are the same - no communication needed
                 a.local[:,:] = b.local[:,:]
+
             else:
                 # maps not the same - redistribution
                 # compute falls intersections
@@ -135,9 +131,9 @@ def subsasgn_2D(a,s,b):
                     b_col_fi = dict()
                     if inmap(b.map, GPC.Pid): 
                         # belongs to b's map
-                        for i in range(len(a.map.proc_list)):
+                        for i in range(len(a.map['proc_list'])):
                             # a_falls is a list of FALLS objects, size is equal to array dimension
-                            a_falls = get_local_falls(a.pitfalls, a.map.grid, a.map.proc_list[i])
+                            a_falls = get_local_falls(a.pitfalls, a.map['grid'], a.map['proc_list'][i])
                             # falls intersection on b's procs
                             # For the 1st dimension
                             b_row_fi[i] = falls_intersection(b.falls[0], a_falls[0])
@@ -151,8 +147,8 @@ def subsasgn_2D(a,s,b):
                     a_row_fi = dict()
                     a_col_fi = dict()
                     if inmap(a.map, GPC.Pid):
-                        for i in range(len(b.map.proc_list)):
-                            b_falls = get_local_falls(b.pitfalls, b.map.grid, b.map.proc_list[i])
+                        for i in range(len(b.map['proc_list'])):
+                            b_falls = get_local_falls(b.pitfalls, b.map['grid'], b.map['proc_list'][i])
                             # falls intersection on a's procs
                             a_row_fi[i] = falls_intersection(b_falls[0], a.falls[0])
                             a_col_fi[i] = falls_intersection(b_falls[1], a.falls[1])
@@ -160,19 +156,18 @@ def subsasgn_2D(a,s,b):
                     # the local processor is either in a's or b's map, otherwise should just fall through
     
                 # determine which data to send and send the data
-                for p1 in range(len(b.map.proc_list)): 
+                for p1 in range(len(b.map['proc_list'])): 
                     # iterate through b's processor list
-                    for p2 in range(len(a.map.proc_list)):
+                    for p2 in range(len(a.map['proc_list'])):
                         # iterate through a's processor list
-    
                         # increment tag
                         GPC.tag_num = GPC.tag_num+1
                         GPC.tag = 'tag-'+str(GPC.tag_num)
     
                         if (inmap(a.map, GPC.Pid)) or (inmap(b.map, GPC.Pid)):
                             # the local processor is either in a's or b's map
-                            if b.map.proc_list[p1] != a.map.proc_list[p2]: # comm is needed
-                                if GPC.Pid==b.map.proc_list[p1]: # my rank is current B rank
+                            if b.map['proc_list'][p1] != a.map['proc_list'][p2]: # comm is needed
+                                if GPC.Pid==b.map['proc_list'][p1]: # my rank is current B rank
                                     # redistribute data
                                     if len(b_row_fi[p2])>0 and len(b_col_fi[p2])>0:
                                         # both intersections not empty
@@ -182,11 +177,11 @@ def subsasgn_2D(a,s,b):
                                         b_fi[1] = b_col_fi
                                         [data, scratch] = subsasgn_data(a, b, p2, b_fi)
                                         if DEBUG:
-                                            print('Send data to Pid=%d'%(a.map.proc_list[p2]))
+                                            print('-> Send data to Pid=%d'%(a.map['proc_list'][p2]))
                                             print(data)
-                                        MPI_Send(a.map.proc_list[p2], GPC.tag, GPC.comm, data)
+                                        MPI_Send(a.map['proc_list'][p2], GPC.tag, GPC.comm, data)
                                         # both intersections not empty
-                                elif GPC.Pid==a.map.proc_list[p2]: # my_rank is current A rank
+                                elif GPC.Pid==a.map['proc_list'][p2]: # my_rank is current A rank
                                     if len(a_row_fi[p1])>0 and len(a_col_fi[p1])>0:
                                         # both intersections not empty
                                         # [scratch, a_local_ind] = subsasgn_data(a, b, p1, a_row_fi, a_col_fi) 
@@ -195,16 +190,16 @@ def subsasgn_2D(a,s,b):
                                         a_fi[1] = a_col_fi
                                         [scratch, a_local_ind] = subsasgn_data(a, b, p1, a_fi) 
                                         if DEBUG:
-                                            print('Receive data from Pid=%d with index, a_local_ind'%(b.map.proc_list[p1]))
+                                            print('<- Receive data from Pid=%d with index, a_local_ind'%(b.map.proc_list[p1]))
                                             print(a_local_ind)
                                         # Python workaround for zero lengh index in subsasgn_data() issue, which is fine in Matlab
-                                        [data] = MPI_Recv(b.map.proc_list[p1], GPC.tag, GPC.comm)
+                                        [data] = MPI_Recv(b.map['proc_list'][p1], GPC.tag, GPC.comm)
                                         for r in range(len(data)):
                                             ind = a_local_ind[r]
                                             # Different behavior compared to Matlab: a.local[ind[0], ind[1]] = data[r]
                                             a.local[slice(ind[0][0],ind[0][-1]+1),slice(ind[1][0],ind[1][-1]+1)] = data[r]
-                            elif b.map.proc_list[p1] == a.map.proc_list[p2]: # no comm
-                                if GPC.Pid==a.map.proc_list[p2]:
+                            elif b.map['proc_list'][p1] == a.map['proc_list'][p2]: # no comm
+                                if GPC.Pid==a.map['proc_list'][p2]:
                                     if len(b_row_fi[p2])>0 and len(b_col_fi[p2])>0:
                                         # both intersections not empty
                                         # [data, a_local_ind] = subsasgn_data(a, b, p2, b_row_fi, b_col_fi) 
@@ -222,6 +217,7 @@ def subsasgn_2D(a,s,b):
             # maps not the same - redistribution
         else:
             # A[i:j, k:l] = B
+            ind = list(range(2))
             ind[0] = s['subs'][0]
             ind[1] = s['subs'][1]
             a_local_ind = get_local_ind(a.global_ind, ind)
@@ -229,6 +225,8 @@ def subsasgn_2D(a,s,b):
                 a.local[a_local_ind[:]] = b.local
             else:
                 raise Exception('DMAT/subsasgn_2D: Subscripted assignment dimensions mismatch.')
+    else:
+        raise Exception("'DMAT/subsasgn_2D: Subscripted assignment not supported for type, %d'%(type(b))")
     if DEBUG:
         print('<-- Exiting subsasgn_2D')
     

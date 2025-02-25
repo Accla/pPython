@@ -11,7 +11,7 @@ def grid(d):
         raise Exception('ERROR(grid): it is not a DMAT object.')
 
     print('Function grid(): called')
-    return d.map.grid
+    return d.map['grid']
 
 ########################################################
 # pMatlab: Parallel Matlab Toolbox

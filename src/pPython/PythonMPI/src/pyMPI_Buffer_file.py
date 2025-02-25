@@ -43,10 +43,12 @@ def pyMPI_Buffer_file(source, dest, tag, comm, **argv):
         else:
             raise Exception('ERROR(pyMPI_Buffer_file): additional argument has a wrong key,value pair as input.')
     # grid_job
-    grid_job = False
     if 'grid_config' in comm:
         grid_job = comm['grid_config']['grid_job']
         mixed_fs = comm['grid_config']['mixed_fs']
+    else:
+        grid_job = False
+        mixed_fs = 0
             
     #
     # With the triples mode, we need to use machine id, instead of rank.

@@ -51,7 +51,7 @@ z = zeros(m,n,map=pmap)
 
 # Check the distributed z matrix
 # Get the local portion of the global indices
-my_i_global = global_ind(z, 0)
+my_i_global = global_ind(z, 0)[0]
 # print('Local portion of global indices in the first direction:')
 # print(my_i_global)
 

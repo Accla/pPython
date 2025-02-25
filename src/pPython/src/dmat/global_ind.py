@@ -14,7 +14,7 @@ def global_ind(d, dim=None):
     D: distributed array
     dim: dimension of the distributed array D. 
         A scalar or list containing the desired dimension axis.
-    local_ind: a NumPy array to make sub-array operation easier
+    local_ind: a list of NumPy array(s) to make sub-array operation easier
  
     Author:   Nadya Travinin
     Python version: Dr. Chansup Byun
@@ -37,7 +37,8 @@ def global_ind(d, dim=None):
         else:
             dims = dim
 
-    if isinstance(d,Dmat): 
+    # if isinstance(d,Dmat): 
+    if hasattr(d,'global_ind'):
         #
         # distributed array
         #
@@ -57,6 +58,7 @@ def global_ind(d, dim=None):
             local_ind = []
             for i in range(len(list_of_ranges)):
                 local_ind += list(list_of_ranges[i])
+            local_ind = [np.array(local_ind)]
         else:
             local_ind = []
             for idim in range(len(dims)):
@@ -79,17 +81,18 @@ def global_ind(d, dim=None):
         if len(my_inds) == 1:
             # 1-D array (even if array construct was 2-D)
             local_ind = list(range(my_inds[0]))
+            local_ind = [np.array(local_ind)]
         else:
             if len(dims)==1:
                 local_ind = list(range(my_inds[dims[0]]))
+                local_ind = [np.array(local_ind)]
             else:
                 local_ind = []
                 for i in range(len(dims)):
-                    local_ind.append(list(range(my_inds[dims[i]])))
-
+                    local_ind.append(np.array(list(range(my_inds[dims[i]]))))
     if DEBUG:
         print('<-- Exiting global_ind')
-    return np.array(local_ind)
+    return local_ind
 
 ########################################################
 # pMatlab: Parallel Matlab Toolbox

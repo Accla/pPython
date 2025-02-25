@@ -124,8 +124,8 @@ def subsasgn_4D(a,s,b):
                     b_dim4_fi = dict()
                     if inmap(b.map, GPC.Pid): 
                         # belongs to b's map
-                        for i in range(len(a.map.proc_list)):
-                            a_falls = get_local_falls(a.pitfalls, a.map.grid, a.map.proc_list[i])
+                        for i in range(len(a.map['proc_list'])):
+                            a_falls = get_local_falls(a.pitfalls, a.map['grid'], a.map['proc_list'][i])
                             # falls intersection on b's procs
                             b_row_fi[i] = falls_intersection(b.falls[0], a_falls[0])
                             b_col_fi[i] = falls_intersection(b.falls[1], a_falls[1])
@@ -141,8 +141,8 @@ def subsasgn_4D(a,s,b):
                     a_dim3_fi = dict()
                     a_dim4_fi = dict()
                     if inmap(a.map, GPC.Pid):
-                        for i in range(len(b.map.proc_list)):
-                            b_falls = get_local_falls(b.pitfalls, b.map.grid, b.map.proc_list[i])
+                        for i in range(len(b.map['proc_list'])):
+                            b_falls = get_local_falls(b.pitfalls, b.map['grid'], b.map['proc_list'][i])
                             # falls intersection on a's procs
                             a_row_fi[i] = falls_intersection(b_falls[0], a.falls[0])
                             a_col_fi[i] = falls_intersection(b_falls[1], a.falls[1])
@@ -152,9 +152,9 @@ def subsasgn_4D(a,s,b):
                 # the local processor is either in a's or b's map, otherwise should just fall through
     
                 # determine which data to send and send the data
-                for p1 in range(len(b.map.proc_list)):
+                for p1 in range(len(b.map['proc_list'])):
                     # iterate through b's processor list
-                    for p2 in range(len(a.map.proc_list)):
+                    for p2 in range(len(a.map['proc_list'])):
                         # iterate through a's processor list
                         # increment tag
                         GPC.tag_num = GPC.tag_num+1
@@ -162,8 +162,8 @@ def subsasgn_4D(a,s,b):
     
                         if (inmap(a.map, GPC.Pid)) or (inmap(b.map, GPC.Pid)):
                             # the local processor is either in a's or b's map
-                            if b.map.proc_list[p1] != a.map.proc_list[p2]: # comm is needed
-                                if GPC.Pid==b.map.proc_list[p1]: # my rank is current B rank
+                            if b.map['proc_list'][p1] != a.map['proc_list'][p2]: # comm is needed
+                                if GPC.Pid==b.map['proc_list'][p1]: # my rank is current B rank
                                     # redistribute data
                                     if len(b_row_fi[p2])>0 and len(b_col_fi[p2])>0 and len(b_dim3_fi[p2])>0 and len(b_dim4_fi[p2])>0 :
                                         # all intersections not empty
@@ -176,9 +176,9 @@ def subsasgn_4D(a,s,b):
                                         # **************************************
                                         [data, scratch] = subsasgn_data(a, b, p2, b_fi)
                                         # **************************************
-                                        MPI_Send(a.map.proc_list[p2], GPC.tag, GPC.comm, data)
+                                        MPI_Send(a.map['proc_list'][p2], GPC.tag, GPC.comm, data)
                                     # both intersections not empty
-                                elif GPC.Pid==a.map.proc_list[p2]: # my_rank is current A rank
+                                elif GPC.Pid==a.map['proc_list'][p2]: # my_rank is current A rank
                                     if len(a_row_fi[p1])>0 and len(a_col_fi[p1])>0 and len(a_dim3_fi[p1])>0 and len(a_dim4_fi[p1])>0 :
                                         # all intersections not empty
                                         # [scratch, a_local_ind] = subsasgn_data(a, b, p1, a_row_fi, a_col_fi) 
@@ -190,15 +190,15 @@ def subsasgn_4D(a,s,b):
                                         # **************************************
                                         [scratch, a_local_ind] = subsasgn_data(a, b, p1, a_fi) 
                                         # **************************************
-                                        [data] = MPI_Recv(b.map.proc_list[p1], GPC.tag, GPC.comm)
+                                        [data] = MPI_Recv(b.map['proc_list'][p1], GPC.tag, GPC.comm)
                                         for r in range(len(data)):
                                             ind = a_local_ind[r]
                                             # Different behavior compared to Matlab: a.local[ind[0], ind[1]] = data[r]
                                             a.local[slice(ind[0][0],ind[0][-1]+1),slice(ind[1][0],ind[1][-1]+1),slice(ind[2][0],ind[2][-1]+1),slice(ind[3][0],ind[3][-1]+1)] = data[r]
                                     # both intersections not empty
                                 # my_rank is current A rank
-                            elif b.map.proc_list[p1] == a.map.proc_list[p2]: # no comm needed
-                                if GPC.Pid==a.map.proc_list[p2]:
+                            elif b.map['proc_list'][p1] == a.map['proc_list'][p2]: # no comm needed
+                                if GPC.Pid==a.map['proc_list'][p2]:
                                     if len(b_row_fi[p2])>0 and len(b_col_fi[p2])>0 and len(b_dim3_fi[p2])>0 and len(b_dim4_fi[p2])>0 :
                                         # all intersections not empty
                                         # [data, a_local_ind] = subsasgn_data(a, b, p2, b_row_fi, b_col_fi) 

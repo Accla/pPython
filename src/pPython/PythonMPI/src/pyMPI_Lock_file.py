@@ -67,10 +67,12 @@ def pyMPI_Lock_file(source, dest, tag, comm, **argv):
         machine_id_dest = comm['machine_id'][dest]
 
     # grid_job
-    grid_job = False
     if 'grid_config' in comm:
         grid_job = comm['grid_config']['grid_job']
         mixed_fs = comm['grid_config']['mixed_fs']
+    else:
+        grid_job = False
+        mixed_fs = 0
 
     if local_fs:
         # if mixed_fs = 1 and either sender or receiver is Pid = 0 (machine id = 0), use the central filesystem

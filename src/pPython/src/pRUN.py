@@ -104,6 +104,9 @@ def pRUN(py_file,n_proc,machines,sched_options=None):
     if sched_options:
         grid.grid_config['sched_options'] = sched_options
 
+    # Added this line to make sure it's allocated in grid_config.
+    grid.grid_config['mixed_fs'] = 0
+
     grid.grid_config['LAUNCH_TIMING'] = False
     if LAUNCH_TIMING:
         grid.grid_config['LAUNCH_TIMING'] = LAUNCH_TIMING

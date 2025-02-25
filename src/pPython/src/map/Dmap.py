@@ -1,10 +1,14 @@
+"""
+Matlab structure (pMatlab map class) is best represented as dictionary in Python.
+Thus Dmap class is redesigned as a dictionary class.
+"""
 from sys import getsizeof
 import numpy as np
 
 import pyMPI_COMM_WORLD as pyMCW
 
-class Dmap:
-    """Define Map class. 
+class Dmap(dict):
+    """ Define Map class. 
 
     MAP(GRID_SPEC, DIST_SPEC, PROC_LIST, overlap)
     GRID_SPEC - array of integers specifying how each dimension of a
@@ -38,15 +42,17 @@ class Dmap:
     name = 'grid_map_class'
     dtype = 'Dmap'
     
-    def __init__(self,grid_spec=None,dist_spec=None,proc_list=None,overlap=None,**kwargs):
+    def __init__(self,grid_spec=None,dist_spec=None,proc_list=None,overlap=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         """Init constructor."""
-        
+
         DEBUG = 0
         if DEBUG:
             print('--> Entering Dmap.__init__()')
             print('grid_spec')
             print(grid_spec)
             print('proc_list')
+            print(type(proc_list))
             print(proc_list)
 
         self.nbytes = 0
@@ -62,49 +68,115 @@ class Dmap:
         # set the comm as MPI_COMM_WORLD
         comm = pyMCW.MPI_COMM_WORLD
 
-        dim = len(grid_spec); # dimension of the distributed object
-        self.dim = dim
-        self.grid_spec = grid_spec
-        # to be used with whosPy
+        self['dim'] = len(grid_spec); # dimension of the distributed object
+        self['grid_spec'] = grid_spec
+        self['proc_list'] = np.array(proc_list)
+        # workaround to be used with whosPy to be compatible with other data types
         self.shape = grid_spec
-        self.proc_list = np.array(proc_list)
- 
-        if isinstance(overlap,type(None)):
-            # MAP(GRID_SPEC, DIST_SPEC, PROC_LIST)
-            # ensure that distribution is specified
-            if not bool(dist_spec):
-                # dist_spec is empty such as {} 
-                # default distribution is block
-                dist_spec = dict()
-                for d in range(len(grid_spec)):
-                    dist_spec[d] = dict()
-                    dist_spec[d]['dist'] ='b'
-            elif isinstance(dist_spec,str):
+        
+        if not isinstance(overlap,type(None)) and (len(overlap) != self['dim']):
+            raise Exception('RROR (Dmap): Overlap must be specified for all of the dimensions of the map.')
+
+        # MAP(GRID_SPEC, DIST_SPEC, PROC_LIST)
+        # ensure that distribution is specified
+        self['dist_spec'] = self._set_dist_spcc(dist_spec,overlap)
+        self['overlap'] = overlap 
+
+        # if the maps are created within the scope of MPI_COMM_WORLD
+        # then the processor list is checked against current
+        # comm scope
+        # find the number of processes allocated for the job
+        if comm:
+            if 'size' in comm:
+                n_procs = comm['size']
+                # check that the length of the processor list matches the number of
+                # processors requested
+                if (len(proc_list) > n_procs):
+                    print('Dmap constructor: Processor list contains more processors '+\
+                    'than number of processors requested.')
+            else:
+                n_procs = None
+
+        # create the grid from the processor list
+        p_list = np.array(proc_list)
+        grid = np.zeros(np.prod(grid_spec),int)
+        # check that the length of the processor list matches the size of
+        # the grid
+        gsize = grid.size
+        if DEBUG:
+            print('Before grid.reshape(gsize)[:] = proc_list[:]')
+            print(grid)
+            print(gsize)
+            print(proc_list)
+        if (len(proc_list) != gsize):
+            raise Exception(('ERROR (Dmap): Processor list (size: %d) does not match the size (%d) of the grid'%(len(proc_list),gsize)))
+        grid[:] = p_list[:]
+        grid = grid.reshape(grid_spec,order=order)
+        if DEBUG:
+            print('After grid.reshape(gsize)[:] = proc_list[:]')
+            print(grid)
+            print(proc_list)
+        self['grid'] = grid
+
+        # Calculate the actual memory usage
+        self.nbytes = getsizeof(self['dim'])+getsizeof(self['grid_spec'])+getsizeof(self.shape)+\
+                getsizeof(self['proc_list'])+getsizeof(self['dist_spec'])+getsizeof(self['grid'])+\
+                getsizeof(self['overlap'])+\
+                64
+        if DEBUG:
+            print('<-- Exiting Dmap.__init__()')
+        return
+
+    def _set_dist_spcc(self, dist_spec, overlap):
+        """ 
+        Set the distribution specification
+        """
+        if not bool(dist_spec):
+            # dist_spec is empty such as {} 
+            # default distribution is block
+            dist_spec = dict()
+            for d in range(self['dim']):
+                dist_spec[d] = dict()
+                dist_spec[d]['dist'] ='b'
+        elif isinstance(dist_spec,str):
+            if isinstance(overlap,type(None)):
                 if dist_spec == 'bc':
                     raise Exception('ERROR (Dmap): block-cyclic distribution also needs block size.')
-                # 'b' for block & 'c' for cyclic distribution
-                tmp_dist_spec = dist_spec
-                dist_spec = dict()
-                for d in range(len(grid_spec)):
-                    dist_spec[d] = dict()
-                    dist_spec[d]['dist'] = tmp_dist_spec
-            elif any(map(lambda x: isinstance(x,dict),dist_spec.values())):
-                # distribution spec is provided for all directions individually
-                # dist_spec = {'0': {'dist': 'bc', 'b_size': 3}, '1': {'dist': 'b'}}
-                if len(grid_spec) != len(dist_spec):
-                    raise Exception('ERROR (Dmap): dimension does not match between grid_spec and dist_spec.')
             else:
-                # dist_spec is provided as a dictionary form
-                # dist_spec['dist'] = 'b' or 'c' or 'bc'
-                # dist_spec['b_size'] = N where N is the block size
-                #                       for block-cyclic distributions
-                tmp_dist_spec = dist_spec
-                dist_spec = dict()
-                for d in range(len(grid_spec)):
-                    dist_spec[d] = tmp_dist_spec
-            # check for distribution spec
-            for i in range(dim):
-                # check that distributions defined are consistent with {'b', 'c', 'bc'}
+                # if only one distribution is provided, then all dimensions are
+                # distributed that way
+                if dist_spec != 'b':
+                    raise Exception('ERROR (Dmap): Overlap is only supported for block distributions.')                
+            # 'b' for block & 'c' for cyclic distribution
+            tmp_dist_spec = dist_spec
+            dist_spec = dict()
+            for d in range(self['dim']):
+                dist_spec[d] = dict()
+                dist_spec[d]['dist'] = tmp_dist_spec
+        elif any(map(lambda x: isinstance(x,dict),dist_spec.values())):
+            # distribution spec is provided for all directions individually as a dictionary variable
+            # dist_spec = {'0': {'dist': 'bc', 'b_size': 3}, '1': {'dist': 'b'}}
+            if self['dim'] != len(dist_spec):
+                raise Exception('ERROR (Dmap): dimension does not match between grid_spec and dist_spec.')
+        else:
+            # dist_spec is provided as a dictionary form
+            # dist_spec['dist'] = 'b' or 'c' or 'bc'
+            # dist_spec['b_size'] = N where N is the block size
+            #                       for block-cyclic distributions
+            if not isinstance(overlap,type(None)):
+                # in case of overlapped mapping
+                if dist_spec['dist'] != 'b':
+                    raise Exception('ERROR (Dmap): Overlap is only supported for block distributions.')
+            tmp_dist_spec = dist_spec
+            dist_spec = dict()
+            for d in range(self['dim']):
+                dist_spec[d] = tmp_dist_spec
+                
+        # check for distribution  for all directions (dimensions)
+        # check that distributions defined are consistent with {'b', 'c', 'bc'}
+        if isinstance(overlap,type(None)):
+            for i in range(self['dim']):
+                # Non-overlapped mapping
                 if (dist_spec[i]['dist'] != 'b') \
                 and (dist_spec[i]['dist'] != 'c') \
                 and (dist_spec[i]['dist'] != 'bc'):
@@ -114,145 +186,27 @@ class Dmap:
                     if dist_spec[i]['dist'] == 'bc':
                         if (not 'b_size' in dist_spec[i]) or (dist_spec[i]['b_size'] < 1):
                             raise Exception('ERROR (Dmap): Block size must be specified for block-cyclic distibution')
-            self.dist_spec = dist_spec
-            
-            # create the grid from the processor list
-            p_list = np.array(proc_list)
-            grid = np.zeros(np.prod(grid_spec),int)
-            grid[:] = p_list[:]
-            grid = grid.reshape(grid_spec,order=order)
-
-            # check that the length of the processor list matches the size of
-            # the grid
-            gsize = grid.size
-            if (len(proc_list) != gsize):
-                raise Exception('ERROR (Dmap): Processor list (size: %d) does not match the size (%d) of the grid'%(len(proc_list),gsize))
-            else:
-                grid.reshape(gsize)[:] = proc_list[:]
-        
-            if DEBUG:
-                print('After grid.reshape(gsize)[:] = proc_list[:]')
-                print(grid)
-                print(proc_list)
-
-            # if the maps are created within the scope of MPI_COMM_WORLD
-            # then the processor list is checked against current
-            # comm scope
-            # find the number of processes allocated for the job
-            if comm:
-                if 'size' in comm:
-                    n_procs = comm['size']
-                    # check that the length of the processor list matches the number of
-                    # processors requested
-                    if (len(proc_list) > n_procs):
-                        print('Dmap constructor: Processor list contains more processors '+\
-                        'than number of processors requested.')
-                else:
-                    n_procs = None
-            self.grid = grid
-            self.overlap = None # no overlap specification
-
-        else:
-            # MAP(GRID_SPEC, DIST_SPEC, PROC_LIST, overlap)
-            # ensure that distribution is specified
-            if not bool(dist_spec):
-                # dist_spec is empty such as {} 
-                # default distribution is block
-                dist_spec = dict()
-                for d in range(len(grid_spec)):
-                    dist_spec[d] = dict()
-                    dist_spec[d]['dist'] ='b'
-            elif isinstance(dist_spec,str):
-                # if only one distribution is provided, then all dimensions are
-                # distributed that way
-                if dist_spec == 'b':
-                    # 'b' for block distribution
-                    tmp_dist_spec = dist_spec
-                    dist_spec = dict()
-                    for d in range(len(grid_spec)):
-                        dist_spec[d] = dict()
-                        dist_spec[d]['dist'] = tmp_dist_spec
-                else:
-                    raise Exception('ERROR (Dmap): Overlap is only supported for block distributions.')
-            elif any(map(lambda x: isinstance(x,dict),dist_spec.values())):
-                # distribution spec is provided for all directions individually
-                # dist_spec = {0: {'dist': 'bc', 'b_size': 3}, 1: {'dist': 'b'}}
-                if len(grid_spec) != len(dist_spec):
-                    raise Exception('ERROR (Dmap): dimension does not match between grid_spec and dist_spec.')
-                #
-                # Can we use overlap only certain direction with this?
-                #
-            else:
-                # dist_spec is provided as a dictionary form
-                # dist_spec['dist'] = 'b'
-                if dist_spec['dist'] != 'b':
-                        raise Exception('ERROR (Dmap): Overlap is only supported for block distributions.')
-                tmp_dist_spec = dist_spec
-                dist_spec = dict()
-                for d in range(len(grid_spec)):
-                    dist_spec[d] = tmp_dist_spec
-            # check for distribution  for all directions (dimensions)
-            for i in range(dim):
+        else: 
+            for i in range(self['dim']):
                 # check that distributions defined are consistent with {'b', 'c', 'bc'}
                 if dist_spec[i]['dist'] != 'b':
                     raise Exception('ERROR (Dmap): Overlap is only supported for block distributions.')
-            self.dist_spec = dist_spec
-            
-            # create the grid from the processor list
-            grid = np.zeros(grid_spec,'int')
+        return dist_spec
 
-            # check that the length of the processor list matches the size of
-            # the grid
-            gsize = grid.size
-            if (len(proc_list) != gsize):
-                raise Exception('ERROR (Dmap): Processor list does not match the size of the grid')
-            else:
-                grid.reshape(gsize)[:] = proc_list[:]
-            self.grid = grid
-        
-            if len(overlap) != self.dim:
-                raise Exception('RROR (Dmap): Overlap must be specified for all of the dimensions of the map.')
-
-            # if the maps are created within the scope of MPI_COMM_WORLD
-            # then the processor list is checked against current
-            # comm scope
-            # find the number of processes allocated for the job
-            if comm:
-                if 'size' in comm:
-                    n_procs = comm['size']
-                    # check that the length of the processor list matches the number of
-                    # processors requested
-                    if (len(proc_list) > n_procs):
-                        print('Dmap constructor: Processor list contains more processors '+\
-                        'than number of processors requested.')
-                else:
-                    n_procs = None
-            self.overlap = overlap
-
-        # Calculate the actual memory usage
-        self.nbytes = getsizeof(self.dim)+getsizeof(self.grid_spec)+getsizeof(self.shape)+\
-                getsizeof(self.proc_list)+getsizeof(self.dist_spec)+getsizeof(self.grid)+\
-                getsizeof(self.overlap)+\
-                64
-
-        if DEBUG:
-            print('<-- Exiting Dmap.__init__()')
 
     def __eq__(self, other):
-
         DEBUG = 0
-        
         # Check if both Dmap objects match with all their propreties
         if isinstance(other, Dmap):
-            if (self.dim == other.dim) and (self.overlap == other.overlap) and (self.grid_spec == other.grid_spec) :
-                if (self.grid == other.grid).all():
-                    if (self.dist_spec == other.dist_spec):
+            if (self['dim'] == other['dim']) and (self['overlap'] == other['overlap']) and (self['grid_spec'] == other['grid_spec']) :
+                if (self['grid'] == other['grid']).all():
+                    if (self['dist_spec'] == other['dist_spec']):
                         if DEBUG:
-                            print(self.proc_list)
-                            print(type(self.proc_list))
-                            print(other.proc_list)
-                            print(type(other.proc_list))
-                        if (self.proc_list == other.proc_list).all() :
+                            print(self['proc_list'])
+                            print(type(self['proc_list']))
+                            print(other['proc_list'])
+                            print(type(other['proc_list']))
+                        if (self['proc_list'] == other['proc_list']).all() :
                             return True
                         else:
                             return False
@@ -263,26 +217,105 @@ class Dmap:
             else:
                 return False
         return False
+
+    
+    def subsref(self,s):
+        """
+        SUBSREF Subscripted reference.
+        A.FIELD - allows the fields of a MAP objects to be referenced using
+        the '.' notation (complies with structure behavior).
+    
+        This functionality might be deprecated from the final API, to limit
+        control the user has of private members of the MAP object. SUBSREF
+        might be replaced by getter functions.
+    
+        Author:  Nadya Travinin
+        Edited:  Edmund L. Wong (elwong@ll.mit.edu)
+        Python version: Dr. Chansup Byun
+        """
+        DEBUG = 0
+        if DEBUG:
+            print('--> Entering subsref for Dmap objects')
+            print(a)
+            print(s)
         
-    def copy(self,old_map):
-        """Copy the given map."""
-        self.grid = old_map.grid
-        self.grid_spec = old_map.grid_spec
-        self.dist_spec = old_map.dist_spec
-        self.proc_list = old_map.proc_list
-        self.overlap = old_map.overlap
-        return self
+        """
+        Note: Matlab is flexible to deal with whether s is a single structure or an array.
+        In order to deal with that behavior in Python, coding becomes a little bit lengthy.
+        s can be a single dictionary variable or a list of dictionary variables.
+        
+        In Python, the Matlab structure is converted to Pythion dictionary. 
+        Listing the elements of the structure is provided by dictionary keys().
+        """
+    
+        if isinstance(s,list):
+            if s[0]['type']=='.': #subscripting type
+                # switch s(1).subs
+                if s[0]['subs']=='dim':
+                    b = self.dim
+                elif s[0]['subs']=='proc_list':
+                    b = self.proc_list
+                elif s[0]['subs']=='dist_spec':
+                    b = self.dist_spec
+                elif s[0]['subs']=='grid_spec':
+                    # added for Python implementation
+                    b = self.grid_spec
+                elif s[0]['subs']=='grid':
+                    b = self.grid
+                elif s[0]['subs']=='overlap':
+                    b = self.overlap
+                else:
+                    raise Exception('%s is not a field of Dmap.'%(s[0]['subs']))
+            if DEBUG:
+                print(b)
+            # recursive call
+            b = self.subsref(self,s[1:])
+        else:
+            if s['type']=='.': #subscripting type
+                # switch s(1).subs
+                if s['subs']=='dim':
+                    b = self.dim
+                elif s['subs']=='proc_list':
+                    b = self.proc_list
+                elif s['subs']=='dist_spec':
+                    b = self.dist_spec
+                elif s['subs']=='grid_spec':
+                    # added for Python implementation
+                    b = self.grid_spec
+                elif s['subs']=='grid':
+                    b = self.grid
+                elif s['subs']=='overlap':
+                    b = self.overlap
+                else:
+                    raise Exception('%s is not a field of Dmap.'%(s['subs']))
+            else:
+                raise Exception('%s is not a field of subset of map.'%(s['type']))
 
-    def print(self):
-        """Print the map."""
-        print('Map Properties:')
-        print('   Process grid (grid): %s'%(str(self.grid)))
-        print('   Map distribution specificaiton (grid_spec): %s'%(str(self.grid_spec)))
-        print('   Distribution type (dist_spec): %s'%(str(self.dist_spec)))
-        print('   Process Pid list (proc_list): %s'%(str(self.proc_list)))
-        print('   Overlap mapping (overlap): %s'%(str(self.overlap)))
-        return
+        if DEBUG:
+            print('<-- Exiting subsref for Dmap objects')
+        return b
 
+    def copy(self):
+        """Copy the given map'"""
+        new_map = Dmap(self['grid_spec'],self['dist_spec'],self['proc_list'],self['overlap'])
+        return new_map
+
+    def show(self):
+        """
+        Show the map properties
+        '"""        
+        print('  Map object')
+        print('      Dimension:  %d'%(self['dim']))
+        print('      Grid specification: ',end='')
+        print(self['grid_spec'])
+        print('      Grid: ',end='')
+        print(self['grid'])
+        print('      Overlap: ',end='')
+        print(self['overlap'])
+        print('      Distribution: ')
+        for i in range(self['dim']):
+            print('         Dim %d: %s'%(i,self['dist_spec'][i]['dist']))
+            
 ########################################################
 # pMatlab: Parallel Matlab Toolbox
 # Software Engineer: Ms. Nadya Travinin (nt@ll.mit.edu)
@@ -317,3 +350,4 @@ class Dmap:
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+

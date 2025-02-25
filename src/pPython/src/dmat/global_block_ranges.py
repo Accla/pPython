@@ -184,7 +184,7 @@ def global_block_ranges(d, dims):
         print('--> Entering global_block_ranges')
 
     # processor grid on which the object is distributed
-    grid = d.map.grid
+    grid = d.map['grid']
     grid_dims = list(grid.shape)
     dim = len(grid_dims)
 

@@ -19,18 +19,7 @@ def display(m):
         print('--> Entering display')
     
     if isinstance(m,Dmap):
-        print('  Map object')
-        print('      Dimension:  %d'%(m.dim))
-        print('      Grid specification: ')
-        print(m.grid_spec)
-        print('      Grid: ')
-        print(m.grid)
-        print('      Overlap: ')
-        print(m.overlap)
-        print('      Distribution: ')
-        for i in range(m.dim):
-            print('      Dim %d: %s'%(i,m.dist_spec[i]['dist']))
-
+        m.show()
     elif isinstance(m,Dmat):
         # ToDo: is there any better way to find the input variable name in Python?
         # Find all keys with same value

@@ -8,7 +8,7 @@ def inmap(m, r):
     Python version: Dr. Chansup Byun
     """
     
-    if r in m.proc_list:
+    if r in m['proc_list']:
         # rank is found in the map
         return True
     else:

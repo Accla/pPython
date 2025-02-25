@@ -125,6 +125,11 @@ def check_runtime( n_proc, machines, grid_config ):
             elif (cpu_type == 'xeon-e5'):
                 # Only on TX-Green
                 grid_config['q_name'] = 'normal'
+        elif cluster_name == 'txe1':
+            if (cpu_type == 'xeon-p8'):
+                grid_config['q_name'] = 'xeon-p8'
+            elif (cpu_type == 'xeon-g6'):
+                grid_config['q_name'] = 'xeon-g6-volta'
         else:
             raise Exception('ERROR(check_runtime): %s is not a supported cluster.'%(grid_config['cluster_name']))
 
@@ -202,8 +207,10 @@ def check_runtime( n_proc, machines, grid_config ):
         print('PPYTHON_LOCAL_FS: %s'%(PPYTHON_LOCAL_FS))
     if (PPYTHON_LOCAL_FS.lower() == 'no'):
         local_fs = 0
-    else:
-        local_fs = 1
+        if interactive and EPPAC:
+            # incorretly set PPYTHON_LOCAL_FS=no for interactive triples mode jobs
+            # ignore PPYTHON_LOCAL_FS=no
+            local_fs = 1
     # Set local_fs = 0 for non grid jobs
     if not grid_config['grid_job']:
         local_fs = 0

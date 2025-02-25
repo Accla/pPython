@@ -80,7 +80,7 @@ def grid_run( py_file, n_proc, machines ):
         cpu_type = grid.grid_config['cpu_type']
         interactive = grid.grid_config['interactive']
     else:
-        islocal = True
+        islocal = 1
 
     OS.islocal = islocal
     if DEBUG:

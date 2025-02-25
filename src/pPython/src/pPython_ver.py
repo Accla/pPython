@@ -13,7 +13,7 @@ def pPython_ver(default_display = None):
     """
     
     location = pathlib.Path().absolute()
-    version = '0.9.10'
+    version = '0.9.11'
     
     if default_display:
         print('pPython version: %s'%(version))

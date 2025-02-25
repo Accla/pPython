@@ -107,7 +107,7 @@ def agg_in_node(d):
     
     if d.dim > 4:
         raise Exception('DMAT/AGG_IN_NODE: Only up to 4-D objects currently supported')
-    dim = d.map.grid.shape
+    dim = d.map['grid'].shape
 
     # if DEBUG:
     #     time_03 = timer()

@@ -94,6 +94,9 @@ def get_global_ind(falls, grid_dims=None):
                 print('falls instance is not Falls type.')
                 
             # store temp in ind
+            if DEBUG:
+                print(temp)
+                print(type(temp))
             ind[i] = temp
                 
     else:

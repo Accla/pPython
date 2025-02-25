@@ -69,7 +69,7 @@ def fft(x, *argv):
                     #>>REMAPPING CODE
                     grid_spec = [1, grid_dims[0]*grid_dims[1]]
                     old_map = x.map
-                    dist_spec = old_map.dist_spec
+                    dist_spec = old_map['dist_spec']
                     proc_list = list(g.flatten('F'))
                     #CB: now work in map equality check,  proc_list = g.flatten('F')
                     new_map = Dmap(grid_spec, dist_spec, proc_list)
@@ -90,7 +90,7 @@ def fft(x, *argv):
                         #>>REMAPPING CODE
                         grid_spec = [grid_dims[0]*grid_dims[1], 1]
                         old_map = x.map
-                        dist_spec = old_map.dist_spec
+                        dist_spec = old_map['dist_spec']
                         proc_list = list(g.flatten('F'))
                         # Not work: proc_list = g.flatten('F')
                         new_map = Dmap(grid_spec, dist_spec, proc_list)
@@ -106,7 +106,7 @@ def fft(x, *argv):
                         #>>REMAPPING CODE
                         grid_spec = [1, grid_dims[0]*grid_dims[1]]
                         old_map = x.map
-                        dist_spec = old_map.dist_spec
+                        dist_spec = old_map['dist_spec']
                         proc_list = list(g.flatten('F'))
                         # Not work: proc_list = g.flatten('F')
                         new_map = Dmap(grid_spec, dist_spec, proc_list)
@@ -133,7 +133,7 @@ def fft(x, *argv):
                     # !!!NEED TO CHECK THAT THIS IS IN FACT THE
                     # MOST EFFICIENT MAPPING
                     old_map = x.map
-                    dist_spec = old_map.dist_spec
+                    dist_spec = old_map['dist_spec']
                     proc_list = list(g.flatten('F'))
                     # Not work: proc_list = g.flatten('F')
                     new_map = Dmap(grid_spec, dist_spec, proc_list)
@@ -159,7 +159,7 @@ def fft(x, *argv):
                         # !!!NEED TO CHECK THAT THIS IS IN FACT THE
                         # MOST EFFICIENT MAPPING
                         old_map = x.map
-                        dist_spec = old_map.dist_spec
+                        dist_spec = old_map['dist_spec']
                         proc_list = list(g.flatten('F'))
                         # Not work: proc_list = g.flatten('F')
                         new_map = Dmap(grid_spec, dist_spec, proc_list)
@@ -179,10 +179,10 @@ def fft(x, *argv):
                         # !!!NEED TO CHECK THAT THIS IS IN FACT THE
                         # MOST EFFICIENT MAPPING
                         old_map = x.map
-                        dist_spec = old_map.dist_spec
+                        dist_spec = old_map['dist_spec']
                         proc_list = list(g.flatten('F'))
                         # Not work: proc_list = g.flatten('F')
-                        new_map = map(grid_spec, dist_spec, proc_list)
+                        new_map = Dmap(grid_spec, dist_spec, proc_list)
                         x = remap(x,new_map)
                         # >>REMAPPING CODE
                         x.local = scipy.fftpack.fft(x.local, N, 0)
