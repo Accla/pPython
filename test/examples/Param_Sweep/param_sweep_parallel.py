@@ -18,7 +18,6 @@
 """
 import os
 
-# from pPython_all import *
 import pPython as GPC
 from Dmap import *
 from zeros import *

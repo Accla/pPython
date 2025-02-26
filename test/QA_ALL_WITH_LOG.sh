@@ -4,7 +4,7 @@
 # Load anaconda module
 source /etc/profile
 module purge
-module load anaconda/Python-ML-2025a
+module load anaconda/Python-ML-2024b
 
 
 # Test types

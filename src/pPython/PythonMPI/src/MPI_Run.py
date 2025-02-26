@@ -179,6 +179,9 @@ def MPI_Run( py_file, n_proc, machines, **argv ):
             unix_commands_prefix = unix_commands_prefix+'    export MODULEPATH=${MODULEPATH}:'+python_module_path+nl
             unix_commands_prefix = unix_commands_prefix+'    module load '+python_module_name+nl
             unix_commands_prefix = unix_commands_prefix+'fi'+nl
+            PYTHONPATH= os.getenv('PYTHONPATH',default='')
+            if len(PYTHONPATH):
+                unix_commands_prefix = unix_commands_prefix+'export PYTHONPATH='+PYTHONPATH+nl
 
             # Loop backwards over number of processes.
             for i_rank in range(i_rank_stop,i_rank_start-1,-1):

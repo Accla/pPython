@@ -4,7 +4,6 @@ from timeit import default_timer as timer
 import matplotlib.pyplot as plt
 
 # Import gridPython methods.
-# from pPython_all import *
 import pPython as GPC
 from Dmap import *
 from zeros import *

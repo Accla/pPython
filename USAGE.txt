@@ -15,7 +15,8 @@ Usage
 
 3. Launch the job
 
-   python RUN.py
+   python RUN.py (use the pPYthon package installation with pip)yypl
+   python RUN_on_src.py (use the pPYthon source installation)
 
 
 

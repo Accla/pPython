@@ -127,6 +127,9 @@ def launch_with_triples(py_file, comm, grid_config):
             unix_commands_prefix = unix_commands_prefix+'    export MODULEPATH=${MODULEPATH}:'+python_module_path+nl
             unix_commands_prefix = unix_commands_prefix+'    module load '+python_module_name+nl
             unix_commands_prefix = unix_commands_prefix+'fi'+nl+nl
+            PYTHONPATH= os.getenv('PYTHONPATH',default='')
+            unix_commands_prefix = unix_commands_prefix+'export PYTHONPATH='+PYTHONPATH+nl
+            unix_commands_prefix = unix_commands_prefix+'echo "`hostname`: PYTHONPATH=$PYTHONPATH"'+nl+nl
             #
             # Create hostname directory
             PIDSTART = str(i_rank_start)

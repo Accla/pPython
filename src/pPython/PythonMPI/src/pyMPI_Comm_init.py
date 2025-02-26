@@ -70,6 +70,28 @@ def pyMPI_Comm_init(n_proc,machines,**argv):
             if EPPAC:
                nppn = MPI_COMM_WORLD['grid_config']['nppn']
     # Default setup: 
+    # Use a batch mode as default
+    if 'interactive' not in MPI_COMM_WORLD['grid_config']:
+        MPI_COMM_WORLD['grid_config']['interactive'] = 0
+    # Use a non triples mode as default (triples mode is not supported with PythonMPI)
+    if 'EPPAC' not in MPI_COMM_WORLD['grid_config']:
+        MPI_COMM_WORLD['grid_config']['EPPAC'] = False
+    # Launch timing is not measured with PythonMPI
+    if 'LAUNCH_TIMING' not in MPI_COMM_WORLD['grid_config']:
+        MPI_COMM_WORLD['grid_config']['LAUNCH_TIMING'] = False
+    # PPYTHON_MANYCORE
+    if 'PPYTHON_MANYCORE' not in MPI_COMM_WORLD['grid_config']:
+        MPI_COMM_WORLD['grid_config']['PPYTHON_MANYCORE'] = 'Yes'
+    # mixed_fs
+    if 'mixed_fs' not in MPI_COMM_WORLD['grid_config']:
+        MPI_COMM_WORLD['grid_config']['mixed_fs'] = 0
+    # Use a shared file system by default if not defined
+    if 'local_fs' not in MPI_COMM_WORLD['grid_config']:
+        MPI_COMM_WORLD['grid_config']['local_fs'] = 0
+    # explicit job launch on to specified nodes
+    if 'grid_job' not in MPI_COMM_WORLD['grid_config']:
+        MPI_COMM_WORLD['grid_config']['grid_job'] = False
+    MPI_COMM_WORLD['grid_config']['islocal'] = 0
     # execution is done locally
     MPI_COMM_WORLD['grid_config']['islocal'] = 0
     if EPPAC:

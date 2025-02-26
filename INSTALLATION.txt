@@ -38,14 +38,14 @@ vi src/pPython/src/pPython_ver.py
 % python -m build |& tee ppython-build.log-v0.9.11
 
 
-Installation (outdated)
+Installation (to run on the source distribution)
 ------------
 
 1. Unpack the pPython tarball source at your desired location on your LLGrid account 
    and set PPYTHON_HOME.
 
    tar xf pPython-$VERSION.tar.bz2 -C /path/to/your/desired/location
-   export PPYTHON_HOME=/path/to/your/desired/location/pPython-$VERSION 
+   export PPYTHON_HOME=/path/to/your/desired/location/pPython-$VERSION/src/pPython 
    ($VERSION is the additional string for the unpacked directory name.)
 
 2. Create ~/ppython_conf directory
@@ -54,11 +54,13 @@ Installation (outdated)
 
 3. Copy the following local configuratiton files to ~/ppython_conf
 
-   cp $PPYTHON_HOME/local/grid_config_local.py ~/ppython_conf
-   cp $PPYTHON_HOME/PythonMPI/local/pyMPI_Comm_settings_local.py ~/ppython_conf
+   cp $PPYTHON_HOME/ppython_conf/grid_config_local.py ~/ppython_conf
+   cp $PPYTHON_HOME/ppython_conf/pyMPI_Comm_settings_local.py ~/ppython_conf
 
 4. Edit the local configuration files for your LLGrid account.
 
    grid_config_local.py
    pyMPI_Comm_settings_local.py
+
+5. Use the RUN_on_src.py script to launch/execute pPython script on LLSC system or locally
 
