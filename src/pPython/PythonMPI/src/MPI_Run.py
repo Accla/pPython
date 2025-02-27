@@ -95,7 +95,7 @@ def MPI_Run( py_file, n_proc, machines, **argv ):
 
     # Create generic comm. (Initialize global pyMCW.MPI_COMM_WORLD)
     # Do not call if called from pPython
-    if 'grid_config' not in pyMCW.MPI_COMM_WORLD:
+    if 'grid_config' not in pyMCW.MPI_COMM_WORLD or not python_mpi_keep:
         pyMCW.MPI_COMM_WORLD = pyMPI_Comm_init(n_proc,machines);
 
     # Set paths.

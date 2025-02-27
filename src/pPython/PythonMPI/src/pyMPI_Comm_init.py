@@ -82,6 +82,9 @@ def pyMPI_Comm_init(n_proc,machines,**argv):
     # PPYTHON_MANYCORE
     if 'PPYTHON_MANYCORE' not in MPI_COMM_WORLD['grid_config']:
         MPI_COMM_WORLD['grid_config']['PPYTHON_MANYCORE'] = 'Yes'
+    # manycore_implicit
+    if 'manycore_implicit' not in MPI_COMM_WORLD['grid_config']:
+        MPI_COMM_WORLD['grid_config']['manycore_implicit'] = 'Yes'
     # mixed_fs
     if 'mixed_fs' not in MPI_COMM_WORLD['grid_config']:
         MPI_COMM_WORLD['grid_config']['mixed_fs'] = 0
