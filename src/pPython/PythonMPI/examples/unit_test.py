@@ -42,7 +42,7 @@ def unit_test( py_file, n_proc, machines, time_limit, time_check ):
     MPI_Abort()
     pyMPI_Delete_all()
     # wait for the filesystem update
-    pyMPI_Sleep(1.0)
+    pyMPI_Sleep(2.0)
 
     # Launch PythonMPI
     py_file_basename = py_file

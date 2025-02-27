@@ -27,7 +27,12 @@
 import numpy as np
 from scipy.fft import fft
 
-from PythonMPI import *
+from pyMPI_Comm_dir import *
+from pyMPI_Sleep import *
+from MPI_Init import *
+from MPI_Comm_size import *
+from MPI_Comm_rank import *
+from MPI_Finalize import *
 
 # Initialize MPI
 MPI_Init()

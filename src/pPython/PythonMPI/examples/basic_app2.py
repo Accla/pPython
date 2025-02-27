@@ -42,7 +42,16 @@
 import numpy as np
 from scipy.fft import fft
 
-from PythonMPI import *
+from MPI_Init import *
+from MPI_Finalize import *
+from MPI_Comm_size import *
+from MPI_Comm_rank import *
+from pyMPI_Sleep import *
+
+from MPI_Send import *
+from MPI_Recv import *
+from MPI_Bcast import *
+
 
 # Set whether a graph should be generated
 UseGraphics = 0

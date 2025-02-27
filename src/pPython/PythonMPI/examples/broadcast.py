@@ -28,7 +28,17 @@
 import numpy as np
 from time import time 
 
-from PythonMPI import *
+from MPI_Init import *
+from MPI_Finalize import *
+from MPI_Comm_size import *
+from MPI_Comm_rank import *
+from pyMPI_Sleep import *
+from pyMPI_Save_messages import *
+
+from MPI_Send import *
+from MPI_Recv import *
+from MPI_Bcast import *
+from MPI_Probe import *
 
 def gen_matrix(mdim):
     newmat = np.zeros((mdim,mdim),dtype=int)

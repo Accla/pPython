@@ -36,19 +36,23 @@
 """
 
 import os
+import shutil
 import sys
 
 #
 # Modify the following variables according to your runtime environment
 #
 # Machines list (dtype: list)
-cpus = ['c-3-2-3.llgrid.ll.mit.edu','c-3-2-4.llgrid.ll.mit.edu']
+cpus = ['a-17-25.llgrid.ll.mit.edu','a-17-26.llgrid.ll.mit.edu']
+
 # Export the path to find PythonMPI source code:
 # For Linux OS
-HOME_PATH="/home/gridsan/ch21778"
+HOME_PATH=os.getenv('HOME')
 # For Windows OS
 # HOME_PATH="Z:"
-LLSC_PYTHONMPI_PATH = HOME_PATH+os.sep+"devtools"+os.sep+"git"+os.sep+"PythonMPI"+os.sep+"src"
+LLSC_PPYTHON_HOME = HOME_PATH+os.sep+"devtools"+os.sep+"git"+os.sep+"pPython"+os.sep+"src"+os.sep+"pPython"
+LLSC_PPYTHON_SRC = LLSC_PPYTHON_HOME+os.sep+"src"
+LLSC_PYTHONMPI_PATH = LLSC_PPYTHON_HOME+os.sep+ "PythonMPI"+os.sep+"src"
 # Export the path to modify PythonMPI settings for an individual user
 LOCAL_PYTHONMPI_CONFIG_PATH = HOME_PATH+os.sep+"ppython_conf"
 
@@ -61,6 +65,11 @@ sys.path.append(LLSC_PYTHONMPI_PATH)
 sys.path.append(LOCAL_PYTHONMPI_CONFIG_PATH)
 sys.path.append(CWD_PATH)
 
+#DEBUG
+print('LLSC_PYTHONMPI_PATH: %s'%(LLSC_PYTHONMPI_PATH))
+print('LOCAL_PYTHONMPI_CONFIG_PATH: %s'%(LOCAL_PYTHONMPI_CONFIG_PATH))
+print('CWD_PATH: %s'%(CWD_PATH))
+
 from unit_test import *
 import checkOS as OS
 
@@ -69,8 +78,13 @@ if OS.ispc:
     sep_path = ";"
 else:
     sep_path = ':'
-PYTHONMPI_PATH = LLSC_PYTHONMPI_PATH+sep_path+LOCAL_PYTHONMPI_CONFIG_PATH+sep_path+CWD_PATH
+PYTHONMPI_PATH = LLSC_PYTHONMPI_PATH
 os.environ["PYTHONMPI_PATH"] = PYTHONMPI_PATH
+
+PYTHON_PATH = LLSC_PYTHONMPI_PATH+':'+LLSC_PPYTHON_HOME
+PYTHON_PATH = LLSC_PYTHONMPI_PATH+':'+LLSC_PPYTHON_HOME+':'+LLSC_PPYTHON_SRC
+os.environ["PYTHONPATH"] = PYTHON_PATH
+print('PYTHONPATH: %s'%(PYTHON_PATH))
 
 # Disable HDF5 file locking
 os.environ["HDF5_USE_FILE_LOCKING"]="FALSE"
@@ -79,66 +93,69 @@ os.environ["HDF5_USE_FILE_LOCKING"]="FALSE"
 all_status = 'SUCCESS';
 
 # Unit test all the scripts.
+dir_path = 'PythonMPI'
 
-print(" Executing unit_test('basic', 4, cpus, 200, 20)")
-status = unit_test('basic', 4, cpus, 200, 20)
+print(" Executing unit_test('xbasic', 4, cpus, 40, 20)")
+status = unit_test('xbasic', 4, cpus, 40, 20)
 if status == 'FAIL':
     all_status = 'FAIL';
 
-print(" Executing unit_test('xbasic', 4, cpus, 200, 20)")
-status = unit_test('xbasic', 4, cpus, 200, 20)
+print(" Executing unit_test('basic', 4, cpus, 40, 20)")
+status = unit_test('basic', 4, cpus, 40, 20)
 if status == 'FAIL':
     all_status = 'FAIL';
 
-print(" Executing unit_test('broadcast', 4, cpus, 200, 20)")
-status = unit_test('broadcast', 4, cpus, 200, 20)
+print(" Executing unit_test('broadcast', 4, cpus, 40, 20)")
+status = unit_test('broadcast', 4, cpus, 40, 20)
 if status == 'FAIL':
     all_status = 'FAIL';
 
-print(" Executing unit_test('basic_app', 4, cpus, 200, 20)")
-status = unit_test('basic_app', 4, cpus, 200, 20)
+print(" Executing unit_test('basic_app', 4, cpus, 40, 20)")
+status = unit_test('basic_app', 4, cpus, 40, 20)
 if status == 'FAIL':
     all_status = 'FAIL';
 
-print(" Executing unit_test('basic_app2', 4, cpus, 200, 20)")
-status = unit_test('basic_app2', 4, cpus, 200, 20)
+print(" Executing unit_test('basic_app2', 4, cpus, 40, 20)")
+status = unit_test('basic_app2', 4, cpus, 40, 20)
 if status == 'FAIL':
     all_status = 'FAIL';
 
-print(" Executing unit_test('basic_app3', 4, cpus, 200, 20)")
-status = unit_test('basic_app3', 4, cpus, 200, 20)
+print(" Executing unit_test('basic_app3', 4, cpus, 40, 20)")
+status = unit_test('basic_app3', 4, cpus, 40, 20)
 if status == 'FAIL':
     all_status = 'FAIL';
 
-print(" Executing unit_test('basic_app4', 4, cpus, 200, 20)")
-status = unit_test('basic_app4', 4, cpus, 200, 20)
+print(" Executing unit_test('basic_app4', 4, cpus, 40, 20)")
+status = unit_test('basic_app4', 4, cpus, 40, 20)
 if status == 'FAIL':
     all_status = 'FAIL';
 
-print(" Executing unit_test('basic_app5', 4, cpus, 200, 20)")
-status = unit_test('basic_app5', 4, cpus, 200, 20)
+print(" Executing unit_test('basic_app5', 4, cpus, 40, 20)")
+status = unit_test('basic_app5', 4, cpus, 40, 20)
 if status == 'FAIL':
     all_status = 'FAIL';
 
-print(" Executing unit_test('basic_app6', 4, cpus, 200, 20)")
-status = unit_test('basic_app6', 4, cpus, 200, 20)
+print(" Executing unit_test('basic_app6', 4, cpus, 40, 20)")
+status = unit_test('basic_app6', 4, cpus, 40, 20)
 if status == 'FAIL':
     all_status = 'FAIL';
 
-print(" Executing unit_test('probe', 2, cpus, 200, 20)")
-status = unit_test('probe', 2, cpus, 200, 20)
+print(" Executing unit_test('probe', 2, cpus, 40, 20)")
+status = unit_test('probe', 2, cpus, 40, 20)
 if status == 'FAIL':
     all_status = 'FAIL';
 
-print(" Executing unit_test('speedtest', 2, cpus, 200, 20)")
-status = unit_test('speedtest', 2, cpus, 200, 20)
+print(" Executing unit_test('speedtest', 2, cpus, 40, 20)")
+status = unit_test('speedtest', 2, cpus, 40, 20)
 if status == 'FAIL':
     all_status = 'FAIL';
 
-print(" Executing unit_test('blurimage', 2, cpus, 200, 20)")
-status = unit_test('blurimage', 4, cpus, 200, 20)
+print(" Executing unit_test('blurimage', 2, cpus, 40, 20)")
+status = unit_test('blurimage', 4, cpus, 40, 20)
 if status == 'FAIL':
     all_status = 'FAIL';
 
 print('All tests: %s'%(all_status))
+
+
 
