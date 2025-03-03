@@ -13,7 +13,7 @@ import sys
 Customization for the user runtime environment
 """
 HOME_PATH = os.getenv('HOME')
-PPYTHON_HOME = HOME_PATH + "/devtools/git/pPython/src/pPython"
+PPYTHON_HOME = HOME_PATH + "/llgrid_beta/pPython/latest/src/pPython"
 os.environ["PPYTHON_HOME"] = PPYTHON_HOME
 
 # Add Python search path for pPython main function
