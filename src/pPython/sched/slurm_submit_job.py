@@ -74,9 +74,9 @@ def slurm_submit_job(grid_config,sched_job_file,py_file,dir_llsc):
     else:
         str_eppac = 'EPPAC=0'
     if grid_config['grid_job']:
-        grid_job = 1
+        grid_job = True
     else:
-        grid_job = 0
+        grid_job = False
     cmdstr = cmdstr+' --comment='+q+'Python:%s,pPython:%s,nTasks=%d,grid_job:%d,isInteractive=%d,isLocalFS=%d,%s'%(version,ppython_ver,ntasks,grid_job,interactive,local_fs,str_eppac)+q
         
     # Construct the final sbatch command
