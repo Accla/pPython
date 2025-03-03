@@ -55,14 +55,15 @@ def agg(d, leader=None):
     PIDSTART = os.getenv('PIDSTART',default='')
     if mixed_fs and Pid==0:
         # For interactive triples mode jobs using mixed messaging kernels
-        # The local pPython process (Pid = 0)
+        # Set for the local pPython process (Pid = 0)
         PIDSTART = '0'
         os.environ['PIDSTART'] = PIDSTART
         os.environ['PIDEND'] = PIDSTART
 
     if DEBUG:
         print('PIDSTART = %s'%(PIDSTART))
-    if len(PIDSTART):
+    EPPAC = comm['grid_config']['EPPAC']
+    if EPPAC:
         # print('AGG: calling topology-aware agg()')
         return agg_by_topology(d)
     """
