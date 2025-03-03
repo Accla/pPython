@@ -25,7 +25,7 @@ import os
 import pPython as GPC
 from Dmap import *
 from ones import *
-from pPython.dmat import global_ind
+from ll_dmat import global_ind
 
 # extract QA_PARALLEL environment variable
 QA_PARALLEL = os.getenv('QA_PARALLEL')

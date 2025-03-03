@@ -1,38 +1,31 @@
 import re
 import os
-from math import floor
 
-from exec_shell_cmd import *
 import checkOS as OS
 from pyMPI_Commands import *
-from pyMPI_Dir_map import *
 from pyMPI_Sleep import *
 
-from get_cpu_info import *
-from map_procs_to_cores import *
-
+from exec_shell_cmd import *
 from slurm_submit_job import *
 from slurm_write_job_script import *
 
-def launch_with_triples(py_file, comm, grid_config):
+def launch_non_triples(py_file, comm, grid_config):
     """
     Launch pPython job on the grid without using the triples mode optimiztion.
     Each individual pPython parallel process becomes an individual array task with the scheduler.
 
-    This is essential for large scale job
+    This is good for small scale job
     
     comm:  MPI communicator which provides information for creating all the required script for job submisison
-    
-    Note: refactored from MPI_RunG_MC() from gridMatlab
+
+    Note: refactored from MPI_RunG() of gridMatlab
 
     Author: Dr. Chansup Byun
     """
     
     DEBUG = 0
     if DEBUG:
-        print('--> Entering launch_with_triples')
-        # print('grid_config from caller:')
-        # print(grid_config)
+        print('--> Entering launch_non_triples')
 
     tmp = py_file.split('.')
     py_file_basename = tmp[0] # Remove .py
@@ -42,43 +35,12 @@ def launch_with_triples(py_file, comm, grid_config):
     qq = '"'
 
     interactive = grid_config['interactive']
-    proc_bind = grid_config['proc_bind']
     
-    pwd_pc,pwd_linux,pwd_mac,pwd_grid = pyMPI_Dir_map(comm['machine_db'],os.getcwd())
+    pwd_pc,pwd_linux,pwd_mac,pwd_grid = pyMPI_Dir_map(pyMCW.MPI_COMM_WORLD['machine_db'],os.getcwd())
 
     
     # Initialize command launch on all the different machines.
     unix_launch = ''
-    bash_script = '#!/bin/bash'+nl+'export PATH=/bin:$PATH'+nl
-    bash_script = bash_script+'export KMP_AFFINITY=granularity=fine'+nl
-    bash_script = bash_script+'export KMP_INIT_AT_FORK=false'+nl
-    bash_script = bash_script+'export OMP_NUM_THREADS='+str(grid_config['ntpp'])+nl+nl
-
-    PPYTHON_DEBUG = os.getenv('PPYTHON_DEBUG')
-    if PPYTHON_DEBUG and PPYTHON_DEBUG.lower() == 'yes':
-        bash_script = bash_script+'ulimit -c 0'+nl
-        bash_script = bash_script+'echo "`hostname`: ulimit -c 0 `ulimit -c 0`"'+nl
-        bash_script = bash_script+'echo "`hostname`: ulimit -n `ulimit -n`"'+nl
-    
-    # Print TMPDIR path explicitly on each node in the PythonMPI/pRUN.log file:
-    bash_script = bash_script+'echo "`hostname`: TMPDIR=$TMPDIR"'+nl
-
-    # Find the CPU informaiton
-    cpu_type = grid_config['cpu_type']
-    cluster_name = grid_config['cluster_name']
-    [max_slots, default_slots, max_cores, max_threads] = get_cpu_info(cpu_type,cluster_name)
-    nptpc = floor(max_threads / max_cores) # number of physical threads per core
-    # grid_config['nppn']: number of processes per node
-    # grid_config['ntpp']: number of threads per process, i.e., OMP_NUM_THREADS
-    # xeon-p8 node numbers processor IDs differently than all other nodes we have
-    if re.search('xeon-p8',grid_config['q_name'],flags=re.IGNORECASE):
-        dist_type = 2
-    else:
-        dist_type = 1
-    cpu_list = map_procs_to_cores(grid_config['nppn'],max_cores,nptpc,dist_type)
-    if DEBUG:
-        print('nppn = %d, cores = %d, ntpc = %d, dist_type = %d'%(grid_config['nppn'],max_cores,nptpc,dist_type))
-        print(cpu_list)
 
     # Get number of machines.
     n_m = comm['machine_db']['n_machine']
@@ -120,49 +82,28 @@ def launch_with_triples(py_file, comm, grid_config):
             python_module_path = comm['machine_db']['python_module_path']
             python_module_name = comm['machine_db']['python_module_name']
             unix_commands = ''
-            unix_commands_prefix = bash_script+nl+'source /etc/profile'+nl
+            unix_commands_prefix = '#!/bin/bash'+nl+'source /etc/profile'+nl
             #
             # Add a check if this is on a LLSC system
             unix_commands_prefix = unix_commands_prefix+'if [ -e /etc/llgrid.id ]; then'+nl
             unix_commands_prefix = unix_commands_prefix+'    export MODULEPATH=${MODULEPATH}:'+python_module_path+nl
             unix_commands_prefix = unix_commands_prefix+'    module load '+python_module_name+nl
-            unix_commands_prefix = unix_commands_prefix+'fi'+nl+nl
+            unix_commands_prefix = unix_commands_prefix+'fi'+nl
             PYTHONPATH= os.getenv('PYTHONPATH',default='')
-            unix_commands_prefix = unix_commands_prefix+'export PYTHONPATH='+PYTHONPATH+nl
-            unix_commands_prefix = unix_commands_prefix+'echo "`hostname`: PYTHONPATH=$PYTHONPATH"'+nl+nl
-            #
-            # Create hostname directory
-            PIDSTART = str(i_rank_start)
-            PIDEND   = str(i_rank_stop)
-            PIDSTR = 'p'+PIDSTART+'-p'+PIDEND
-            unix_commands_prefix = unix_commands_prefix+'export PIDSTART='+PIDSTART+nl
-            unix_commands_prefix = unix_commands_prefix+'export PIDEND='+PIDEND+nl
-            unix_commands_prefix = unix_commands_prefix+'export PIDSTR='+PIDSTR+nl
-            # Override HOSTNAME when launching with srun
-            if grid_config['srun']:
-                unix_commands_prefix = unix_commands_prefix+'export HOSTNAME=`hostname`'+nl
-            unix_commands_prefix = unix_commands_prefix+'export OUTPUT_DIR="PythonMPI/${PIDSTR}_$HOSTNAME"'+nl
-            unix_commands_prefix = unix_commands_prefix+'mkdir $OUTPUT_DIR'+nl+nl
+            if len(PYTHONPATH):
+                unix_commands_prefix = unix_commands_prefix+'export PYTHONPATH='+PYTHONPATH+nl
+                unix_commands_prefix = unix_commands_prefix+'echo "`hostname`: PYTHONPATH=$PYTHONPATH"'+nl+nl
 
             # Loop backwards over number of processes.
-            ipos = 0
             for i_rank in range(i_rank_stop,i_rank_start-1,-1):
                 if DEBUG:
-                    print('--> launch_with_triples: i_rank = %d'%(i_rank))
+                    print('--> launch_non_triples: i_rank = %d'%(i_rank))
                 # Note: python index start zero to N-1.
                 # Check if i_rank value needs to be adjusted
-                proc_bind_cmd = '"taskset --cpu-list '+','.join(cpu_list[ipos])+'" '
-                # print(proc_bind_cmd)
 
                 # Build commands that lauch multiple matlab on target nodes.
-                defscommands, unix_cmd_i_rank = pyMPI_Commands(py_file_basename,i_rank,comm,grid_config=grid_config,\
-                                                               start=i_rank_start,stop=i_rank_stop)
-                if proc_bind:
-                    # Enforce process pinning
-                    unix_commands = unix_commands+'export TASKSET_CMD='+proc_bind_cmd+nl+unix_cmd_i_rank
-                else:
-                    unix_commands = unix_commands+'export TASKSET_CMD='+nl+unix_cmd_i_rank
-                ipos += 1
+                defscommands, unix_cmd_i_rank = pyMPI_Commands(py_file_basename,i_rank,comm,grid_config=grid_config)
+                unix_commands = unix_commands+unix_cmd_i_rank
 
             # Create a file name to hold script that will be run on target.
             # Make sure to use the correct directory separator for Unix and DOS
@@ -255,14 +196,12 @@ def launch_with_triples(py_file, comm, grid_config):
         # print(defscommands)
         print('grid_run: executing %s in the current python process.'%(py_file))
         print(' ')
-        # Export MPI_COMM_WORLD_RANK=0
-        os.environ['MPI_COMM_WORLD_RANK']='0'
         exec(defscommands)
 
     if DEBUG:
         print(defscommands)
         print('. . .')
-        print('<-- Exiting launch_with_triples')
+        print('<-- Exiting launch_non_triples')
         
     return defscommands
 

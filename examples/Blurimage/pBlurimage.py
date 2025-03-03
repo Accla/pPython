@@ -22,8 +22,8 @@ import matplotlib.pyplot as plt
 
 # import pPython modules
 import pPython as GPC
-from pPython.map import Dmap,zeros,ones
-from pPython.dmat import size,synch,local,global_ind,agg,put_local
+from ll_map import Dmap,zeros,ones
+from ll_dmat import size,synch,local,global_ind,agg,put_local
 
 #  MPI information
 Np = GPC.Np

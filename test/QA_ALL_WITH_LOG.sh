@@ -10,8 +10,9 @@ module load anaconda/Python-ML-2024b
 # Test types
 # 1: QA tests on the development soruces
 # 2: QA tests on a release candidate
-
 QA_TYPE=1
+
+export PPYTHON_RUN_ON_SOURCE=yes
 
 # Defind which partition to use for the test
 if [[ "x$GRID_QA_MACHINES"=="x" ]]; then

@@ -10,7 +10,7 @@ def grid(d):
     if not isinstance(d,Dmat):
         raise Exception('ERROR(grid): it is not a DMAT object.')
 
-    print('Function grid(): called')
+    # print('Function grid(): called')
     return d.map['grid']
 
 ########################################################

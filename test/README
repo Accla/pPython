@@ -1,0 +1,8 @@
+Run the test after copying the entire directory to your working directory:
+   tar cf - * |(cd /path/to/working/directory; tar xf -)
+
+In order to run the tests using pPython installed using the source distribut, you will need to set
+   export PPYTHON_RUN_ON_SOURCE=yes 
+before running
+   QA_ALL_WITH_LOG.sh
+

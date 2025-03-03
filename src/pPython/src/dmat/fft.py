@@ -3,7 +3,7 @@ import scipy.fftpack
 
 from Dmap import *
 #2022-12-08: changed to fix a TypeError: 'module' object is not callable
-from grid import grid as proc_grid
+from ll_dmat import grid as proc_grid
 from size import *
 from remap import *
 

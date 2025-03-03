@@ -6,8 +6,35 @@ import re
 import os
 import sys
 
+RUN_ON_SOURCE=os.getenv('PPYTHON_RUN_ON_SOURCE',default='')
+if len(RUN_ON_SOURCE):
+    # Set to run pPython code from a source installation directory
+    """
+    Customization for the user runtime environment
+    """
+    HOME_PATH = os.getenv('HOME')
+    PPYTHON_HOME = HOME_PATH + "/devtools/git/pPython/src/pPython"
+    os.environ["PPYTHON_HOME"] = PPYTHON_HOME
+
+    # Add Python search path for pPython main function
+    PPYTHON_PATH = PPYTHON_HOME+os.sep+"src"
+    sys.path.append(PPYTHON_PATH)
+
+    #Update PYTHONPATH to direct to the pPython modules from the source location
+    PYTHONPATH=PPYTHON_HOME+os.sep+'PythonMPI'+os.sep+'src'
+    PYTHONPATH=PYTHONPATH+':'+PPYTHON_HOME+os.sep+'grid'
+    PYTHONPATH=PYTHONPATH+':'+PPYTHON_HOME+os.sep+'src'
+    PYTHONPATH=PYTHONPATH+':'+PPYTHON_HOME+os.sep+'src'+os.sep+'map'
+    PYTHONPATH=PYTHONPATH+':'+PPYTHON_HOME+os.sep+'src'+os.sep+'dmat'
+    PYTHONPATH=PYTHONPATH+':'+PPYTHON_HOME
+    os.environ["PYTHONMPI"]=PYTHONPATH
+    # print('PYTHONMPI=%s'%(PYTHONPATH))
+
+    # Disable HDF5 file locking (Lustre parallel filesystem on LLSC)
+    os.environ["HDF5_USE_FILE_LOCKING"]="FALSE"
+
 # import pPython and pRUN.
-import pPython
+# import pPython
 from pRUN import pRUN
 
 # Python environment variable to define a pPython script filename and runtime environment

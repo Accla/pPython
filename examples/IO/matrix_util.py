@@ -1,5 +1,5 @@
 import numpy as np
-from pPython.dmat import global_ind,local,put_local
+from ll_dmat import global_ind,local,put_local
 
 def write_matrix(X,file):
     """Save a distributed matrix (2D) into a file

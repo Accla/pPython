@@ -22,8 +22,8 @@ import matplotlib.pyplot as plt
 
 # Import PythonMPI methods.
 import pPython as GPC
-from pPython.map import Dmap,rand,zeros
-from pPython.dmat import dcomplex,local,global_ind,agg,put_local
+from ll_map import Dmap,rand,zeros
+from ll_dmat import dcomplex,local,global_ind,agg,put_local
 
 # Import auxiliary module
 from beamformer_vectors import *

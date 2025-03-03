@@ -3,8 +3,8 @@ from timeit import default_timer as timer
 
 # Import gridPython methods.
 import pPython as GPC
-from pPython.map import Dmap,rand,zeros
-from pPython.dmat import agg,local
+from ll_map import Dmap,rand,zeros
+from ll_dmat import agg,local
 
 #  MPI information
 comm = GPC.comm

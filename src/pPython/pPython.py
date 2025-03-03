@@ -15,7 +15,7 @@ os.environ['PPYTHON_HOME'] = base_dir_path
 sys.path.append(base_dir_path+os.sep+'src')
 sys.path.append(base_dir_path+os.sep+'src'+os.sep+'map')
 sys.path.append(base_dir_path+os.sep+'src'+os.sep+'dmat')
-sys.path.append(base_dir_path+os.sep+'grid')
+sys.path.append(base_dir_path+os.sep+'sched')
 sys.path.append(base_dir_path+os.sep+'PythonMPI'+os.sep+'src')
 
 # Share pPython Environment Variables

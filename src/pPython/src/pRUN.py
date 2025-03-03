@@ -34,7 +34,7 @@ DMAT_PATH = PPYTHON_PATH+os.sep+'dmat'
 sys.path.append(DMAT_PATH)
 
 # Additional path for gridPython (code for scheduler integration)
-GRIDPYTHON_PATH = PPYTHON_HOME+os.sep+"grid"
+GRIDPYTHON_PATH = PPYTHON_HOME+os.sep+"sched"
 sys.path.append(GRIDPYTHON_PATH)
 
 # Assuming local configuration is available from $HOME/ppython_conf directory.

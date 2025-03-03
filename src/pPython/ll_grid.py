@@ -1,5 +1,5 @@
 import sys
-sys.path.append('./grid')
+sys.path.append('./sched')
 from check_allowance import *
 from check_mount import *
 from check_runtime import *

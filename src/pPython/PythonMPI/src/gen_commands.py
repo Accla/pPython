@@ -44,6 +44,13 @@ def gen_commands(py_file,python_mpi_path,rank,machine,comm,EPPAC=False):
 
     commands = dict()
     commands[0] = 'import os'+nl+'import sys'+nl+'sys.path.append(".")'+nl
+    PYTHONMPI = os.getenv('PYTHONMPI',default='')
+    if len(PYTHONMPI):
+        PPYTHON_HOME=os.getenv("PPYTHON_HOME")
+        commands[0] = commands[0]+'sys.path.append("'+PPYTHON_HOME+'")'+nl
+        commands[0] = commands[0]+'sys.path.append("'+PPYTHON_HOME+'/PythonMPI/src")'+nl
+        commands[0] = commands[0]+'sys.path.append("'+PPYTHON_HOME+'/src")'+nl
+        commands[0] = commands[0]+'os.environ["PYTHONMPI"]="'+PYTHONMPI+'"'+nl
     commands[0] = commands[0]+'os.environ["HDF5_USE_FILE_LOCKING"]="FALSE"' + nl
     if EPPAC:
         # For the triples mode, a single script launches many pPython MPI processes.
@@ -53,7 +60,7 @@ def gen_commands(py_file,python_mpi_path,rank,machine,comm,EPPAC=False):
     else:
         commands[0] = commands[0]+'os.environ["OMP_NUM_THREADS"]="' + OMP_NUM_THREADS + '"' + nl
     # commands[0] = commands[0]+'from PythonMPI import *' + nl
-    commands[0] = commands[0]+'import pPython' + nl
+    commands[0] = commands[0]+'# import pPython' + nl
     commands[0] = commands[0]+'import pyMPI_COMM_WORLD as pyMCW' + nl
     commands[0] = commands[0]+'from dict_with_pickle import load_dict_from_pickle' + nl
     commands[1] = 'from pRUN_Parallel_wrapper import *' + nl

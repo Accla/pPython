@@ -13,7 +13,7 @@ from global_block_range import *
 from global_block_ranges import *
 
 # newly introduced
-from grid import grid as proc_grid
+from ll_dmat import grid as proc_grid
 from size import *
 from remap import *
 

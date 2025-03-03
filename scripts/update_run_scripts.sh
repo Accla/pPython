@@ -8,7 +8,9 @@ do echo $mydir;
    PYFILE=`grep ^py_file $EXAMPLE_DIR/$mydir/RUN.py|cut -d= -f2|xargs`; 
    echo "My pPython file: $PYFILE"
    cp ./RUN.py $EXAMPLE_DIR/$mydir/RUN.py 
+   cp ./RUN_on_src.py $EXAMPLE_DIR/$mydir/RUN_on_src.py 
    sed -i s/pMandelbrot.py/$PYFILE/ $EXAMPLE_DIR/$mydir/RUN.py 
+   sed -i s/pMandelbrot.py/$PYFILE/ $EXAMPLE_DIR/$mydir/RUN_on_src.py 
    echo " "
 done
 

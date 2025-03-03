@@ -5,8 +5,8 @@ from timeit import default_timer as timer
 
 # import pPython modules
 import pPython as GPC
-from pPython.map import Dmap,rand,zeros
-from pPython.dmat import local
+from ll_map import Dmap,rand,zeros
+from ll_dmat import local
 
 # import local modules
 from matrix_util import write_matrix,read_matrix
