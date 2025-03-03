@@ -55,6 +55,7 @@ def pRUN_Parallel_wrapper(py_file):
         print(' ')
         local_fs = grid_config['local_fs']
         print('pRUN_Parallel_Wrapper: local_fs = %d'%(local_fs))
+        print('pRUN_Parallel_Wrapper: grid_job = %d'%(grid_job))
         mixed_fs = grid_config['mixed_fs']
         print('pRUN_Parallel_Wrapper: mixed_fs = %d'%(mixed_fs))
         SLURM_JOB_ID = os.getenv('SLURM_JOB_ID',default='')
@@ -64,6 +65,8 @@ def pRUN_Parallel_wrapper(py_file):
         print(' ')
 
     if (local_fs or (not interactive and EPPAC))and grid_job:
+        # Only use this either usiing local filesystem or EPPAC with batch jobs for grid jobs
+        # Old style grid jobs may not use the local filesysstem
         tic = timer()
         # update MPI_COMM_WORLD
         # add mixed messaging kernel support
