@@ -58,7 +58,7 @@ def check_runtime( n_proc, machines, grid_config ):
               
     if isinstance(machines,(dict,list,set)):
         endStr = ''
-        interactive = 1
+        interactive = 0
         grid_job = False  # meaning no scheduler is involved
     else:
         if machines[-1] == '&':

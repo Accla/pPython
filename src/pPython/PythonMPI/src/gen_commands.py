@@ -60,7 +60,8 @@ def gen_commands(py_file,python_mpi_path,rank,machine,comm,EPPAC=False):
     else:
         commands[0] = commands[0]+'os.environ["OMP_NUM_THREADS"]="' + OMP_NUM_THREADS + '"' + nl
     # commands[0] = commands[0]+'from PythonMPI import *' + nl
-    commands[0] = commands[0]+'# import pPython' + nl
+    if not len(PYTHONMPI):
+        commands[0] = commands[0]+'import pPython' + nl
     commands[0] = commands[0]+'import pyMPI_COMM_WORLD as pyMCW' + nl
     commands[0] = commands[0]+'from dict_with_pickle import load_dict_from_pickle' + nl
     commands[1] = 'from pRUN_Parallel_wrapper import *' + nl

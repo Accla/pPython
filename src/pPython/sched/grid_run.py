@@ -108,6 +108,8 @@ def grid_run( py_file, n_proc, machines ):
         elif (OS.ispc):
             host = os.getenv('computername')
         machines,islocal = convert_to_dict(machines,host)
+        OS.islocal = islocal
+        grid.grid_config['islocal'] = islocal
 
     pyMCW.MPI_COMM_WORLD = pyMPI_Comm_init(n_proc,machines,grid_config=grid.grid_config);
 

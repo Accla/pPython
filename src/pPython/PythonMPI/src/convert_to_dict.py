@@ -14,6 +14,7 @@ def convert_to_dict(input,host):
     if DEBUG:
         print('--> Entering convert_to_dict')
         print(input)
+        print(type(input))
 
     islocal = 0
     output = dict()
@@ -21,20 +22,28 @@ def convert_to_dict(input,host):
         output = {0:host}
         islocal = 1
         if DEBUG:
+            print('islocal = %d'%(islocal))
+            print(output)
             print('<-- Exiting convert_to_dict')
         return output,islocal
     
-    if type(input) == type(set()) or type(input) == type(list()):
+    if isinstance(input,set) or isinstance(input,list):
         ii = 0
         for machine in input:
             output[ii] = machine
             ii = ii + 1
+        if DEBUG:
+            print('islocal = %d'%(islocal))
+            print(output)
+            print('<-- Exiting convert_to_dict')
         return output,islocal
-    elif type(input) == type(dict()):
+    elif isinstance(input,dict):
         ii = 0
         for machine in input:
             output[ii] = machine
             ii = ii + 1
+        if DEBUG:
+            print('<-- Exiting convert_to_dict')
         return output,islocal
     else:
         raise Exception('Error in convert_to_dict(). Input is neither list nor set variable.')
