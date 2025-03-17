@@ -95,7 +95,7 @@ def transpose_grid(B):
     else:
         if DEBUG:
             print('Creae dmat object, A, as a real numbers in its local array')
-        A = zeros(B_size, map=mapA) + 1.j
+        A = zeros(B_size, map=mapA)
     
     # Pick off everthing but the special case.
     # not (grid has a 1 in either col or row

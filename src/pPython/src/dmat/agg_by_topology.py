@@ -6,7 +6,6 @@ from timeit import default_timer as timer
 from MPI_Recv import *
 from MPI_Send import *
 
-from grid import *
 from size import *
 from reconstruct import *
 from agg_in_node import *
