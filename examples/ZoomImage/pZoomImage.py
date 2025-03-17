@@ -4,8 +4,8 @@ from timeit import default_timer as timer
 import matplotlib.pyplot as plt
 
 import pPython as GPC
-from ll_map import Dmap,zeros
-from ll_dmat import put_local,agg,find,global_ind
+from pPython.map import Dmap,zeros
+from pPython.dmat import put_local,agg,find,global_ind
 
 from reference_frame import *
 from zoom_frames import *

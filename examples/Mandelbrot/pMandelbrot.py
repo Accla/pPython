@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 
 # Import PythonMPI methods.
 import pPython as GPC
-from ll_map import Dmap,zeros
-from ll_dmat import local,put_local,agg,find,global_ind
+from pPython.map import Dmap,zeros
+from pPython.dmat import local,put_local,agg,find,global_ind
 
 """
 Computes the Mandelbrot set in parallel.
