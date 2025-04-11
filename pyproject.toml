@@ -1,9 +1,10 @@
+# [project]
+# dependencies = [
+#     "multipledispatch",
+# ]
 [build-system]
 requires = [
     "setuptools>=42",
     "wheel"
-]
-dependencies = [
-    "multipledispatch",
 ]
 build-backend = "setuptools.build_meta"
