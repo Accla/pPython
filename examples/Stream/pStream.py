@@ -3,10 +3,8 @@ import os
 from timeit import default_timer as timer
 
 import pPython as GPC
-from Dmap import *
-from local import *
-from zeros import *
-from agg import *
+from pPython.map import Dmap,zeros
+from pPython.dmat import local,agg
 
 """
 This script implements a simple parallel stream benchmark.  It times the
