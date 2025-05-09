@@ -1,9 +1,10 @@
 import numpy as np
 
-def local(d):
+def local(d,**argv):
     """Returns the local part of the distributed array.
-    if it is not a distributed array, it returns itself (no op).
-
+    if it is not a distributed array, it returns itself.
+    Note: pPython version returns a copy. 
+          Otherwise, it points to the same memory location.
     Author:   Nadya Travinin
     Python version: Dr. Chansup Byun
     """
@@ -12,10 +13,21 @@ def local(d):
     if DEBUG:
         print('--> Entering local')
 
+    # Provision to clear input after calling local()
+    keep_local = 1
+    for key in argv:
+        if key == 'keep_local':
+            keep_local = argv[key]
+
     if hasattr(d,'local'):
         x = np.copy(d.local)
+        if keep_local == 0:
+            # del d.local
+            d.clear()
     else:
         x = np.copy(d)
+        if keep_local == 0:
+            del d
 
     if DEBUG:
         print('Return local part, its size is x.shape')

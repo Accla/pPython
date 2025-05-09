@@ -718,6 +718,15 @@ class Dmat:
         d.local[:] = self.local
         return d
 
+    def clear(self):
+        """
+        Clear (delete) all the Dmat elements
+        '"""
+        
+        # del self.global_ind; del self.shape; del self.dim; del self.map  
+        # del self.pitfalls
+        del self.local; del self.falls; del self.local_dim; del self._dtype
+
     def show(self):
         """
         Show the Dmat properties

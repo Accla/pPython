@@ -118,7 +118,7 @@ def transpose_grid(B):
             print('Optimized row to column or column to row redistribution')
         # Optimized row to column or column to row redistribution
         A_local = local(A)
-        B_local = local(B)
+        B_local = local(B,keep_local=0)
         if DEBUG:
             if (np.iscomplex(A_local)).any():
                 print('A_local is a complex array')
@@ -170,6 +170,7 @@ def transpose_grid(B):
                             print(temp)
                         else:
                             print('Received temp for A_local is NOT a complex array')
+                    del temp
         else:
             # Row to column redistribution
             # Get global ranges of dmats.
@@ -202,9 +203,13 @@ def transpose_grid(B):
                             print(temp)
                         else:
                             print('Received temp for A_local is NOT a complex array')
+                    del temp
 
         # Put local data back.
         A = put_local(A, A_local)
+ 
+    # Clear input
+    del A_local;  del B_local
               
     if DEBUG:
         print('<-- Exiting transpose_grid')

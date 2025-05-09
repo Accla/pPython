@@ -22,8 +22,12 @@ def put_local(x, x_local):
             y = np.real(x_local)
             z = np.imag(x_local)
             x.local = np.vectorize(complex)(y,z)
+            # clear memory
+            del y; del z
         else:
             x.local[:] = x_local
+        # clear x_local
+        del x_local
     else:
         if (np.iscomplex(x_local)).any():
             y = np.real(x_local)
@@ -32,6 +36,8 @@ def put_local(x, x_local):
         else:
             x = np.zeros(x.shape,x.dtype)
             x[:] = x_local
+        # clear x_local
+        del x_local
 
     if DEBUG:
         print('<-- Exiting put_local')

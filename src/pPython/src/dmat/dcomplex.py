@@ -31,6 +31,8 @@ def dcomplex(x,y):
                 else:
                     print('DMAT object has dtype attribute. Set as dtype = %s'%(d.dtype))
                     print('DMAT object has nbytes attribute. Set as nbytes = %d'%(d.nbytes))
+            # Clear the input arrays
+            del x.local; del y.local
         else:
             raise Exception('ERROR: Both DMAT objects have to be the same kind.')
         if DEBUG:
@@ -39,6 +41,8 @@ def dcomplex(x,y):
         d = np.vectorize(complex)(x,y)
         if DEBUG:
             print('dmat/dcomplex: return non-distributed array shape of %s'%(str(d.shape)))
+        # Clear the input arrays
+        del x; del y
  
     if DEBUG:
         print('<-- Exiting dcomplex')
