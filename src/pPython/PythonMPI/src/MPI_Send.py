@@ -82,6 +82,8 @@ def MPI_Send(dest, tag, comm, *argv):
     if DEBUG or DEBUG_TIMING:
         print(buffer_file)
 
+    '''
+    # No need to create a msg dictionary. Just passs the argv vector
     # Save buf to file after packing the message into a dictionary
     msg = dict()
     ii = 0
@@ -93,9 +95,10 @@ def MPI_Send(dest, tag, comm, *argv):
         #     print(arg)
         msg[ii] = arg
         ii = ii + 1
+    '''
     # Write the message into a file.
     try:
-        save_dict_to_pickle(msg,buffer_file)
+        save_dict_to_pickle(argv,buffer_file)
     except:
         raise Exception('MPI_Send: fail to create a message file, %s'%(buffer_file))
     if DEBUG_TIMING:

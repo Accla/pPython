@@ -110,7 +110,9 @@ def MPI_Recv( source, tag, comm ):
             print(buf.values())
         print('<-- Exiting MPI_Recv')
     # Get variable out of buf.
-    return list(buf.values())
+    # return list(buf.values())
+    # Return argv in MPI_Send.py
+    return buf
 
 ########################################################
 # MatlabMPI
