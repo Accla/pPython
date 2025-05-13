@@ -91,7 +91,8 @@ def MPI_Recv( source, tag, comm ):
         t_st_2 = timer()
         print('  MPI_Recv: time to create message and lock files (sec): %f'%(t_st_2 - t_start))
     # Read all data out of buffer_file.
-    buf = load_dict_from_pickle(buffer_file)
+    #CB buf = load_dict_from_pickle(buffer_file)
+    argv = load_dict_from_pickle(buffer_file)
     
     # Delete buffer and lock files.
     if (not(comm['save_message_flag'])):
@@ -110,9 +111,8 @@ def MPI_Recv( source, tag, comm ):
             print(buf.values())
         print('<-- Exiting MPI_Recv')
     # Get variable out of buf.
-    # return list(buf.values())
-    # Return argv in MPI_Send.py
-    return buf
+    #CB return list(buf.values())
+    return argv
 
 ########################################################
 # MatlabMPI
