@@ -62,6 +62,7 @@ def slurm2hostmap():
     # For the triples mode jobs, ntasks != nprocs
     nTasks = grid.grid_config['ntasks'] 
     EPPAC    = grid.grid_config['EPPAC']  
+    IMPLICIT_EPPAC    = grid.grid_config['IMPLICIT_EPPAC']  
     
     if EPPAC:
         nnode   = grid.grid_config['nnode']
@@ -69,6 +70,15 @@ def slurm2hostmap():
         # Only 1 slurm task script per each compute node with PPYTHON_MANYCORE mode
         # Do not use nTasks (slurm) for total number of process because of interactive jobs
         nProcs    = nnode * nppn 
+        # For the triples mode jobs, ntasks != nprocs
+        nTasks = nnode
+    elif IMPLICIT_EPPAC:
+        nnode   = grid.grid_config['nnode']
+        nppn   = grid.grid_config['nppn']
+        # Keep the old style Np as ntasks in grid_config
+        nProcs    = grid.grid_config['ntasks']  
+        # For the implicit triples mode jobs, ntasks != nprocs
+        nTasks = nnode
     else:
         # Traditional jobs (number of Slurm tasks == Np of pPython)
         nProcs    = grid.grid_config['ntasks']  
@@ -244,9 +254,11 @@ def slurm2hostmap():
         # So no TMPDIR defined in general.
         tmpdir  = os.getenv('TMPDIR').split('.')
     
-    if EPPAC:
+    if EPPAC or IMPLICIT_EPPAC:
         # For the triples mode jobs
         # nTasks is equivalent to number of compute nodes on the grid
+        if DEBUG:
+            print('nTasks =  %d, nProcs = %d, nppn = %d'%(nTasks,nProcs,nppn))
         for i in range(nTasks):
             # hostmap key is a positive integer 
             # Adjust for mixed messaging kernel
@@ -271,6 +283,7 @@ def slurm2hostmap():
                    MPI_COMM_WORLD['tmpdir'][i+mixed_fs] = '/state/partition1/slurm_tmp/'+tmp[1]+'.'+tmpdir[1]+'.'+tmpdir[2]
                 if DEBUG:
                    print("slurm2hostmap: MPI_COMM_WORLD['tmpdir'][%d] = %s"%(i+mixed_fs,MPI_COMM_WORLD['tmpdir'][i+mixed_fs]))
+            # For IMPLICIT_EPPAC, nppn may be changed at the last machine
             for j in range(nppn):
                 ipos = (my_node_rank - mixed_fs)*nppn+j 
                 if i == 0 and j == 0 and mixed_fs and nppn > 1:
@@ -285,6 +298,7 @@ def slurm2hostmap():
                 # Introduce pid list for those on the same compute ndoe 
                 MPI_COMM_WORLD['local_pids'][tmp[2]].append(ipos)
             if DEBUG:
+                print('local_pids key = %s, '%(tmp[2]),end="")
                 print(MPI_COMM_WORLD['local_pids'][tmp[2]])
         machines = MPI_COMM_WORLD['machine_db']['machine']
         if mixed_fs:

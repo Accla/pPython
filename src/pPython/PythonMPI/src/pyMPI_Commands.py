@@ -36,11 +36,13 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD,**argv):
     DONE = False
     grid_job = False
     EPPAC = False
+    IMPLICIT_EPPAC = False
     for key in argv:
         if key == 'grid_config':
             grid_config = argv[key]
             grid_job = grid_config['grid_job']
             EPPAC = grid_config['EPPAC']
+            IMPLICIT_EPPAC = grid_config['IMPLICIT_EPPAC']
         elif key == 'start':
             i_rank_start = argv[key]
         elif key == 'stop':
@@ -73,14 +75,17 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD,**argv):
     type = MPI_COMM_WORLD['machine_db']['type'][machine_id]
 
     # Create filename each Python job will run at startup.
-    if EPPAC:
+    COM_EPPAC = False
+    if EPPAC or IMPLICIT_EPPAC:
+       # either EPPAC or IMPLICIT_EPPAC
+       COM_EPPAC = True
        defsbase = 'PythonMPI/PythonMPIdefs'
     else:
        defsbase = 'PythonMPI/PythonMPIdefs' + str(rank)
     defsfile = defsbase + '.py'
 
     # Replace my_script_file with py_file basename (withoutt .py)
-    if EPPAC:
+    if EPPAC or IMPLICIT_EPPAC:
        outfile = '$OUTPUT_DIR/' + py_file + '.' + str(rank) +'.out'
     else:
        outfile = 'PythonMPI/' + py_file + '.' + str(rank) +'.out'
@@ -96,16 +101,16 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD,**argv):
     # Generate a series of commands to be executed to setup pPython runtime 
     # for each Python MPI process
     # the commands are stored in a dictionary
-    commands = gen_commands(py_file,python_mpi_path,rank,machine,MPI_COMM_WORLD,EPPAC)
+    commands = gen_commands(py_file,python_mpi_path,rank,machine,MPI_COMM_WORLD,COM_EPPAC)
 
     defscommands = '';
 
     # Print name of the target machine we are launching on.
     # CB: Reduce the output when Np > 16
-    if EPPAC:
-       # nnode = grid_config['nnode']
+    if EPPAC or IMPLICIT_EPPAC:
+       nnode = grid_config['nnode']
        # Use the following to deal with an interactive triples mode job with nppn=1
-       nnode = grid_config['ntasks']
+       # nnode = grid_config['ntasks']
        if (nnode>=8):
            if ((machine_id > (nnode-3)) or (machine_id < 2)) and (rank == i_rank_stop):
                print('Launching MPI rank: %d to %d on %s.' %(i_rank_stop,i_rank_start,machine))
@@ -174,7 +179,7 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD,**argv):
     else:
         # Target is a remote machine.
         # Write commands to a .py text file.
-        if EPPAC:
+        if EPPAC or IMPLICIT_EPPAC:
            if not DONE:
                fid = open(defsfile,'w')
                n_command = len(commands)
@@ -211,7 +216,7 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD,**argv):
             else:
                 FORWARD_ERR = ' 2> >(awk '+q+'BEGIN{FS="\\n"}{print "Pid='+str(rank)+': " $1}'+q+' |tee -a '+errfile+' >&2)'
             unix_command = python_command+FORWARD_ERR+' &'+nl+'touch PythonMPI/pid.'+machine+'.$!'+nl
-    if EPPAC:
+    if EPPAC or IMPLICIT_EPPAC:
         # prepend to export MPI_COMM_WORLD_RANK=<mpi_rank>
         unix_command = 'export MPI_COMM_WORLD_RANK='+str(rank)+nl+ \
                        '$TASKSET_CMD '+unix_command

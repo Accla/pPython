@@ -14,6 +14,10 @@ def check_triples(cluster_name,cpu_type,n_proc,grid_config):
     if DEBUG:
         print('--> Entering check_triples')
 
+    # Check environment varialbe to determine using the triples mode for traditional n_proc input
+    # Only supported for backgrounded jobs
+    PPYTHON_IMPLICIT_EPPAC = os.getenv('PPYTHON_IMPLICIT_EPPAC','')
+
     # If needed, preprocess triples mode resource request
     # check if n_proc is not an integer but an array of numerals
     if not isinstance(n_proc,(int,np.int64,np.int32)):
@@ -55,6 +59,7 @@ def check_triples(cluster_name,cpu_type,n_proc,grid_config):
         if grid_config['interactive'] and n_proc_req == 1:
             print('interactive triples mode job with NNODE*NPPN=1')
             grid_config['EPPAC'] = False
+            grid_config['IMPLICIT_EPPAC'] = False
             grid_config['grid_job'] = False
             return n_proc_req, grid_config
 
@@ -64,6 +69,7 @@ def check_triples(cluster_name,cpu_type,n_proc,grid_config):
         grid_config['nppn'] = nppn
         grid_config['ntpp'] = ntpp
         grid_config['EPPAC'] = True
+        grid_config['IMPLICIT_EPPAC'] = False
         if os.getenv('PPYTHON_PROC_BIND',default='Yes').lower() == 'no':
             grid_config['proc_bind'] = False
         else:
@@ -85,12 +91,34 @@ def check_triples(cluster_name,cpu_type,n_proc,grid_config):
                 'You are launching more threads than the %d cores on the node you requested, which may be sub-optimal.\n'%(max_cores)+\
                 'See https://supercloud.mit.edu/faq#triples-warning for more information.\n')
     
+    elif len(PPYTHON_IMPLICIT_EPPAC)>0 :
+        # If implicitly define EPPAC with the old Np inpu, set nppn with PPYTHON_NP_PER_NODE environment variable
+        # Set the default nppn as 24
+        nppn = int(os.getenv('PPYTHON_NP_PER_NODE','24'))
+        grid_config['nnode'] = int(np.ceil(n_proc / nppn))
+        # Should this keep the old style Np?
+        # grid_config['ntasks'] = grid_config['nnode']
+        grid_config['ntasks'] = n_proc
+        grid_config['nppn'] = nppn
+        grid_config['ntpp'] = 1
+
+        if os.getenv('PPYTHON_PROC_BIND',default='Yes').lower() == 'no':
+            grid_config['proc_bind'] = False
+        else:
+            grid_config['proc_bind'] = True
+
+        # Inherit old style Np input case
+        grid_config['EPPAC'] = False
+        grid_config['IMPLICIT_EPPAC'] = True
+        n_proc_req = n_proc
+
     else:
         # nproc is an integer
         # Check if n_proc cores available for the user
         # Exit with an error if not
         #
         grid_config['EPPAC'] = False
+        grid_config['IMPLICIT_EPPAC'] = False
         n_proc_req = n_proc
 
     if DEBUG:

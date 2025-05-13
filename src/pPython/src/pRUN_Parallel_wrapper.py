@@ -34,6 +34,7 @@ def pRUN_Parallel_wrapper(py_file):
         else:
             islocal = 1
         EPPAC = grid_config['EPPAC']
+        IMPLICIT_EPPAC = grid_config['IMPLICIT_EPPAC']
         # Passed from pRUN()
         LAUNCH_TIMING = grid_config['LAUNCH_TIMING']
     else:
@@ -64,7 +65,7 @@ def pRUN_Parallel_wrapper(py_file):
         print('pRUN_Parallel_Wrapper: SLURM_ARRAY_JOB_ID = %s'%(SLURM_ARRAY_JOB_ID))
         print(' ')
 
-    if (local_fs or (not interactive and EPPAC))and grid_job:
+    if (local_fs or (not interactive and (EPPAC or IMPLICIT_EPPAC)))and grid_job:
         # Only use this either usiing local filesystem or EPPAC with batch jobs for grid jobs
         # Old style grid jobs may not use the local filesysstem
         tic = timer()

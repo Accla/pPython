@@ -55,6 +55,7 @@ def pyMPI_Comm_init(n_proc,machines,**argv):
     
     # Default: EPPAC = 0 (non triples mode job)
     EPPAC = False
+    IMPLICIT_EPPAC = False
     # Added to save grid_config
     MPI_COMM_WORLD['grid_config'] = dict()
     for key in argv:
@@ -65,9 +66,13 @@ def pyMPI_Comm_init(n_proc,machines,**argv):
                 EPPAC = MPI_COMM_WORLD['grid_config']['EPPAC']
             else:
                 MPI_COMM_WORLD['grid_config']['EPPAC'] = EPPAC
+            if 'IMPLICIT_EPPAC' in MPI_COMM_WORLD['grid_config']:
+                IMPLICIT_EPPAC = MPI_COMM_WORLD['grid_config']['IMPLICIT_EPPAC']
+            else:
+                MPI_COMM_WORLD['grid_config']['IMPLICIT_EPPAC'] = IMPLICIT_EPPAC
             interactive = MPI_COMM_WORLD['grid_config']['interactive']
             nnode = MPI_COMM_WORLD['grid_config']['nnode']
-            if EPPAC:
+            if EPPAC or IMPLICIT_EPPAC:
                nppn = MPI_COMM_WORLD['grid_config']['nppn']
     # Default setup: 
     # Use a batch mode as default
@@ -100,6 +105,9 @@ def pyMPI_Comm_init(n_proc,machines,**argv):
     if EPPAC:
         MPI_COMM_WORLD['group'] = np.arange(0,nnode*nppn,dtype=int)
         MPI_COMM_WORLD['machine_id'] = np.zeros((nnode*nppn,),dtype=int)
+    elif IMPLICIT_EPPAC:
+        MPI_COMM_WORLD['group'] = np.arange(0,nnode*nppn,dtype=int)
+        MPI_COMM_WORLD['machine_id'] = np.zeros((n_proc,),dtype=int)
     else:
         MPI_COMM_WORLD['group'] = np.arange(0,n_proc,dtype=int)
         MPI_COMM_WORLD['machine_id'] = np.zeros((n_proc,),dtype=int)
@@ -121,11 +129,27 @@ def pyMPI_Comm_init(n_proc,machines,**argv):
     #
 
     # Evaluate how many processes per each machine
-    if EPPAC:
+    # Check environment varialbe to determine using the triples mode for traditional n_proc input 
+    # Only supported for backgrounded jobs
+    PPYTHON_IMPLICIT_EPPAC = os.getenv('PPYTHON_IMPLICIT_EPPAC','')
+    if len(PPYTHON_IMPLICIT_EPPAC)>0:
+        IMPLICIT_EPPAC = True
+        MPI_COMM_WORLD['grid_config']['IMPLICIT_EPPAC'] = IMPLICIT_EPPAC
+        # If implicitly define EPPAC with the old Np inpu, set nppn with PPYTHON_NP_PER_NODE environment variable
+        # Set the default nppn as 24
+        nppn = int(os.getenv('PPYTHON_NP_PER_NODE','24'))
+    if EPPAC or IMPLICIT_EPPAC:
         # For the triples mode jobs, take care of the node where the interactive process runs
         # The first node on the grid will have one less processes running due to the interactive process
+        # For large memory need for Pid=0, use the reverse order with the traditional Np 
+        PPYTHON_REVERSE_ORDER = os.getenv('PPYTHON_REVERSE_ORDER','')
+        if len(PPYTHON_REVERSE_ORDER)>0:
+            node_id_list = reversed(range(n_m))
+        else:
+            node_id_list = range(n_m)
+
         if interactive and nppn>1:
-            for i_machine in range(n_m):
+            for i_machine in node_id_list:
                 if DEBUG:
                     print('  -> i_machine: %d'%(i_machine))
                 if i_machine == 0:
@@ -135,8 +159,13 @@ def pyMPI_Comm_init(n_proc,machines,**argv):
                 else:
                     machine_db['n_proc'][i_machine] = nppn
         else:
-            for i_machine in range(n_m):
-                machine_db['n_proc'][i_machine] = nppn
+            i_proc = n_proc
+            for i_machine in node_id_list:
+                if i_proc > nppn:
+                    machine_db['n_proc'][i_machine] = nppn
+                else:
+                    machine_db['n_proc'][i_machine] = i_proc
+                i_proc -= nppn
     else:
         for i_rank in range(n_proc):
             i_machine = i_rank % n_m

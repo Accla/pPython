@@ -48,13 +48,14 @@ def slurm_submit_job(grid_config,sched_job_file,py_file,dir_llsc):
     cmdstr = cmdstr+' -J '+py_file
         
     # Array job
-    ntasks = grid_config['ntasks']
-    if grid_config['EPPAC']:
+    if grid_config['EPPAC'] or grid_config['IMPLICIT_EPPAC']:
+        ntasks = grid_config['nnode']
         if grid_config['srun']:
             cmdstr = cmdstr+' --exclusive --distribution=nopack --ntasks-per-node=1 --ntasks=%d'%(ntasks)
         else:
             cmdstr = cmdstr+' --exclusive -a 1-%d'%(ntasks)
     else:
+        ntasks = grid_config['ntasks']
         cmdstr = cmdstr+' -a 1-%d'%(ntasks)
         
     # Standard output or Slurm log
@@ -71,6 +72,8 @@ def slurm_submit_job(grid_config,sched_job_file,py_file,dir_llsc):
     local_fs = grid_config['local_fs']
     if grid_config['EPPAC']:
         str_eppac = 'EPPAC=1,[%d,%d,%d]'%(grid_config['nnode'],grid_config['nppn'],grid_config['ntpp'])
+    elif grid_config['IMPLICIT_EPPAC']:
+        str_eppac = 'IMPLICIT_EPPAC=1,[%d,%d,%d]'%(grid_config['nnode'],grid_config['nppn'],grid_config['ntpp'])
     else:
         str_eppac = 'EPPAC=0'
     if grid_config['grid_job']:

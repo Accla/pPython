@@ -136,6 +136,7 @@ def check_runtime( n_proc, machines, grid_config ):
     # check and process the triples mode job request if needed
     n_proc_req, grid_config = check_triples(cluster_name,cpu_type,n_proc,grid_config)
     EPPAC = grid_config['EPPAC'] 
+    IMPLICIT_EPPAC = grid_config['IMPLICIT_EPPAC'] 
     #
     # number of cores to be allocated from the grid
     # At this point, n_proc_req is already translated into number of cores (int) if triples mode is used.
@@ -154,15 +155,21 @@ def check_runtime( n_proc, machines, grid_config ):
         # set the Pid=0 machine for an interactive job
         if interactive:
             machines.append(host)
-        if grid_config['nnode'] > 0: 
+        # if grid_config['nnode'] > 0: 
+        if EPPAC or IMPLICIT_EPPAC:
+            n_slurm_nodes = grid_config['nnode']
             # Triples modes, pPython MPI processes on the same node are aggregated into a single scheduler task
             if interactive and (grid_config['nppn']==1):
                 grid_config['ntasks'] = grid_config['nnode']-1
-            else:
-                grid_config['ntasks'] = grid_config['nnode']
+                n_slurm_nodes = grid_config['nnode']-1
+            #CB duplicated: 
+            # else:
+            #    if not IMPLICIT_EPPA:
+            #    grid_config['ntasks'] = grid_config['nnode']
+
             # Figure out how many digits are needed to represent the number of requested nodes
             n_digits = int(math.log10(grid_config['nnode'])+1)
-            for i in range(grid_config['ntasks']):
+            for i in range(n_slurm_nodes):
                 node_strid = str(i+1).zfill(n_digits)
                 machines.append('grid_slurm_'+node_strid)
         else:

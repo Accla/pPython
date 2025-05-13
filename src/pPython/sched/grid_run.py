@@ -131,8 +131,7 @@ def grid_run( py_file, n_proc, machines ):
         print(os.getcwd())
     
     ## Work in Progress
-    
-    if (grid.grid_config['EPPAC'] == True):
+    if grid.grid_config['EPPAC'] or grid.grid_config['IMPLICIT_EPPAC']:
         #
         # Triples mode job
         #

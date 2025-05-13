@@ -63,7 +63,8 @@ def agg(d, leader=None):
     if DEBUG:
         print('PIDSTART = %s'%(PIDSTART))
     EPPAC = comm['grid_config']['EPPAC']
-    if EPPAC:
+    IMPLICIT_EPPAC = comm['grid_config']['IMPLICIT_EPPAC']
+    if EPPAC or IMPLICIT_EPPAC:
         # print('AGG: calling topology-aware agg()')
         return agg_by_topology(d)
     """
