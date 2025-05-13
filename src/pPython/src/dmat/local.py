@@ -22,7 +22,6 @@ def local(d,**argv):
     if hasattr(d,'local'):
         x = np.copy(d.local)
         if keep_local == 0:
-            # del d.local
             d.clear()
     else:
         x = np.copy(d)

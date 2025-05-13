@@ -118,7 +118,9 @@ def transpose_grid(B):
             print('Optimized row to column or column to row redistribution')
         # Optimized row to column or column to row redistribution
         A_local = local(A)
-        B_local = local(B,keep_local=0)
+        # B_local = local(B,keep_local=0)
+        B_local = local(B)
+        B.clear()
         if DEBUG:
             if (np.iscomplex(A_local)).any():
                 print('A_local is a complex array')
@@ -161,16 +163,17 @@ def transpose_grid(B):
                 if (recv_rank != my_rank):
                     j1 = B_j_ranges[recv_rank, 1]
                     j2 = B_j_ranges[recv_rank, 2] + 1
-                    [temp] = MPI_Recv(recv_rank, GPC.tag, comm)
-                    A_local[:,j1:j2] = temp
+                    # [temp] = MPI_Recv(recv_rank, GPC.tag, comm)
+                    # A_local[:,j1:j2] = temp
+                    [ A_local[:,j1:j2] ] = MPI_Recv(recv_rank, GPC.tag, comm)
                     if DEBUG:
                         print('Pid = %d receives A_local from Pid = %d'%(my_rank,recv_rank))
                         if (np.iscomplex(temp)).any():
                             print('Received temp for A_local is a complex array')
-                            print(temp)
+                            # print(temp)
                         else:
                             print('Received temp for A_local is NOT a complex array')
-                    del temp
+                    # del temp
         else:
             # Row to column redistribution
             # Get global ranges of dmats.
@@ -194,16 +197,17 @@ def transpose_grid(B):
                 if (recv_rank != my_rank):
                     i1 = B_i_ranges[recv_rank, 1]
                     i2 = B_i_ranges[recv_rank, 2] + 1
-                    [temp] = MPI_Recv(recv_rank, GPC.tag, comm)
-                    A_local[i1:i2,:] = temp
+                    # [temp] = MPI_Recv(recv_rank, GPC.tag, comm)
+                    # A_local[i1:i2,:] = temp
+                    [ A_local[i1:i2,:] ] = MPI_Recv(recv_rank, GPC.tag, comm)
                     if DEBUG:
                         print('Pid = %d receives temp for A_local from Pid = %d'%(my_rank,recv_rank))
                         if (np.iscomplex(temp)).any():
                             print('Received temp for A_local is a complex array')
-                            print(temp)
+                            # print(temp)
                         else:
                             print('Received temp for A_local is NOT a complex array')
-                    del temp
+                    # del temp
 
         # Put local data back.
         A = put_local(A, A_local)
