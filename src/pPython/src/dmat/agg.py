@@ -42,6 +42,9 @@ def agg(d, leader=None):
 
     Pid = GPC.Pid
     Np = GPC.Np
+    if DEBUG:
+        print('(Np,Pid) = (%d,%d)'%(Np,Pid))
+
     # Return immediately if Np = 1
     if Np == 1:
         mat = d.local
@@ -65,7 +68,8 @@ def agg(d, leader=None):
     EPPAC = comm['grid_config']['EPPAC']
     IMPLICIT_EPPAC = comm['grid_config']['IMPLICIT_EPPAC']
     if EPPAC or IMPLICIT_EPPAC:
-        # print('AGG: calling topology-aware agg()')
+        if DEBUG:
+            print('AGG: calling topology-aware agg()')
         return agg_by_topology(d)
     """
     else:
@@ -208,9 +212,9 @@ def agg(d, leader=None):
         sendBuf[0] = d.local
         imsgLast = 0   # pointer to manage send buffer location
 
-    # if DEBUG:
-    #     time_03 = timer()
-    #     print('Initial op for local array for hierarchical agg: %f (sec)'%(time_03-time_01))
+    if DEBUG:
+        time_03 = timer()
+        print('Initial op for local array for hierarchical agg: %f (sec)'%(time_03-time_01))
 
     # Walk up the binary tree.
     while (bt <= btMax):
@@ -222,8 +226,12 @@ def agg(d, leader=None):
         # pidList[1:len(pidPost)]
         [tmp1] = np.where( np.array(pidList[0:len(pidPost)]) == Pid)
         # tmp1 is an array 
+        if DEBUG:
+            print('...Check if tmp1 is not empty: len(tmp1) = %d'%(len(tmp1)))
         if (len(tmp1)):
             myPidPos = tmp1[0]
+            if DEBUG:
+                print('  myPidPos+1 = %d'%(myPidPos))
             # Pid participates in communication at this level
             if ( (myPidPos+1)%2 ):
                 # Odd position from the left. In Python, first odd position is zero.
@@ -231,15 +239,18 @@ def agg(d, leader=None):
                 fromRank = pidList[myPidPos+1]
                 if DEBUG: print('  myPidPos+1 = %d, fromRank = %d)'%(myPidPos+1,fromRank))
                 if inmap(d.map, fromRank):  # Only receive data if fromRank is in the map
-                    # if DEBUG: print('agg() recv: Pid = %d, fromRank %d w/ msg unit = %d'%(Pid,fromRank,msgUnit))
-                    # if DEBUG:
-                    #     time_04 = timer()
-                    [recvBuf] = MPI_Recv(fromRank, GPC.tag, GPC.comm)
-                    # if DEBUG:
-                    #     time_05 = timer()
-                    #     print('Time for MPI_Recv call: %f (sec)'%(time_05-time_04))
+                    if DEBUG: print('agg() recv: Pid = %d, fromRank %d w/ msg unit = %d'%(Pid,fromRank,msgUnit))
+                    if DEBUG:
+                        time_04 = timer()
 
-                    # if DEBUG: print('  len(recvBuf) = %d' %(len(recvBuf)))
+                    [recvBuf] = MPI_Recv(fromRank, GPC.tag, GPC.comm)
+
+                    if DEBUG:
+                        time_05 = timer()
+                        print('Time for MPI_Recv call: %f (sec)'%(time_05-time_04))
+                        print('Received: len(recvBuf) = %d'%(len(recvBuf)))
+
+                    if DEBUG: print('  len(recvBuf) = %d' %(len(recvBuf)))
                     if (Pid == map_leader):
                         # agg() leader puts the received msg into temp dmat
                         # imsg represents the number of Pid's who sent messages to me
@@ -252,7 +263,7 @@ def agg(d, leader=None):
                             for imsg in range(len(recvBuf)):
                                 if d.dim==2:
                                     # Two dimensional array
-                                    # if DEBUG: print('imsg=%s, Msg from Pid = %d' %(imsg,pidKeep[recvPidPos+imsg]))
+                                    if DEBUG: print('imsg=%s, Msg from Pid = %d' %(imsg,pidKeep[recvPidPos+imsg]))
                                     # Find the position in the processor grid for the given Pid
                                     [i,j] = np.where(d.map['grid'] == pidKeep[recvPidPos+imsg])
                                     i = int(i); j = int(j)
@@ -287,17 +298,24 @@ def agg(d, leader=None):
                         # Others puts the received msg to a buffer for the next level
                         # msg aggregation. Always store the local first and then, the
                         # msg from the right neighbors sequentially
+
                         for imsg in range(len(recvBuf)):
                             sendBuf[imsgLast + imsg+1] = recvBuf[imsg]
                         imsgLast = imsgLast + len(recvBuf)
+
+                    # delete temporary buffer
+                    del recvBuf
             else:
                 # Even position from the left. In Python, first even position is one.
                 # Send message to my left neighbor, pidList(myPidPos-1)
                 toRank = pidList[myPidPos-1]
                 if inmap(d.map, Pid):   # Only send data if processor is in the map
-                    # if DEBUG: print('agg() sent: Pid = %d, toRank %d w/ msg unit = %d'%(Pid,toRank,msgUnit))
-                    # if DEBUG: print('  len(sendBuf) = %d' %(len(sendBuf)))
+                    if DEBUG: print('agg() sent: Pid = %d, toRank %d w/ msg unit = %d'%(Pid,toRank,msgUnit))
+                    if DEBUG: print('  len(sendBuf) = %d' %(len(sendBuf)))
+
                     MPI_Send(toRank, GPC.tag, GPC.comm, sendBuf);           
+
+                    del sendBuf
         #
         # Prepare for the next level (reduce size in half)
         bt = bt + 1

@@ -1,22 +1,13 @@
 from math import log2
 import numpy as np
 from timeit import default_timer as timer
-from scipy.fftpack import fft
 from scipy.sparse import csr_matrix
 
 # Import PythonMPI methods.
 import pPython as GPC
-from Dmap import *
-from rand import *
-from zeros import *
-from agg import *
-from global_ind import *
-from global_block_range import *
-from global_block_ranges import *
-from dcomplex import *
-from cos import *
-from sin import *
-from transpose_grid import *
+from pPython.map import Dmap,rand,zeros
+from pPython.dmat import agg,global_ind,global_block_range,global_block_ranges,dcomplex,cos,sin,local,put_local,fft
+from pPython.utils import transpose_grid
 
 """
 This script implements a simple 1D FFT benchmark using a 2D approach, which is
@@ -44,20 +35,18 @@ at the Python prompt type
 
 #  MPI information
 comm = GPC.comm
-Np = GPC.Np
-Pid = GPC.Pid
+Np = GPC.Np; Pid = GPC.Pid
 
 PARALLEL=1                           # Turn parallelism on and off.
 
 # Set vector/matrix dimensions.
-N = (2**25)*Np  
-N = (2**23)*Np  
-M = int(N/Np)
-# Debug.
-# N = (2**20)*Np  
+# N = (2**25)*Np  
 # M = int(N/Np)
+# Debug.
+N = (2**20)*Np  
+M = int(N/Np)
 
-VALIDATE = 1                         # Turn validation on or off.
+VALIDATE = 0                         # Turn validation on or off.
 ErrorRate = np.finfo(float).eps      # Set error to machine precision.
 
 Xmap = 1                             # Serial map.
@@ -68,6 +57,7 @@ print('Np                                 = %d'%(Np))
 print('Pid                                = %d'%(Pid))
 print('Distributed vector size (words)    = %d'%(N))
 print('Distributed vector size (bytes)    = %d'%(N*16))
+print('Local array size (Np,M/Np)    = (%d,%d)'%(Np,int(M/Np)))
 
 tic = timer()
 X = dcomplex(rand(1,N,map=Xmap),rand(1,N,map=Xmap)) # Create distributed vector.
@@ -111,7 +101,7 @@ Tcomm = timer()-tic
 
 print('Begin FFT of 2nd Dimension')
 tic = timer()
-Xloc = fft(Xloc,axis=1)              # FFT 2nd dimension.
+Xloc = fft(Xloc,[],1)                # FFT 2nd dimension.
 Xloc = omega * Xloc                  # Multiply by twiddle factors.
 X = put_local(X,Xloc)
 Tcomp = Tcomp + timer()-tic
@@ -122,14 +112,15 @@ X = transpose_grid(X)                # Redistribute along 2nd dimension.
 Xloc = local(X) 
 Tcomm = Tcomm + timer()-tic
 
+print('Begin FFT of 1st Dimension')
 tic = timer()
-Xloc = fft(Xloc,len(Xloc),0)         # FFT 1st dimension. Needs len(Xloc)
+Xloc = fft(Xloc,[],0)         # FFT 1st dimension. Needs len(Xloc)
 X = put_local(X,Xloc)
 Tcomp = Tcomp + timer()-tic
 
 tic = timer()
 X = transpose_grid(X)                # Redistribute along 1st dimension.
-Xloc = local(X)
+Xloc = local(X,keep_local=0)
 X = put_local(Xshell,Xloc)           # Insert back into vector.
 Tcomm = Tcomm + timer()-tic
 Trun = Tcomp + Tcomm;

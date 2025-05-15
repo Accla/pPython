@@ -19,21 +19,12 @@ def SendMsg(dest, tag, *argv):
     comm = GPC.comm
     Pid = GPC.Pid
     
-    # Send after packing the message into a dictionary
-    msg = dict()
-    ii = 0
-    if DEBUG:
-        print('Length of argv: %d'%(len(argv)))
-    for arg in argv:
-        if DEBUG:
-            print(arg)
-        msg[ii] = arg
-        ii = ii + 1
-
     if isinstance(dest,(int,np.int64,np.int32)):
-        MPI_Send(dest,tag,comm,msg)
+        if DEBUG:
+            print(argv)
+        MPI_Send(dest,tag,comm,argv)
     elif (len(dest) > 1):
-        MPI_Mcast(Pid,dest,tag,comm,msg)
+        MPI_Mcast(Pid,dest,tag,comm,argv)
 
     if DEBUG:
         print('<-- Exiting SendMsg')

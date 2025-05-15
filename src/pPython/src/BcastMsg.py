@@ -20,31 +20,19 @@ def BcastMsg(source, tag, *argv):
     comm = GPC.comm
     Pid = GPC.Pid
 
-    # BcastMsg add an additional dictionary layer
+    # BcastMsg add an additional tuple layer
     # So unpack it before returning the message.
-
-    msg = dict()
-    if Pid == source:
-        # Send after packing the message into a dictionary
-        ii = 0
-        if DEBUG_TIMING:
-            print('    Length of argv: %d'%(len(argv)))
-        for arg in argv:
-            if DEBUG: print(arg)
-            if DEBUG_TIMING: print('    size of message: %d'%(sys.getsizeof(arg)))
-            msg[ii] = arg
-            ii = ii + 1
    
-    [out] = MPI_Bcast(source,tag,comm,msg)
+    [argv] = MPI_Bcast(source,tag,comm,argv)
 
     if DEBUG or DEBUG_TIMING:
         if DEBUG: print('source: %d, tag: %d'%(source,tag))
         if DEBUG_TIMING: 
-            for arg in out.values():
+            for arg in argv:
                 print('    size of message: %d'%(sys.getsizeof(arg)))
         print('<-- Exiting BcastMsg')
         
-    return list(out.values())
+    return argv
 
 ########################################################
 # pMatlab: Parallel Matlab Toolbox

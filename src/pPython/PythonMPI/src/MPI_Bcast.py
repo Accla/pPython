@@ -171,15 +171,9 @@ def MPI_Bcast( source, tag, comm, *argv ):
         buffer_file = pyMPI_Buffer_file(my_rank,source,tag,comm)
             
         # Save varargin to file [Duplicated from MPI_Send()]
-        # Save buf to file after packing the message into a dictionary
-        msg = dict()
-        ii = 0
-        # print('Length of argv: %d'%(len(argv)))
-        for arg in argv:
-            msg[ii] = arg
-            ii = ii + 1
+        # Save argv to file directly without creating intermediate dictionary array
         # Write the message into a file.
-        save_dict_to_pickle(msg, buffer_file)
+        save_dict_to_pickle(argv, buffer_file)
     
         # Loop over everyone in comm and create link to data file.
         if (OS.ispc):

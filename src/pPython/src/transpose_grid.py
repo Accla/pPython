@@ -166,6 +166,7 @@ def transpose_grid(B):
                     # [temp] = MPI_Recv(recv_rank, GPC.tag, comm)
                     # A_local[:,j1:j2] = temp
                     [ A_local[:,j1:j2] ] = MPI_Recv(recv_rank, GPC.tag, comm)
+                    """
                     if DEBUG:
                         print('Pid = %d receives A_local from Pid = %d'%(my_rank,recv_rank))
                         if (np.iscomplex(temp)).any():
@@ -173,7 +174,8 @@ def transpose_grid(B):
                             # print(temp)
                         else:
                             print('Received temp for A_local is NOT a complex array')
-                    # del temp
+                    del temp
+                    """
         else:
             # Row to column redistribution
             # Get global ranges of dmats.
@@ -200,6 +202,7 @@ def transpose_grid(B):
                     # [temp] = MPI_Recv(recv_rank, GPC.tag, comm)
                     # A_local[i1:i2,:] = temp
                     [ A_local[i1:i2,:] ] = MPI_Recv(recv_rank, GPC.tag, comm)
+                    """
                     if DEBUG:
                         print('Pid = %d receives temp for A_local from Pid = %d'%(my_rank,recv_rank))
                         if (np.iscomplex(temp)).any():
@@ -207,7 +210,8 @@ def transpose_grid(B):
                             # print(temp)
                         else:
                             print('Received temp for A_local is NOT a complex array')
-                    # del temp
+                    del temp
+                    """
 
         # Put local data back.
         A = put_local(A, A_local)

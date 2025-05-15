@@ -91,7 +91,6 @@ def MPI_Recv( source, tag, comm ):
         t_st_2 = timer()
         print('  MPI_Recv: time to create message and lock files (sec): %f'%(t_st_2 - t_start))
     # Read all data out of buffer_file.
-    #CB buf = load_dict_from_pickle(buffer_file)
     argv = load_dict_from_pickle(buffer_file)
     
     # Delete buffer and lock files.
@@ -108,10 +107,10 @@ def MPI_Recv( source, tag, comm ):
             t_st_3 = timer()
             print('  MPI_Recv: time to receive message file (sec): %f'%(t_st_3 - t_st_2))
         elif DEBUG:
-            print(buf.values())
+            print('len(argv) = %d'%(len(argv)))
+            print(argv)
         print('<-- Exiting MPI_Recv')
-    # Get variable out of buf.
-    #CB return list(buf.values())
+    # 
     return argv
 
 ########################################################
