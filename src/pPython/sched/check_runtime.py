@@ -5,6 +5,7 @@ import checkOS as OS
 from convert_to_dict import *
 from grid_resource_policy import *
 from check_triples import *
+from get_queue_cpu_table import *
 
 def check_runtime( n_proc, machines, grid_config ):
     """Check runtime environment for pPython
@@ -87,9 +88,19 @@ def check_runtime( n_proc, machines, grid_config ):
     if len(machines) > 5:
         # 'grid-xeon-e5[&]'
         if endStr == '&':
-            cpu_type = machines[5:-1]
+            key_str = machines[5:-1]
         else:
-            cpu_type = machines[5:]
+            key_str = machines[5:]
+        # Checck if the input string is a partition name or a CPU type name
+        PT,CT = get_queue_cpu_table()
+        if key_str in CT.keys():
+            cpu_type = key_str
+        elif key_str in PT.keys():
+            # input string is a partition name
+            grid_config['q_name'] = key_str
+            cpu_type = PT[key_str]['cpu_type']
+        else:
+            raise Exception('ERROR(check_runtime): the simplified grid extension string, '+key_str+' is neither a partition name nor a cpu_type name.')
     else:
         # if cpu_type is not provided with the grid option
         # set the default cpu_type
@@ -115,23 +126,6 @@ def check_runtime( n_proc, machines, grid_config ):
         # Check grid_config['cluster_name'] in $HOME/ppython_conf/grid_config_local.py
         # for future support with other clusters
         #
-        if cluster_name == 'txgreen':
-            if (cpu_type == 'xeon64c'):
-                grid_config['q_name'] = 'manycore'
-            elif (cpu_type == 'xeon-p8'):
-                grid_config['q_name'] = 'xeon-p8'
-            elif (cpu_type == 'xeon-g6'):
-                grid_config['q_name'] = 'gaia'
-            elif (cpu_type == 'xeon-e5'):
-                # Only on TX-Green
-                grid_config['q_name'] = 'normal'
-        elif cluster_name == 'txe1':
-            if (cpu_type == 'xeon-p8'):
-                grid_config['q_name'] = 'xeon-p8'
-            elif (cpu_type == 'xeon-g6'):
-                grid_config['q_name'] = 'xeon-g6-volta'
-        else:
-            raise Exception('ERROR(check_runtime): %s is not a supported cluster.'%(grid_config['cluster_name']))
 
     # check and process the triples mode job request if needed
     n_proc_req, grid_config = check_triples(cluster_name,cpu_type,n_proc,grid_config)
