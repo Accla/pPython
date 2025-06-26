@@ -1,5 +1,8 @@
 import os
 from glob import glob
+import random
+import string
+import subprocess
 
 from pyMPI_Comm_settings import *
 import checkOS as OS
@@ -108,6 +111,15 @@ def MPI_Abort():
             print(unix_command)
             os.system(unix_command)
 
+    # Rename PythonMPI directory before deleting it
+    if os.path.exists( os.path.join(os.getcwd(),'PythonMPI') ):
+        # Rename PythonMPI to a temporary name
+        rand_string = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(5))
+        NewPythonMPI = 'PythonMPI_'+rand_string 
+        os.rename('PythonMPI',NewPythonMPI)
+        # Execute a command and capture the output
+        result = subprocess.run(['rm', '-fr', NewPythonMPI, '&'], capture_output=True, text=True)
+        
     return
 
 ########################################################

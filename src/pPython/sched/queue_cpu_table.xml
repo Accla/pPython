@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<!--
+    Define partitions and CPU types along with
+    CPU properties for each CPU type
+    Each partition is made of homogeneous compute nodes of the same CPU type
+-->
+<data>
+<PT title="Partition and its CPU type table">
+    <partition name="normal">
+        <cputype>xeon-e5</cputype>
+    </partition>
+    <partition name="xeon-p8">
+        <cputype>xeon-p8</cputype>
+    </partition>
+    <partition name="gaia">
+        <cputype>xeon-g6</cputype>
+    </partition>
+    <partition name="gpu">
+        <cputype>xeon-e5</cputype>
+    </partition>
+    <partition name="debug-cpu">
+        <cputype>xeon-p8</cputype>
+    </partition>
+    <partition name="debug-gpu">
+        <cputype>xeon-g6</cputype>
+    </partition>
+    <partition name="download">
+        <cputype>xeon-p8</cputype>
+    </partition>
+    <partition name="jupyter-cpu">
+        <cputype>xeon-p8</cputype>
+    </partition>
+    <partition name="jupyter-gpu">
+        <cputype>xeon-g6</cputype>
+    </partition>
+    <partition name="spot-xeon-p8">
+        <cputype>xeon-p8</cputype>
+    </partition>
+    <partition name="spot-xeon-e5">
+        <cputype>xeon-e5</cputype>
+    </partition>
+    <partition name="spot-xeon-g6">
+        <cputype>xeon-g6</cputype>
+    </partition>
+    <partition name="xeon-g6-volta">
+        <cputype>xeon-g6</cputype>
+    </partition>
+    <partition name="xeon-e5-volta">
+        <cputype>xeon-e5</cputype>
+    </partition>
+    <partition name="xeon-g6430-h100">
+        <cputype>xeon-g6430</cputype>
+    </partition>
+    <partition name="e9-h100nvl">
+        <cputype>amd-e9254</cputype>
+    </partition>
+</PT>
+<CT title="CPU type and its properties table">
+    <cputype name="xeon-p8">
+        <max_slots>48</max_slots>
+        <default_slots>48</default_slots>
+        <max_cores>48</max_cores>
+        <max_threads>96</max_threads>
+    </cputype>
+    <cputype name="xeon-g6">
+        <max_slots>40</max_slots>
+        <default_slots>40</default_slots>
+        <max_cores>40</max_cores>
+        <max_threads>80</max_threads>
+    </cputype>
+    <cputype name="xeon-e5">
+        <max_slots>28</max_slots>
+        <default_slots>28</default_slots>
+        <max_cores>28</max_cores>
+        <max_threads>56</max_threads>
+    </cputype>
+    <cputype name="xeon-g6430">
+        <max_slots>64</max_slots>
+        <default_slots>64</default_slots>
+        <max_cores>64</max_cores>
+        <max_threads>128</max_threads>
+    </cputype>
+    <cputype name="amd-e9254">
+        <max_slots>48</max_slots>
+        <default_slots>48</default_slots>
+        <max_cores>48</max_cores>
+        <max_threads>96</max_threads>
+    </cputype>
+</CT>
+</data>

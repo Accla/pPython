@@ -100,16 +100,9 @@ def MPI_Mcast(source, dest, tag, comm, *argv):
         # Save msg_dict to file.
         # print(buffer_file)
 
-        # Save buf to file after packing the message into a dictionary
-        msg = dict()
-        ii = 0
-        # print('Length of argv: %d'%(len(argv)))
-        for arg in argv:
-            # Serialize object with pickle
-            msg[ii] = arg
-            ii = ii + 1
+        # Save argv directly to file without introducing intermediate dictionary array
         # Write the message into a file.
-        save_dict_to_pickle(msg, buffer_file)   
+        save_dict_to_pickle(argv, buffer_file)   
         
         if DEBUG:
             print('Messae is saved to %s'%(buffer_file))

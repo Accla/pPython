@@ -13,6 +13,11 @@ def slurm_write_job_script(grid_config,sched_job_file,py_file,cwd_path):
     
     job_details = '#!/bin/bash\n'
     job_details = job_details+'#\n'
+    job_details = job_details+'# Increase system resources: number of open files, stack size, max. user processes\n'
+    job_details = job_details+'# ulimit -n 10240\n'
+    job_details = job_details+'# ulimit -s 81920\n'
+    job_details = job_details+'# ulimit -u 40000\n'
+    job_details = job_details+'#\n'
     job_details = job_details+'# Slurm-HPC submit file for PythonMPI job: '
     job_details = job_details+'%s\n\n'%(py_file)
     job_details = job_details+'#\n'

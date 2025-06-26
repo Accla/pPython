@@ -82,20 +82,12 @@ def MPI_Send(dest, tag, comm, *argv):
     if DEBUG or DEBUG_TIMING:
         print(buffer_file)
 
-    # Save buf to file after packing the message into a dictionary
-    msg = dict()
-    ii = 0
-    if DEBUG:
-        print('Length of argv: %d'%(len(argv)))
-    for arg in argv:
-        # Serialize object with pickle
-        # if DEBUG:
-        #     print(arg)
-        msg[ii] = arg
-        ii = ii + 1
+    # No need to create a msg dictionary. Just passs the argv vector
     # Write the message into a file.
     try:
-        save_dict_to_pickle(msg,buffer_file)
+        save_dict_to_pickle(argv,buffer_file)
+        if DEBUG:
+            print(argv)
     except:
         raise Exception('MPI_Send: fail to create a message file, %s'%(buffer_file))
     if DEBUG_TIMING:
@@ -138,7 +130,7 @@ def MPI_Send(dest, tag, comm, *argv):
             pauseTime = 1
             done_scp = False
             try_counter = 0
-            try_max = 10
+            try_max = 5
             scp_cmd = 'scp '
             cmd1 = scp_cmd+buffer_file+' '+machines[machine_id_dest]+':'+tmpdir[machine_id_dest]
             cmd2 = scp_cmd+lock_file+' '+machines[machine_id_dest]+':'+tmpdir[machine_id_dest]
@@ -148,7 +140,7 @@ def MPI_Send(dest, tag, comm, *argv):
             while not done_scp:
                 try_counter = try_counter + 1;
                 # transfer the message to the remote host, return status with 0 when successful
-                status1 = True
+                status1 = 1
                 try:
                     ecmd.run(cmd1)
                     status1 = ecmd.get_stderr()
@@ -157,24 +149,44 @@ def MPI_Send(dest, tag, comm, *argv):
                         print('Status: %s'%(status1)) 
                 except:
                     print('Try Error [MPI_Send]: failed to scp the buffer file to the remote host.')
-                status2 = True
-                try:
-                    ecmd.run(cmd2)
-                    status2 = ecmd.get_stderr()
-                    if status2:
-                        print('scp failed by Rank = %d on %s with a command, %s' %(my_rank,myhostname,cmd2))
-                        print('status: %s'%(status2)) 
-                except:
-                    print('Try Error [MPI_Send]: failed to scp the lock file to the remote host.')
-                if (not status1) and (not status2):
+
+                if not status1:
                     done_scp = True
                 else:
                     if try_counter > try_max:
-                        raise Exception('Error [MPI_Send]: attempts to scp buffer or lock file exceeds 3 tries.')
+                        raise Exception('Error [MPI_Send]: attempts to scp buffer file exceeds '+str(try_counter)+' tries.')
                     else:
                         if DEBUG:
                             print('. . . scp failed. continue for next scp . . . ')
                         pyMPI_Sleep(pauseTime)
+                        pauseTime = pauseTime + 0.1
+
+            try_counter = 0
+            done_scp = False
+            pauseTime = 1
+            while not done_scp:
+                try_counter = try_counter + 1;
+                # transfer the message to the remote host, return status with 0 when successful
+                status2 = 1
+                try:
+                    ecmd.run(cmd2)
+                    status2 = ecmd.get_stderr()
+                    if status2:
+                        print('scp failed by Rank = %d on %s with command, %s' %(my_rank,myhostname,cmd2))
+                        print('status: %s'%(status2)) 
+                except:
+                    print('Try Error [MPI_Send]: failed to scp the lock file to the remote host.')
+                
+                if not status2:
+                    done_scp = True
+                else:
+                    if try_counter > try_max:
+                        raise Exception('Error [MPI_Send]: attempts to scp lock file exceeds '+str(try_counter)+' tries.')
+                    else:
+                        if DEBUG:
+                            print('. . . scp failed. continue for next scp . . . ')
+                        pyMPI_Sleep(pauseTime)
+                        pauseTime = pauseTime + 0.1
 
             os.remove(buffer_file)
             os.remove(lock_file)

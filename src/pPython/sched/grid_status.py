@@ -37,7 +37,10 @@ def grid_status(cpu_type):
     grid_scheduler_ver = ''
     
     # Check for LLGrid system availability (Use the LLGrid command)
-    cmdstr = 'LLfree --hide-header'
+    if DEBUG:
+        cmdstr = '/home/gridsan/CH21778/LLGrid/Releases/2025-07/usr/local/bin/LLfree --hide-header'
+    else:
+        cmdstr = 'LLfree --hide-header'
     ecmd = ExecShellCmd(set_remote_cc())
     ecmd.run(cmdstr)
     llsc_status = ecmd.get_output()

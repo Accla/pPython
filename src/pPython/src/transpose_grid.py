@@ -1,4 +1,6 @@
 import numpy as np
+# For process memory usage tracking
+import psutil
 
 # pPython class
 from MPI_Send import *
@@ -39,6 +41,8 @@ def transpose_grid(B):
     DEBUG = 0
     if DEBUG:
         print('--> Entering transpose_grid')
+        p = psutil.Process()
+
     comm = GPC.comm
     my_rank = GPC.Pid
     
@@ -122,6 +126,8 @@ def transpose_grid(B):
         B_local = local(B)
         B.clear()
         if DEBUG:
+            # print memory usage
+            print(p.memory_full_info())
             if (np.iscomplex(A_local)).any():
                 print('A_local is a complex array')
             else:
@@ -166,6 +172,7 @@ def transpose_grid(B):
                     # [temp] = MPI_Recv(recv_rank, GPC.tag, comm)
                     # A_local[:,j1:j2] = temp
                     [ A_local[:,j1:j2] ] = MPI_Recv(recv_rank, GPC.tag, comm)
+                    """
                     if DEBUG:
                         print('Pid = %d receives A_local from Pid = %d'%(my_rank,recv_rank))
                         if (np.iscomplex(temp)).any():
@@ -173,7 +180,11 @@ def transpose_grid(B):
                             # print(temp)
                         else:
                             print('Received temp for A_local is NOT a complex array')
-                    # del temp
+                    del temp
+                    """
+            if DEBUG:
+                # print memory usage
+                print(p.memory_full_info())
         else:
             # Row to column redistribution
             # Get global ranges of dmats.
@@ -200,6 +211,7 @@ def transpose_grid(B):
                     # [temp] = MPI_Recv(recv_rank, GPC.tag, comm)
                     # A_local[i1:i2,:] = temp
                     [ A_local[i1:i2,:] ] = MPI_Recv(recv_rank, GPC.tag, comm)
+                    """
                     if DEBUG:
                         print('Pid = %d receives temp for A_local from Pid = %d'%(my_rank,recv_rank))
                         if (np.iscomplex(temp)).any():
@@ -207,10 +219,18 @@ def transpose_grid(B):
                             # print(temp)
                         else:
                             print('Received temp for A_local is NOT a complex array')
-                    # del temp
+                    del temp
+                    """
 
+            if DEBUG:
+                # print memory usage
+                print(p.memory_full_info())
         # Put local data back.
         A = put_local(A, A_local)
+        if DEBUG:
+            # print memory usage
+            print('After calling put_local():')
+            print(p.memory_full_info())
  
     # Clear input
     del A_local;  del B_local

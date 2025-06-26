@@ -11,11 +11,11 @@ def RecvMsg(source, tag):
 
     comm = GPC.comm
     
-    # SendMsg add an additional dictionary layer
+    # SendMsg add an additional tuple layer
     # So unpack it before returning the message.
     [buf] =  MPI_Recv(source, tag, comm)
 
-    return list(buf.values())
+    return buf
 
 ########################################################
 # pMatlab: Parallel Matlab Toolbox

@@ -68,20 +68,6 @@ def MPI_Tcast(source, dest, tag, comm, *argv):
                 # Non-leader prepares to send its local data
         return argv
     
-    """
-    # Dictionary varialbe to hold the message if there are multiple variables in the message
-    if Pid == source:
-        msg = dict()
-        ii = 0
-        if DEBUG:
-            print('Length of argv: %d'%(len(argv)))
-        for arg in argv:
-            if DEBUG:
-                print(arg)
-            msg[ii] = arg
-            ii = ii + 1
-    """
-
     # Check if nproc is power of two
     if( (nproc & (nproc-1) == 0) and (nproc > 0)): 
         POTN = nproc
@@ -150,7 +136,9 @@ def MPI_Tcast(source, dest, tag, comm, *argv):
                     if DEBUG: print('  pid_pos+1 = %d, toRank = %d)'%(pid_pos+1,toRank))
                     if DEBUG: print('  MPI_Tcast() send: Pid = %d, toRank %d'%(Pid,toRank))
                     if DEBUG_TIMING: time_04 = timer()
+
                     MPI_Send(toRank, tag, comm, argv)
+
                     if DEBUG_TIMING:
                         time_05 = timer()
                         print('    Time for MPI_Send call (sec): %f'%(time_05-time_04))
@@ -162,7 +150,9 @@ def MPI_Tcast(source, dest, tag, comm, *argv):
                     fromRank = local_pid_list[vPidPos]
                     if DEBUG: print('  MPI_Tcast() received: Pid = %d, fromRank %d'%(Pid,fromRank))
                     if DEBUG_TIMING: time_06 = timer()
-                    [argv] = MPI_Recv(fromRank, tag, comm)  
+
+                    [argv] = MPI_Recv(fromRank, tag, comm)
+
                     if DEBUG_TIMING:
                         time_07 = timer()
                         print('    Time for MPI_Recv call (sec): %f'%(time_07-time_06))
