@@ -1,5 +1,6 @@
 from multipledispatch import dispatch
 import os
+import getpass
 from glob import glob
 
 import checkOS as OS
@@ -55,8 +56,12 @@ def grid_abort(grid_config):
     n_files = len(pid_files)
 
     # Get username (assuming local and remote username are the same)
-    username = os.getlogin()
-        
+    try:
+        username = os.getlogin()
+    except OSError as e:
+        # Fallback to getpass.getuser() for a more robust solution
+        username = getpass.getuser()
+
     # Check if there are any files
     if (n_files < 1):
         print('No pid files found')
