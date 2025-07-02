@@ -40,7 +40,7 @@ def pyMPI_Comm_settings_local(machine_db_settings):
     	# machine_db_settings['python_module_name'] = 'anaconda/2021b'
     	python_location = '/state/partition1/llgrid/pkg/anaconda/python-ML-2024b/bin/python'
     	machine_db_settings['python_module_path'] = '/etc/environment-modules/modules'
-    	machine_db_settings['python_module_name'] = 'anaconda/Python-ML-2024b'
+    	machine_db_settings['python_module_name'] = 'anaconda'
 
     else:
         # Set location of python on unix systems.
@@ -68,7 +68,7 @@ def pyMPI_Comm_settings_local(machine_db_settings):
         else:
             # Assuming running on LLSC
             machine_db_settings['python_module_path'] = '/etc/environment-modules/modules'
-            machine_db_settings['python_module_name'] = 'anaconda/Python-ML-2024b'
+            machine_db_settings['python_module_name'] = 'anaconda'
 
     machine_db_settings['python_command_llsc'] = python_location + ' -u '
 
