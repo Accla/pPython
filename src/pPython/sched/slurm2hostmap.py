@@ -1,6 +1,7 @@
 import os
 from math import ceil
 import numpy as np
+from time import sleep
 
 from pyMPI_Sleep import *
 
@@ -142,9 +143,21 @@ def slurm2hostmap():
 
             if SLURM_ARRAY_JOB_ID:
                 # An array job
-                cmdstr = 'squeue -h -j '+SLURM_ARRAY_JOB_ID+' --format="%15K %15A %N"'
-                ecmd.run(cmdstr)
-                output = ecmd.get_output().strip()
+                # Wait until all array job tasks are deployed
+                deployed_all = False
+                while not deployed_all:
+                    cmdstr = 'squeue -h -j '+SLURM_ARRAY_JOB_ID+' --format="%15K %15A %N"'
+                    ecmd.run(cmdstr)
+                    output = ecmd.get_output().strip()
+                    lines = output.split('\n')
+                    nlines = len(lines)
+                    if DEBUG:
+                       print('len(lines) = %d'%(nlines))
+                    if nlines == nTasks:
+                        deployed_all = True
+                    else:
+                        sleep(3)
+
                 if DEBUG:
                     print(output)
                 #
