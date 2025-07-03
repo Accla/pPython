@@ -83,6 +83,13 @@ def launch_with_triples(py_file, comm, grid_config):
     # Get number of machines.
     n_m = comm['machine_db']['n_machine']
 
+    # Check if GPU binding is enabled
+    GPU_BINDING = False
+    PPYTHON_GPU_BINDING = os.getenv('PPYTHON_GPU_BINDING',default='no')
+    if PPYTHON_GPU_BINDING.lower() == 'yes':
+        GPU_BINDING = True
+    NGPUS_PER_NODE = int(os.getenv('PPYTHON_NGPUS_PER_NODE',default='2'))
+
     # Loop backwards over each machine target machine
     # so that we hit the host machine last (if it is a target).
     for i_m in range(n_m,0,-1):
@@ -145,6 +152,14 @@ def launch_with_triples(py_file, comm, grid_config):
             unix_commands_prefix = unix_commands_prefix+'export OUTPUT_DIR="PythonMPI/${PIDSTR}_$HOSTNAME"'+nl
             unix_commands_prefix = unix_commands_prefix+'mkdir $OUTPUT_DIR'+nl+nl
 
+            # Add GPU binding if desired
+            if GPU_BINDING:
+                unix_commands_prefix = unix_commands_prefix+'# Generalized bash code to split with comma for more than two GPUs on a node:'+nl
+                unix_commands_prefix = unix_commands_prefix+'oldIFS=${IFS};IFS=",";array=($CUDA_VISIBLE_DEVICES);IFS=${oldIFS}'+nl
+                unix_commands_prefix = unix_commands_prefix+'for val in "${!array[@]}"; do'+nl
+                unix_commands_prefix = unix_commands_prefix+'    export GPU${val}=${array[$val]}'+nl
+                unix_commands_prefix = unix_commands_prefix+'done'+nl
+
             # Loop backwards over number of processes.
             ipos = 0
             for i_rank in range(i_rank_stop,i_rank_start-1,-1):
@@ -158,6 +173,13 @@ def launch_with_triples(py_file, comm, grid_config):
                 # Build commands that lauch multiple matlab on target nodes.
                 defscommands, unix_cmd_i_rank = pyMPI_Commands(py_file_basename,i_rank,comm,grid_config=grid_config,\
                                                                start=i_rank_start,stop=i_rank_stop)
+                if GPU_BINDING:
+                    # Identify GPU ID for the given task (gpu_oversubscription contains number of GPUs on the node)
+                    gpu_id = int(ipos%NGPUS_PER_NODE)
+                    # Redefine CUDA_VISIBLE_DEVICES environment variable for each task
+                    unix_commands = unix_commands+'# Redefine CUDA_VISIBLE_DEVICES environment variable for each task'+nl
+                    unix_commands = unix_commands+'export CUDA_VISIBLE_DEVICES=$GPU%d'%(gpu_id)+nl
+
                 if proc_bind:
                     # Enforce process pinning
                     unix_commands = unix_commands+'export TASKSET_CMD='+proc_bind_cmd+nl+unix_cmd_i_rank
