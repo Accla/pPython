@@ -212,7 +212,8 @@ def slurm2hostmap():
                         jobArrayIndex = tmp[0]
                         jobNumber = tmp[1]
                         slurm_node = tmp[2]
-                    hostmap[jobArrayIndex] = str(jobArrayIndex)+' '+jobNumber+' '+slurm_node
+                    if jobArrayIndex not in hostmap:
+                        hostmap[jobArrayIndex] = str(jobArrayIndex)+' '+jobNumber+' '+slurm_node
             
             if iter > maxIteration:
                 raise Exception('ERROR(slurm2hostmap): failed to get hostmap within the maximum iteration.')
