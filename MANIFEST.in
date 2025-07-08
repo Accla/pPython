@@ -2,3 +2,4 @@ graft examples
 graft scripts
 graft tutorials
 global-exclude *.py[cod]
+include src/pPython/sched/queue_cpu_table.xml
