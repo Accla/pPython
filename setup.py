@@ -164,6 +164,10 @@ setup(
     # package_data={  # Optional
     #     'example': ['test_LLSC_job_launch.ipynb'],
     # },
+    package_data={  # Optional
+        'src': ['queue_cpu_table.xml'],
+    },
+    include_package_data=True,
 
     # Although 'package_data' is the preferred approach, in some case you may
     # need to place data files outside of your packages. See:
