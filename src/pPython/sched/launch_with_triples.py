@@ -158,6 +158,7 @@ def launch_with_triples(py_file, comm, grid_config):
                 unix_commands_prefix = unix_commands_prefix+'oldIFS=${IFS};IFS=",";array=($CUDA_VISIBLE_DEVICES);IFS=${oldIFS}'+nl
                 unix_commands_prefix = unix_commands_prefix+'for val in "${!array[@]}"; do'+nl
                 unix_commands_prefix = unix_commands_prefix+'    export GPU${val}=${array[$val]}'+nl
+                unix_commands_prefix = unix_commands_prefix+'    echo "set and export GPU${val}: export GPU${val}=${array[$val]}"'+nl
                 unix_commands_prefix = unix_commands_prefix+'done'+nl
 
             # Loop backwards over number of processes.
