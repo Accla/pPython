@@ -18,11 +18,8 @@
 # File: param_sweep_v4.py
 
 import pPython as GPC
-from Dmap import *
-from rand import *
-from global_ind import *
-from local import *
-from put_local import *
+from pPython.map import Dmap,rand
+from pPython.dmat import global_ind,local,put_local
 
 from sample_function import *
 

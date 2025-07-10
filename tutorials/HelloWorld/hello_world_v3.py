@@ -1,10 +1,6 @@
 import pPython as GPC
-from Dmap import *
-from rand import *
-from local import *
-from global_ind import *
-from put_local import *
-from agg import *
+from pPython.map import Dmap,rand
+from pPython.dmat import local,global_ind,put_local,agg
 
 # Just print 'Hello World!'
 print('Hello World!')

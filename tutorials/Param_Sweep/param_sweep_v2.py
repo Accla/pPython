@@ -12,7 +12,7 @@
 # File: param_sweep_v2.py
 
 import pPython as GPC
-from Dmap import *
+from pPython.map import Dmap
 
 # pPython MPI communicator.
 comm = GPC.comm

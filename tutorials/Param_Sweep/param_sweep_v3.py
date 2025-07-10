@@ -15,10 +15,8 @@
 # File: param_sweep_v3.py
 
 import pPython as GPC
-from Dmap import *
-from rand import *
-from global_ind import *
-from local import *
+from pPython.map import Dmap,rand
+from pPython.dmat import global_ind,local
 
 # pPython MPI communicator.
 comm = GPC.comm
