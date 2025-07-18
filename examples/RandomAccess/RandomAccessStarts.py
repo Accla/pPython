@@ -1,7 +1,7 @@
 import numpy as np
 
 # import pPython functions
-from uint64 import *
+from pPython.dmat import uint64
 
 def RandomAccessStarts(n):
     """Utility routine to start random number generator at Nth step

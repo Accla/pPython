@@ -69,7 +69,7 @@ N = np.power(2,lgN)
 # SETUP
 
 # Pick initial values.
-A0 = 1.0; B0 = 2.0; C0 = 0.0: q = 3.14
+A0 = 1.0; B0 = 2.0; C0 = 0.0; q = 3.14
 
 # Compute final values.
 ANm1 = (np.power((2*q + q**2),(NTRIALS-1)))*A0

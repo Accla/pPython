@@ -3,15 +3,12 @@ from timeit import default_timer as timer
 
 # Import PythonMPI methods.
 import pPython as GPC
-from Dmap import *
-from agg import *
-from zeros import *
-from global_ind import *
-from global_block_range import *
-from global_block_ranges import *
-from uint64 import *
-from exec_shell_cmd import *
 
+from pPython.map import Dmap,zeros
+from pPython.dmat import agg,global_ind,global_block_range,global_block_ranges,uint64
+
+from pRandomAccessTree import *
+from pRandomAccessSpray import *
 from RandomAccessStarts import *
 
 """
@@ -60,7 +57,7 @@ ErrorRate = 0.01  # Set allowed error rate.
 # Log size of main table (suggested: half of global memory).
 #lgN = 27+log2(Np)   # Full memory.
 #lgN = 20   # Performance.
-lgN = 25   # Book
+#lgN = 25   # Book
 lgN = 18   # Debug.
 
 # Since the main table size is large, updates are performed in blocks instead
@@ -128,15 +125,13 @@ print('Launch Time (sec)                  = %f'%(Tlaunch))
 
 # Cache VALIDATE flag.
 tempVALIDATE = VALIDATE
-VALIDATE = 0
+VALIDATE = 1
 
 # Run core of parallel RandomAccess benchmark, without validation
 tic = timer()
 
-# Execute pRandomAccessSpray script
-ecmd = ExecShellCmd()
-cmdstr = 'python3 pRandomAccessTree.py'
-ecmd.run(cmdstr)
+# Execute pRandomAccessTree
+pRandomAccessTree(VALIDATE,Np,Pid,myBLOCK,mask,ranStarts,allX,myX,Xloc,X)
 
 Trun = timer() - tic
 print('Run time (sec)                     = %f'%(Trun))
@@ -157,8 +152,7 @@ if VALIDATE:
     tic = timer()
 
     # Run core of parallel RandomAccess benchmark, with validation
-    cmdstr = 'python3 pRandomAccessSpray.py'
-    ecmd.run(cmdstr)
+    pRandomAccessSpray(VALIDATE,Np,Pid,myBLOCK,mask,ranStarts,allX,myX,Xloc,X)
 
     Xloc0 = uint64(global_ind(X,1)[0])  # Compute errors.
     Nerrors = np.count_nonzero(np.not_equal(Xloc,Xloc0))

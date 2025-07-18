@@ -14,13 +14,12 @@
 #   eval(pRUN('pAddOne',2,'grid'))
 ######################################################
 
-# pPython class
+# Import pPython class.
 import pPython as GPC
-from Dmap import *
 
-from zeros import *
-from local import *
-from put_local import *
+# Import pPython methods.
+from pPython.map import Dmap,zeros
+from pPython.dmat import local,put_local
 
 N = 100       # Set matrix size.
 PARALLEL = 1  # Set control flag.

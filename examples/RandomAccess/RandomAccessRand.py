@@ -1,6 +1,6 @@
 import numpy as np
 
-from uint64 import *
+from pPython.dmat import uint64
 
 def RandomAccessRand(ran):
     """

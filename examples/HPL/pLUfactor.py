@@ -2,19 +2,13 @@ import numpy as np
 from scipy.linalg import lu
 from timeit import default_timer as timer
 
-# Import PythonMPI methods.
-from pyMPI_Save_messages import *
-from SendMsg import *
-from RecvMsg import *
-
 # pPython class
 import pPython as GPC
 
-from global_block_range import *
-from global_block_ranges import *
-from local import *
-from put_local import *
-
+# Import PythonMPI/pPython methods.
+from pPython.pmpi import pyMPI_Save_messages
+from pPython.utils import SendMsg,RecvMsg
+from pPython.dmat import global_block_range,global_block_ranges,local,put_local
 
 def pLUfactor(A):
     """Parallel LU factorization on a column distributed NxN matrix A.

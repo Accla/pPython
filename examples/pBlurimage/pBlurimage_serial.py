@@ -7,8 +7,9 @@ from scipy.signal import convolve
 from timeit import default_timer as timer
 import matplotlib.pyplot as plt
 
-from zeros import *
-from global_ind import *
+# Import pPython methods.
+from pPython.map import zeros
+from pPython.dmat import global_ind
 
 UseGraphics = 1
 
@@ -50,7 +51,13 @@ if (CHECK):
 imOv = zeros(n_image_x,n_image_y,map=mapImOv) 
 
 # Get local indices.
-[myI,myJ] = global_ind(imOv) 
+[myI,myJ] = g# Import pPython class.
+import pPython as GPC
+
+# Import pPython methods.
+from pPython.map import Dmap,zeros,rand
+from pPython.dmat import local,agg,global_ind
+lobal_ind(imOv) 
 
 # Assign values to image.
 # Add one to compensate the starting index, zero

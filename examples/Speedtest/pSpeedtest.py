@@ -6,12 +6,11 @@ To run in parallel at the Matlab prompt type
 import numpy as np
 from timeit import default_timer as timer
 
-# Import PythonMPI methods.
-from SendMsg import *
-from RecvMsg import *
-
-# pPython class
+# Import pPython class.
 import pPython as GPC
+
+# Import pPython methods.
+from pPython.utils import SendMsg,RecvMsg
 
 #  MPI information
 comm = GPC.comm

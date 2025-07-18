@@ -18,12 +18,8 @@
 """
 
 import pPython as GPC
-from Dmap import *
-from zeros import *
-from global_ind import *
-from local import *
-from put_local import *
-from agg import *
+from pPython.map import Dmap,zeros
+from pPython.dmat import global_ind,local,put_local,agg
 
 from sample_function import *
 

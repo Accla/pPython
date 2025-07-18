@@ -15,7 +15,7 @@ from pRUN import pRUN
 py_file = 'pBlurimage.py'
 # Define number of MPI processes
 n_proc = 4
-n_proc_triples = [4,2,24]
+n_proc_triples = [1,4,12]
 
 # Launch pPython
 # print('Running: %s via pRUN().'%(py_file))

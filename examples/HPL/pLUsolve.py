@@ -7,8 +7,9 @@ from RecvMsg import *
 
 # pPython class
 import pPython as GPC
-from global_block_range import *
-from local import *
+
+# Import pPython methods.
+from pPython.dmat import global_block_range,local
 
 from pLUfactor import *
 

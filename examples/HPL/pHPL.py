@@ -2,14 +2,12 @@ import numpy as np
 from math import floor,sqrt
 from timeit import default_timer as timer
 
-# Import pPython methods.
-from Dmap import *
+# Import pPython class.
 import pPython as GPC
-from local import *
-from zeros import *
-from rand import *
-from agg import *
-from global_ind import *
+
+# Import pPython methods.
+from pPython.map import Dmap,zeros,rand
+from pPython.dmat import local,agg,global_ind
 
 from pLUsolve import *
 
