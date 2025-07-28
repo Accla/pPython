@@ -7,9 +7,18 @@ def get_queue_cpu_table():
     convert xml data into Python dictionary variables
     '''
 
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    xml_file = os.path.join(dir_path,'queue_cpu_table.xml')
-    root = ET.parse(xml_file).getroot()
+    # Check if queue_cpu_table.xml exists in ~/ppythjon_conf first
+    HOME = os.environ['HOME']
+    xml_file = os.path.join(HOME,'ppython_conf','queue_cpu_table.xml')
+    if os.path.exists(xml_file):
+        root = ET.parse(xml_file).getroot()
+    else:
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        xml_file = os.path.join(dir_path,'queue_cpu_table.xml')
+        root = ET.parse(xml_file).getroot()
+
+    # debug
+    print('Absolute path for queue_cpu_table.xml: %s'%(xml_file))
 
     PT = dict()
     for partition in root[0].findall('partition'):
