@@ -155,7 +155,7 @@ if VALIDATE:
     pRandomAccessSpray(VALIDATE,Np,Pid,myBLOCK,mask,ranStarts,allX,myX,Xloc,X)
 
     Xloc0 = uint64(global_ind(X,1)[0])  # Compute errors.
-    Nerrors = np.count_nonzero(np.not_equal(Xloc,Xloc0))
+    Nerrors = float(np.count_nonzero(np.not_equal(Xloc,Xloc0)))
 
     Tvalidate = timer() - tic;
     print('Validate time (sec)                = %f'%(Tvalidate))
