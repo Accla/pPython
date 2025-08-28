@@ -12,7 +12,8 @@ from pPython.dmat import global_block_range,global_block_ranges,local,put_local
 
 def pLUfactor(A):
     """Parallel LU factorization on a column distributed NxN matrix A.
-
+    In Python, A is passed by address. Thus we need a copy to manipulate
+    in this function so that the original A is not modified.
     """
 
     DEBUG = 0
@@ -25,21 +26,24 @@ def pLUfactor(A):
     Np = GPC.Np
     Pid = GPC.Pid
 
-    N,N = A.shape                           # Get size of distributed array A.  
+    # Make a copy of A
+    B = A.copy()
+
+    N,N = B.shape                           # Get size of distributed array A.  
     # Python index starts from 0. Hene -1
     #                                         global_block_range returns a 2-D array [ 1 or N dimens, 2 (start,end)]
-    myJ  = global_block_range(A,1)          # Get the local columns.
+    myJ  = global_block_range(B,1)          # Get the local columns.
     #                                         global_block_ranges returns a 2-D array [ N dimensions, 3 (rank,start,end)]
-    allJ = global_block_ranges(A,1)         # Get all the local columns.
+    allJ = global_block_ranges(B,1)         # Get all the local columns.
     allNloc = allJ[0:,2] - allJ[0:,1] + 1   # Number of local columns., it returns a list of len(Np)
     if DEBUG:
         print('myJ: %s'%(str(myJ)))
         print('allJ: %s'%(str(allJ)))
 
-    Aloc = local(A)                         # Get local part of A.
+    Aloc = local(B)                         # Get local part of A.
     Nloc = Aloc.shape[1]                    # Get local number of columns.
     #
-    A = put_local(A,0)                    # Zero out local part of A.
+    B = put_local(B,0.0)                    # Zero out local part of A.
 
     # Turn off message deletion to allow non-blocking broadcasts.
     comm = pyMPI_Save_messages(comm,1)
@@ -149,13 +153,23 @@ def pLUfactor(A):
     i = range(myJ[0][0],myJ[0][1]+1)       # Get local rows.
     Lloc[i,:] = Lloc[i,:] + np.eye(Nloc,Nloc)    # Add ones to diagonal.
 
-    L = put_local(A,Lloc)                        # Put into distributed array.
+    L = put_local(B,Lloc)                        # Put into distributed array.
     Uloc = np.triu( Aloc, -(myJ[0][0]))          # Get upper triangle.
     U = L.copy()
     U = put_local(U,Uloc)                        # Insert into U.
 
     # Tput = timer()
     if DEBUG:
+        if not hasattr(B,'local'):
+           print('B')
+           print(B)
+           print('L')
+           print(L)
+           print('U')
+           print(U)
         print('<-- Exiting pLUfactor')
+    # clear B
+    del B
+
     return L,U,pivots
 

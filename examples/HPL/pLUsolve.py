@@ -27,7 +27,7 @@ def pLUsolve(A,b):
     Np = GPC.Np
     Pid = GPC.Pid
 
-    [N,N] = list(A.shape)             # Get size of distributed array A.  
+    N,N = A.shape                     # Get size of distributed array A.  
     #                                   Python index starts from 0. Hene -1
     #                                   global_block_range returns a 2-D array [ 1 or N dimens, 2 (start,end)]
     myJ  = global_block_range(A,1)    # Get the local columns.
