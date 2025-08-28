@@ -90,7 +90,7 @@ print('Launch Time (sec)                  = %f'%(Tlaunch))
 # BEGIN BENCHMARK
 tic = timer()
 Xloc = np.reshape(Xloc,(Np,int(M/Np)),order='F') # Reshape local part into a matrix.
-X = put_local(zeros(Np,M,map=Xmap),Xloc)
+X = put_local(dcomplex(zeros(Np,M,map=Xmap),zeros(Np,M,map=Xmap)),Xloc) # Allocate complex Dmat to avoid type casting warning
 Tcomp = timer()-tic
 
 print('Begin 1st CornerTurn')
@@ -120,7 +120,7 @@ Tcomp = Tcomp + timer()-tic
 
 tic = timer()
 X = transpose_grid(X)                # Redistribute along 1st dimension.
-Xloc = local(X,keep_local=0)
+Xloc = local(X)
 X = put_local(Xshell,Xloc)           # Insert back into vector.
 Tcomm = Tcomm + timer()-tic
 Trun = Tcomp + Tcomm;
