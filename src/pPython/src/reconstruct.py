@@ -51,7 +51,11 @@ def reconstruct(pitfalls, grid, temp_mat, mat_size):
             for jkey in ival.keys():
                 jval = ival[jkey]
                 jkeys = ival.keys()
-                dtype = type(jval[0,0])
+                if isinstance(jval,(int,float)):
+                    # special treatment for a single element temp_mat array
+                    dtype = type(jval)
+                else:
+                    dtype = type(jval[0,0])
                 if DEBUG:
                     print('dtype, %s, at ikey,jkey = %s,%s'%(dtype,ikey,jkey))
                     print('jval:')
@@ -87,7 +91,9 @@ def reconstruct(pitfalls, grid, temp_mat, mat_size):
         for ikey in ikeys:
             j = 0
             for jkey in jkeys:
-                if temp_mat[ikey][jkey].any() != 0.0:
+                # How to handle if temp_mat[ikey][jkey] has only 1 element?
+                if ( isinstance(temp_mat[ikey][jkey],(int,float)) and temp_mat[ikey][jkey] != 0 or 
+                     isinstance(temp_mat[ikey][jkey],np.ndarray) and temp_mat[ikey][jkey].any() != 0.0 ):
                     # Change due to switch from list to tuple of ranges
                     # Construct indices from all the range elements in the 1st dimension
                     list_of_ranges = my_global_ind[i][j][0]
@@ -126,7 +132,11 @@ def reconstruct(pitfalls, grid, temp_mat, mat_size):
                 for kkey in jval.keys():
                     kval = jval[kkey]
                     kkeys = jval.keys()
-                    dtype = type(kval[0,0,0])
+                    if isinstance(kval,(int,float)):
+                        # special treatment for a single element temp_mat array
+                        dtype = type(kval)
+                    else:
+                        dtype = type(kval[0,0,0])
                     if DEBUG:
                         print('dtype, %s, at ikey,jkey,kkey = %s,%s,%s'%(dtype,ikey,jkey,kkey))
                         print('kval:')
@@ -161,7 +171,8 @@ def reconstruct(pitfalls, grid, temp_mat, mat_size):
             for jkey in jkeys:
                 k = 0
                 for kkey in kkeys:
-                    if temp_mat[ikey][jkey][kkey].any() != 0.0:
+                    if ( isinstance(temp_mat[ikey][jkey][kkey],(int,float)) and temp_mat[ikey][jkey] != 0 or 
+                         isinstance(temp_mat[ikey][jkey][kkey],np.ndarray) and temp_mat[ikey][jkey][kkey].any() != 0.0 ):
                         # Change due to switch from list to tuple of ranges
                         # Construct indices from all the range elements in the 1st dimension
                         list_of_ranges = my_global_ind[i][j][k][0]
@@ -215,7 +226,11 @@ def reconstruct(pitfalls, grid, temp_mat, mat_size):
                     for mkey in kval.keys():
                         mval = kval[mkey]
                         mkeys = kval.keys()
-                        dtype = type(mval[0,0,0,0])
+                        if isinstance(mval,(int,float)):
+                            # special treatment for a single element temp_mat array
+                            dtype = type(mval)
+                        else:
+                            dtype = type(mval[0,0,0,0])
                         if DEBUG:
                             print('dtype, %s, at ikey,jkey,kkey = %s,%s,%s,%s'%(dtype,ikey,jkey,kkey,mkey))
                             print('mval:')
@@ -256,7 +271,8 @@ def reconstruct(pitfalls, grid, temp_mat, mat_size):
                 for kkey in kkeys:
                     m = 0
                     for mkey in mkeys:
-                        if temp_mat[ikey][jkey][kkey][mkey].any() != 0.0:
+                        if ( isinstance(temp_mat[ikey][jkey][kkey][mkey],(int,float)) and temp_mat[ikey][jkey] != 0 or 
+                             isinstance(temp_mat[ikey][jkey][kkey][mkey],np.ndarray) and temp_mat[ikey][jkey][kkey][mkey].any() != 0.0 ):
                             # Change due to switch from list to tuple of ranges
                             # Construct indices from all the range elements in the 1st dimension
                             list_of_ranges = my_global_ind[i][j][k][m][0]
