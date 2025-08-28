@@ -18,26 +18,10 @@ def put_local(x, x_local):
         print('--> Entering put_local')
 
     if hasattr(x,'local'):
-        if (np.iscomplex(x_local)).any():
-            # y = np.real(x_local)
-            # z = np.imag(x_local)
-            x.local = np.vectorize(complex)(np.real(x_local),np.imag(x_local))
-            # clear memory
-            # del y; del z
-        else:
-            x.local[:] = x_local
-        # clear x_local
-        del x_local
+        x.local = x_local
     else:
-        if (np.iscomplex(x_local)).any():
-            # y = np.real(x_local)
-            # z = np.imag(x_local)
-            x = np.vectorize(complex)(np.real(x_local),np.imag(x_local))
-        else:
-            x = np.zeros(x.shape,x.dtype)
-            x[:] = x_local
-        # clear x_local
-        del x_local
+        # Regular array, return input array
+        x = x_local
 
     if DEBUG:
         print('<-- Exiting put_local')

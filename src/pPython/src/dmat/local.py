@@ -1,6 +1,6 @@
 import numpy as np
 
-def local(d,**argv):
+def local(d):
     """Returns the local part of the distributed array.
     if it is not a distributed array, it returns itself.
     Note: pPython version returns a copy. 
@@ -13,20 +13,11 @@ def local(d,**argv):
     if DEBUG:
         print('--> Entering local')
 
-    # Provision to clear input after calling local()
-    keep_local = 1
-    for key in argv:
-        if key == 'keep_local':
-            keep_local = argv[key]
-
     if hasattr(d,'local'):
-        x = np.copy(d.local)
-        if keep_local == 0:
-            d.clear()
+        x = d.local
     else:
-        x = np.copy(d)
-        if keep_local == 0:
-            del d
+        # Not a ditributed array, return as is
+        x = d
 
     if DEBUG:
         print('Return local part, its size is x.shape')
