@@ -712,7 +712,8 @@ class Dmat:
         d.global_ind = self.global_ind
         # create an array same as d.local
         if (np.iscomplex(self.local)).any():
-            d.local = np.vectorize(complex)(np.zeros(self.local.shape),np.zeros(self.local.shape))
+            #bad performance: d.local = np.vectorize(complex)(np.zeros(self.local.shape),np.zeros(self.local.shape))
+            d.local = np.zeros(self.local.shape) + 1j*np.zeros(self.local.shape)
         else:
             d.local = np.zeros(self.local.shape)
         d.local[:] = self.local

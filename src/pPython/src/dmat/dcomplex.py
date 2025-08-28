@@ -1,9 +1,6 @@
 import numpy as np
 
-from size import *
-from zeros import *
-
-def dcomplex(x,y):
+def dcomplex(*argv):
     """Convert each local part of the DMATs, X & y to a new local portion of DMAT with a complex number, x.local + (y.local)j.
     If x & y are not a DMAT, it returns complex(x,y)
  
@@ -17,36 +14,27 @@ def dcomplex(x,y):
     if DEBUG:
         print('--> Entering dcomplex')
 
-    if hasattr(x,'local') and hasattr(y,'local'):
-        # DMAT objects
-        if DEBUG:
-            print('DMAT object')
-        # if only works if x and y are equally sized and distributed DMAT
-        if x.map == y.map:
-            d = zeros(size(x),map=x.map,dtype=np.complex128)
-            d.local = np.vectorize(complex)(x.local,y.local)
-            if DEBUG:
-                if not hasattr(d,'dtype'): 
-                    print('DMAT object has no dtype attribute. Set as dtype = Dmat')
-                else:
-                    print('DMAT object has dtype attribute. Set as dtype = %s'%(d.dtype))
-                    print('DMAT object has nbytes attribute. Set as nbytes = %d'%(d.nbytes))
-            # Clear the input arrays
-            del x.local; del y.local
+    if len(argv) == 1:
+        a = argv[0]
+        if hasattr(a,'local'):
+            #bad performance: a.local = np.vectorize(complex)(a.local)
+            a.local = a.local + 1j*0.
         else:
-            raise Exception('ERROR: Both DMAT objects have to be the same kind.')
-        if DEBUG:
-            print('dmat/dcomplex: return distributed array with its local array shape of %s'%(str(d.local.shape)))
-    else:
-        d = np.vectorize(complex)(x,y)
-        if DEBUG:
-            print('dmat/dcomplex: return non-distributed array shape of %s'%(str(d.shape)))
-        # Clear the input arrays
-        del x; del y
- 
+            #bad performance: a = np.vectorize(complex)(a)
+            a = a + 1j*0.
+    elif len(argv) == 2:
+        a = argv[0]
+        b = argv[1]
+        if hasattr(a,'local'):
+            #bad performance: a.local = np.vectorize(complex)(a.local,b.local)
+            a.local = a.local + 1j*b.local
+        else:
+            #bad performance: a = np.vectorize(complex)(a,b)
+            a = a + 1j*b
+
     if DEBUG:
         print('<-- Exiting dcomplex')
-    return d
+    return a
 
 ########################################################
 # pMatlab: Parallel Matlab Toolbox
