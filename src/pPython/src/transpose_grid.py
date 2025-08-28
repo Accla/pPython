@@ -2,6 +2,9 @@ import numpy as np
 # For process memory usage tracking
 import psutil
 
+# memory profiling
+# from memory_profiler import profile
+
 # pPython class
 from MPI_Send import *
 from MPI_Recv import *
@@ -18,6 +21,7 @@ from put_local import *
 from global_block_ranges import *
 from dcomplex import *
 
+# @profile
 def transpose_grid(B):
     """
     TRANSPOSE_GRID Redistributes a dmat by transposing its process grid.
@@ -36,6 +40,10 @@ def transpose_grid(B):
     distributions, overlap, etc., SUBSASGN will be used to redistribute B.
 
     Python version: Dr. Chansup Byun
+    Note: pMatlab version does not distinguish between double and complex numbers but Python 
+          casues type error. Thus, new distributed array is created with complex number if needed.
+          This caused significant memory usage increase and performance slow down.
+          (This was cuased by inefficient np.vectorize() in dcomplex(), which was fixed now)
     """
 
     DEBUG = 0
@@ -43,12 +51,6 @@ def transpose_grid(B):
         print('--> Entering transpose_grid')
         p = psutil.Process()
 
-    comm = GPC.comm
-    my_rank = GPC.Pid
-    
-    # Check that B is 2D
-    if (ndims(B) != 2):
-        print('TRANSPOSE_GRID for %d-D array is not defined.'%(ndims(B)))
     
     if not hasattr(B,'local'):
         # If B is not a dmat, simply do a copy
@@ -59,6 +61,14 @@ def transpose_grid(B):
         return A
 
     else:
+        comm = GPC.comm
+        my_rank = GPC.Pid
+    
+        # Check that B is 2D
+        if (ndims(B) != 2):
+            print('TRANSPOSE_GRID for %d-D array is not defined.'%(ndims(B)))
+            exit(-1)
+
         # If B is a dmat, perform the redistribution
         # Get B's size, map, grid, dist, overlap and cpus list.
         B_size      = size(B)

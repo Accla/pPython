@@ -18,7 +18,7 @@ def get_queue_cpu_table():
         root = ET.parse(xml_file).getroot()
 
     # debug
-    print('Absolute path for queue_cpu_table.xml: %s'%(xml_file))
+    # print('Absolute path for queue_cpu_table.xml: %s'%(xml_file))
 
     PT = dict()
     for partition in root[0].findall('partition'):
