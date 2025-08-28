@@ -48,13 +48,13 @@ def fft(x, *argv):
     
     if isinstance(x,np.ndarray):
         if nargin==1:  #FFT(X)
-            scipy.fftpack.fft(x)
+            x = scipy.fftpack.fft(x)
         else:
             if isinstance(argv[0],list):
-                N = x.shape[0]
+                N = x.shape[argv[1]]
             else:
                 N = argv[0]
-            scipy.fftpack.fft(x,N,argv[1])
+            x = scipy.fftpack.fft(x,N,argv[1])
     else:
         if x.dim == 2:  # distributed array is a matrix
             g = proc_grid(x)
