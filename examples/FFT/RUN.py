@@ -7,6 +7,7 @@
 
     Author: Dr. Chansup Byun
 """
+import os
 
 import pPython
 from pRUN import pRUN
@@ -26,8 +27,8 @@ if run_locally:
     pRUN( py_file, n_proc, {})
 else:
     # Running on a grid environment if configured properly
-    # Use the triples mode job
-    GRID_TARGET = 'grid&'
+    # Use the triples mode job, allow to modify TARGET
+    GRID_TARGET = os.getenv('GRID_TARGET','grid&')
     pRUN( py_file, n_proc_triples, GRID_TARGET )
 
 ########################################################
