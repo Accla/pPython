@@ -175,11 +175,7 @@ if VALIDATE:
             print('Validation Passed')
 
 print('')
-print('')
-print('')
 print('SUCCESS')
-print('')
-print('')
 print('')
 
 

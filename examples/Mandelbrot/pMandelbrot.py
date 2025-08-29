@@ -91,9 +91,7 @@ if (Pid == 0):
         plt.show()
 
 print('')
-print('')
 print('SUCCESS')
-print('')
 print('')
 
 

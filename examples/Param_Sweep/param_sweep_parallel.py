@@ -100,7 +100,6 @@ print(z_final)
 print(' ')
 print('SUCCESS')
 print(' ')
-print(' ')
 # MPI_Finalize()
 
 """

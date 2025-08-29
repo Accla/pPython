@@ -120,5 +120,4 @@ whosPy(v1,v2)
 print('')
 print('SUCCESS')
 print('')
-print('')
 

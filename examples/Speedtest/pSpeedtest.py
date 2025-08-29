@@ -62,11 +62,6 @@ outfile = 'speedtest.'+str(Pid)+'.npz'
 np.savez(outfile, ByteSize=ByteSize,TotalTime=TotalTime,MessageBytes=MessageBytes,Bandwidth=Bandwidth)
 
 print('')
-print('')
-print('')
 print('SUCCESS')
-print('')
-print('')
-print('')
 print('')
 

@@ -99,8 +99,6 @@ if (VERIFY):
             print('Failure');
 
 print('')
-print('')
 print('SUCCESS')
-print('')
 print('')
 

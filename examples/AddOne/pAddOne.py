@@ -37,9 +37,6 @@ Yloc = Xloc + 1          # Add one to local part.
 Y = put_local(Y,Yloc)    # Put back into Y.
 
 print('')
-print('')
 print('SUCCESS')
-print('')
-print('')
 print('')
 

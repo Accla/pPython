@@ -89,5 +89,4 @@ if (Pid == 0) and (PLOT_IMAGE == 1):
 print('')
 print('SUCCESS')
 print('')
-print('')
 

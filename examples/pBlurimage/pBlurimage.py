@@ -143,5 +143,4 @@ print('GigaFlops: %f'%(gigaflops))
 print('')
 print('SUCCESS') 
 print('')
-print('')
 

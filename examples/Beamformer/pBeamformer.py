@@ -149,7 +149,6 @@ if (Pid == 0) and (DISPLAY_PLOT==1):
 print('')
 print('SUCCESS')
 print('')
-print('')
 
 """
 v1=[X0,X0loc,X1,X1loc,X2,X2loc,X3,x3,myI_f,myV]
