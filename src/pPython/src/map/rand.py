@@ -13,6 +13,8 @@ def rand(*array_sizes, **keywords):
         keywords: 
             'dmap': 1 or distributed map, Dmap object
             'dtype': data type of array element
+            'gpu': array on a gpu specified using CuPy with CUDA_VISIBLE_DEVICE in Dmat class
+            'gpu': array on a gpu specified using CuPy with CUDA_VISIBLE_DEVICE in Dmat class
 
     Distributed array of random numbers between 0 and 1 distributed uniformly.
     NOTE: DIMENSION OF THE DISTRIBUTED ARRAY MUST BE CONSISTENT WITH THE
@@ -70,10 +72,14 @@ def rand(*array_sizes, **keywords):
     if 'dtype' in keywords:
         dtype = keywords['dtype']
 
+    use_gpu = False
+    if 'gpu' in keywords:
+        use_gpu = keywords['gpu']
+
     if not isinstance(dmap,Dmap):
         if DEBUG:
             print('<-- Exiting rand with non-Dmat array')
-        d = np.random.random(dims)
+        d = np.random.random(dims).astype(dtype)
         return d
     
     d = Dmat(None, dtype, dims, map=dmap)
@@ -102,26 +108,41 @@ def rand(*array_sizes, **keywords):
                 if DEBUG:
                     print('my rank: %d, Process grid rank: %d'%(GPC.Pid,dmap['grid'][i][j]))
                 if (GPC.Pid==dmap['grid'][i][j]):
-                    d.local = np.random.random(local_size)
-                else:
-                    np.random.random(local_size)
+                    if use_gpu:
+                        import cupy as cp
+                        d.local = cp.asarray(np.random.random(local_size).astype(dtype))
+                    else:
+                        d.local = np.random.random(local_size).astype(dtype)
+                # This does not make any sense
+                # else:
+                #     np.random.random(local_size)
     elif dim==3:
         for k in range(g[2]):
             for j in range(g[1]):
                 for i in range(g[0]):
                     if (GPC.Pid==dmap['grid'][i][j][k]):
-                        d.local = np.random.random(local_size)
-                    else:
-                        np.random.random(local_size)
+                        if use_gpu:
+                            import cupy as cp
+                            d.local = cp.asarray(np.random.random(local_size).astype(dtype))
+                        else:
+                            d.local = np.random.random(local_size).astype(dtype)
+                    # This does not make any sense
+                    # else:
+                    #     np.random.random(local_size)
     elif dim==4:
         for l in range(g[3]):
             for k in range(g[2]):
                 for j in range(g[1]):
                     for i in range(g[0]):
                         if (GPC.Pid==dmap['grid'][i][j][k][l]):
-                            d.local = np.random.random(local_size)
-                        else:
-                            np.random.random(local_size)
+                            if use_gpu:
+                                import cupy as cp
+                                d.local = cp.asarray(np.random.random(local_size).astype(dtype))
+                            else:
+                                d.local = np.random.random(local_size).astype(dtype)
+                        # This does not make any sense
+                        # else:
+                        #     np.random.random(local_size)
     else:
         raise Exception('@MAP/RAND: Only objects up to 4 dimensions are supported.')
 

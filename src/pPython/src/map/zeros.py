@@ -13,7 +13,7 @@ def zeros(*array_sizes, **keywords):
         keywords: 
             'dmap': 1 or distributed map, Dmap object
             'dtype': data type of array element
-
+            'gpu': array on a gpu specified using CuPy with CUDA_VISIBLE_DEVICE in Dmat class
     
     NOTE: DIMENSION OF THE DISTRIBUTED ARRAY MUST BE CONSISTENT WITH THE
         DIMENSION OF THE MAP.
@@ -73,6 +73,10 @@ def zeros(*array_sizes, **keywords):
     if 'dtype' in keywords:
         dtype = keywords['dtype']
 
+    use_gpu = False
+    if 'gpu' in keywords:
+        use_gpu = keywords['gpu']
+
     if not isinstance(dmap,Dmap):
         d = np.zeros(dims, dtype)
         return d
@@ -105,7 +109,11 @@ def zeros(*array_sizes, **keywords):
     # Allocate a zeros matrix for the local portion of the Dmat
     # Determine Matlab version
 
-    d.local = np.zeros(d.local_dim, dtype)
+    if use_gpu:
+        import cupy as cp
+        d.local = cp.asarray(np.zeros(d.local_dim, dtype))
+    else:
+        d.local = np.zeros(d.local_dim, dtype)
 
     if DEBUG:
         print('<-- Exiting zero')
