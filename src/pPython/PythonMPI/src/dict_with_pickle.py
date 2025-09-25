@@ -1,5 +1,7 @@
 #
 import pickle
+from datetime import datetime
+from pyMPI_Wait import *
 
 def save_dict_to_pickle(msg, buffer_file):
     """
@@ -15,8 +17,18 @@ def load_dict_from_pickle(buffer_file):
     Load a pickled dictionary variable from a file
     """
     # Read all data out of buffer_file.
-    with open(buffer_file, 'rb') as handle:
-        buf = pickle.load(handle)
+    try:
+        with open(buffer_file, 'rb') as handle:
+            buf = pickle.load(handle)
+    except:
+        current_time = datetime.now()
+        formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+        print('ERROR(load_dict_from_pickle): failed to load %s at %s'%(buffer_file,formatted_time))
+        # Spin on buffer file again in case it failed to find it
+        pyMPI_Wait('load_dict_from_pickle', buffer_file, False)
+        with open(buffer_file, 'rb') as handle:
+            buf = pickle.load(handle)
+
     return buf
 
 ########################################################
