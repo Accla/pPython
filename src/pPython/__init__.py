@@ -34,6 +34,19 @@ except NameError: Np = 1
 try: Pid
 except NameError: Pid = 0
 
+# Check GPU availability
+# Based on CUDA_VISIBLE_DEVICES
+use_gpu = (os.getenv('CUDA_VISIBLE_DEVICES','') != '')
+if DEBUG:
+    print('pPython __init__: use_gpu = ',end='')
+    print(use_gpu)
+    print('pPython __init__: CUDA_VISIBLE_DEVICES = ',end='')
+    print(os.getenv('CUDA_VISIBLE_DEVICES',''))
+gpu_device = None
+if use_gpu:
+    import cupy as cp
+    gpu_device = cp.cuda.Device(Pid%cp.cuda.runtime.getDeviceCount())
+
 if DEBUG:
     print('pPython:')
     print('sys.path')
@@ -41,6 +54,7 @@ if DEBUG:
     print('comm')
     print(comm)
     print('Np = %d, Pid = %d'%(Np,Pid))
+    print(gpu_device)
 
 ########################################################
 # pPython: Parallel Python Programming Tool
