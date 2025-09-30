@@ -34,13 +34,15 @@ def pyMPI_Comm_settings_local(machine_db_settings):
     # Set default type of remote machines to 'unix' (for linux and mac OSes) or 'pc'
     machine_db_settings['type'] = 'unix';     # [OK TO CHANGE.]
 
+    python_location_llsc = '/state/partition1/llgrid/pkg/conda/python-ML-2025b-pytorch/bin/python'
+
     if os.path.exists('/etc/llgrid.id'):
     	# LLSC python location
     	# python_location = '/state/partition1/llgrid/pkg/anaconda/anaconda3-2021b/bin/python'
     	# machine_db_settings['python_module_name'] = 'anaconda/2021b'
     	python_location = '/state/partition1/llgrid/pkg/anaconda/python-ML-2024b/bin/python'
     	machine_db_settings['python_module_path'] = '/etc/environment-modules/modules'
-    	machine_db_settings['python_module_name'] = 'anaconda'
+    	machine_db_settings['python_module_name'] = 'conda/Python-ML-2025b-pytorch'
 
     else:
         # Set location of python on unix systems.
@@ -67,10 +69,12 @@ def pyMPI_Comm_settings_local(machine_db_settings):
                 raise Exception('Error (pyMPI_Comm_settings_local): unsupported OS.')
         else:
             # Assuming running on LLSC
+            python_location = 'python'
             machine_db_settings['python_module_path'] = '/etc/environment-modules/modules'
-            machine_db_settings['python_module_name'] = 'anaconda'
+            machine_db_settings['python_module_name'] = 'conda/Python-ML-2025b-pytorch'
 
-    machine_db_settings['python_command_llsc'] = python_location + ' -u '
+    machine_db_settings['python_command'] = python_location + ' -u '
+    machine_db_settings['python_command_llsc'] = python_location_llsc + ' -u '
 
     # local directory mapping. (pc, linux, mac, grid, sgrp_1, sgrp_2, sgrp_3)
     machine_db_settings['local_dir_map'] = ['Z:', '/home/gridsan/'+USER, '/Volumes/'+USER, '/home/gridsan/'+USER, '/home/gridsan/groups', '/data2/groups', '/state/partition1/user/'+USER]
