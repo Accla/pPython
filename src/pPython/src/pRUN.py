@@ -113,7 +113,9 @@ def pRUN(py_file,n_proc,machines,sched_options=None):
 
     n_proc_req, machines, grid.grid_config = check_runtime( n_proc, machines, grid.grid_config )
     if DEBUG:
-        print('After check_runtime: n_proc_req = %d'%(n_proc_req))
+        print('After check_runtime: n_proc_req = ',end='')
+        print(n_proc_req)
+        print(machines)
         print(grid.grid_config)
 
     if grid.grid_config['grid_job']:
