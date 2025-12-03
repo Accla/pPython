@@ -62,70 +62,43 @@ def check_runtime( n_proc, machines, grid_config ):
         interactive = 0
         grid_job = False  # meaning no scheduler is involved
     else:
+        grid_job = True
         if machines[-1] == '&':
             # Backgrounded job
             endStr = '&'
             interactive = 0
-            grid_job = True
         else:
             # Interacttive job
             endStr = ''
             interactive = 1
-            if machines[:4] == 'grid':
-                grid_job = True
-            else:
-                grid_job = False
+            #CB if machines[:4] == 'grid':
+            #CB     grid_job = True
+            #CB else:
+            #CB     grid_job = False
     grid_config['interactive'] = interactive
     grid_config['grid_job'] = grid_job
     
     if not grid_job:
         return n_proc, machines, grid_config
 
-    # Determine if a specific CPU type is requested
-    # Old partition also requires partition name 
-    # But new partition, starting xeon-p8, does not need partition name 
-    # to submit jobs to the grid.
-    if len(machines) > 5:
-        # 'grid-xeon-e5[&]'
-        if endStr == '&':
-            key_str = machines[5:-1]
-        else:
-            key_str = machines[5:]
-        # Checck if the input string is a partition name or a CPU type name
-        PT,CT = get_queue_cpu_table()
-        if key_str in CT.keys():
-            cpu_type = key_str
-        elif key_str in PT.keys():
-            # input string is a partition name
-            grid_config['q_name'] = key_str
-            cpu_type = PT[key_str]['cpu_type']
-        else:
-            raise Exception('ERROR(check_runtime): the simplified grid extension string, '+key_str+' is neither a partition name nor a cpu_type name.')
+    # The 3rd argument is now used to specify a partition name
+    # If 'grid' is used, it means the default partition.
+    if endStr == '&':
+        key_str = machines[:-1]
     else:
-        # if cpu_type is not provided with the grid option
-        # set the default cpu_type
-        if grid_config['cpu_type']:
-            # default cpu_type is set in the local grid configuraiton
-            cpu_type = grid_config['cpu_type']
-        else:
-            # not defined at all
-            if (cluster_name == 'txgreen') or (cluster_name == 'txe1') or (cluster_name == 'txc'):
-                cpu_type = 'xeon-p8'
-            else:
-                # exit since no cpu_type id set
-                raise Exception('ERROR(check_runtime): no cpu_type is set.')
-            
-    # Set the partition (queue) name if cpu_type is specified
-    # This is required for old partition name
-    if len(cpu_type):
-        if DEBUG:
-            print('CPU type, grid_config[\'cpu_type\'] = %s'%(cpu_type))
-        grid_config['cpu_type'] = cpu_type
-        # Update the queue name (partition name) accordingly
-        # The following is specific to TX-Green 
-        # Check grid_config['cluster_name'] in $HOME/ppython_conf/grid_config_local.py
-        # for future support with other clusters
-        #
+        key_str = machines
+    if (len(key_str)==4) and (key_str == 'grid'):
+        # Use the default partition
+        grid_config['q_name'] = 'xeon-p8'
+    else:
+        # Use the given partition
+        grid_config['q_name'] = key_str
+
+    # Obtain cpu_type based on the partition name
+    # input string is a partition name
+    PT,CT = get_queue_cpu_table()
+    cpu_type = PT[grid_config['q_name']]['cpu_type']
+    grid_config['cpu_type'] = cpu_type
 
     # check and process the triples mode job request if needed
     n_proc_req, grid_config = check_triples(cluster_name,cpu_type,n_proc,grid_config)
