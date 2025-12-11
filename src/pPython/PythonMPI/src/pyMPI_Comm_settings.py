@@ -63,7 +63,7 @@ def pyMPI_Comm_settings():
     # -u: unbuffered standard output
     machine_db_settings['python_command'] = python_location + ' -u '
     machine_db_settings['python_module_path'] = '/etc/environment-modules/modules'
-    machine_db_settings['python_module_name'] = 'anaconda/2022a'
+    machine_db_settings['python_module_name'] = 'conda/Python-ML-2025b-pytorch'
 
     # Remote launch command.
     # To use ssh, change ' rsh ' to ' ssh ' in line below.
