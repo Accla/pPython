@@ -114,22 +114,22 @@ for i_trial in range(NTRIALS):
 
     # COPY
     tic = timer()
-    Cloc[:,:] = Aloc
+    Cloc = Aloc
     TsumCopy = TsumCopy + (timer() - tic)
 
     # SCALE
     tic = timer()
-    Bloc[:,:] = q*Cloc
+    Bloc = q*Cloc
     TsumScale = TsumScale + (timer() - tic)
 
     # ADD
     tic = timer()
-    Cloc[:,:] = Aloc + Bloc
+    Cloc = Aloc + Bloc
     TsumAdd = TsumAdd + (timer() - tic)
 
     # TRIAD
     tic = timer()
-    Aloc[:,:] = Bloc + q*Cloc
+    Aloc = Bloc + q*Cloc
     TsumTriad = TsumTriad + (timer() - tic)
 
 # Check results.

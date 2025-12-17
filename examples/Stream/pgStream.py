@@ -125,7 +125,7 @@ for i_trial in range(NTRIALS):   # note, i_trial starts from 0 instead of 1 with
     if GPU:
         gpudev.synchronize()
     tic = timer()
-    Cloc[:,:] = Aloc;
+    Cloc = Aloc;
     if GPU:
         gpudev.synchronize()
     TsumCopy = TsumCopy + (timer()-tic);
@@ -134,7 +134,7 @@ for i_trial in range(NTRIALS):   # note, i_trial starts from 0 instead of 1 with
     if GPU:
         gpudev.synchronize()
     tic = timer()
-    Bloc[:,:] = q*Cloc;
+    Bloc = q*Cloc;
     if GPU:
         gpudev.synchronize()
     TsumScale = TsumScale + (timer()-tic);
@@ -143,7 +143,7 @@ for i_trial in range(NTRIALS):   # note, i_trial starts from 0 instead of 1 with
     if GPU:
         gpudev.synchronize()
     tic = timer()
-    Cloc[:,:] = Aloc + Bloc;
+    Cloc = Aloc + Bloc;
     if GPU:
         gpudev.synchronize()
     TsumAdd = TsumAdd + (timer()-tic);
@@ -152,7 +152,7 @@ for i_trial in range(NTRIALS):   # note, i_trial starts from 0 instead of 1 with
     if GPU:
         gpudev.synchronize()
     tic = timer()
-    Aloc[:,:] = Bloc + q*Cloc;
+    Aloc = Bloc + q*Cloc;
     if GPU:
         gpudev.synchronize()
     TsumTriad = TsumTriad + (timer()-tic);
