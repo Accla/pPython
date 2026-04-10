@@ -51,6 +51,12 @@ Nb = 80  # Plot
 Nt = 50
 Nb = 40
 
+# J.K. parameter for GPU benchmark
+Nt = 600; Ns = 90;  Nb = 40; Nf = 100;
+Nt = int(16*Nt); Ns = int(256*Ns);  Nb = int(256*Nb); Nf = int(Np*Nf/25);
+
+SAVEFILES = 0
+
 PARALLEL = 1    # Set control flag.
 Xmap = 1        # Create serial map.
 if (PARALLEL):
@@ -85,27 +91,26 @@ X0loc[:,round(0.5*Nb)-1,:] = 1
 
 # STEP 1: CREATE SYNTHETIC DATA. ---------------------
 tic = timer()               # Start timer.
-for i_t in range(Nt):       # Loop over time snapshots.
-    for i_f in range(myI_f.size):  # Loop over local frequencies.
-        # Convert from beams to sensors.
-        # X1loc[i_t,:,i_f] = X1loc[i_t,:,i_f] + dot(squeeze(myV[:,:,i_f]),transpose(squeeze(X0loc[i_t,:,i_f])))
-        X1loc[i_t,:,i_f] += dot(squeeze(myV[:,:,i_f]),transpose(squeeze(X0loc[i_t,:,i_f])))
+# Convert from beams to sensors.
+for i_f in range(myI_f.size):  # Loop over local frequencies.
+    # X1loc[:, :, i_f] = X1loc[:, :, i_f] + dot(squeeze(X0loc[:, :, i_f]), squeeze(myV[:, :, i_f]).T)
+    X1loc[:, :, i_f] += dot(squeeze(X0loc[:, :, i_f]), squeeze(myV[:, :, i_f]).T)
 
 # STEP 2: BEAMFORM AND SAVE DATA. ---------------------
 
-for i_t in range(Nt):      # Loop over time snapshots.
-    for i_f in range(myI_f.size):  # Loop over local frequencies.
-        # Convert from sensors back to beams.
-        # Matlab automatically transpose vector as 1xN but not with Python, whcih needs explicit transpose()
-        X2loc[i_t,:,i_f] = abs(dot(squeeze(X1loc[i_t,:,i_f]).T, squeeze(myV[:,:,i_f])))**2
+# Convert from sensors back to beams.
+for i_f in range(myI_f.size):  # Loop over local frequencies.
+    X2loc[:, :, i_f] = abs(dot(squeeze(X1loc[:, :, i_f]), squeeze(myV[:, :, i_f])))**2
 
-for i_f in range(myI_f.size):  # Loop over frequencies.
-    X_i_f = squeeze(X2loc[:,:,i_f])   # Get a matrix of data.
-    filename = 'dat/pBeamformer_freq.'+str(myI_f[i_f])+'.npy'
-    save(filename, X_i_f)             # .npy extension is added if not given
+if SAVEFILES:
+    for i_f in range(myI_f.size):  # Loop over frequencies.
+        X_i_f = squeeze(X2loc[:,:,i_f])   # Get a matrix of data.
+        filename = 'dat/pBeamformer_freq.'+str(myI_f[i_f])+'.npy'
+        save(filename, X_i_f)             # .npy extension is added if not given
 
 Tcompute = timer()-tic
 print('Compute Time (sec)                 = %f'%(Tcompute))
+print('Compute GFlops                     = %f'%(2*8*Nt*Ns*Nb*Nf/Tcompute/1e9))
 
 # STEP 3: SUM ACROSS FREQUNCY. ---------------------
 
