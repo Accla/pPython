@@ -2,8 +2,8 @@ import re
 import os
 
 import checkOS as OS
-from pyMPI_Commands import *
 from pyMPI_Sleep import *
+from pyMPI_Dir_map import *
 
 from exec_shell_cmd import *
 from slurm_submit_job import *
@@ -34,6 +34,14 @@ def launch_non_triples(py_file, comm, grid_config):
     nl = '\n'
     qq = '"'
 
+    # Check if MPI4PY is used for MPI communication
+    USE_MPI4PY = grid_config['USE_MPI4PY']
+    if USE_MPI4PY:
+        # Only 1 PythonMPI4PYdefs.py file
+        from pyMPI4PY_Commands import pyMPI4PY_Commands
+    else:
+        from pyMPI_Commands import pyMPI_Commands
+
     interactive = grid_config['interactive']
     
     pwd_pc,pwd_linux,pwd_mac,pwd_grid = pyMPI_Dir_map(pyMCW.MPI_COMM_WORLD['machine_db'],os.getcwd())
@@ -44,6 +52,9 @@ def launch_non_triples(py_file, comm, grid_config):
 
     # Get number of machines.
     n_m = comm['machine_db']['n_machine']
+
+    if DEBUG:
+        print(f"USE_MPI4PY = {USE_MPI4PY}")
 
     # Loop backwards over each machine target machine
     # so that we hit the host machine last (if it is a target).
@@ -94,16 +105,17 @@ def launch_non_triples(py_file, comm, grid_config):
                 unix_commands_prefix = unix_commands_prefix+'export PYTHONPATH='+PYTHONPATH+nl
                 unix_commands_prefix = unix_commands_prefix+'echo "`hostname`: PYTHONPATH=$PYTHONPATH"'+nl+nl
 
-            # Loop backwards over number of processes.
-            for i_rank in range(i_rank_stop,i_rank_start-1,-1):
-                if DEBUG:
-                    print('--> launch_non_triples: i_rank = %d'%(i_rank))
-                # Note: python index start zero to N-1.
-                # Check if i_rank value needs to be adjusted
+            if not USE_MPI4PY:
+                # Loop backwards over number of processes.
+                for i_rank in range(i_rank_stop,i_rank_start-1,-1):
+                    if DEBUG:
+                        print('--> launch_non_triples: i_rank = %d'%(i_rank))
+                    # Note: python index start zero to N-1.
+                    # Check if i_rank value needs to be adjusted
 
-                # Build commands that lauch multiple matlab on target nodes.
-                defscommands, unix_cmd_i_rank = pyMPI_Commands(py_file_basename,i_rank,comm,grid_config=grid_config)
-                unix_commands = unix_commands+unix_cmd_i_rank
+                    # Build commands that lauch multiple matlab on target nodes.
+                    defscommands, unix_cmd_i_rank = pyMPI_Commands(py_file_basename,i_rank,comm,grid_config=grid_config)
+                    unix_commands = unix_commands+unix_cmd_i_rank
 
             # Create a file name to hold script that will be run on target.
             # Make sure to use the correct directory separator for Unix and DOS
@@ -117,41 +129,58 @@ def launch_non_triples(py_file, comm, grid_config):
                     # skip the last one
                     continue
 
-            if type == 'pc':
-                unix_cmd_file = 'PythonMPI/Dos_Commands.'+imstr+file_ext
-                dos_cmd_file = 'PythonMPI\\Dos_Commands.'+imstr+file_ext
-            else:
-                # Add prefix for Unix systems
-                unix_commands = unix_commands_prefix+unix_commands
-                unix_cmd_file = 'PythonMPI/Unix_Commands.'+imstr+file_ext
-                dos_cmd_file = 'PythonMPI/Unix_Commands.'+imstr+file_ext
+            if not USE_MPI4PY:
+                if type == 'pc':
+                    unix_cmd_file = 'PythonMPI/Dos_Commands.'+imstr+file_ext
+                    dos_cmd_file = 'PythonMPI\\Dos_Commands.'+imstr+file_ext
+                else:
+                    # Add prefix for Unix systems
+                    unix_commands = unix_commands_prefix+unix_commands
+                    unix_cmd_file = 'PythonMPI/Unix_Commands.'+imstr+file_ext
+                    dos_cmd_file = 'PythonMPI/Unix_Commands.'+imstr+file_ext
 
-            # Put commands in a file.
-            fid = open(unix_cmd_file,'w')
+                # Put commands in a file.
+                fid = open(unix_cmd_file,'w')
             
-            # Fix unix_commands for LLGrid run
-            # Remove & at the end of each line
-            # unix_commands = re.sub("out &","out", unix_commands)
-            # Comment out the touch command
-            unix_commands = re.sub("touch","# touch", unix_commands)
-            # Add the "wait" at the end so that all the processes are done 
-            # before exiting Slurm task
-            unix_commands += '\nwait\n'
-            fid.write(unix_commands)
-            fid.close()
+                # Fix unix_commands for LLGrid run
+                # Remove & at the end of each line
+                # unix_commands = re.sub("out &","out", unix_commands)
+                # Comment out the touch command
+                unix_commands = re.sub("touch","# touch", unix_commands)
+                # Add the "wait" at the end so that all the processes are done 
+                # before exiting Slurm task
+                unix_commands += '\nwait\n'
+                fid.write(unix_commands)
+                fid.close()
 
-    # If it's an interactive job, translate the current working directory as local path for Pid=0
-    if interactive:
-        if os.path.exists('/etc/llgrid.id'):
-            local_path = pwd_grid
+    if USE_MPI4PY:
+        # Only 1 PythonMPI4PYdefs.py file 
+        defscommands, unix_cmd_mpi4py = pyMPI4PY_Commands(py_file_basename,comm,grid_config=grid_config)
+        unix_commands = unix_commands+unix_cmd_mpi4py
+        if type == 'pc':
+            unix_cmd_file = 'PythonMPI/Dos_Commands.mpi4py'+file_ext
+            dos_cmd_file = 'PythonMPI\\Dos_Commands.mpi4py'+file_ext
         else:
-            if OS.ispc:
-                local_path = pwd_pc
-            elif OS.islinux:
-                local_path = pwd_linux
-            elif OS.ismac:
-                local_path = pwd_mac
-        comm['machine_db']['dir']['0'] = local_path
+            # Add prefix for Unix systems
+            unix_commands = unix_commands_prefix+unix_commands
+            unix_cmd_file = 'PythonMPI/Unix_Commands.mpi4py'+file_ext
+            dos_cmd_file = 'PythonMPI/Unix_Commands.mpi4py'+file_ext
+
+        # Put commands in a file.
+        fid = open(unix_cmd_file,'w')
+            
+        # Fix unix_commands for LLGrid run
+        # Remove & at the end of each line
+        # unix_commands = re.sub("out &","out", unix_commands)
+        # Comment out the touch command
+        unix_commands = re.sub("touch","# touch", unix_commands)
+        # Add the "wait" at the end so that all the processes are done 
+        # before exiting Slurm task
+        # unix_commands += '\nwait\n'
+        fid.write(unix_commands)
+        fid.close()
+
+    # interactive jobs are not supported with MPI4PY.
         
     # Display launch command.
     # print(unix_launch)

@@ -9,6 +9,7 @@ import grid_config as grid
 from exec_shell_cmd import *
 from set_remote_cc import *
 from dict_with_pickle import save_dict_to_pickle,load_dict_from_pickle
+from slurm_jobid_host_association import slurm_jobid_host_association
 
 import pPython as GPC
 
@@ -37,10 +38,13 @@ def slurm2hostmap():
         print('--> Entering slurm2hostmap')
     
     MPI_COMM_WORLD = GPC.comm
+    if DEBUG:
+        print(MPI_COMM_WORLD)
     Pid = GPC.Pid
     
     # Recover grid_config from MPI_COMM_WORLD
     grid.grid_config = MPI_COMM_WORLD['grid_config']
+    USE_MPI_4PY = grid.grid_config['USE_MPI4PY']
 
     if DEBUG:
         print('slurm2hostmap: Pid = %d' %(Pid))
@@ -48,6 +52,7 @@ def slurm2hostmap():
         print(grid.grid_config['mixed_fs'])
         print('slurm2hostmap: grid.grid_config["srun"] = ',end="")
         print(grid.grid_config['srun'])
+        print(f'USE_MPI_4PY: {USE_MPI_4PY}')
         print("")
         # print("slurm2hostmap: grid.grid_config['srun'] = %s"%(grid.grid_config['srun']))
     
@@ -134,51 +139,24 @@ def slurm2hostmap():
                 hostmap[i] = str(i)+' '+jobNumber+' '+host
                 i += 1
         else:
-            SLURM_ARRAY_JOB_ID = os.getenv('SLURM_ARRAY_JOB_ID')
-            if DEBUG:
-                if SLURM_ARRAY_JOB_ID:
-                    print('slurm2host: SLURM_ARRAY_JOB_ID = %s'%(SLURM_ARRAY_JOB_ID))
-                else:
-                    raise Exception('ERROR(slurm2host): SLURM_ARRAY_JOB_ID is NOT defined.')
-
-            if SLURM_ARRAY_JOB_ID:
-                # An array job
-                # Wait until all array job tasks are deployed
-                deployed_all = False
-                while not deployed_all:
-                    cmdstr = 'squeue -h -j '+SLURM_ARRAY_JOB_ID+' --format="%15K %15A %N"'
-                    ecmd.run(cmdstr)
-                    output = ecmd.get_output().strip()
-                    lines = output.split('\n')
-                    nlines = len(lines)
-                    if DEBUG:
-                       print('len(lines) = %d'%(nlines))
-                    if nlines == nTasks:
-                        deployed_all = True
-                    else:
-                        sleep(3)
-
+            # pPython is launched with either MPI4PY or PythonMPI
+            if USE_MPI_4PY:
+                SLURM_JOB_ID = os.getenv('SLURM_JOB_ID')
                 if DEBUG:
-                    print(output)
-                #
-                # Expect multiple lines
-                #
-                slurm_nodelist = ''
-                for line in output.split('\n'):
-                    # print('Line: %s'%(line))
-                    tmp = line.split()
-                    if len(tmp)<3:
-                        continue
+                    if SLURM_JOB_ID:
+                        print('slurm2host (MPI4PY): SLURM_JOB_ID = %s'%(SLURM_JOB_ID))
                     else:
-                        # if mixed messaging kernel, the first host is local machine
-                        jobArrayIndex = int(tmp[0]) + mixed_fs
-                        jobNumber = tmp[1]
-                        slurm_node = tmp[2]
-                    hostmap[jobArrayIndex] = str(jobArrayIndex)+' '+jobNumber+' '+slurm_node
+                        raise Exception('ERROR(slurm2host:MPI4PY): SLURM_JOB_ID is NOT defined.')
+                hostmap = slurm_jobid_host_association(hostmap,SLURM_JOB_ID)
             else:
-                # Not a batch job
-                for j in range(nProcs):
-                    hostmap[j+1] = str(j+1)+' '+'not_a_batch_job localhost'
+                SLURM_ARRAY_JOB_ID = os.getenv('SLURM_ARRAY_JOB_ID')
+                if DEBUG:
+                    if SLURM_ARRAY_JOB_ID:
+                        print('slurm2host: SLURM_ARRAY_JOB_ID = %s'%(SLURM_ARRAY_JOB_ID))
+                    else:
+                        raise Exception('ERROR(slurm2host): SLURM_ARRAY_JOB_ID is NOT defined.')
+                hostmap = slurm_jobid_host_association(hostmap,SLURM_ARRAY_JOB_ID)
+
         if DEBUG:
             print('Hostmap:')
             print(hostmap)
@@ -187,6 +165,10 @@ def slurm2hostmap():
         while len(hostmap) < nTasks:
             if DEBUG:
                 print('slurm2hostmap [Pid=%d]: current number tasks: %d should be %d' %(Pid,len(hostmap),nTasks))
+
+            if MPI4PY:
+                raise Exception('ERROR(slurm2hostmap:MPI4PY): failed to get hostmap with Slurm.')
+
             # Wiat for pauseTime before checking again
             pyMPI_Sleep(pauseTime)
             
@@ -196,24 +178,7 @@ def slurm2hostmap():
                 raise Exception('ERROR(slurm2hostmap): failed to get hostmap with Slurm srun.')
             else:
                 # An array job
-                cmdstr = 'squeue -h -j '+SLURM_ARRAY_JOB_ID+' --format="%15K %15A %N"'
-                ecmd.run(cmdstr)
-                output = ecmd.get_output().strip()
-                # print(output)
-                #
-                # Expect multiple lines
-                #
-                for line in output.split('\n'):
-                    # print('Line: %s'%(line))
-                    tmp = line.split()
-                    if len(tmp)<3:
-                        continue
-                    else:
-                        jobArrayIndex = tmp[0]
-                        jobNumber = tmp[1]
-                        slurm_node = tmp[2]
-                    if jobArrayIndex not in hostmap:
-                        hostmap[jobArrayIndex] = str(jobArrayIndex)+' '+jobNumber+' '+slurm_node
+                hostmap = slurm_jobid_host_association(hostmap,SLURM_ARRAY_JOB_ID)
             
             if iter > maxIteration:
                 raise Exception('ERROR(slurm2hostmap): failed to get hostmap within the maximum iteration.')

@@ -22,12 +22,22 @@ def slurm_write_job_script(grid_config,sched_job_file,py_file,cwd_path):
     job_details = job_details+'%s\n\n'%(py_file)
     job_details = job_details+'#\n'
 
+    # Check if MPI4PY is used for MPI communication
+    USE_MPI4PY = grid_config['USE_MPI4PY']
+    if USE_MPI4PY:
+        # job_details = job_details+'env | egrep -i "slurm|mpi"\n'
+        job_details = job_details+'export PPYTHON_USE_MPI4PY=YES\n'
+
     working_dir = cwd_path+'/PythonMPI'
     if grid_config['srun']:
         job_details = job_details+'export SCRIPT_ID=$(($SLURM_NODEID+1))\n'
         job_details = job_details+'/bin/bash %s/Unix_Commands.${SCRIPT_ID}.sh\n'%(working_dir)
     else:
-        job_details = job_details+'/bin/bash %s/Unix_Commands.${SLURM_ARRAY_TASK_ID}.sh\n'%(working_dir)
+        if USE_MPI4PY:
+            # job_details = job_details+'mpirun --display-map --map-by ppr:2:node -x UCX_LOG_LEVEL=info /bin/bash %s/Unix_Commands.mpi4py.sh\n'%(working_dir)
+            job_details = job_details+'mpirun --display-map -x UCX_LOG_LEVEL=info /bin/bash %s/Unix_Commands.mpi4py.sh\n'%(working_dir)
+        else:
+            job_details = job_details+'/bin/bash %s/Unix_Commands.${SLURM_ARRAY_TASK_ID}.sh\n'%(working_dir)
     
     fid.write(job_details)
     fid.close()

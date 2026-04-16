@@ -66,12 +66,20 @@ def gen_commands(py_file,python_mpi_path,rank,machine,comm,EPPAC=False):
     commands[0] = commands[0]+'from dict_with_pickle import load_dict_from_pickle' + nl
     commands[1] = 'from pRUN_Parallel_wrapper import *' + nl
     commands[2] = 'pyMCW.MPI_COMM_WORLD = load_dict_from_pickle('+q+comm_pkl_file+q+')' + nl
+    commands[2] = commands[2] + "PPYTHON_USE_MPI4PY = os.getenv('PPYTHON_USE_MPI4PY','')" + nl
+    commands[2] = commands[2] + "if PPYTHON_USE_MPI4PY:" + nl
+    commands[2] = commands[2] + "    from mpi4py import MPI" + nl
+    commands[2] = commands[2] + "    pyMCW.MPI_COMM_WORLD['mpi4py'] = MPI.COMM_WORLD" + nl
+    commands[2] = commands[2] + "    pyMCW.MPI_COMM_WORLD['rank'] = pyMCW.MPI_COMM_WORLD['mpi4py'].Get_rank()" + nl
+    commands[2] = commands[2] + "    pyMCW.MPI_COMM_WORLD['size'] = pyMCW.MPI_COMM_WORLD['mpi4py'].Get_size()" + nl
+    commands[2] = commands[2] + "else:" + nl
     if EPPAC:
         # For the triples mode, a single script launches many pPython MPI processes.
         # Each process will get its rank from MPI_COMM_WORLD_RANK environment variable exported by the script
-        commands[3] = 'pyMCW.MPI_COMM_WORLD['+q+'rank'+q+'] = ' + 'int(os.getenv('+q+'MPI_COMM_WORLD_RANK'+q+'))' + nl
+        # OpenMPI: OMPI_COMM_WORLD_RANK
+        commands[3] = '    pyMCW.MPI_COMM_WORLD['+q+'rank'+q+'] = ' + 'int(os.getenv('+q+'MPI_COMM_WORLD_RANK'+q+'))' + nl
     else:
-        commands[3] = 'pyMCW.MPI_COMM_WORLD['+q+'rank'+q+'] = ' + rank_str + nl
+        commands[3] = '    pyMCW.MPI_COMM_WORLD['+q+'rank'+q+'] = ' + rank_str + nl
     # Additional to define global variables: 
     commands[3] = commands[3]+'pRUN_Parallel_wrapper('+q+py_file+'.py'+q+')' + nl
     # commands[3] = commands[3]+'id=CheckOS()' + nl

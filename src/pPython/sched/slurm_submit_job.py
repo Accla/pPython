@@ -37,13 +37,6 @@ def slurm_submit_job(grid_config,sched_job_file,py_file,dir_llsc):
     if 'sched_options' not in grid_config or (not re.search('--partition',grid_config['sched_options'])):
         cmdstr = cmdstr+' -p '+grid_config['q_name']
     
-    # CPU type (if needed)
-    if (grid_config['cpu_type'] == 'xeon-e5') or \
-    (grid_config['cpu_type'] == 'xeon64c') or \
-    (grid_config['cpu_type'] == 'xeon-g6') or \
-    (grid_config['cpu_type'] == 'opteron'):
-        cmdstr = cmdstr+' -C '+grid_config['cpu_type']
-        
     # Job name
     cmdstr = cmdstr+' -J '+py_file
         
@@ -56,7 +49,12 @@ def slurm_submit_job(grid_config,sched_job_file,py_file,dir_llsc):
             cmdstr = cmdstr+' --exclusive -a 1-%d'%(ntasks)
     else:
         ntasks = grid_config['ntasks']
-        cmdstr = cmdstr+' -a 1-%d'%(ntasks)
+        # Check if MPI4PY is used for MPI communication
+        USE_MPI4PY = grid_config['USE_MPI4PY']
+        if USE_MPI4PY:
+            cmdstr = cmdstr+' --ntasks=%d'%(ntasks)
+        else: 
+            cmdstr = cmdstr+' -a 1-%d'%(ntasks)
         
     # Standard output or Slurm log
     cmdstr = cmdstr+' -o '+dir_llsc+'/PythonMPI/pRUN.log'
