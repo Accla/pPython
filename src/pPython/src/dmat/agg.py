@@ -47,7 +47,12 @@ def agg(d, leader=None):
 
     # Return immediately if Np = 1
     if Np == 1:
-        mat = d.local
+        try:
+            # Assuming GPU array
+            mat = d.local.get()
+        except:
+            # Fallback to CPU array
+            mat = d.local
         return mat
     comm = GPC.comm
     mixed_fs = comm['grid_config']['mixed_fs']

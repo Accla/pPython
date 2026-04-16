@@ -77,12 +77,21 @@ def ones(*array_sizes, **keywords):
     if 'gpu' in keywords:
         use_gpu = keywords['gpu']
 
+    # Python default row-major order (C style)
+    order = 'C'
+    if 'order' in keywords:
+        order = keywords['order']
+
     if not isinstance(dmap,Dmap):
-        d = np.ones(dims, dtype)
+        if use_gpu:
+            import cupy as cp
+            d = cp.ones(dims, dtype=dtype, order=order)
+        else:
+            d = np.ones(dims, dtype=dtype, order=order)
         return d
     
     if len(dims) < 5:
-        d = Dmat(None, dtype, dims, map=dmap)
+        d = Dmat(None, dtype, dims, map=dmap, order=order)
     else:
         print('ERROR(map/ones): Incorrect number of inputs')
 
@@ -108,9 +117,9 @@ def ones(*array_sizes, **keywords):
 
     if use_gpu:
         import cupy as cp
-        d.local = cp.asarray(np.ones(d.local_dim, dtype))
+        d.local = cp.ones(d.local_dim, dtype, order=order)
     else:
-        d.local = np.ones(d.local_dim, dtype)
+        d.local = np.ones(d.local_dim, dtype, order=order)
 
 
     if DEBUG:

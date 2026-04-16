@@ -76,13 +76,22 @@ def rand(*array_sizes, **keywords):
     if 'gpu' in keywords:
         use_gpu = keywords['gpu']
 
+    # Python default row-major order (C style)
+    order = 'C'
+    if 'order' in keywords:
+        order = keywords['order']
+
     if not isinstance(dmap,Dmap):
         if DEBUG:
             print('<-- Exiting rand with non-Dmat array')
-        d = np.random.random(dims).astype(dtype)
+        if use_gpu:
+            import cupy as cp
+            d = cp.random.random(dims).astype(dtype,order=order)
+        else:
+            d = np.random.random(dims).astype(dtype,order=order)
         return d
     
-    d = Dmat(None, dtype, dims, map=dmap)
+    d = Dmat(None, dtype, dims, map=dmap, order=order)
     local_size = d.local_dim
 
     if DEBUG:
@@ -110,9 +119,9 @@ def rand(*array_sizes, **keywords):
                 if (GPC.Pid==dmap['grid'][i][j]):
                     if use_gpu:
                         import cupy as cp
-                        d.local = cp.asarray(np.random.random(local_size).astype(dtype))
+                        d.local = cp.random.random(local_size).astype(dtype, order=order)
                     else:
-                        d.local = np.random.random(local_size).astype(dtype)
+                        d.local = np.random.random(local_size).astype(dtype, order=order)
                 # This does not make any sense
                 # else:
                 #     np.random.random(local_size)
@@ -123,9 +132,9 @@ def rand(*array_sizes, **keywords):
                     if (GPC.Pid==dmap['grid'][i][j][k]):
                         if use_gpu:
                             import cupy as cp
-                            d.local = cp.asarray(np.random.random(local_size).astype(dtype))
+                            d.local = cp.random.random(local_size).astype(dtype, order=order)
                         else:
-                            d.local = np.random.random(local_size).astype(dtype)
+                            d.local = np.random.random(local_size).astype(dtype, order=order)
                     # This does not make any sense
                     # else:
                     #     np.random.random(local_size)
@@ -137,9 +146,9 @@ def rand(*array_sizes, **keywords):
                         if (GPC.Pid==dmap['grid'][i][j][k][l]):
                             if use_gpu:
                                 import cupy as cp
-                                d.local = cp.asarray(np.random.random(local_size).astype(dtype))
+                                d.local = cp.random.random(local_size).astype(dtype, order=order)
                             else:
-                                d.local = np.random.random(local_size).astype(dtype)
+                                d.local = np.random.random(local_size).astype(dtype, order=order)
                         # This does not make any sense
                         # else:
                         #     np.random.random(local_size)

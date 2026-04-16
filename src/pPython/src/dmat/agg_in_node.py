@@ -66,7 +66,13 @@ def agg_in_node(d):
     
     # Dictionary varialbe to hold the locally aggregated messages within a node
     send_buf = dict()
-    send_buf[0] = d.local
+    # how to handle a GPU array?
+    try:
+        # assuming d.local is a GPU array and extract the value before sending.
+        send_buf[0] = d.local.get()
+    except:
+        # Fallback to a CPU array
+        send_buf[0] = d.local
     imsg_pos = 0
 
     if nproc == 1:
@@ -169,7 +175,12 @@ def agg_in_node(d):
     if Pid == PIDMIN: # agg() leader
         mat = send_buf
     else:
-        mat = d.local
+        try:
+            # assuming d.local is a GPU array and extract the value before sending.
+            mat = d.local.get()
+        except:
+            # Fallback to a CPU array
+            mat = d.local
     
     if DEBUG or DEBUG_TIMING:
         time_end = timer() - time_start

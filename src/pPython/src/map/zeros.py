@@ -77,12 +77,21 @@ def zeros(*array_sizes, **keywords):
     if 'gpu' in keywords:
         use_gpu = keywords['gpu']
 
+    # Python default row-major order (C style)
+    order = 'C'
+    if 'order' in keywords:
+        order = keywords['order']
+
     if not isinstance(dmap,Dmap):
-        d = np.zeros(dims, dtype)
+        if use_gpu:
+            import cupy as cp
+            d = cp.zeros(dims, dtype=dtype, order=order)
+        else:
+            d = np.zeros(dims, dtype=dtype, order=order)
         return d
 
     if len(dims) < 5:
-        d = Dmat(None, dtype, dims, map=dmap)
+        d = Dmat(None, dtype, dims, map=dmap, order=order)
         if DEBUG:
             print('Initialize Dmat with dtype = %s'%(dtype))
             print(dir(d))
@@ -111,9 +120,9 @@ def zeros(*array_sizes, **keywords):
 
     if use_gpu:
         import cupy as cp
-        d.local = cp.asarray(np.zeros(d.local_dim, dtype))
+        d.local = cp.asarray(np.zeros(d.local_dim, dtype=dtype))
     else:
-        d.local = np.zeros(d.local_dim, dtype)
+        d.local = np.zeros(d.local_dim, dtype=dtype)
 
     if DEBUG:
         print('<-- Exiting zero')

@@ -37,7 +37,11 @@ def agg_by_topology(d):
     if (Np == 1):
         # If a single process run, no need to go further.
         # Just return the local data
-        return d.local
+        try:
+            tmp = d.local.get()
+            return tmp
+        except:
+            return d.local
     
     ## Part 1: Aggregation within a node
     

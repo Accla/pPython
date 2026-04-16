@@ -1,5 +1,9 @@
 import numpy as np
 from sys import getsizeof
+import os
+GPU = int(os.getenv('GPU','0'))
+if GPU:
+    import cupy as cp
 
 import pyMPI_COMM_WORLD as pyMCW
 from MPI_Comm_rank import *
@@ -109,10 +113,19 @@ class Dmat:
                 dmap = keywords['map']
             elif isinstance(keywords['map'], int):
                 dmap = 1
-    
+
+        # Python default row-major order (C style)
+        order = 'C'
+        if 'order' in keywords:
+            order = keywords['order']
+        self._order = order
+
         if not isinstance(dmap,Dmap):
             # Not a distributed array 
-            self.local = np.zeros(dims,dtype)
+            if GPU:
+                self.local = cp.zeros(dims,dtype=dtype, order=self._order)
+            else:
+                self.local = np.zeros(dims,dtype=dtype, order=self._order)
             return
         
         if len(dims) == 1: # DMAT(M, P)
@@ -184,7 +197,10 @@ class Dmat:
         # Allocating memory is the responsibility of map functions
         # (e.g. ones, zeros, rand and sparse)
         # pPython: allocate memory for sparse method
-        self.local = np.zeros(self.local_dim, dtype)
+        if GPU:
+            self.local = cp.zeros(self.local_dim, dtype=dtype, order=self._order)
+        else:
+            self.local = np.zeros(self.local_dim, dtype=dtype, order=self._order)
         if DEBUG:
             print('Dmat local array: ')
             print(self.local)
@@ -454,11 +470,11 @@ class Dmat:
                 if (self.dim == other.dim): #compare dimensions
                     if (self.shape == other.shape): #compare shape (a.k.a. size)
                         if self.dim == 2:
-                            c = Dmat(self._nbytes, self._dtype, self.shape[0],self.shape[1], map=self.map)
+                            c = Dmat(self._nbytes, self._dtype, self.shape[0],self.shape[1], map=self.map, order=self._order)
                         elif self.dim == 3:
-                            c = Dmat(self._nbytes, self._dtype, self.shape[0], self.shape[1], self.shape[2], map=self.map)
+                            c = Dmat(self._nbytes, self._dtype, self.shape[0], self.shape[1], self.shape[2], map=self.map, order=self._order)
                         elif self.dim == 4:
-                            c = Dmat(self._nbytes, self._dtype, self.shape[0], self.shape[1], self.shape[2], self.shape[3], map=self.map)
+                            c = Dmat(self._nbytes, self._dtype, self.shape[0], self.shape[1], self.shape[2], self.shape[3], map=self.map, order=self._order)
                         else:
                             print('Dmat/eq: Only distributed arrays of up to 4D are supported')
                             exit(-1)
@@ -650,7 +666,7 @@ class Dmat:
                        print(m_dist_spec)
                        print(proc_list)
                     mapB = Dmap(size(gridB), m_dist_spec, proc_list)
-                    b = Dmat(self.nbytes,self.dtype,sizeB, map=mapB)
+                    b = Dmat(self.nbytes,self.dtype,sizeB, map=mapB, order=self._order)
     
                     #
                     # If local processor has data that needs to be sent, send it.
@@ -702,7 +718,7 @@ class Dmat:
 
     def copy(self):
         """Copy the given dmat."""
-        d = Dmat(self._nbytes, self._dtype)
+        d = Dmat(self._nbytes, self._dtype, order=self._order)
         d.map = self.map
         d.dim = self.dim
         d.shape = self.shape
@@ -713,9 +729,15 @@ class Dmat:
         # create an array same as d.local
         if (np.iscomplex(self.local)).any():
             #bad performance: d.local = np.vectorize(complex)(np.zeros(self.local.shape),np.zeros(self.local.shape))
-            d.local = np.zeros(self.local.shape) + 1j*np.zeros(self.local.shape)
+            if GPU:
+                d.local = cp.zeros(self.local.shape, dtype=self._dtype, order=self._order) + 1j*cp.zeros(self.local.shape, dtype=self._dtype, order=self._order)
+            else:
+                d.local = np.zeros(self.local.shape, dtype=self._dtype, order=self._order) + 1j*np.zeros(self.local.shape, dtype=self._dtype, order=self._order)
         else:
-            d.local = np.zeros(self.local.shape)
+            if GPU:
+                d.local = cp.zeros(self.local.shape, dtype=self._dtype, order=self._order)
+            else:
+                d.local = np.zeros(self.local.shape, dtype=self._dtype, order=self._order)
         d.local[:] = self.local
         return d
 
