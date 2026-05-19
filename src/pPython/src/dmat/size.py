@@ -1,3 +1,7 @@
+import os
+GPU = int(os.getenv('GPU','0'))
+if GPU:
+    import cupy as cp
 import numpy as np
 
 def size(d, dims=None):
@@ -16,6 +20,7 @@ def size(d, dims=None):
     DEBUG = 0
     if DEBUG:
         print('--> Entering size')
+        print(type(d))
 
     # if no dimensions are specified, all are used
     if dims == None:
@@ -28,7 +33,17 @@ def size(d, dims=None):
             # special treatment for a scalar
             dims = list(range(2))
         else:
-            dims = list(range(d.dim))
+            if GPU:
+                if isinstance(d,cp.ndarray):
+                    # print(f"d.shape = {d.shape}")
+                    # print(f"d.size = {d.size}")
+                    if len(d.shape) == 1:
+                        d = d.reshape(1,d.shape[0])
+                    dims = list(range(len(d.shape)))
+                else:
+                    dims = list(range(2))
+            else:
+                dims = list(range(d.dim))
     elif isinstance(dims,(int)):
         dims = [dims]
     

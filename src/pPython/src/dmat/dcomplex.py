@@ -33,6 +33,7 @@ def dcomplex(*argv):
             a = a + 1j*b
 
     if DEBUG:
+        print(f"type(a): {type(a)}")
         print('<-- Exiting dcomplex')
     return a
 

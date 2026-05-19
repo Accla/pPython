@@ -16,12 +16,26 @@ def put_local(x, x_local):
     DEBUG = 0
     if DEBUG:
         print('--> Entering put_local')
+        if hasattr(x,'local'):
+            print(f"type(x.local)-> {type(x.local)}")
+            print(f"x.local.shape {x.local.shape}")
+            print(f"type(x_local)-> {type(x_local)}")
+            print(f"x_local.shape {x_local.shape}")
+            print(f"len(x_local.shape) {len(x_local.shape)}")
 
     if hasattr(x,'local'):
-        x.local = x_local
+        if len(x_local.shape) == 0:
+            # This is update of the entire matrix by a single element 
+            x.local[:] = x_local
+        else:
+            x.local = x_local
     else:
         # Regular array, return input array
-        x = x_local
+        if len(x_local.shape) == 0:
+            # This is update of the entire matrix by a single element 
+            x.local[:] = x_local
+        else:
+            x = x_local
 
     if DEBUG:
         print('<-- Exiting put_local')
