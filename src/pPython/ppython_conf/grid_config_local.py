@@ -180,6 +180,16 @@ def grid_config_local(grid_config):
     # For now, no mnaycore optimization
     grid_config['PPYTHON_MANYCORE'] = 'no'
 
+    # Additional pPython variables to switch between MPI4PY and PythonMPI
+    # Set default False as a bool data type
+    PPYTHON_USE_MPI4PY = os.getenv('PPYTHON_USE_MPI4PY','')
+    if PPYTHON_USE_MPI4PY:
+        print('Set pPYTHON to use MPI4PY')
+        grid_config['USE_MPI4PY'] = True
+    else:
+        print('Set pPYTHON to use PythonMPI')
+        grid_config['USE_MPI4PY'] = False
+
     if DEBUG:
         print(grid_config)
         print('--> Exiting grid_config_local')
