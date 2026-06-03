@@ -6,7 +6,7 @@ def set_remote_cc():
     Author: Dr. Chansup Byun
     """
     # Remote execution command
-    if 'local' == detect_transport():
+    if 'local' == detect_transport(grid.grid_config):
         return ''
     else:
         return ' '.join([grid.grid_config['remote_launch'],grid.grid_config['remote_flags'],grid.grid_config['remote_host']])

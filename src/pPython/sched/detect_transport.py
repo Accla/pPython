@@ -1,16 +1,29 @@
 import os
 
-def detect_transport():
+def detect_transport(grid_config):
     """
     Detect the scheduler transport command. 
     
     Author: Dr. Chansuo Byun
     """
+    DEBUG = 0
+    if DEBUG:
+        print('--> Entering detect_transport')
+        print(grid_config)
+
     sched_transport = 'ssh'
     if os.path.exists('/etc/llgrid.id'):
         # LLSC system 
         sched_transport = 'local'
+    elif  grid_config['cluster_name'] == 'aicr' :
+        # AICR system (local execution only)
+        sched_transport = 'local'
+    else:
+        sched_transport = 'ssh'
         
+    if DEBUG:
+        print('--> Exiting detect_transport')
+
     return sched_transport
 
 ########################################################

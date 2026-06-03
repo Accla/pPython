@@ -14,6 +14,9 @@ from map_procs_to_cores import *
 from slurm_submit_job import *
 from slurm_write_job_script import *
 
+# Use MPI4PY
+from pyMPI4PY_Commands import *
+
 def launch_with_triples(py_file, comm, grid_config):
     """
     Launch pPython job on the grid without using the triples mode optimiztion.
@@ -83,6 +86,9 @@ def launch_with_triples(py_file, comm, grid_config):
     # Get number of machines.
     n_m = comm['machine_db']['n_machine']
 
+    # Check if MPI4PY is used for MPI communication
+    USE_MPI4PY = grid_config['USE_MPI4PY']
+
     # Check if GPU binding is enabled
     GPU_BINDING = False
     PPYTHON_GPU_BINDING = os.getenv('PPYTHON_GPU_BINDING',default='no')
@@ -130,10 +136,16 @@ def launch_with_triples(py_file, comm, grid_config):
             unix_commands_prefix = bash_script+nl+'source /etc/profile'+nl
             #
             # Add a check if this is on a LLSC system
-            unix_commands_prefix = unix_commands_prefix+'if [ -e /etc/llgrid.id ]; then'+nl
-            unix_commands_prefix = unix_commands_prefix+'    export MODULEPATH=${MODULEPATH}:'+python_module_path+nl
-            unix_commands_prefix = unix_commands_prefix+'    module load '+python_module_name+nl
+            # unix_commands_prefix = unix_commands_prefix+'if [ -e /etc/llgrid.id ]; then'+nl
+            # unix_commands_prefix = unix_commands_prefix+'    export MODULEPATH=${MODULEPATH}:'+python_module_path+nl
+            # unix_commands_prefix = unix_commands_prefix+'    module load '+python_module_name+nl
+            # unix_commands_prefix = unix_commands_prefix+'fi'+nl+nl
+            # Add custom conda environment setup in ~/ppython_conf/activate_conda.sh
+            # - Embed module load command in this file
+            unix_commands_prefix = unix_commands_prefix+'if [ -e ~/ppython_conf/activate_conda.sh ]; then'+nl
+            unix_commands_prefix = unix_commands_prefix+'    source ~/ppython_conf/activate_conda.sh'+nl
             unix_commands_prefix = unix_commands_prefix+'fi'+nl+nl
+
             PYTHONPATH= os.getenv('PYTHONPATH',default='')
             if len(PYTHONPATH):
                 unix_commands_prefix = unix_commands_prefix+'export PYTHONPATH='+PYTHONPATH+nl
@@ -161,32 +173,35 @@ def launch_with_triples(py_file, comm, grid_config):
                 unix_commands_prefix = unix_commands_prefix+'    echo "set and export GPU${val}: export GPU${val}=${array[$val]}"'+nl
                 unix_commands_prefix = unix_commands_prefix+'done'+nl
 
-            # Loop backwards over number of processes.
-            ipos = 0
-            for i_rank in range(i_rank_stop,i_rank_start-1,-1):
-                if DEBUG:
-                    print('--> launch_with_triples: i_rank = %d'%(i_rank))
-                # Note: python index start zero to N-1.
-                # Check if i_rank value needs to be adjusted
-                proc_bind_cmd = '"taskset --cpu-list '+','.join(cpu_list[ipos])+'" '
-                # print(proc_bind_cmd)
+            if not USE_MPI4PY:
+                # Loop backwards over number of processes.
 
-                # Build commands that lauch multiple matlab on target nodes.
-                defscommands, unix_cmd_i_rank = pyMPI_Commands(py_file_basename,i_rank,comm,grid_config=grid_config,\
+                # Loop backwards over number of processes.
+                ipos = 0
+                for i_rank in range(i_rank_stop,i_rank_start-1,-1):
+                    if DEBUG:
+                        print('--> launch_with_triples: i_rank = %d'%(i_rank))
+                    # Note: python index start zero to N-1.
+                    # Check if i_rank value needs to be adjusted
+                    proc_bind_cmd = '"taskset --cpu-list '+','.join(cpu_list[ipos])+'" '
+                    # print(proc_bind_cmd)
+
+                    # Build commands that lauch multiple matlab on target nodes.
+                    defscommands, unix_cmd_i_rank = pyMPI_Commands(py_file_basename,i_rank,comm,grid_config=grid_config,\
                                                                start=i_rank_start,stop=i_rank_stop)
-                if GPU_BINDING:
-                    # Identify GPU ID for the given task (gpu_oversubscription contains number of GPUs on the node)
-                    gpu_id = int(ipos%NGPUS_PER_NODE)
-                    # Redefine CUDA_VISIBLE_DEVICES environment variable for each task
-                    unix_commands = unix_commands+'# Redefine CUDA_VISIBLE_DEVICES environment variable for each task'+nl
-                    unix_commands = unix_commands+'export CUDA_VISIBLE_DEVICES=$GPU%d'%(gpu_id)+nl
+                    if GPU_BINDING:
+                        # Identify GPU ID for the given task (gpu_oversubscription contains number of GPUs on the node)
+                        gpu_id = int(ipos%NGPUS_PER_NODE)
+                        # Redefine CUDA_VISIBLE_DEVICES environment variable for each task
+                        unix_commands = unix_commands+'# Redefine CUDA_VISIBLE_DEVICES environment variable for each task'+nl
+                        unix_commands = unix_commands+'export CUDA_VISIBLE_DEVICES=$GPU%d'%(gpu_id)+nl
 
-                if proc_bind:
-                    # Enforce process pinning
-                    unix_commands = unix_commands+'export TASKSET_CMD='+proc_bind_cmd+nl+unix_cmd_i_rank
-                else:
-                    unix_commands = unix_commands+'export TASKSET_CMD='+nl+unix_cmd_i_rank
-                ipos += 1
+                    if proc_bind:
+                        # Enforce process pinning
+                        unix_commands = unix_commands+'export TASKSET_CMD='+proc_bind_cmd+nl+unix_cmd_i_rank
+                    else:
+                        unix_commands = unix_commands+'export TASKSET_CMD='+nl+unix_cmd_i_rank
+                    ipos += 1
 
             # Create a file name to hold script that will be run on target.
             # Make sure to use the correct directory separator for Unix and DOS
@@ -199,29 +214,73 @@ def launch_with_triples(py_file, comm, grid_config):
                 if i_m == 1:
                     # skip the last one
                     continue
+            if not USE_MPI4PY:
+                if type == 'pc':
+                    unix_cmd_file = 'PythonMPI/Dos_Commands.'+imstr+file_ext
+                    dos_cmd_file = 'PythonMPI\\Dos_Commands.'+imstr+file_ext
+                else:
+                    # Add prefix for Unix systems
+                    unix_commands = unix_commands_prefix+unix_commands
+                    unix_cmd_file = 'PythonMPI/Unix_Commands.'+imstr+file_ext
+                    dos_cmd_file = 'PythonMPI/Unix_Commands.'+imstr+file_ext
 
-            if type == 'pc':
-                unix_cmd_file = 'PythonMPI/Dos_Commands.'+imstr+file_ext
-                dos_cmd_file = 'PythonMPI\\Dos_Commands.'+imstr+file_ext
-            else:
-                # Add prefix for Unix systems
-                unix_commands = unix_commands_prefix+unix_commands
-                unix_cmd_file = 'PythonMPI/Unix_Commands.'+imstr+file_ext
-                dos_cmd_file = 'PythonMPI/Unix_Commands.'+imstr+file_ext
-
-            # Put commands in a file.
-            fid = open(unix_cmd_file,'w')
+                # Put commands in a file.
+                fid = open(unix_cmd_file,'w')
             
-            # Fix unix_commands for LLGrid run
-            # Remove & at the end of each line
-            # unix_commands = re.sub("out &","out", unix_commands)
-            # Comment out the touch command
-            unix_commands = re.sub("touch","# touch", unix_commands)
-            # Add the "wait" at the end so that all the processes are done 
-            # before exiting Slurm task
-            unix_commands += '\nwait\n'
-            fid.write(unix_commands)
-            fid.close()
+                # Fix unix_commands for LLGrid run
+                # Remove & at the end of each line
+                # unix_commands = re.sub("out &","out", unix_commands)
+                # Comment out the touch command
+                unix_commands = re.sub("touch","# touch", unix_commands)
+                # Add the "wait" at the end so that all the processes are done 
+                # before exiting Slurm task
+                unix_commands += '\nwait\n'
+                fid.write(unix_commands)
+                fid.close()
+
+    # When using MPI4PY
+    if USE_MPI4PY:
+        if type == 'pc':
+            unix_cmd_file = 'PythonMPI/Dos_Commands.mpi4py'+file_ext
+            dos_cmd_file = 'PythonMPI\\Dos_Commands.mpi4py'+file_ext
+        else:
+            # Add prefix for Unix systems
+            unix_commands = unix_commands_prefix+unix_commands
+            unix_cmd_file = 'PythonMPI/Unix_Commands.mpi4py'+file_ext
+            dos_cmd_file = 'PythonMPI/Unix_Commands.mpi4py'+file_ext
+
+        # Note: python index start zero to N-1.
+        # Check if i_rank value needs to be adjusted
+        # proc_bind_cmd = '"taskset --cpu-list '+','.join(cpu_list[ipos])+'" '
+        # print(proc_bind_cmd)
+
+        # Build commands that lauch multiple matlab on target nodes.
+        defscommands, unix_cmd_mpi4py = pyMPI4PY_Commands(py_file_basename,comm,grid_config=grid_config,\
+                                                               start=i_rank_start,stop=i_rank_stop)
+        unix_commands = unix_commands+unix_cmd_mpi4py
+        # if GPU_BINDING:
+        #     # Identify GPU ID for the given task (gpu_oversubscription contains number of GPUs on the node)
+        #     gpu_id = int(ipos%NGPUS_PER_NODE)
+        #     # Redefine CUDA_VISIBLE_DEVICES environment variable for each task
+        #     unix_commands = unix_commands+'# Redefine CUDA_VISIBLE_DEVICES environment variable for each task'+nl
+        #     unix_commands = unix_commands+'export CUDA_VISIBLE_DEVICES=$GPU%d'%(gpu_id)+nl
+
+        # if proc_bind:
+        #     # Enforce process pinning
+        #     unix_commands = unix_commands+'export TASKSET_CMD='+proc_bind_cmd+nl+unix_cmd_mpi4py
+        # else:
+        #     unix_commands = unix_commands+'export TASKSET_CMD='+nl+unix_cmd_mpi4py
+
+        # Put commands in a file.
+        fid = open(unix_cmd_file,'w')
+    
+        # Fix unix_commands for LLGrid run
+        # Remove & at the end of each line
+        unix_commands = re.sub("touch","# touch", unix_commands)
+        # Add the "wait" at the end so that all the processes are done 
+        # before exiting Slurm task
+        fid.write(unix_commands)
+        fid.close()
 
     # If it's an interactive job, translate the current working directory as local path for Pid=0
     if interactive:
@@ -237,7 +296,7 @@ def launch_with_triples(py_file, comm, grid_config):
         comm['machine_db']['dir']['0'] = local_path
         
     # Display launch command.
-    # print(unix_launch)
+    print(unix_launch)
   
     # Write the scheduler job script file
     # This is done to fix Matlab's problem with very long commands sent to unix().
