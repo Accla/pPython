@@ -50,7 +50,7 @@ def grid_config_local(grid_config):
 
     DEBUG = 0
     if DEBUG:
-        print('--> Entering grid_config_local')
+        print('--> Entering grid_config_local in ~/ppython_config')
 
     # Am I on a LLGrid system?
     # Set the cluster name to work with
@@ -67,7 +67,7 @@ def grid_config_local(grid_config):
             elif re.search('txc',line,re.IGNORECASE):
                 cluster_name = 'txc'
     else:
-        # Manually define
+        # Manually define for other systems
         cluster_name = 'txgreen'
     grid_config['cluster_name'] = cluster_name
 
@@ -83,6 +83,8 @@ def grid_config_local(grid_config):
             grid_config['remote_user'] = 'ch21778'
         elif cluster_name == 'txe1':
             grid_config['remote_user'] = 'cbyun'
+        elif cluster_name == 'aicr':
+            grid_config['remote_user'] = 'cbyun_mit'
         else:
             raise Exception('grid_config_local: Unsupported system. Exited.')
     else:
@@ -94,6 +96,8 @@ def grid_config_local(grid_config):
         grid_config['remote_host'] = 'txg-login.llgrid.ll.mit.edu'
     elif cluster_name == 'txe1':
         grid_config['remote_host'] = 'txe1-login.mit.edu'
+    elif cluster_name == 'aicr':
+        grid_config['remote_host'] = 'login.aicr.ai'
     else:
         # print('grid_config_local: Unsupported system. Exited.')
         print('grid_config_local: This is not a LLSC system. ')
@@ -101,23 +105,37 @@ def grid_config_local(grid_config):
     grid_config['remote_launch'] = 'ssh'
     grid_config['remote_flags'] = '-q -x'
     #
-    # Cluster system
-    grid_config['default_q_name'] = 'xeon-p8'
-    grid_config['default_cpu_type'] = 'xeon-p8'
+    # Define default resource for a given cluster system
+    if cluster_name == 'aicr':
+        grid_config['default_q_name'] = 'rtx-devel'
+        grid_config['default_cpu_type'] = 'amd-e9575'
+    else:
+        grid_config['default_q_name'] = 'xeon-p8'
+        grid_config['default_cpu_type'] = 'xeon-p8'
     grid_config['q_name'] = grid_config['default_q_name']
     grid_config['cpu_type'] = grid_config['default_cpu_type']
     #
     # Paths for PythonMPI installation location and customization
-    grid_config['GRID_HOME_PATH'] = '/home/gridsan/'+grid_config['remote_user']
+    if cluster_name == 'aicr':
+        # AIRC systems
+        grid_config['GRID_HOME_PATH'] = os.path.join('/home',grid_config['remote_user'])
+    else:
+        # LLSC systems
+        grid_config['GRID_HOME_PATH'] = os.path.join('/home/gridsan',grid_config['remote_user'])
     
     # LLGrid Filesystem
-    grid_config['LL_FILE_SERVER'] = 'txe1-login.mit.edu'
+    if cluster_name == 'aicr':
+        # AICR systems
+        grid_config['LL_FILE_SERVER'] = 'login.aicr.ai'
+    else:
+        # LLSC SuperCloud systems
+        grid_config['LL_FILE_SERVER'] = 'txe1-login.mit.edu'
     
     # HOME directory path
     HOME= os.getenv('HOME')
 
     # locally mounted GRID_HOME_PATH
-    if os.path.exists('/etc/llgrid.id'):
+    if os.path.exists('/etc/llgrid.id') or (cluster_name == 'aicr') :
         # path on the grid
         GRID_MOUNT_PATH = grid_config['GRID_HOME_PATH']
     else:
@@ -131,18 +149,21 @@ def grid_config_local(grid_config):
 
     # pPython installation path
     try:
-        PPYTHON_HOME = os.getenv('PPYTHON_HOME')
+        if cluster_name == 'aicr':
+            PPYTHON_HOME = os.getenv('PPYTHON_HOME','/home/cbyun_mit/.local/lib/python3.12/site-packages/pPython')
+        else:
+            PPYTHON_HOME = os.getenv('PPYTHON_HOME')
         # print('grid_config_local: PPYTHON_HOME = %s'%(PPYTHON_HOME))
-        PPYTHON_PATH = PPYTHON_HOME+os.sep+"src"
+        PPYTHON_PATH = os.path.join(PPYTHON_HOME,"src")
         # PythonMPI installation path
-        PYTHONMPI_PATH = PPYTHON_HOME+os.sep+"PythonMPI"+os.sep+"src"
+        PYTHONMPI_PATH = os.path.join(PPYTHON_HOME,"PythonMPI","src")
         # PythonMPI customization path for an individual user
         if os.path.exists(GRID_MOUNT_PATH):
-            LOCAL_PYTHONMPI_CONFIG_PATH = GRID_MOUNT_PATH+os.sep+"ppython_conf"
+            LOCAL_PYTHONMPI_CONFIG_PATH = os.path.join(GRID_MOUNT_PATH,"ppython_conf")
         else:
-            LOCAL_PYTHONMPI_CONFIG_PATH = HOME+os.sep+"ppython_conf"
+            LOCAL_PYTHONMPI_CONFIG_PATH = os.path.join(HOME,"ppython_conf")
         # pPython path (codes for scheduler integration)
-        GRIDPYTHON_PATH = PPYTHON_HOME+os.sep+"grid"
+        GRIDPYTHON_PATH = os.path.join(PPYTHON_HOME,"sched")
         # Current working directory path
         CWD_PATH = os.getcwd()
     except Exception:
@@ -165,6 +186,30 @@ def grid_config_local(grid_config):
     grid_config['DMAP_PATH'] = DMAP_PATH
     grid_config['DMAT_PATH'] = DMAT_PATH
 
+    # Set TMPDIR
+    PPYTHON_TMPDIR = os.getenv('PPYTHON_TMPDIR','')
+    if PPYTHON_TMPDIR:
+        grid_config['TMPDIR'] = PPYTHON_TMPDIR
+    else:
+        if cluster_name == 'aicr':
+            grid_config['TMPDIR'] = '/tmp'
+        else:
+            grid_config['TMPDIR'] = '/state/partition1/slurm_tmp'
+    if DEBUG:
+        print('grid_config_local: Set pPYTHON to use TMPDIR = %s'%(grid_config['TMPDIR']))
+
+    # Additional pPython variables to switch between MPI4PY and PythonMPI
+    # Set default False as a bool data type
+    PPYTHON_USE_MPI4PY = os.getenv('PPYTHON_USE_MPI4PY','')
+    if PPYTHON_USE_MPI4PY:
+        if DEBUG:
+            print('Set pPYTHON to use MPI4PY')
+        grid_config['USE_MPI4PY'] = True
+    else:
+        if DEBUG:
+            print('Set pPYTHON to use PythonMPI')
+        grid_config['USE_MPI4PY'] = False
+
     # Triples modes releated
     grid_config['nnode'] = 0
 
@@ -179,16 +224,6 @@ def grid_config_local(grid_config):
     grid_config['local_fs'] = 0
     # For now, no mnaycore optimization
     grid_config['PPYTHON_MANYCORE'] = 'no'
-
-    # Additional pPython variables to switch between MPI4PY and PythonMPI
-    # Set default False as a bool data type
-    PPYTHON_USE_MPI4PY = os.getenv('PPYTHON_USE_MPI4PY','')
-    if PPYTHON_USE_MPI4PY:
-        print('Set pPYTHON to use MPI4PY')
-        grid_config['USE_MPI4PY'] = True
-    else:
-        print('Set pPYTHON to use PythonMPI')
-        grid_config['USE_MPI4PY'] = False
 
     if DEBUG:
         print(grid_config)
