@@ -33,7 +33,7 @@ def slurm2hostmap():
     Date: November 28, 2022
     """
 
-    DEBUG = 0
+    DEBUG = 1
     if DEBUG:
         print('--> Entering slurm2hostmap')
     
@@ -44,6 +44,7 @@ def slurm2hostmap():
     
     # Recover grid_config from MPI_COMM_WORLD
     grid.grid_config = MPI_COMM_WORLD['grid_config']
+    TMPDIR = grid.grid_config['TMPDIR']
     USE_MPI_4PY = grid.grid_config['USE_MPI4PY']
 
     if DEBUG:
@@ -52,6 +53,7 @@ def slurm2hostmap():
         print(grid.grid_config['mixed_fs'])
         print('slurm2hostmap: grid.grid_config["srun"] = ',end="")
         print(grid.grid_config['srun'])
+        print(f'TMPDIR: {TMPDIR}')
         print(f'USE_MPI_4PY: {USE_MPI_4PY}')
         print("")
         # print("slurm2hostmap: grid.grid_config['srun'] = %s"%(grid.grid_config['srun']))
@@ -246,6 +248,7 @@ def slurm2hostmap():
                 # print('Slurm TaskID: %s, JobID: %s, Hostname: %s'%(tmp[0],tmp[1],tmp[2]))
                 print('pPython Machine ID: %s, JobID: %s, Hostname: %s'%(tmp[0],tmp[1],tmp[2]))
             my_node_rank = int(tmp[0])-1
+            # tmp[1] is job ID
             # tmp[2] is compute node name
             MPI_COMM_WORLD['local_pids'][tmp[2]]=[]
             # Adjust for mixed messaging kernel
@@ -256,10 +259,17 @@ def slurm2hostmap():
             if not (mixed_fs and Pid == 0):
                 # Skip if Pid = 0 with mixed_fs = 1
                 # Otherwise, set MPI_COMM_WORLD['tmpdir'][i+mixed_fs]
+                # Construct the TMPDIR given by Slurm on LLSC environment?
                 if grid.grid_config['srun']:
-                    MPI_COMM_WORLD['tmpdir'][i+mixed_fs] = '/state/partition1/slurm_tmp/'+tmp[1]+'.'+tmpdir[1]+'.'+str(my_node_rank)
+                    if len(tmpdir) >= 2:
+                        MPI_COMM_WORLD['tmpdir'][i+mixed_fs] = os.path.join(TMPDIR,tmp[1]+'.'+tmpdir[1]+'.'+str(my_node_rank))
+                    else:
+                        MPI_COMM_WORLD['tmpdir'][i+mixed_fs] = os.path.join(TMPDIR,tmp[1]+'.'+SLURM_JOB_ID+'.'+str(my_node_rank))
                 else:
-                   MPI_COMM_WORLD['tmpdir'][i+mixed_fs] = '/state/partition1/slurm_tmp/'+tmp[1]+'.'+tmpdir[1]+'.'+tmpdir[2]
+                    if len(tmpdir) >= 3:
+                        MPI_COMM_WORLD['tmpdir'][i+mixed_fs] = os.path.join(TMPDIR,tmp[1]+'.'+tmpdir[1]+'.'+tmpdir[2])
+                    else:
+                        MPI_COMM_WORLD['tmpdir'][i+mixed_fs] = os.path.join(TMPDIR,tmp[1]+'.'+SLURM_ARRAY_JOB_ID)
                 if DEBUG:
                    print("slurm2hostmap: MPI_COMM_WORLD['tmpdir'][%d] = %s"%(i+mixed_fs,MPI_COMM_WORLD['tmpdir'][i+mixed_fs]))
             # For IMPLICIT_EPPAC, nppn may be changed at the last machine
@@ -290,7 +300,11 @@ def slurm2hostmap():
             tmp = hostmap[i+1].split()
             ipos = int(tmp[0])-1
             MPI_COMM_WORLD['machine_db']['machine'][ipos] = tmp[2]
-            MPI_COMM_WORLD['tmpdir'][ipos] = '/state/partition1/slurm_tmp/'+tmp[1]+'.'+tmpdir[1]+'.'+tmpdir[2]
+            # Construct the TMPDIR given by Slurm on LLSC environment?
+            # MPI_COMM_WORLD['tmpdir'][ipos] = '/state/partition1/slurm_tmp/'+tmp[1]+'.'+tmpdir[1]+'.'+tmpdir[2]
+            #
+            MPI_COMM_WORLD['tmpdir'][ipos] = os.path.join(TMPDIR,tmp[1]+'.'+tmpdir[1]+'.'+tmpdir[2])
+
         # Generate pid list on the same node
         machines = MPI_COMM_WORLD['machine_db']['machine']
         for hostname in sorted( set( machines.values() ) ):
