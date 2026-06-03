@@ -33,7 +33,7 @@ def slurm2hostmap():
     Date: November 28, 2022
     """
 
-    DEBUG = 1
+    DEBUG = 0
     if DEBUG:
         print('--> Entering slurm2hostmap')
     
