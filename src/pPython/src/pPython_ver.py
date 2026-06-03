@@ -13,7 +13,7 @@ def pPython_ver(default_display = None):
     """
     
     location = pathlib.Path().absolute()
-    version = '0.10.3l'   # GPU array special
+    version = '0.10.4'   # GPU array special
     
     if default_display:
         print('pPython version: %s'%(version))
