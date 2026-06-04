@@ -7,8 +7,10 @@ for mydir in `ls $EXAMPLE_DIR`;
 do echo $mydir; 
    PYFILE=`grep ^py_file $EXAMPLE_DIR/$mydir/RUN.py|cut -d= -f2|xargs`; 
    echo "My pPython file: $PYFILE"
-   cp ./RUN.py $EXAMPLE_DIR/$mydir/RUN.py 
+   cp ./RUN.py $EXAMPLE_DIR/$mydir/
+   cp ./launch_pPython.sh $EXAMPLE_DIR/$mydir/
    sed -i s/pMandelbrot.py/$PYFILE/ $EXAMPLE_DIR/$mydir/RUN.py 
+   sed -i s/pMandelbrot.py/$PYFILE/ $EXAMPLE_DIR/$mydir/launch_pPython.sh 
    echo " "
 done
 
