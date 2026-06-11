@@ -36,7 +36,13 @@ except NameError: Pid = 0
 
 # Check GPU availability
 # Based on CUDA_VISIBLE_DEVICES
-use_gpu = (os.getenv('CUDA_VISIBLE_DEVICES','') != '')
+# use_gpu = (os.getenv('CUDA_VISIBLE_DEVICES','') != '')
+CUDA_VISIBLE_DEVICES = os.getenv('CUDA_VISIBLE_DEVICES','')
+if (CUDA_VISIBLE_DEVICES == '0') or (CUDA_VISIBLE_DEVICES == ''):
+    use_gpu = False
+else:
+    use_gpu = True
+
 if DEBUG:
     print('pPython __init__: use_gpu = ',end='')
     print(use_gpu)
