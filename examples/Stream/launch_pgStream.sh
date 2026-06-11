@@ -10,7 +10,7 @@ module load anaconda/Python-ML-2024b
 # This allows to see the actual job submission command
 export PPYTHON_DEBUG=YES
 # Define the partition to submit the job
-PARTITION='e9-h100nvl'
+PARTITION='xeon-g6-volta'
 # pRuN() 3rd argument input
 TARGET="'$PARTITION&'"
 
@@ -60,6 +60,5 @@ for NPPN in 1 2 ; do
     #
     # Rename PythonMPI
     FNPPN=$(printf "%02d" "$NPPN")
-    mv PythonMPI PythonMPI_$PARTITIION_${type_str}_${FNPPN}
+    mv PythonMPI PythonMPI_${PARTITION}_${type_str}_${FNPPN}
 done
-
