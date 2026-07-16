@@ -38,7 +38,8 @@ except NameError: Pid = 0
 # Based on CUDA_VISIBLE_DEVICES
 # use_gpu = (os.getenv('CUDA_VISIBLE_DEVICES','') != '')
 CUDA_VISIBLE_DEVICES = os.getenv('CUDA_VISIBLE_DEVICES','')
-if (CUDA_VISIBLE_DEVICES == '0') or (CUDA_VISIBLE_DEVICES == ''):
+# if (CUDA_VISIBLE_DEVICES == '0') or (CUDA_VISIBLE_DEVICES == ''):
+if (CUDA_VISIBLE_DEVICES == ''):
     use_gpu = False
 else:
     use_gpu = True
@@ -51,7 +52,10 @@ if DEBUG:
 gpu_device = None
 if use_gpu:
     import cupy as cp
+    # The following code happens to work only because Pid is always 0 at this stage and, 
+    # due to the GPU binding, only a single GPU is visible to the process.
     gpu_device = cp.cuda.Device(Pid%cp.cuda.runtime.getDeviceCount())
+    # bug because only 1 GPU is visible to my process: gpu_device = cp.cuda.Device(int(CUDA_DEVICE_ID))
 
 if DEBUG:
     print('pPython:')
@@ -60,7 +64,7 @@ if DEBUG:
     print('comm')
     print(comm)
     print('Np = %d, Pid = %d'%(Np,Pid))
-    print(gpu_device)
+    print(f"gpu_device: {gpu_device}")
 
 ########################################################
 # pPython: Parallel Python Programming Tool
