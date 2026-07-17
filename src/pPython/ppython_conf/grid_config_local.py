@@ -198,6 +198,18 @@ def grid_config_local(grid_config):
     if DEBUG:
         print('grid_config_local: Set pPYTHON to use TMPDIR = %s'%(grid_config['TMPDIR']))
 
+    # Additional pPython variables to switch between exclusive and shared comput node environment
+    # Set default False (exclusive mode) as a bool data type
+    PPYTHON_SHARED_NODE = os.getenv('PPYTHON_SHARED_NODE','')
+    if PPYTHON_SHARED_NODE:
+        if DEBUG:
+            print('Set pPYTHON to use a shared mode on a compute node.')
+        grid_config['SHARED_NODE'] = True
+    else:
+        if DEBUG:
+            print('Set pPYTHON to use an exclusive mode on a compute node.')
+        grid_config['SHARED_NODE'] = False
+
     # Additional pPython variables to switch between MPI4PY and PythonMPI
     # Set default False as a bool data type
     PPYTHON_USE_MPI4PY = os.getenv('PPYTHON_USE_MPI4PY','')
