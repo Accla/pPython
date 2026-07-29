@@ -92,15 +92,19 @@ X0loc[:,round(0.5*Nb)-1,:] = 1
 # STEP 1: CREATE SYNTHETIC DATA. ---------------------
 tic = timer()               # Start timer.
 # Convert from beams to sensors.
-for i_f in range(myI_f.size):  # Loop over local frequencies.
-    # X1loc[:, :, i_f] = X1loc[:, :, i_f] + dot(squeeze(X0loc[:, :, i_f]), squeeze(myV[:, :, i_f]).T)
-    X1loc[:, :, i_f] += dot(squeeze(X0loc[:, :, i_f]), squeeze(myV[:, :, i_f]).T)
+for i_t in range(Nt):                 # Loop over time snapshots (0 .. Nt-1)
+    for i_f in range(myI_f.size):  # Loop over local frequencies.
+        # X1loc[:, :, i_f] = X1loc[:, :, i_f] + dot(squeeze(X0loc[:, :, i_f]), squeeze(myV[:, :, i_f]).T)
+        # X1loc[:, :, i_f] += dot(squeeze(X0loc[:, :, i_f]), squeeze(myV[:, :, i_f]).T)
+        X1loc[i_t, :, i_f] = ( X1loc[i_t, :, i_f] + squeeze(myV[:, :, i_f]) @ squeeze(X0loc[i_t, :, i_f]) )
 
 # STEP 2: BEAMFORM AND SAVE DATA. ---------------------
 
 # Convert from sensors back to beams.
-for i_f in range(myI_f.size):  # Loop over local frequencies.
-    X2loc[:, :, i_f] = abs(dot(squeeze(X1loc[:, :, i_f]), squeeze(myV[:, :, i_f])))**2
+for i_t in range(Nt):
+    for i_f in range(myI_f.size):  # Loop over local frequencies.
+        # X2loc[:, :, i_f] = abs(dot(squeeze(X1loc[:, :, i_f]), squeeze(myV[:, :, i_f])))**2
+        X2loc[i_t, :, i_f] = abs( np.squeeze(X1loc[i_t, :, i_f]) @ squeeze(myV[:, :, i_f]) ) ** 2
 
 if SAVEFILES:
     for i_f in range(myI_f.size):  # Loop over frequencies.
