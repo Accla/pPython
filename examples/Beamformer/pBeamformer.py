@@ -52,23 +52,28 @@ Nt = 50
 Nb = 40
 
 # J.K. parameter for GPU benchmark
-Nt = 600; Ns = 90;  Nb = 40; Nf = 100;
-Nt = int(16*Nt); Ns = int(256*Ns);  Nb = int(256*Nb); Nf = int(Np*Nf/25);
+# Nt = 600; Ns = 90;  Nb = 40; Nf = 100;
+# Nt = int(16*Nt); Ns = int(256*Ns);  Nb = int(256*Nb); Nf = int(Np*Nf/25);
+
+# debug
+Nt = 100; Nf = 256
+
+print(f"    Parameters: Nt={Nt}: Ns={Ns}: Nb={Nb}: Nf={Nf}:")
 
 SAVEFILES = 0
 
 PARALLEL = 1    # Set control flag.
 Xmap = 1        # Create serial map.
 if (PARALLEL):
-    Xmap = Dmap([1,1,Np],{},range(Np))  # Create parallel map.
+    Xmap = Dmap([Np,1,1],{},range(Np))  # Create parallel map.
 
 # ALLOCATE PARALLEL DATA STRUCTURES ---------------------
-X0 = zeros(Nt,Nb,Nf,map=Xmap)   # Source array.
-X1 = sqrt(Ns)*dcomplex(rand(Nt,Ns,Nf,map=Xmap),rand(Nt,Ns,Nf,map=Xmap))  # Sensor input.
-X2 = zeros(Nt,Nb,Nf,map=Xmap)   # Beamformed output.
-X3 = zeros(Nt,Nb,Np,map=Xmap)   # Intermediate sum.
+X0 = zeros(Nf,Nt,Nb,map=Xmap)   # Source array.
+X1 = sqrt(Ns)*dcomplex(rand(Nf,Nt,Ns,map=Xmap),rand(Nf,Nt,Ns,map=Xmap))  # Sensor input.
+X2 = zeros(Nf,Nt,Nb,map=Xmap)   # Beamformed output.
+X3 = zeros(Np,Nt,Nb,map=Xmap)   # Intermediate sum.
 
-myI_f = global_ind(X1,2)[0]   # Get local indices.
+myI_f = global_ind(X1,0)[0]   # Get local indices.
 # Get local parts of arrays.
 X0loc = local(X0)  
 X1loc = local(X1)  
@@ -86,29 +91,26 @@ myV = squeeze(beamformer_vectors(Ns,Nb,frequencies[myI_f]))
 
 # Insert two targets at different angles in X0.
 # Subtract one to match with the same index location used by Matlab
-X0loc[:,round(0.25*Nb)-1,:] = 1  
-X0loc[:,round(0.5*Nb)-1,:] = 1
+X0loc[:,:,round(0.25*Nb)-1] = 1  
+X0loc[:,:,round(0.5*Nb)-1] = 1
 
 # STEP 1: CREATE SYNTHETIC DATA. ---------------------
 tic = timer()               # Start timer.
 # Convert from beams to sensors.
-for i_t in range(Nt):                 # Loop over time snapshots (0 .. Nt-1)
-    for i_f in range(myI_f.size):  # Loop over local frequencies.
-        # X1loc[:, :, i_f] = X1loc[:, :, i_f] + dot(squeeze(X0loc[:, :, i_f]), squeeze(myV[:, :, i_f]).T)
-        # X1loc[:, :, i_f] += dot(squeeze(X0loc[:, :, i_f]), squeeze(myV[:, :, i_f]).T)
-        X1loc[i_t, :, i_f] = ( X1loc[i_t, :, i_f] + squeeze(myV[:, :, i_f]) @ squeeze(X0loc[i_t, :, i_f]) )
+for i_f in range(len(myI_f)):   # Loop over local frequencies.
+    # Convert from beams to sensors.
+    X1loc[i_f,:, :] = X1loc[i_f,:, :] + ( squeeze(X0loc[i_f,:, :]) @ squeeze(myV[i_f,:, :]).T )
 
 # STEP 2: BEAMFORM AND SAVE DATA. ---------------------
 
 # Convert from sensors back to beams.
-for i_t in range(Nt):
-    for i_f in range(myI_f.size):  # Loop over local frequencies.
-        # X2loc[:, :, i_f] = abs(dot(squeeze(X1loc[:, :, i_f]), squeeze(myV[:, :, i_f])))**2
-        X2loc[i_t, :, i_f] = abs( np.squeeze(X1loc[i_t, :, i_f]) @ squeeze(myV[:, :, i_f]) ) ** 2
+for i_f in range(len(myI_f)):      # Loop over local frequencies.
+    # Convert from sensors back to beams.
+    X2loc[i_f,:, :] = abs( squeeze(X1loc[i_f,:, :]) @ squeeze(myV[i_f,:, :])) ** 2
 
 if SAVEFILES:
     for i_f in range(myI_f.size):  # Loop over frequencies.
-        X_i_f = squeeze(X2loc[:,:,i_f])   # Get a matrix of data.
+        X_i_f = squeeze(X2loc[i_f,:,:])   # Get a matrix of data.
         filename = 'dat/pBeamformer_freq.'+str(myI_f[i_f])+'.npy'
         save(filename, X_i_f)             # .npy extension is added if not given
 
@@ -119,31 +121,32 @@ print('Compute GFlops                     = %f'%(2*8*Nt*Ns*Nb*Nf/Tcompute/1e9))
 # STEP 3: SUM ACROSS FREQUNCY. ---------------------
 
 # Add the missing axis for the broadcast ops in put_local() when sum() reduces X2loc dimension
-X3 = put_local(X3,sum(X2loc,2)[:,:,newaxis])   # Sum local part and put into X3.
+X3 = put_local(X3,sum(X2loc,0)[newaxis,:,:])   # Sum local part and put into X3.
+
 tic = timer()                        # Start timer.
-x3 = squeeze(sum(agg(X3),2))   # Aggregate X3 on leader and complte sum.
+x3 = squeeze(sum(agg(X3),0))   # Aggregate X3 on leader and complte sum.
 
 Tcomm = timer() - tic
 print('Launch+Comm Time (sec)             = %f'%(Tcomm))
 
 # STEP 4: Finalize and display. ---------------------
 # Display on leader.
-DISPLAY_PLOT=0
+DISPLAY_PLOT=1
 if (Pid == 0) and (DISPLAY_PLOT==1):
     pstr = str(PARALLEL)
     npstr = str(Np)
     
-    img0 = plt.imshow(abs(squeeze(X0loc[:,:,0])), origin = 'upper')
+    img0 = plt.imshow(abs(squeeze(X0loc[0,:,:])), origin = 'upper')
     # img0.set_cmap('bwr')
     filename = 'beamformer_x0_'+pstr+'_'+npstr+'.png'
     plt.savefig(filename)
 
-    img1 = plt.imshow(abs(squeeze(X1loc[:,:,0])), origin = 'upper')
+    img1 = plt.imshow(abs(squeeze(X1loc[0,:,:])), origin = 'upper')
     # img1.set_cmap('bwr')
     filename = 'beamformer_x1_'+pstr+'_'+npstr+'.png'
     plt.savefig(filename)
 
-    img2 = plt.imshow(abs(squeeze(X2loc[:,:,0])), origin = 'upper')
+    img2 = plt.imshow(abs(squeeze(X2loc[0,:,:])), origin = 'upper')
     # img2.set_cmap('bwr')
     filename = 'beamformer_x2_'+pstr+'_'+npstr+'.png'
     plt.savefig(filename)
