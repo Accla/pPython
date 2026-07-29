@@ -223,6 +223,8 @@ def slurm2hostmap():
     #
     # Now for all pPython processes . . . 
     #
+    # Get the array job id
+    SLURM_ARRAY_JOB_ID = os.getenv('SLURM_ARRAY_JOB_ID')
     # Modify MPI_COMM_WORLD to save the host to rank map along with TMPDIR
     MPI_COMM_WORLD['tmpdir'] = dict()
     MPI_COMM_WORLD['local_pids'] = dict()
@@ -264,13 +266,15 @@ def slurm2hostmap():
                     if len(tmpdir) >= 2:
                         MPI_COMM_WORLD['tmpdir'][i+mixed_fs] = os.path.join(TMPDIR,tmp[1]+'.'+tmpdir[1]+'.'+str(my_node_rank))
                     else:
-                        MPI_COMM_WORLD['tmpdir'][i+mixed_fs] = os.path.join(TMPDIR,tmp[1]+'.'+SLURM_JOB_ID+'.'+str(my_node_rank))
+                        # MPI_COMM_WORLD['tmpdir'][i+mixed_fs] = os.path.join(TMPDIR,tmp[1]+'.'+SLURM_JOB_ID+'.'+str(my_node_rank))
+                        MPI_COMM_WORLD['tmpdir'][i+mixed_fs] = os.path.join(TMPDIR,SLURM_JOB_ID+'.'+str(my_node_rank))
                 else:
                     if len(tmpdir) >= 3:
                         # MPI_COMM_WORLD['tmpdir'][i+mixed_fs] = '/state/partition1/slurm_tmp/'+tmp[1]+'.'+tmpdir[1]+'.'+tmpdir[2]
                         MPI_COMM_WORLD['tmpdir'][i+mixed_fs] = os.path.join(TMPDIR,tmp[1]+'.'+tmpdir[1]+'.'+tmpdir[2])
                     else:
-                        MPI_COMM_WORLD['tmpdir'][i+mixed_fs] = os.path.join(TMPDIR,tmp[1]+'.'+SLURM_ARRAY_JOB_ID)
+                        # MPI_COMM_WORLD['tmpdir'][i+mixed_fs] = os.path.join(TMPDIR,tmp[1]+'.'+SLURM_ARRAY_JOB_ID)
+                        MPI_COMM_WORLD['tmpdir'][i+mixed_fs] = os.path.join(TMPDIR,SLURM_ARRAY_JOB_ID)
                 if DEBUG:
                     print("slurm2hostmap: MPI_COMM_WORLD['tmpdir'][%d] = %s"%(i+mixed_fs,MPI_COMM_WORLD['tmpdir'][i+mixed_fs]))
             # For IMPLICIT_EPPAC, nppn may be changed at the last machine
@@ -309,13 +313,15 @@ def slurm2hostmap():
                 if len(tmpdir) >= 2:
                     MPI_COMM_WORLD['tmpdir'][i+mixed_fs] = os.path.join(TMPDIR,tmp[1]+'.'+tmpdir[1]+'.'+str(my_node_rank))
                 else:
-                    MPI_COMM_WORLD['tmpdir'][i+mixed_fs] = os.path.join(TMPDIR,tmp[1]+'.'+SLURM_JOB_ID+'.'+str(my_node_rank))
+                    #BUG? MPI_COMM_WORLD['tmpdir'][i+mixed_fs] = os.path.join(TMPDIR,tmp[1]+'.'+SLURM_JOB_ID+'.'+str(my_node_rank))
+                    MPI_COMM_WORLD['tmpdir'][i+mixed_fs] = os.path.join(TMPDIR,SLURM_JOB_ID+'.'+str(my_node_rank))
             else:
                 if len(tmpdir) >= 3:
                     # MPI_COMM_WORLD['tmpdir'][i+mixed_fs] = '/state/partition1/slurm_tmp/'+tmp[1]+'.'+tmpdir[1]+'.'+tmpdir[2]
                     MPI_COMM_WORLD['tmpdir'][i+mixed_fs] = os.path.join(TMPDIR,tmp[1]+'.'+tmpdir[1]+'.'+tmpdir[2])
                 else:
-                    MPI_COMM_WORLD['tmpdir'][i+mixed_fs] = os.path.join(TMPDIR,tmp[1]+'.'+SLURM_ARRAY_JOB_ID)
+                    #BUG?: MPI_COMM_WORLD['tmpdir'][i+mixed_fs] = os.path.join(TMPDIR,tmp[1]+'.'+SLURM_ARRAY_JOB_ID)
+                    MPI_COMM_WORLD['tmpdir'][i+mixed_fs] = os.path.join(TMPDIR,SLURM_ARRAY_JOB_ID)
 
         # Generate pid list on the same node
         machines = MPI_COMM_WORLD['machine_db']['machine']
@@ -343,6 +349,12 @@ def slurm2hostmap():
             MPI_COMM_WORLD['leader'][i] = pidmin
             MPI_COMM_WORLD['pidmax'][i] = pidmax
 
+    # Create the local filesystem message buffer
+    if MPI_COMM_WORLD['leader'][Pid] == Pid :
+        # I am the leader on this node
+        # Create the tmpdir on this node (share the same path among all the processes)
+        os.makedirs( MPI_COMM_WORLD['tmpdir'][Pid], exist_ok=True)
+    
     if DEBUG:
         print("MPI_COMM_WORLD['machine_id']")
         print(MPI_COMM_WORLD['machine_id'])
