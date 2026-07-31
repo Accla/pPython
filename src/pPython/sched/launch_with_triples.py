@@ -91,6 +91,19 @@ def launch_with_triples(py_file, comm, grid_config):
         GPU_BINDING = True
     NGPUS_PER_NODE = int(os.getenv('PPYTHON_NGPUS_PER_NODE',default='2'))
 
+    # For Nvidia GPU profiloing
+    PPYTHON_NVPROF = os.getenv('PPYTHON_NVPROF','')
+    if len(PPYTHON_NVPROF)>0:
+        # Use NVIDIA nvprof to profile performance on NVIDIA GPUs.
+        # Update PATH to include nvprof before launching pRUN()
+        # PPYTHON_NVPROF_LOG: log filename for profiling
+        PPYTHON_NVPROF_LOG = os.getenv('PPYTHON_NVPROF_LOG','nvprof.log-%p')
+        nvprof_cmd = ' nvprof --log-file '+PPYTHON_NVPROF_LOG+' '
+    else:
+        nvprof_cmd = ''
+    # update grid_config
+    grid_config['nvprof_cmd'] = nvprof_cmd
+
     # Loop backwards over each machine target machine
     # so that we hit the host machine last (if it is a target).
     for i_m in range(n_m,0,-1):
@@ -173,7 +186,11 @@ def launch_with_triples(py_file, comm, grid_config):
                     print('--> launch_with_triples: i_rank = %d'%(i_rank))
                 # Note: python index start zero to N-1.
                 # Check if i_rank value needs to be adjusted
-                proc_bind_cmd = '"taskset --cpu-list '+','.join(cpu_list[ipos])+'" '
+                if proc_bind:
+                    # Enforce process pinning
+                    proc_bind_cmd = '"taskset --cpu-list '+','.join(cpu_list[ipos])+'" '
+                else:
+                    proc_bind_cmd = ''
                 # print(proc_bind_cmd)
 
                 # Build commands that lauch multiple matlab on target nodes.
@@ -186,11 +203,8 @@ def launch_with_triples(py_file, comm, grid_config):
                     unix_commands = unix_commands+'# Redefine CUDA_VISIBLE_DEVICES environment variable for each task'+nl
                     unix_commands = unix_commands+'export CUDA_VISIBLE_DEVICES=$GPU%d'%(gpu_id)+nl
 
-                if proc_bind:
-                    # Enforce process pinning
-                    unix_commands = unix_commands+'export TASKSET_CMD='+proc_bind_cmd+nl+unix_cmd_i_rank
-                else:
-                    unix_commands = unix_commands+'export TASKSET_CMD='+nl+unix_cmd_i_rank
+                unix_commands = unix_commands+'export TASKSET_CMD='+nl+proc_bind_cmd+nl+unix_cmd_i_rank
+
                 ipos += 1
 
             # Create a file name to hold script that will be run on target.
