@@ -92,17 +92,28 @@ def launch_with_triples(py_file, comm, grid_config):
     NGPUS_PER_NODE = int(os.getenv('PPYTHON_NGPUS_PER_NODE',default='2'))
 
     # For Nvidia GPU profiloing
+    PPYTHON_NSIGHT = os.getenv('PPYTHON_NSIGHT','')
+    use_nsight = PPYTHON_NSIGHT != '' 
     PPYTHON_NVPROF = os.getenv('PPYTHON_NVPROF','')
-    if len(PPYTHON_NVPROF)>0:
+    use_nvprof = PPYTHON_NVPROF != '' 
+    if use_nsight:
+        # Use NVIDIA nSight to profile performance on NVIDIA GPUs with compute capability 8.0 or higher
+        PPYTHON_NVIDIA_LOG = os.getenv('PPYTHON_NVIDIA_LOG','prof-$(date +%Y%m%d_%H%M%S)')
+        nvidia_prof_cmd = ' nsys profile -o '+PPYTHON_NVIDIA_LOG+' '
+        NVLOG_CONFIG_FILE = os.getenv('NVLOG_CONFIG_FILE','')
+        use_config = NVLOG_CONFIG_FILE != '' 
+        if use_config:
+            nvidia_prof_cmd += ' --env-var=NVLOG_CONFIG_FILE='+NVLOG_CONFIG_FILE+' '
+    elif use_nvprof:
         # Use NVIDIA nvprof to profile performance on NVIDIA GPUs.
         # Update PATH to include nvprof before launching pRUN()
-        # PPYTHON_NVPROF_LOG: log filename for profiling
-        PPYTHON_NVPROF_LOG = os.getenv('PPYTHON_NVPROF_LOG','nvprof.log-%p')
-        nvprof_cmd = ' nvprof --log-file '+PPYTHON_NVPROF_LOG+' '
+        # PPYTHON_NVIDIA_LOG: log filename for profiling
+        PPYTHON_NVIDIA_LOG = os.getenv('PPYTHON_NVIDIA_LOG','nvprof.log-%p')
+        nvidia_prof_cmd = ' nvprof --log-file '+PPYTHON_NVIDIA_LOG+' '
     else:
-        nvprof_cmd = ''
+        nvidia_prof_cmd = ''
     # update grid_config
-    grid_config['nvprof_cmd'] = nvprof_cmd
+    grid_config['nvidia_prof_cmd'] = nvidia_prof_cmd
 
     # Loop backwards over each machine target machine
     # so that we hit the host machine last (if it is a target).
