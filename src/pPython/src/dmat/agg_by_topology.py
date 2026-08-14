@@ -116,7 +116,7 @@ def agg_by_topology(d):
                     print('Msg from Pid = %d' %(vPid))
                 # Find the position in the processor grid for the given Pid
                 [i,j] = np.where(d.map['grid'] == vPid)
-                i = int(i); j = int(j)
+                i = int(i[0]); j = int(j[0])
                 if DEBUG:
                     print('i,j,imsg=%d,%d,%d'%(i,j,imsg))
                     print('len(send_buf) = %d'%(len(send_buf)))
@@ -128,7 +128,7 @@ def agg_by_topology(d):
                 # Three dimensional array
                 # Find the position in the processor grid for the given Pid
                 [i,j,k] = np.where(d.map['grid'] == vPid)
-                i = int(i); j = int(j); k = int(k)
+                i = int(i[0]); j = int(j[0]); k = int(k[0])
                 if DEBUG:
                     print('i,j,k,imsg=%d,%d,%d'%(i,j,k,imsg))
                     print('len(send_buf) = %d'%(len(send_buf)))
@@ -142,7 +142,7 @@ def agg_by_topology(d):
                 # Four dimensional array
                 # Find the position in the processor grid for the given Pid
                 [i,j,k,m] = np.where(d.map['grid'] == vPid)
-                i = int(i); j = int(j); k = int(k); m = int(m)
+                i = int(i[0]); j = int(j[0]); k = int(k[0]); m = int(m[0])
                 if DEBUG:
                     print('i,j,k,m,imsg=%d,%d,%d'%(i,j,k,m,imsg))
                     print('len(send_buf) = %d'%(len(send_buf)))
@@ -282,7 +282,7 @@ def agg_by_topology(d):
                                     print('i,j,imsg=%d,%d,%d'%(i,j,imsg),end='')
                                     print('len(recv_buf) = %d'%(len(recv_buf)))
                                     # print(recv_buf)
-                                i = int(i); j = int(j)
+                                i = int(i[0]); j = int(j[0])
                                 if i not in temp_mat:
                                     temp_mat[i] = dict()
                                 temp_mat[i][j] = recv_buf[imsg]
@@ -290,7 +290,7 @@ def agg_by_topology(d):
                                 # Three dimensional array
                                 # Find the position in the processor grid for the given vPid
                                 [i,j,k] = np.where(d.map['grid'] == vPid)
-                                i = int(i); j = int(j); k = int(k)
+                                i = int(i[0]); j = int(j[0]); k = int(k[0])
                                 if i not in temp_mat:
                                     temp_mat[i] = dict()
                                 if j not in temp_mat[i]:
@@ -300,7 +300,7 @@ def agg_by_topology(d):
                                 # Four dimensional array
                                 # Find the position in the processor grid for the given vPid
                                 [i,j,k,m] = np.where(d.map['grid'] == vPid)
-                                i = int(i); j = int(j); k = int(k); m = int(m)
+                                i = int(i[0]); j = int(j[0]); k = int(k[0]); m = int(m[0])
                                 if i not in temp_mat:
                                     temp_mat[i] = dict()
                                 if j not in temp_mat[i]:

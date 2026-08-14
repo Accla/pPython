@@ -43,6 +43,8 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD,**argv):
             grid_job = grid_config['grid_job']
             EPPAC = grid_config['EPPAC']
             IMPLICIT_EPPAC = grid_config['IMPLICIT_EPPAC']
+            # Nvidia nvprof 
+            nvidia_prof_cmd = grid_config['nvidia_prof_cmd']
         elif key == 'start':
             i_rank_start = argv[key]
         elif key == 'stop':
@@ -219,7 +221,7 @@ def pyMPI_Commands(py_file,rank,MPI_COMM_WORLD,**argv):
     if EPPAC or IMPLICIT_EPPAC:
         # prepend to export MPI_COMM_WORLD_RANK=<mpi_rank>
         unix_command = 'export MPI_COMM_WORLD_RANK='+str(rank)+nl+ \
-                       '$TASKSET_CMD '+unix_command
+                       '$TASKSET_CMD '+nvidia_prof_cmd+unix_command
 
     if DEBUG:
         print('unix_command: %s'%(unix_command))

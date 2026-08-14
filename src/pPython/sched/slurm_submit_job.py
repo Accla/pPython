@@ -46,7 +46,14 @@ def slurm_submit_job(grid_config,sched_job_file,py_file,dir_llsc):
         if grid_config['srun']:
             cmdstr = cmdstr+' --exclusive --distribution=nopack --ntasks-per-node=1 --ntasks=%d'%(ntasks)
         else:
-            cmdstr = cmdstr+' --exclusive -a 1-%d'%(ntasks)
+            if grid_config['SHARED_NODE']:
+                # For non-exclusive node scheduling (sharing a multi-GPU node with other jobs 
+                # while only sharing CPU and memory, not GPUs), 
+                # PPYTHON_PROC_BIND must be disabled.
+                cmdstr = cmdstr+'  -a 1-%d'%(ntasks)
+            else:
+                # For exclusive node scheduling mode
+                cmdstr = cmdstr+' --exclusive -a 1-%d'%(ntasks)
     else:
         ntasks = grid_config['ntasks']
         # Check if MPI4PY is used for MPI communication

@@ -169,8 +169,8 @@ def agg(d, leader=None):
             # Two dimensional array
             # Find the position in the processor grid for the given Pid
             [i,j] = np.where(d.map['grid'] == Pid)
-            # i & j are np.array
-            i = int(i); j = int(j)
+            # i & j are np.array of a single element
+            i = int(i[0]); j = int(j[0])
             # if DEBUG: 
             #     print('Process position [i,j] = [%d, %d]'%(i,j))
             #     print('Type: %s'%(type(i)))
@@ -271,7 +271,7 @@ def agg(d, leader=None):
                                     if DEBUG: print('imsg=%s, Msg from Pid = %d' %(imsg,pidKeep[recvPidPos+imsg]))
                                     # Find the position in the processor grid for the given Pid
                                     [i,j] = np.where(d.map['grid'] == pidKeep[recvPidPos+imsg])
-                                    i = int(i); j = int(j)
+                                    i = int(i[0]); j = int(j[0])
                                     if DEBUG:
                                         print('i,j,imsg=%d,%d,%d'%(i,j,imsg))
                                         print('len(recvBuf) = %d'%(len(recvBuf)))

@@ -1,60 +1,75 @@
 """
-    Add system search paths for all the pPython files
-    and define initial parameters necessary for pPython.
+pPython initialization.
+
+Adds system search paths for all pPython files and defines the initial
+parameters necessary for pPython.
 """
+
 import os
 import sys
 
 DEBUG = 0
 
+# --------------------------------------------------------------------------
+# Paths
+# --------------------------------------------------------------------------
+
 # Set pPython HOME path environment
-base_dir_path = os.path.dirname(os.path.abspath(__file__))
-os.environ['PPYTHON_HOME'] = base_dir_path
+BASE_DIR_PATH = os.path.dirname(os.path.abspath(__file__))
+os.environ['PPYTHON_HOME'] = BASE_DIR_PATH
 
 # Set pPython runtime paths
-sys.path.append(base_dir_path+os.sep+'src')
-sys.path.append(base_dir_path+os.sep+'src'+os.sep+'map')
-sys.path.append(base_dir_path+os.sep+'src'+os.sep+'dmat')
-sys.path.append(base_dir_path+os.sep+'sched')
-sys.path.append(base_dir_path+os.sep+'PythonMPI'+os.sep+'src')
+_SUBDIRS = [
+    ('src',),
+    ('src', 'map'),
+    ('src', 'dmat'),
+    ('sched',),
+    ('PythonMPI', 'src'),
+]
+for subdir in _SUBDIRS:
+    sys.path.append(os.path.join(BASE_DIR_PATH, *subdir))
 
-# Share pPython Environment Variables
-import pyMPI_COMM_WORLD as pyMCW
+# --------------------------------------------------------------------------
+# MPI environment
+# --------------------------------------------------------------------------
 
-# Define MPI_COMM_WORLD dictionary if not defined.
-try: comm
-except NameError: comm = None
+# Share pPython environment variables
+import pyMPI_COMM_WORLD as pyMCW  # noqa: E402  (sys.path set above)
+
+# Define MPI_COMM_WORLD dictionary if not defined
+comm = globals().get('comm')
 if comm is None:
-        comm = pyMCW.MPI_COMM_WORLD
-        if not isinstance(comm,dict):
-            comm = dict()
-            comm['rank'] = 0
-try: Np
-except NameError: Np = 1
-try: Pid
-except NameError: Pid = 0
+    comm = pyMCW.MPI_COMM_WORLD
+    if not isinstance(comm, dict):
+        comm = {'rank': 0}
 
-# Check GPU availability
-# Based on CUDA_VISIBLE_DEVICES
-use_gpu = (os.getenv('CUDA_VISIBLE_DEVICES','') != '')
-if DEBUG:
-    print('pPython __init__: use_gpu = ',end='')
-    print(use_gpu)
-    print('pPython __init__: CUDA_VISIBLE_DEVICES = ',end='')
-    print(os.getenv('CUDA_VISIBLE_DEVICES',''))
+Np = globals().get('Np', 1)
+Pid = globals().get('Pid', 0)
+
+# --------------------------------------------------------------------------
+# GPU setup
+# --------------------------------------------------------------------------
+
+# Check GPU availability based on CUDA_VISIBLE_DEVICES
+cuda_visible_devices = os.getenv('CUDA_VISIBLE_DEVICES', '')
+use_gpu = cuda_visible_devices != ''
+
 gpu_device = None
 if use_gpu:
-    import cupy as cp
-    gpu_device = cp.cuda.Device(Pid%cp.cuda.runtime.getDeviceCount())
+    import cupy as cp  # noqa: E402
+    # Only a single GPU is visible to the process due to GPU binding,
+    # and Pid is always 0 at this stage, so this effectively selects
+    # the (single) visible device.
+    gpu_device = cp.cuda.Device(Pid % cp.cuda.runtime.getDeviceCount())
 
 if DEBUG:
+    print(f'pPython **init**: use_gpu = {use_gpu}')
+    print(f'pPython **init**: CUDA_VISIBLE_DEVICES = {cuda_visible_devices}')
     print('pPython:')
-    print('sys.path')
-    print(sys.path)
-    print('comm')
-    print(comm)
-    print('Np = %d, Pid = %d'%(Np,Pid))
-    print(gpu_device)
+    print(f'sys.path: {sys.path}')
+    print(f'comm: {comm}')
+    print(f'Np = {Np}, Pid = {Pid}')
+    print(f'gpu_device: {gpu_device}')
 
 ########################################################
 # pPython: Parallel Python Programming Tool

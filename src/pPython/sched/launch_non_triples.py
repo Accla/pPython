@@ -49,6 +49,20 @@ def launch_non_triples(py_file, comm, grid_config):
     
     # Initialize command launch on all the different machines.
     unix_launch = ''
+    bash_script = '#!/bin/bash'+nl+'export PATH=/bin:$PATH'+nl
+    bash_script = bash_script+'export KMP_AFFINITY=granularity=fine'+nl
+    bash_script = bash_script+'export KMP_INIT_AT_FORK=false'+nl
+    OMP_NUM_THREADS = os.getenv('OMP_NUM_THREADS','1')
+    bash_script = bash_script+'export OMP_NUM_THREADS='+OMP_NUM_THREADS+nl+nl
+
+    PPYTHON_DEBUG = os.getenv('PPYTHON_DEBUG')
+    if PPYTHON_DEBUG and PPYTHON_DEBUG.lower() == 'yes':
+        bash_script = bash_script+'ulimit -c 0'+nl
+        bash_script = bash_script+'echo "`hostname`: ulimit -c 0 `ulimit -c 0`"'+nl
+        bash_script = bash_script+'echo "`hostname`: ulimit -n `ulimit -n`"'+nl
+    
+    # Print TMPDIR path explicitly on each node in the PythonMPI/pRUN.log file:
+    bash_script = bash_script+'echo "`hostname`: TMPDIR=$TMPDIR"'+nl
 
     # Get number of machines.
     n_m = comm['machine_db']['n_machine']
@@ -93,13 +107,14 @@ def launch_non_triples(py_file, comm, grid_config):
             python_module_path = comm['machine_db']['python_module_path']
             python_module_name = comm['machine_db']['python_module_name']
             unix_commands = ''
-            unix_commands_prefix = '#!/bin/bash'+nl+'source /etc/profile'+nl
+            unix_commands_prefix = bash_script+nl+'source /etc/profile'+nl
             #
             # Add a check if this is on a LLSC system
-            unix_commands_prefix = unix_commands_prefix+'if [ -e /etc/llgrid.id ]; then'+nl
-            unix_commands_prefix = unix_commands_prefix+'    export MODULEPATH=${MODULEPATH}:'+python_module_path+nl
-            unix_commands_prefix = unix_commands_prefix+'    module load '+python_module_name+nl
-            unix_commands_prefix = unix_commands_prefix+'fi'+nl
+            unix_commands_prefix = unix_commands_prefix+'if [ -e ~/ppython_conf/activate_conda.sh ]; then'+nl
+            # Add custom conda environment setup in ~/ppython_conf/activate_conda.sh
+            # - embed module load command in this file
+            unix_commands_prefix = unix_commands_prefix+'    source ~/ppython_conf/activate_conda.sh'+nl
+            unix_commands_prefix = unix_commands_prefix+'fi'+nl+nl
             PYTHONPATH= os.getenv('PYTHONPATH',default='')
             if len(PYTHONPATH):
                 unix_commands_prefix = unix_commands_prefix+'export PYTHONPATH='+PYTHONPATH+nl

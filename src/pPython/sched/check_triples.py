@@ -70,7 +70,8 @@ def check_triples(cluster_name,cpu_type,n_proc,grid_config):
         grid_config['ntpp'] = ntpp
         grid_config['EPPAC'] = True
         grid_config['IMPLICIT_EPPAC'] = False
-        if os.getenv('PPYTHON_PROC_BIND',default='Yes').lower() == 'no':
+        if (os.getenv('PPYTHON_PROC_BIND',default='Yes').lower() == 'no') or \
+           grid_config['SHARED_NODE'] :
             grid_config['proc_bind'] = False
         else:
             grid_config['proc_bind'] = True

@@ -1,150 +1,100 @@
 import numpy as np
-from numpy import cos,sin,pi
 
-class Params:
+#def beamformer_vectors_freq_first(Nsensors, Nbeams, myFreqs,
+def beamformer_vectors(Nsensors, Nbeams, myFreqs, focus_range=None, sound_speed=1500.0):
     """
-    To hold some code parameters:
-    params.az = azimuth angles (deg), 0 = fwde       (1xM)
-    params.el = D/E angle (deg) 0= horizontal bea   (1xL)
-    params.arrayGeom = structure containing array element (x,y,z) location
-    params.freqs = vector of frequencies (Hz)        (1xF)
-    params.soundSpeed = speed of sound (m/sec)
-    """
-    pass
+    Python version of the MATLAB Beamformer_vectors function,
+    with frequency as the first dimension.
 
-def beamformer_vectors(Nsensors,Nbeams,myFreqs):
-    """
-    beamformer_vectors - routine to return broadband 3D focused single-path replica vector
-    
-    Input:       
-    params.az = azimuth angles (deg), 0 = fwde       (1xM)
-    params.el = D/E angle (deg) 0= horizontal bea   (1xL)
-    params.arrayGeom = structure containing array element (x,y,z) location
-    params.freqs = vector of frequencies (Hz)        (1xF)
-    params.soundSpeed = speed of sound (m/sec)
-    focus_range = focus range (m) (OPTIONAL)         (1x1)
-                  defaults to a very large number to get plane-wave replica
-    Output:     
-    v = steering vector (Nelements x M x L x F)
-    """
-    DEBUG = 0
-    if DEBUG:
-        print('--> Entering beamformer_vectors')
-      
-    # Hard some code parameters.
-    params = Params()
-    params.el = np.array([0])
-    params.az = np.linspace(0, 360, Nbeams)
+    Inputs
+    ------
+    Nsensors : int
+        Number of array elements.
+    Nbeams : int
+        Number of azimuth beams (0 to 360 degrees).
+    myFreqs : array-like
+        Frequencies in Hz (length F).
+    focus_range : float, optional
+        Focus range in meters. If None, uses far-field (1e10 m).
+    sound_speed : float, optional
+        Speed of sound (m/s), default 1500 (typical for water).
 
-    # frequencies and array positions are dimensionless.
-    params.freqs=myFreqs
-    params.arrayGeom = Params()
-    params.arrayGeom.x = np.linspace(-1000,1000,Nsensors)
-    if DEBUG:
-        print(params.arrayGeom.x.shape)
-        print(np.size(params.arrayGeom.x))
-    params.arrayGeom.y = np.zeros(np.size(params.arrayGeom.x))
-    params.arrayGeom.z = np.zeros(np.size(params.arrayGeom.x))
-    params.numEls = len(params.arrayGeom.x)
-    
-    params.soundSpeed=1500
-    
-    # get dimensions
-    numElev = len(params.el)
-    numAz = len(params.az)
-    numFreqs = len(params.freqs)
-    if DEBUG:
-        print('numFreqs = %d'%(numFreqs))
-    
-    # set so all azimuths have the same focus range
-    if(hasattr(params, 'focus_range')):
-        focus_range = params.focus_range*np.ones((1,numAz))
+    Returns
+    -------
+    v : np.ndarray
+        Steering vectors, shape (Nfreqs, Nelements, Naz, Nel),
+        where Naz = Nbeams, Nel = number of elevation angles (here 1),
+        and Nfreqs = len(myFreqs).
+    """
+
+    # Hard-coded parameters, matching MATLAB code
+    el = np.array([0.0])                        # elevation angle(s) in degrees
+    az = np.linspace(0.0, 360.0, Nbeams)        # azimuth angles in degrees
+
+    freqs = np.asarray(myFreqs, dtype=float)
+
+    # Array geometry (dimensionless positions, as in MATLAB)
+    x = np.linspace(-1000.0, 1000.0, Nsensors)
+    y = np.zeros_like(x)
+    z = np.zeros_like(x)
+    numEls = x.size
+
+    numElev = el.size
+    numAz = az.size
+    numFreqs = freqs.size
+
+    # Focus range for each azimuth
+    if focus_range is None:
+        # Default to far-field (plane-wave replica)
+        focus_range = np.full(numAz, 1e10, dtype=float)
     else:
-        # default to far-field
-        focus_range = 1e10*np.ones((1,numAz))
+        # Same focus range for all azimuths
+        focus_range = np.full(numAz, float(focus_range), dtype=float)
 
-    # shoehorn rr structure into P_array.
-    P_array = np.concatenate((params.arrayGeom.x,params.arrayGeom.y,params.arrayGeom.z)).reshape((-1, 3), order='F')
-    P_array_matrix=np.broadcast_to(P_array, (numAz, *P_array.shape))  
-    # Note that the index order in P_array_matrix has changes as
-    # MATLAB: (:,:,1) -> Python: [0,:,:]
-    #
-    # Should do np.swapaxes() twice to make it conpatible with the Matlab results? Yes, it's needed later for subtraction ops
-    if DEBUG:
-        print('Swap between axes 0 and 1 first. Then, swap between axes 1 and 2.')
-    P_array_matrix = np.swapaxes(P_array_matrix,0,1)
-    P_array_matrix = np.swapaxes(P_array_matrix,1,2)
-    if DEBUG:
-        for i in range(P_array_matrix.shape[2]):
-            print('P_array_matrix[:,:,%d]'%(i))
-            print(P_array_matrix[:,:,i])
+    # Array element positions: shape (Nelements, 3)
+    P_array = np.stack([x, y, z], axis=1)
 
-    #CB: v is an array of complex numbers. So allocate memory accordingly
-    v = np.zeros((params.numEls,numAz,numElev,numFreqs))
-    v = np.vectorize(complex)(v,v)
-    if DEBUG:
-        print('v.shape')
-        print(v.shape)
+    # Replicate array positions for each azimuth: shape (Nelements, 3, Naz)
+    P_array_matrix = np.repeat(P_array[:, :, np.newaxis], numAz, axis=2)
 
-    pointing_vectors = np.zeros((3,numAz))
+    # Output steering vector: (Nfreqs, Nelements, Naz, Nel)
+    v = np.zeros((numFreqs, numEls, numAz, numElev), dtype=np.complex128)
+
+    az_rad = np.deg2rad(az)
+    el_rad = np.deg2rad(el)
+
+    # Loop over elevation (in this code, only one: 0 deg)
     for ielev in range(numElev):
-        # Define the vector that points at this azimuth and elevation
-        # from the array phase center
-        # Use np.around to overcome the exact zero issue
-        pointing_vectors[0,:] = np.around(cos(params.az*pi/180),decimals=8)*cos(params.el[ielev]*pi/180)
-        pointing_vectors[1,:] = np.around(sin(params.az*pi/180),decimals=8)*cos(params.el[ielev]*pi/180)
-        pointing_vectors[2,:] = np.ones((1,numAz))*sin(params.el[ielev]*pi/180)
-    
-        # Compute the actual focus point (meters)
-        focus_points = np.dot(pointing_vectors,np.diag(focus_range[0]))
-        """
-        if DEBUG:
-            print('focus_points')
-            print(focus_points)
-            print('pointing_vectors')
-            print(pointing_vectors)
-        """
+        cos_el = np.cos(el_rad[ielev])
+        sin_el = np.sin(el_rad[ielev])
 
-    
-        # Compute the difference in range to each element in the array with
-        # respect to the array phase center
-        focus_points_matrix = np.reshape(np.kron(focus_points,np.ones((params.numEls,1))),(params.numEls,3,numAz),'F')
-        """
-        if DEBUG:
-            print('np.kron(focus_points,np.ones(params.numEls,1))')
-            print(np.kron(focus_points,np.ones(params.numEls,1)))
-            
-            print('focus_points_matrix.shape')
-            print(focus_points_matrix.shape)
-            # print(focus_points_matrix)
-            for i in range(focus_points_matrix.shape[2]):
-                print('focus_points_matrix[:,:,%d]'%(i))
-                print(focus_points_matrix[:,:,i])
-        """
-    
-        delta_range = np.sqrt(np.squeeze(np.sum((P_array_matrix - focus_points_matrix)**2,1))) - np.ones((params.numEls,1))*focus_range
+        # Pointing vectors: shape (3, Naz)
+        pointing_vectors = np.zeros((3, numAz), dtype=float)
+        pointing_vectors[0, :] = np.cos(az_rad) * cos_el
+        pointing_vectors[1, :] = np.sin(az_rad) * cos_el
+        pointing_vectors[2, :] = sin_el
 
-        if DEBUG:
-            print('delta_range')
-            print(delta_range)
+        # Focus points (meters): each azimuth scaled by its focus_range
+        # shape (3, Naz)
+        focus_points = pointing_vectors * focus_range[np.newaxis, :]
 
-    
-        # Compute the true array response vectors to the source
-        # (azimuth,elevation,focus range)
-    
-        for ifrq in range(numFreqs):
-            freq = params.freqs[ifrq]
-            v[:,:,ielev,ifrq] = np.exp(1.0j*2*pi*delta_range*freq/params.soundSpeed)
-            """
-            if DEBUG: 
-                print('ifrq = %d'%(ifrq))
-                print('1.0j*2*pi*delta_range*freq/params.soundSpeed')
-                print(1.0j*2*pi*delta_range*freq/params.soundSpeed)
-            """
-    
-    if DEBUG:
-        print('<-- Exiting beamformer_vectors')
+        # Replicate focus points for each sensor: shape (Nelements, 3, Naz)
+        focus_points_matrix = np.repeat(focus_points[np.newaxis, :, :], numEls, axis=0)
+
+        # Range difference to each element relative to phase center
+        diff = P_array_matrix - focus_points_matrix  # (Nelements, 3, Naz)
+        element_ranges = np.sqrt(np.sum(diff**2, axis=1))  # (Nelements, Naz)
+
+        # Subtract focus_range replicated for each element: (Nelements, Naz)
+        delta_range = element_ranges - (np.ones((numEls, 1)) * focus_range[np.newaxis, :])
+
+        # Vectorized over frequency:
+        # delta_range: (Nelements, Naz)
+        # freqs[:, None, None]: (Nfreqs, 1, 1)
+        phase = 2.0 * np.pi * freqs[:, None, None] * delta_range[None, :, :] / sound_speed
+        # phase: (Nfreqs, Nelements, Naz)
+
+        v[:, :, :, ielev] = np.exp(1j * phase)
 
     return v
-
 
